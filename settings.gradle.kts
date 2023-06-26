@@ -15,5 +15,10 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "ExpensesTracker"
+rootProject.name = "expensestracker"
 include(":app")
+include(":core:designsystem")
+
+include(":feature:accounts")
+include(":feature:categories")
+include(":feature:transactions")
