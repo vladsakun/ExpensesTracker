@@ -3,6 +3,12 @@ plugins {
   id("expensestracker.android.library.compose")
 }
 
+ksp {
+  arg("compose-destinations.mode", "navgraphs")
+  arg("compose-destinations.moduleName", "accounts")
+  arg("compose-destinations.useComposableVisibility", "true")
+}
+
 android {
   namespace = "com.emendo.expensestracker.feature.accounts"
 }

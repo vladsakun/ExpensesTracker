@@ -52,8 +52,8 @@ android {
 
 dependencies {
   implementation(project(":feature:accounts"))
-  implementation(project(":feature:categories"))
   implementation(project(":feature:transactions"))
+  implementation(project(":feature:categories"))
 
   implementation(project(":core:designsystem"))
 
@@ -67,9 +67,11 @@ dependencies {
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.compose.material3)
   implementation(libs.compose.destinations)
-  ksp(libs.compose.destinations.ksp)
   implementation(libs.androidx.hilt.navigation.compose)
   implementation(libs.androidx.window.manager)
+  implementation(libs.androidx.compose.material3.windowSizeClass)
+
+  ksp(libs.compose.destinations.ksp)
 
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")

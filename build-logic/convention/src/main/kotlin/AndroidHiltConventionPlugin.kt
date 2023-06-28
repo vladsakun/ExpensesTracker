@@ -2,6 +2,8 @@ import com.emendo.expensestracker.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.plugins
+import org.gradle.kotlin.dsl.version
 
 class AndroidHiltConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
