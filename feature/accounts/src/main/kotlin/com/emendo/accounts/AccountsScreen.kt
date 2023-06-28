@@ -12,9 +12,7 @@ import com.ramcosta.composedestinations.annotation.NavGraph
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 
 @RootNavGraph(start = true)
-@Destination(
-  start = true,
-)
+@Destination(start = true)
 @Composable
 fun AccountsScreen() {
   Column(

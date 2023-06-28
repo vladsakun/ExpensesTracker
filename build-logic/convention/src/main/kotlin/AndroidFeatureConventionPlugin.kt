@@ -16,16 +16,18 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         apply("expensestracker.android.hilt")
         apply("com.google.devtools.ksp")
       }
-
-      println("Path" + projectDir.canonicalPath)
+      val moduleName = path.split(":").last()
 
       extensions.configure<LibraryExtension> {
-//        val configure: Action<KspExtension> = Action {
-//          arg("compose-destinations.mode", "destinations")
-//          arg("compose-destinations.moduleName", "accounts")
-//        }
+        namespace = NAMESPACE_PREFIX + moduleName
 
-//        extensions.configure("ksp", configure)
+        val configure: Action<KspExtension> = Action {
+          arg("compose-destinations.mode", "navgraphs")
+          arg("compose-destinations.moduleName", moduleName)
+          arg("compose-destinations.useComposableVisibility", "true")
+        }
+
+        extensions.configure("ksp", configure)
       }
 
       dependencies {

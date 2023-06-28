@@ -12,9 +12,7 @@ import com.emendo.categories.destinations.CategoriesScreenSuperDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination(
-  start = true,
-)
+@Destination(start = true)
 @Composable
 fun CategoriesScreen(
   navigator: DestinationsNavigator
