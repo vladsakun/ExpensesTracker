@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="account">Account</string>
+  <string name="accounts">Accounts</string>
+  <string name="accounts_loading">Loading accounts</string>
+  <string name="account_name">Account name</string>
 </resources>

@@ -17,7 +17,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "expensestracker"
 include(":app")
+include(":core:app-resources")
+include(":core:data")
+include(":core:common")
 include(":core:designsystem")
+include(":core:database")
+include(":core:model")
 
 include(":feature:accounts")
 include(":feature:categories")

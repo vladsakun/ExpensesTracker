@@ -7,7 +7,7 @@ import com.emendo.categories.destinations.CategoriesScreenDestination
 import com.emendo.expensestracker.R
 import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
-import icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.feature.accounts.R as AR
 import com.emendo.expensestracker.feature.categories.R as CR
 import com.emendo.expensestracker.feature.transactions.R as TR
@@ -28,8 +28,8 @@ enum class TopLevelDestination(
     direction = AccountsScreenDestination,
     selectedIcon = ExpIcons.Accounts,
     unselectedIcon = ExpIcons.AccountsBorder,
-    iconTextId = AR.string.account,
-    titleTextId = R.string.app_name,
+    iconTextId = AR.string.accounts,
+    titleTextId = AR.string.accounts,
   ),
   CATEGORIES(
     direction = CategoriesScreenDestination,

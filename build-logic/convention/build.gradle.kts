@@ -25,6 +25,14 @@ dependencies {
 
 gradlePlugin {
   plugins {
+    register("androidApplicationCompose"){
+      id = "expensestracker.android.application.compose"
+      implementationClass = "AndroidApplicationComposeConventionPlugin"
+    }
+    register("androidApplication"){
+      id = "expensestracker.android.application"
+      implementationClass = "AndroidApplicationConventionPlugin"
+    }
     register("androidLibraryCompose"){
       id = "expensestracker.android.library.compose"
       implementationClass = "AndroidLibraryComposeConventionPlugin"
@@ -40,6 +48,14 @@ gradlePlugin {
     register("androidHilt") {
       id = "expensestracker.android.hilt"
       implementationClass = "AndroidHiltConventionPlugin"
+    }
+    register("androidRoom") {
+      id = "expensestracker.android.room"
+      implementationClass = "AndroidRoomConventionPlugin"
+    }
+    register("jvmLibrary"){
+      id = "expensestracker.jvm.library"
+      implementationClass = "JvmLibraryConventionPlugin"
     }
   }
 }

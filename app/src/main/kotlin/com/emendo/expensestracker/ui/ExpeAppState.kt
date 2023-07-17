@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.ui
 
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -11,11 +12,17 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.emendo.accounts.destinations.AccountsScreenDestination
+import com.emendo.accounts.destinations.AddAccountScreenDestination
+import com.emendo.categories.destinations.CategoriesScreenDestination
 import com.emendo.expensestracker.navigation.RootNavGraph
 import com.emendo.expensestracker.navigation.TopLevelDestination
+import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
+import com.ramcosta.composedestinations.spec.DestinationSpec
+import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import kotlinx.coroutines.CoroutineScope
 
@@ -48,6 +55,18 @@ class ExpeAppState(
   val currentDestination: NavDestination?
     @Composable get() = navController
       .currentBackStackEntryAsState().value?.destination
+
+  val currentComposableDestination: DestinationSpec<*>?
+    @Composable get() = navController.currentDestinationAsState().value
+
+  val currentTopLevelDestination: TopLevelDestination?
+    @Composable get() = when (navController.currentDestinationAsState().value) {
+      is AccountsScreenDestination -> TopLevelDestination.ACCOUNTS
+      is AddAccountScreenDestination -> TopLevelDestination.ACCOUNTS
+      is CategoriesScreenDestination -> TopLevelDestination.CATEGORIES
+      is TransactionsScreenDestination -> TopLevelDestination.TRANSACTIONS
+      else -> null
+    }
 
   val shouldShowBottomBar: Boolean
     get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact

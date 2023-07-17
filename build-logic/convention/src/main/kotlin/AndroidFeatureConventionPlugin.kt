@@ -20,18 +20,19 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
       extensions.configure<LibraryExtension> {
         namespace = NAMESPACE_PREFIX + moduleName
+      }
 
-        val configure: Action<KspExtension> = Action {
-          arg("compose-destinations.mode", "navgraphs")
-          arg("compose-destinations.moduleName", moduleName)
-          arg("compose-destinations.useComposableVisibility", "true")
-        }
-
-        extensions.configure("ksp", configure)
+      extensions.configure<KspExtension> {
+        arg("compose-destinations.mode", "navgraphs")
+        arg("compose-destinations.moduleName", moduleName)
+        arg("compose-destinations.useComposableVisibility", "true")
       }
 
       dependencies {
         add("implementation", project(":core:designsystem"))
+        add("implementation", project(":core:model"))
+        add("implementation", project(":core:data"))
+        add("implementation", project(":core:common"))
 
         add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
         add("implementation", libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
