@@ -36,3 +36,4 @@ Features:
 26) Wearable support
 27) Sign in with google, apple, facebook
 28) Transactions map
+29) Export data to excel or other formats
