@@ -35,3 +35,4 @@ Features:
 25) Subcategories (extract to a separate category)
 26) Wearable support
 27) Sign in with google, apple, facebook
+28) Transactions map
