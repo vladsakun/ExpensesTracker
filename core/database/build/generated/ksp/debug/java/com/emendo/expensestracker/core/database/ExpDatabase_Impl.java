@@ -19,6 +19,8 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper.Callback;
 import androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration;
 import com.emendo.expensestracker.core.database.dao.AccountDao;
 import com.emendo.expensestracker.core.database.dao.AccountDao_Impl;
+import com.emendo.expensestracker.core.database.dao.CategoryDao;
+import com.emendo.expensestracker.core.database.dao.CategoryDao_Impl;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
@@ -34,19 +36,23 @@ import java.util.Set;
 public final class ExpDatabase_Impl extends ExpDatabase {
   private volatile AccountDao _accountDao;
 
+  private volatile CategoryDao _categoryDao;
+
   @Override
   protected SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration configuration) {
     final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(configuration, new RoomOpenHelper.Delegate(1) {
       @Override
       public void createAllTables(SupportSQLiteDatabase _db) {
         _db.execSQL("CREATE TABLE IF NOT EXISTS `account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` REAL NOT NULL, `currencyId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)");
+        _db.execSQL("CREATE TABLE IF NOT EXISTS `categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)");
         _db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        _db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5d83ea8e7e4dc1cacdc8281ea7ac581f')");
+        _db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '317c9dcf57197c849f059024cb7cfae6')");
       }
 
       @Override
       public void dropAllTables(SupportSQLiteDatabase _db) {
         _db.execSQL("DROP TABLE IF EXISTS `account`");
+        _db.execSQL("DROP TABLE IF EXISTS `categories`");
         if (mCallbacks != null) {
           for (int _i = 0, _size = mCallbacks.size(); _i < _size; _i++) {
             mCallbacks.get(_i).onDestructiveMigration(_db);
@@ -101,9 +107,23 @@ public final class ExpDatabase_Impl extends ExpDatabase {
                   + " Expected:\n" + _infoAccount + "\n"
                   + " Found:\n" + _existingAccount);
         }
+        final HashMap<String, TableInfo.Column> _columnsCategories = new HashMap<String, TableInfo.Column>(4);
+        _columnsCategories.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategories.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategories.put("iconId", new TableInfo.Column("iconId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategories.put("colorId", new TableInfo.Column("colorId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysCategories = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesCategories = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoCategories = new TableInfo("categories", _columnsCategories, _foreignKeysCategories, _indicesCategories);
+        final TableInfo _existingCategories = TableInfo.read(_db, "categories");
+        if (! _infoCategories.equals(_existingCategories)) {
+          return new RoomOpenHelper.ValidationResult(false, "categories(com.emendo.expensestracker.core.database.model.CategoryEntity).\n"
+                  + " Expected:\n" + _infoCategories + "\n"
+                  + " Found:\n" + _existingCategories);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "5d83ea8e7e4dc1cacdc8281ea7ac581f", "514232ce8975e0d9b2037154e0266ca9");
+    }, "317c9dcf57197c849f059024cb7cfae6", "b4829d75e9c8dfbf9a93f9121a0e599a");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(configuration.context)
         .name(configuration.name)
         .callback(_openCallback)
@@ -116,7 +136,7 @@ public final class ExpDatabase_Impl extends ExpDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "account");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "account","categories");
   }
 
   @Override
@@ -126,6 +146,7 @@ public final class ExpDatabase_Impl extends ExpDatabase {
     try {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `account`");
+      _db.execSQL("DELETE FROM `categories`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -140,6 +161,7 @@ public final class ExpDatabase_Impl extends ExpDatabase {
   protected Map<Class<?>, List<Class<?>>> getRequiredTypeConverters() {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(AccountDao.class, AccountDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(CategoryDao.class, CategoryDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -165,6 +187,20 @@ public final class ExpDatabase_Impl extends ExpDatabase {
           _accountDao = new AccountDao_Impl(this);
         }
         return _accountDao;
+      }
+    }
+  }
+
+  @Override
+  public CategoryDao categoryDao() {
+    if (_categoryDao != null) {
+      return _categoryDao;
+    } else {
+      synchronized(this) {
+        if(_categoryDao == null) {
+          _categoryDao = new CategoryDao_Impl(this);
+        }
+        return _categoryDao;
       }
     }
   }

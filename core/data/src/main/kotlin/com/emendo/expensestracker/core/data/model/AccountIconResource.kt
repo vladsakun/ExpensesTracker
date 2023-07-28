@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 
 enum class AccountIconResource constructor(
-  val id: Long,
+  val id: Int,
   val imageVector: ImageVector,
 ) {
   GOVERNMENT(1, ExpIcons.Accounts),
@@ -19,7 +19,7 @@ enum class AccountIconResource constructor(
   companion object {
     private val values = values().associateBy { it.id }
 
-    fun getById(id: Long): AccountIconResource {
+    fun getById(id: Int): AccountIconResource {
       return values[id] ?: throw IllegalArgumentException("No AccountIconResource with id $id")
     }
   }

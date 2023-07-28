@@ -9,7 +9,7 @@ data class AccountEntity(
   val id: Long = 0,
   val name: String,
   val balance: Double,
-  val currencyId: Long,
-  val iconId: Long,
-  val colorId: Long,
+  val currencyId: Int,
+  val iconId: Int,
+  val colorId: Int,
 )

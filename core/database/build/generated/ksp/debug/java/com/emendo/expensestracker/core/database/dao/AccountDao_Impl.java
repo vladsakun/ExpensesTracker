@@ -197,12 +197,12 @@ public final class AccountDao_Impl extends AccountDao {
             }
             final double _tmpBalance;
             _tmpBalance = _cursor.getDouble(_cursorIndexOfBalance);
-            final long _tmpCurrencyId;
-            _tmpCurrencyId = _cursor.getLong(_cursorIndexOfCurrencyId);
-            final long _tmpIconId;
-            _tmpIconId = _cursor.getLong(_cursorIndexOfIconId);
-            final long _tmpColorId;
-            _tmpColorId = _cursor.getLong(_cursorIndexOfColorId);
+            final int _tmpCurrencyId;
+            _tmpCurrencyId = _cursor.getInt(_cursorIndexOfCurrencyId);
+            final int _tmpIconId;
+            _tmpIconId = _cursor.getInt(_cursorIndexOfIconId);
+            final int _tmpColorId;
+            _tmpColorId = _cursor.getInt(_cursorIndexOfColorId);
             _item = new AccountEntity(_tmpId,_tmpName,_tmpBalance,_tmpCurrencyId,_tmpIconId,_tmpColorId);
             _result.add(_item);
           }
@@ -252,12 +252,12 @@ public final class AccountDao_Impl extends AccountDao {
             }
             final double _tmpBalance;
             _tmpBalance = _cursor.getDouble(_cursorIndexOfBalance);
-            final long _tmpCurrencyId;
-            _tmpCurrencyId = _cursor.getLong(_cursorIndexOfCurrencyId);
-            final long _tmpIconId;
-            _tmpIconId = _cursor.getLong(_cursorIndexOfIconId);
-            final long _tmpColorId;
-            _tmpColorId = _cursor.getLong(_cursorIndexOfColorId);
+            final int _tmpCurrencyId;
+            _tmpCurrencyId = _cursor.getInt(_cursorIndexOfCurrencyId);
+            final int _tmpIconId;
+            _tmpIconId = _cursor.getInt(_cursorIndexOfIconId);
+            final int _tmpColorId;
+            _tmpColorId = _cursor.getInt(_cursorIndexOfColorId);
             _result = new AccountEntity(_tmpId,_tmpName,_tmpBalance,_tmpCurrencyId,_tmpIconId,_tmpColorId);
           } else {
             _result = null;

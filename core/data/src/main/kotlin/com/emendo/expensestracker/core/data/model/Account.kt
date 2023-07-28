@@ -8,7 +8,7 @@ data class Account constructor(
   val balance: Double,
   val currency: Currency,
   val icon: AccountIconResource,
-  val color: AccountColor,
+  val color: EntityColor,
 )
 
 fun AccountEntity.toExternalModel(): Account = with(this) {
@@ -18,7 +18,7 @@ fun AccountEntity.toExternalModel(): Account = with(this) {
     balance = balance,
     currency = Currency.getById(currencyId),
     icon = AccountIconResource.getById(iconId),
-    color = AccountColor.getById(colorId),
+    color = EntityColor.getById(colorId),
   )
 }
 

@@ -6,7 +6,7 @@ import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.TopAppBarActionClickEventBus
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.model.Account
-import com.emendo.expensestracker.core.data.model.AccountColor
+import com.emendo.expensestracker.core.data.model.EntityColor
 import com.emendo.expensestracker.core.data.model.AccountIconResource
 import com.emendo.expensestracker.core.data.model.Currency
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
@@ -51,7 +51,7 @@ fun generateAccounts(): List<Account> {
       balance = 100.0,
       currency = Currency.USD,
       icon = AccountIconResource.EDUCATION,
-      color = AccountColor.CYAN
+      color = EntityColor.CYAN
     )
   }
 }
@@ -59,12 +59,6 @@ fun generateAccounts(): List<Account> {
 fun getMockState(): AccountsListUiState = AccountsListUiState.DisplayAccountsList(generateAccounts())
 
 private fun accountsUiState(accountsRepository: AccountsRepository): Flow<AccountsListUiState> {
-  //  return flowOf(
-  //    AccountsListUiState.DisplayAccountsList(
-  //      accounts = generateAccounts()
-  //    )
-  //  )
-
   return accountsRepository.getAccounts().asResult().map { accountsResult ->
     when (accountsResult) {
       is Result.Success -> {

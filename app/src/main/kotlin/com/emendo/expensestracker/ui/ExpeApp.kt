@@ -11,12 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.emendo.accounts.destinations.AccountsScreenDestination
-import com.emendo.accounts.destinations.AddAccountScreenDestination
+import com.emendo.accounts.destinations.CreateAccountScreenDestination
+import com.emendo.categories.destinations.CreateCategoryScreenDestination
 import com.emendo.expensestracker.core.app.common.result.TopAppBarActionClickEventBus
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
@@ -26,7 +25,6 @@ import com.emendo.expensestracker.feature.transactions.R
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.spec.DestinationSpec
-import kotlinx.coroutines.launch
 import com.emendo.expensestracker.R as AppR
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -73,26 +71,6 @@ fun ExpeApp(
           )
         }
       },
-      topBar = {
-        ExpeTopAppBar(
-          titleRes = appState.currentTopLevelDestination?.titleTextId ?: AppR.string.app_name,
-          navigationIcon = null,
-          navigationIconContentDescription = stringResource(
-            id = R.string.transactions,
-          ),
-          actionIcon = getTopAppBarActionIcon(appState.currentComposableDestination),
-          actionIconContentDescription = stringResource(
-            id = R.string.transactions,
-          ),
-          onActionClick = {
-            topAppBarActionClickEventBus.actionClicked()
-          },
-          onNavigationClick = { },
-          colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.Transparent,
-          ),
-        )
-      }
     ) { padding ->
       Row(
         modifier = Modifier
@@ -105,7 +83,30 @@ fun ExpeApp(
             ),
           ),
       ) {
+        if (appState.shouldShowNavRail) {
+          // Todo
+        }
+
         Column(modifier = Modifier.fillMaxSize()) {
+
+          val destination = appState.currentTopLevelDestination
+          if (destination != null) {
+            ExpeTopAppBar(
+              titleRes = appState.currentTopLevelDestination?.titleTextId ?: AppR.string.app_name,
+              navigationIcon = null,
+              navigationIconContentDescription = stringResource(
+                id = R.string.transactions,
+              ),
+              actionIcon = getTopAppBarActionIcon(appState.currentComposableDestination),
+              actionIconContentDescription = stringResource(
+                id = R.string.transactions,
+              ),
+              onActionClick = {
+                topAppBarActionClickEventBus.actionClicked()
+              },
+              onNavigationClick = { },
+            )
+          }
           ExpeNavHost(
             appState = appState,
             onShowSnackbar = { message, action ->
@@ -120,11 +121,7 @@ fun ExpeApp(
 
 @Composable
 private fun getTopAppBarActionIcon(destinationSpec: DestinationSpec<*>?): ImageVector? {
-  return when (destinationSpec) {
-    is AccountsScreenDestination -> ExpIcons.Add
-    is AddAccountScreenDestination -> ExpIcons.Check
-    else -> null
-  }
+  return null
 }
 
 @Composable

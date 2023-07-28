@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.data.model
 
 enum class Currency constructor(
-  val id: Long,
+  val id: Int,
   val currencySymbol: String,
 ) {
   USD(1, "$"),
@@ -18,7 +18,7 @@ enum class Currency constructor(
   companion object {
     private val values = Currency.values().associateBy { it.id }
 
-    fun getById(id: Long): Currency {
+    fun getById(id: Int): Currency {
       return values[id] ?: throw IllegalArgumentException("No Currency with id $id")
     }
   }

@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.core.database
 
 import com.emendo.expensestracker.core.database.dao.AccountDao
+import com.emendo.expensestracker.core.database.dao.CategoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,4 +12,7 @@ import dagger.hilt.components.SingletonComponent
 object DaosModule {
   @Provides
   fun providesAccountDao(database: ExpDatabase): AccountDao = database.accountDao()
+
+  @Provides
+  fun providesCategoryDao(database: ExpDatabase): CategoryDao = database.categoryDao()
 }

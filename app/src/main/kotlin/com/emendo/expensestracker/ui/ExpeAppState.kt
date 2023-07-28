@@ -9,18 +9,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavDestination
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.emendo.accounts.destinations.AccountsScreenDestination
-import com.emendo.accounts.destinations.AddAccountScreenDestination
-import com.emendo.categories.destinations.CategoriesScreenDestination
-import com.emendo.expensestracker.navigation.RootNavGraph
+import com.emendo.categories.destinations.CategoriesListScreenDestination
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
-import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
@@ -62,8 +60,7 @@ class ExpeAppState(
   val currentTopLevelDestination: TopLevelDestination?
     @Composable get() = when (navController.currentDestinationAsState().value) {
       is AccountsScreenDestination -> TopLevelDestination.ACCOUNTS
-      is AddAccountScreenDestination -> TopLevelDestination.ACCOUNTS
-      is CategoriesScreenDestination -> TopLevelDestination.CATEGORIES
+      is CategoriesListScreenDestination -> TopLevelDestination.CATEGORIES
       is TransactionsScreenDestination -> TopLevelDestination.TRANSACTIONS
       else -> null
     }
@@ -102,7 +99,7 @@ class ExpeAppState(
       // Pop up to the start destination of the graph to
       // avoid building up a large stack of destinations
       // on the back stack as users select items
-      popUpTo(RootNavGraph) {
+      popUpTo(navController.graph.findStartDestination().id) {
         saveState = true
       }
 

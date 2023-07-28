@@ -13,5 +13,7 @@ object ExpIcons {
   val ReceiptLong = Icons.Rounded.ReceiptLong
   val ReceiptLongBorder = Icons.Outlined.ReceiptLong
   val Add = Icons.Outlined.Add
+  val Remove = Icons.Outlined.Remove
   val Check = Icons.Outlined.Check
+  val Close = Icons.Outlined.Close
 }

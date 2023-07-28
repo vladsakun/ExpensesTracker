@@ -3,11 +3,10 @@ package com.emendo.expensestracker.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.accounts.destinations.AccountsScreenDestination
-import com.emendo.categories.destinations.CategoriesScreenDestination
-import com.emendo.expensestracker.R
+import com.emendo.categories.destinations.CategoriesListScreenDestination
+import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.feature.accounts.R as AR
 import com.emendo.expensestracker.feature.categories.R as CR
 import com.emendo.expensestracker.feature.transactions.R as TR
@@ -32,7 +31,7 @@ enum class TopLevelDestination(
     titleTextId = AR.string.accounts,
   ),
   CATEGORIES(
-    direction = CategoriesScreenDestination,
+    direction = CategoriesListScreenDestination,
     selectedIcon = ExpIcons.DonutLarge,
     unselectedIcon = ExpIcons.DonutLargeBorder,
     iconTextId = CR.string.categories,

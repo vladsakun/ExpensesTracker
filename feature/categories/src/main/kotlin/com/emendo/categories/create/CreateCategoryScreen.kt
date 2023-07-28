@@ -1,4 +1,4 @@
-package com.emendo.accounts.add
+package com.emendo.categories.create
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -10,40 +10,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.emendo.expensestracker.core.designsystem.utils.AccountState
-import com.emendo.expensestracker.core.designsystem.utils.AccountStateSaver
-import com.emendo.expensestracker.feature.accounts.R
+import com.emendo.expensestracker.core.designsystem.utils.AccountNameStateSaver
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Composable
 @Destination
-fun AddAccountScreen(
-  viewModel: AddAccountViewModel = hiltViewModel()
+@Composable
+fun CreateCategoryScreen(
+  navigator: DestinationsNavigator,
+  viewModel: CreateCategoryViewModel = hiltViewModel()
 ) {
-  val accountNameState by rememberSaveable(stateSaver = AccountStateSaver) {
+  viewModel.registerListener()
+
+  val categoryNameState by rememberSaveable(stateSaver = AccountNameStateSaver) {
     mutableStateOf(AccountState())
   }
 
-  viewModel.registerListener()
-
-  Column(modifier = Modifier.padding(16.dp)) {
+  Column(
+    modifier = Modifier.padding(16.dp),
+  ) {
     OutlinedTextField(
-      value = accountNameState.text,
+      value = categoryNameState.text,
       onValueChange = {
-        viewModel.accountName = it
-        accountNameState.text = it
+        viewModel.categoryName = it
+        categoryNameState.text = it
       },
-      label = {
+      placeholder = {
         Text(
-          text = stringResource(id = R.string.account_name),
-          style = MaterialTheme.typography.bodyMedium
+          text = "Category name",
+          style = MaterialTheme.typography.labelSmall
         )
       },
       textStyle = MaterialTheme.typography.bodyMedium,
-      isError = accountNameState.showErrors(),
+      isError = categoryNameState.showErrors(),
     )
   }
 }

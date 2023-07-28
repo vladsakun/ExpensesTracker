@@ -1,7 +1,9 @@
 package com.emendo.expensestracker.core.data.di
 
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
+import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import com.emendo.expensestracker.core.data.repository.OfflineFirstAccountsRepository
+import com.emendo.expensestracker.core.data.repository.OfflineFirstCategoryRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,4 +17,9 @@ interface DataModule {
   fun bindsAccountsRepository(
     accountsRepository: OfflineFirstAccountsRepository,
   ): AccountsRepository
+
+  @Binds
+  fun bindsCategoriesRepository(
+    categoriesRepository: OfflineFirstCategoryRepository,
+  ): CategoryRepository
 }

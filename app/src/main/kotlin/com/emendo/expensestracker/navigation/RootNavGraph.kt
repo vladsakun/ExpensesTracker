@@ -4,7 +4,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import com.emendo.accounts.AccountsNavGraph
 import com.emendo.accounts.destinations.AccountsScreenDestination
 import com.emendo.categories.CategoriesNavGraph
-import com.emendo.categories.destinations.CategoriesScreenDestination
+import com.emendo.categories.destinations.CategoriesListScreenDestination
 import com.emendo.transactions.TransactionsNavGraph
 import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.spec.DestinationSpec
@@ -17,11 +17,11 @@ object RootNavGraph : NavGraphSpec {
 
   override val destinationsByRoute: Map<String, DestinationSpec<*>> = listOf(
     AccountsScreenDestination,
-    CategoriesScreenDestination,
+    CategoriesListScreenDestination,
     TransactionsScreenDestination,
   ).associateBy { it.route }
 
-  override val startRoute = AccountsNavGraph
+  override val startRoute = CategoriesNavGraph
 
   override val nestedNavGraphs = listOf(
     AccountsNavGraph,
