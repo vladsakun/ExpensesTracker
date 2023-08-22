@@ -18,7 +18,9 @@ import javax.inject.Provider;
 )
 @SuppressWarnings({
     "unchecked",
-    "rawtypes"
+    "rawtypes",
+    "KotlinInternal",
+    "KotlinInternalInJava"
 })
 public final class DaosModule_ProvidesCategoryDaoFactory implements Factory<CategoryDao> {
   private final Provider<ExpDatabase> databaseProvider;

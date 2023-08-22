@@ -19,5 +19,6 @@ fun ExpeNavHost(
     navGraph = RootNavGraph,
     navController = navController,
     startRoute = RootNavGraph.startRoute,
+    modifier = modifier,
   )
 }

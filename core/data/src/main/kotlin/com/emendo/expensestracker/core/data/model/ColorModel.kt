@@ -2,7 +2,7 @@ package com.emendo.expensestracker.core.data.model
 
 import androidx.compose.ui.graphics.Color
 
-enum class EntityColor constructor(
+enum class ColorModel constructor(
   val id: Int,
   val color: Color
 ) {
@@ -22,7 +22,7 @@ enum class EntityColor constructor(
   companion object {
     private val values = values().associateBy { it.id }
 
-    fun getById(id: Int): EntityColor {
+    fun getById(id: Int): ColorModel {
       return values[id] ?: throw IllegalArgumentException("No EntityColor with id $id")
     }
   }

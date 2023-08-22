@@ -17,7 +17,7 @@ fun ExpeNavigationBar(
   NavigationBar(
     modifier = modifier,
     contentColor = ExpeNavigationDefaults.navigationContentColor(),
-    tonalElevation = 0.dp,
+//    tonalElevation = 0.dp,
     content = content,
   )
 }

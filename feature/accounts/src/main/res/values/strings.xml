@@ -2,5 +2,10 @@
 <resources>
   <string name="accounts">Accounts</string>
   <string name="accounts_loading">Loading accounts</string>
-  <string name="account_name">Title</string>
+  <string name="account_name">Account name</string>
+  <string name="currency">Currency</string>
+  <string name="icon">Icon</string>
+  <string name="color">Color</string>
+  <string name="create_account">Create account</string>
+  <string name="initial_balance">Initial balance</string>
 </resources>

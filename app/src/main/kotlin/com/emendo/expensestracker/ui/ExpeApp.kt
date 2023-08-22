@@ -1,66 +1,40 @@
 package com.emendo.expensestracker.ui
 
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.emendo.accounts.destinations.CreateAccountScreenDestination
-import com.emendo.categories.destinations.CreateCategoryScreenDestination
-import com.emendo.expensestracker.core.app.common.result.TopAppBarActionClickEventBus
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.accounts.destinations.AccountsScreenDestination
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
-import com.emendo.expensestracker.core.designsystem.component.ExpeTopAppBar
-import com.emendo.expensestracker.feature.transactions.R
+import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
-import com.ramcosta.composedestinations.spec.DestinationSpec
-import com.emendo.expensestracker.R as AppR
+import com.ramcosta.composedestinations.navigation.navigate
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+private const val TAG = "ExpeApp"
+
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExpeApp(
   windowSizeClass: WindowSizeClass,
-  appState: ExpeAppState = rememberExpeAppState(
-    windowSizeClass = windowSizeClass
-  ),
-  topAppBarActionClickEventBus: TopAppBarActionClickEventBus
+  appState: ExpeAppState = rememberExpeAppState(windowSizeClass = windowSizeClass),
 ) {
+  val scaffoldState = rememberBottomSheetScaffoldState(SheetState(skipPartiallyExpanded = true))
 
-  var showBottomSheet by remember { mutableStateOf(false) }
-  val sheetState = androidx.compose.material.rememberModalBottomSheetState(
-    initialValue = ModalBottomSheetValue.Hidden,
-    skipHalfExpanded = true,
-  )
-
-  ModalBottomSheetLayout(
-    modifier = Modifier
-      .fillMaxSize()
-      .windowInsetsPadding(
-        WindowInsets.safeDrawing.only(
-          WindowInsetsSides.Horizontal,
-        ),
-      ),
-    sheetState = sheetState,
-    sheetContent = {
-      AddAccountSheet(
-        onHideBottomSheet = { showBottomSheet = false }
-      )
-    },
-  ) {
+  BottomSheetScaffold(
+    modifier = Modifier.fillMaxSize(),
+    scaffoldState = scaffoldState,
+    sheetContent = {},
+    sheetShape = ExpeBottomSheetShape,
+  ) { paddingBottomSheetScaffold ->
     Scaffold(
-      containerColor = Color.Transparent,
-      contentColor = MaterialTheme.colorScheme.onBackground,
       contentWindowInsets = WindowInsets(0, 0, 0, 0),
       bottomBar = {
         if (appState.shouldShowBottomBar) {
@@ -83,65 +57,12 @@ fun ExpeApp(
             ),
           ),
       ) {
-        if (appState.shouldShowNavRail) {
-          // Todo
-        }
-
-        Column(modifier = Modifier.fillMaxSize()) {
-
-          val destination = appState.currentTopLevelDestination
-          if (destination != null) {
-            ExpeTopAppBar(
-              titleRes = appState.currentTopLevelDestination?.titleTextId ?: AppR.string.app_name,
-              navigationIcon = null,
-              navigationIconContentDescription = stringResource(
-                id = R.string.transactions,
-              ),
-              actionIcon = getTopAppBarActionIcon(appState.currentComposableDestination),
-              actionIconContentDescription = stringResource(
-                id = R.string.transactions,
-              ),
-              onActionClick = {
-                topAppBarActionClickEventBus.actionClicked()
-              },
-              onNavigationClick = { },
-            )
+        ExpeNavHost(
+          appState = appState,
+          onShowSnackbar = { message, action ->
+            return@ExpeNavHost true
           }
-          ExpeNavHost(
-            appState = appState,
-            onShowSnackbar = { message, action ->
-              return@ExpeNavHost true
-            }
-          )
-        }
-      }
-    }
-  }
-}
-
-@Composable
-private fun getTopAppBarActionIcon(destinationSpec: DestinationSpec<*>?): ImageVector? {
-  return null
-}
-
-@Composable
-private fun AddAccountSheet(
-  onHideBottomSheet: () -> Unit,
-) {
-  Box(
-    modifier = Modifier
-      .fillMaxSize()
-      .background(Color.Red)
-  ) {
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .safeDrawingPadding(),
-      verticalArrangement = Arrangement.Top
-    ) {
-      // Sheet content
-      Button(onClick = onHideBottomSheet) {
-        Text("Hide bottom sheet")
+        )
       }
     }
   }
@@ -154,9 +75,7 @@ private fun ExpeBottomBar(
   currentDestination: NavDestination?,
   modifier: Modifier = Modifier
 ) {
-  ExpeNavigationBar(
-    modifier = modifier,
-  ) {
+  ExpeNavigationBar(modifier = modifier) {
     destinations.forEach { destination ->
       val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
       ExpeNavigationBarItem(

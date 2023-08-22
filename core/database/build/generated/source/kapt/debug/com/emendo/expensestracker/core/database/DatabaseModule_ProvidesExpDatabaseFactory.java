@@ -18,7 +18,9 @@ import javax.inject.Provider;
 )
 @SuppressWarnings({
     "unchecked",
-    "rawtypes"
+    "rawtypes",
+    "KotlinInternal",
+    "KotlinInternalInJava"
 })
 public final class DatabaseModule_ProvidesExpDatabaseFactory implements Factory<ExpDatabase> {
   private final Provider<Context> contextProvider;

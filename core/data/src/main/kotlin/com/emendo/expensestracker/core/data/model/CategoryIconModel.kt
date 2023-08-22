@@ -3,23 +3,23 @@ package com.emendo.expensestracker.core.data.model
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 
-enum class AccountIconResource constructor(
+enum class CategoryIconModel constructor(
   val id: Int,
   val imageVector: ImageVector,
 ) {
-  GOVERNMENT(1, ExpIcons.Accounts),
-  GROCERIES(2, ExpIcons.Accounts),
-  TRANSPORT(3, ExpIcons.Accounts),
-  HEALTHCARE(4, ExpIcons.Accounts),
-  HOUSEHOLDS(5, ExpIcons.Accounts),
-  EDUCATION(6, ExpIcons.Accounts),
-  ENTERTAINMENT(7, ExpIcons.Accounts),
-  OTHERS(8, ExpIcons.Accounts);
+  GOVERNMENT(1, ExpIcons.CreditCard),
+  GROCERIES(2, ExpIcons.CreditCard),
+  TRANSPORT(3, ExpIcons.CreditCard),
+  HEALTHCARE(4, ExpIcons.CreditCard),
+  HOUSEHOLDS(5, ExpIcons.CreditCard),
+  EDUCATION(6, ExpIcons.CreditCard),
+  ENTERTAINMENT(7, ExpIcons.CreditCard),
+  OTHERS(8, ExpIcons.CreditCard);
 
   companion object {
     private val values = values().associateBy { it.id }
 
-    fun getById(id: Int): AccountIconResource {
+    fun getById(id: Int): CategoryIconModel {
       return values[id] ?: throw IllegalArgumentException("No AccountIconResource with id $id")
     }
   }

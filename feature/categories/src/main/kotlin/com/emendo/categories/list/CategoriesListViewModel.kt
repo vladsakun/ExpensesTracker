@@ -3,22 +3,16 @@ package com.emendo.categories.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.common.result.Result
-import com.emendo.expensestracker.core.app.common.result.TopAppBarActionClickEventBus
 import com.emendo.expensestracker.core.app.common.result.asResult
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
-import com.emendo.expensestracker.core.data.model.Category
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoriesListViewModel @Inject constructor(
   categoryRepository: CategoryRepository,
-  private val topAppBarActionClickEventBus: TopAppBarActionClickEventBus,
 ) : ViewModel() {
 
   private val _navigationChannel = Channel<Unit?>(Channel.CONFLATED)
@@ -32,11 +26,6 @@ class CategoriesListViewModel @Inject constructor(
     )
 
   fun registerListener() {
-    topAppBarActionClickEventBus.registeredCallback = {
-      viewModelScope.launch(Dispatchers.IO) {
-        _navigationChannel.send(Unit)
-      }
-    }
   }
 }
 

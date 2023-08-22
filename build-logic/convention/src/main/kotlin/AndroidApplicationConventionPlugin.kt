@@ -5,10 +5,10 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
-class AndroidApplicationConventionPlugin: Plugin<Project> {
+class AndroidApplicationConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
-    with(target){
-      with(pluginManager){
+    with(target) {
+      with(pluginManager) {
         apply("com.android.application")
         apply("org.jetbrains.kotlin.android")
         apply("com.google.devtools.ksp")
@@ -16,11 +16,9 @@ class AndroidApplicationConventionPlugin: Plugin<Project> {
 
       extensions.configure<ApplicationExtension> {
         configureKotlinAndroid(this)
-        defaultConfig.targetSdk = 33
+        defaultConfig.targetSdk = 34
       }
-      extensions.configure<ApplicationAndroidComponentsExtension> {
-
-      }
+      extensions.configure<ApplicationAndroidComponentsExtension> {}
     }
   }
 }

@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-  compileSdk = 33
+  compileSdk = libs.versions.compileSdk.get().toInt()
 
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
-    minSdk = 26
-    targetSdk = 33
+    minSdk = libs.versions.minSdk.get().toInt()
+    targetSdk = libs.versions.targetSdk.get().toInt()
     versionCode = 1
     versionName = "1.0"
 
@@ -39,7 +39,7 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion = "1.4.7"
+    kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
   }
 
   packagingOptions {
@@ -66,15 +66,12 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.core.splashscreen)
   implementation(libs.androidx.lifecycle.runtimeCompose)
-  implementation(platform(libs.androidx.compose.bom))
-  implementation("androidx.compose.ui:ui")
-  implementation("androidx.compose.ui:ui-graphics")
-  implementation(libs.androidx.compose.ui.tooling.preview)
-  implementation(libs.androidx.compose.material)
-  implementation(libs.compose.destinations)
+  implementation(libs.androidx.compose.material3.windowSizeClass)
   implementation(libs.androidx.hilt.navigation.compose)
   implementation(libs.androidx.window.manager)
-  implementation(libs.androidx.compose.material3.windowSizeClass)
+  implementation(libs.compose.destinations)
+//  implementation("androidx.compose.ui:ui")
+//  implementation("androidx.compose.ui:ui-graphics")
 
   ksp(libs.compose.destinations.ksp)
 

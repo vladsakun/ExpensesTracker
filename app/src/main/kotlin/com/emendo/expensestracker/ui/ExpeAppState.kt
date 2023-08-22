@@ -7,13 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.emendo.accounts.destinations.AccountsScreenDestination
+import com.emendo.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.categories.destinations.CategoriesListScreenDestination
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.emendo.transactions.destinations.TransactionsScreenDestination
@@ -23,6 +23,7 @@ import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import kotlinx.coroutines.CoroutineScope
+import com.emendo.expensestracker.R as AppR
 
 @Composable
 fun rememberExpeAppState(
@@ -44,7 +45,7 @@ fun rememberExpeAppState(
 }
 
 @Stable
-class ExpeAppState(
+class ExpeAppState constructor(
   val navController: NavHostController,
   val coroutineScope: CoroutineScope,
   val windowSizeClass: WindowSizeClass,
@@ -84,7 +85,6 @@ class ExpeAppState(
    *
    * @param topLevelDestination: The destination the app needs to navigate to.
    */
-  @OptIn(ExperimentalComposeUiApi::class)
   fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
     val isCurrentDestOnBackStack = navController.isRouteOnBackStack(topLevelDestination.direction)
 

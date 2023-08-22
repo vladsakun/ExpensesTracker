@@ -82,13 +82,9 @@ private fun CategoriesListScreenContent(
   onClick: () -> Unit,
 ) {
   LazyColumn(
-    modifier = Modifier.fillMaxWidth(),
+    modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    item {
-      Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeDrawing))
-    }
-
     when (uiState) {
       is CategoriesListUiState.Loading -> item {
         ExpLoadingWheel(
@@ -176,10 +172,6 @@ private fun CategoriesListScreenContent(
         }
       }
     }
-
-    item {
-      Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
-    }
   }
 }
 
@@ -198,13 +190,11 @@ private fun CategoryScreenItem(
       )
 
     is CategoryItemType.CategoryItem -> {
-      DragTarget(modifier = Modifier, dataToDrop = categoryItemType.category) {
-        CategoryItem(
-          category = categoryItemType,
-          cellSizeDp = cellSizeDp,
-          isEditMode = isEditMode,
-        )
-      }
+      CategoryItem(
+        category = categoryItemType,
+        cellSizeDp = cellSizeDp,
+        isEditMode = isEditMode,
+      )
     }
   }
 }
@@ -311,12 +301,4 @@ fun RoundedRectangleItem(
       style = MaterialTheme.typography.labelSmall
     )
   }
-}
-
-internal class DragTargetInfo {
-  var isDragging: Boolean by mutableStateOf(false)
-  var dragPosition by mutableStateOf(Offset.Zero)
-  var dragOffset by mutableStateOf(Offset.Zero)
-  var draggableComposable by mutableStateOf<(@Composable () -> Unit)?>(null)
-  var dataToDrop by mutableStateOf<Any?>(null)
 }

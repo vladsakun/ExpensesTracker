@@ -25,8 +25,8 @@ enum class TopLevelDestination(
 ) {
   ACCOUNTS(
     direction = AccountsScreenDestination,
-    selectedIcon = ExpIcons.Accounts,
-    unselectedIcon = ExpIcons.AccountsBorder,
+    selectedIcon = ExpIcons.CreditCard,
+    unselectedIcon = ExpIcons.CreditCardBorder,
     iconTextId = AR.string.accounts,
     titleTextId = AR.string.accounts,
   ),

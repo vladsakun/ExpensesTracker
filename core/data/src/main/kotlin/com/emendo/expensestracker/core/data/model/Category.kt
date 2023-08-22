@@ -5,16 +5,16 @@ import com.emendo.expensestracker.core.database.model.CategoryEntity
 data class Category constructor(
   val id: Long = 0,
   val name: String,
-  val icon: CategoryIconResource,
-  val color: EntityColor,
+  val icon: CategoryIconModel,
+  val color: ColorModel,
 )
 
 fun CategoryEntity.toExternalModel(): Category = with(this) {
   Category(
     id = id,
     name = name,
-    icon = CategoryIconResource.getById(iconId),
-    color = EntityColor.getById(colorId),
+    icon = CategoryIconModel.getById(iconId),
+    color = ColorModel.getById(colorId),
   )
 }
 
