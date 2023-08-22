@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -265,7 +266,7 @@ fun RoundedRectangleItem(
   ) {
     Box {
       if (isEditMode) {
-        Image(
+        Icon(
           imageVector = ExpIcons.Remove,
           contentDescription = "remove",
           modifier = Modifier
@@ -284,7 +285,7 @@ fun RoundedRectangleItem(
           .background(backgroundColor, RectangleShape)
           .clickable(onClick = onClick)
       ) {
-        Image(
+        Icon(
           imageVector = icon,
           contentDescription = "category icon",
           modifier = Modifier

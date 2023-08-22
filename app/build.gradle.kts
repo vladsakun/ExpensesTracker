@@ -70,8 +70,6 @@ dependencies {
   implementation(libs.androidx.hilt.navigation.compose)
   implementation(libs.androidx.window.manager)
   implementation(libs.compose.destinations)
-//  implementation("androidx.compose.ui:ui")
-//  implementation("androidx.compose.ui:ui-graphics")
 
   ksp(libs.compose.destinations.ksp)
 

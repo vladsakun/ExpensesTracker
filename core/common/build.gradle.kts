@@ -8,5 +8,6 @@ android {
 }
 
 dependencies {
+  api(libs.timber)
   implementation(libs.kotlinx.coroutines.android)
 }

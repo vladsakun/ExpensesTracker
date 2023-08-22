@@ -46,7 +46,7 @@ fun AccountsScreen(
   AccountsListScreenContent(accountsListUiState) { navigator.navigate(CreateAccountRouteDestination) }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun AccountsListScreenContent(
   uiState: AccountsListUiState,
@@ -58,32 +58,31 @@ private fun AccountsListScreenContent(
     modifier = Modifier
       .fillMaxSize()
       .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+    contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    topBar = {
+      ExpeTopAppBar(
+        titleRes = R.string.accounts,
+        scrollBehavior = topAppBarScrollBehavior,
+      )
+    },
     floatingActionButtonPosition = FabPosition.End,
     floatingActionButton = {
       FloatingActionButton(
         onClick = onAddAccountClick,
         content = {
-          Image(
+          Icon(
             imageVector = ExpIcons.Add,
             contentDescription = "Add",
           )
         }
       )
     },
-    topBar = {
-      ExpeTopAppBar(
-        titleRes = R.string.accounts,
-        scrollBehavior = topAppBarScrollBehavior,
-      )
-    }
   ) { padding ->
-    Log.d(TAG, "AccountsListScreenContent: padding = $padding")
     LazyColumn(
       modifier = Modifier
         .fillMaxSize()
-        .padding(top = padding.calculateTopPadding())
-        .padding(start = padding.calculateStartPadding(LayoutDirection.Ltr))
-        .padding(end = padding.calculateEndPadding(LayoutDirection.Ltr)),
+        .padding(padding)
+        .consumeWindowInsets(padding),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       when (uiState) {

@@ -18,8 +18,6 @@ import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.navigation.navigate
 
-private const val TAG = "ExpeApp"
-
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExpeApp(
@@ -33,7 +31,7 @@ fun ExpeApp(
     scaffoldState = scaffoldState,
     sheetContent = {},
     sheetShape = ExpeBottomSheetShape,
-  ) { paddingBottomSheetScaffold ->
+  ) {
     Scaffold(
       contentWindowInsets = WindowInsets(0, 0, 0, 0),
       bottomBar = {

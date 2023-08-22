@@ -454,7 +454,7 @@ private fun IconItem(
           )
         }
     ) {
-      Image(
+      Icon(
         imageVector = icon.imageVector,
         contentDescription = icon.name,
       )
