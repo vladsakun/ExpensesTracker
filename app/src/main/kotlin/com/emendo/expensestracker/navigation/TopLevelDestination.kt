@@ -2,11 +2,10 @@ package com.emendo.expensestracker.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.emendo.accounts.destinations.AccountsScreenDestination
-import com.emendo.categories.destinations.CategoriesListScreenDestination
+import com.emendo.accounts.AccountsNavGraph
+import com.emendo.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
-import com.emendo.transactions.destinations.TransactionsScreenDestination
-import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
+import com.emendo.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 import com.emendo.expensestracker.feature.accounts.R as AR
 import com.emendo.expensestracker.feature.categories.R as CR
@@ -25,21 +24,21 @@ enum class TopLevelDestination(
   @StringRes val titleTextId: Int,
 ) {
   ACCOUNTS(
-    screen = NavGraphs.accounts,
+    screen = AccountsNavGraph,
     selectedIcon = ExpIcons.CreditCard,
     unselectedIcon = ExpIcons.CreditCardBorder,
     iconTextId = AR.string.accounts,
     titleTextId = AR.string.accounts,
   ),
   CATEGORIES(
-    screen = NavGraphs.categories,
+    screen = CategoriesNavGraph,
     selectedIcon = ExpIcons.DonutLarge,
     unselectedIcon = ExpIcons.DonutLargeBorder,
     iconTextId = CR.string.categories,
     titleTextId = CR.string.categories,
   ),
   TRANSACTIONS(
-    screen = NavGraphs.transactions,
+    screen = TransactionsNavGraph,
     selectedIcon = ExpIcons.ReceiptLong,
     unselectedIcon = ExpIcons.ReceiptLongBorder,
     iconTextId = TR.string.transactions,

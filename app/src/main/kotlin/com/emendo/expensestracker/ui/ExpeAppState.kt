@@ -84,37 +84,19 @@ class ExpeAppState constructor(
    * @param topLevelDestination: The destination the app needs to navigate to.
    */
   fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
-//    val isCurrentDestOnBackStack = navController.isRouteOnBackStack(topLevelDestination.screen)
-
-//    if (isCurrentDestOnBackStack) {
-//      // When we click again on a bottom bar item and it was already selected
-//      // we want to pop the back stack until the initial destination of this bottom bar item
-//      navController.popBackStack(topLevelDestination.direction, inclusive = false)
-//      return
-//    }
-
     navController.navigate(topLevelDestination.screen) {
-      launchSingleTop = true
-      restoreState = true
-
-      popUpTo(navController.graph.findStartDestination().id){
+      // Pop up to the start destination of the graph to
+      // avoid building up a large stack of destinations
+      // on the back stack as users select items
+      popUpTo(navController.graph.findStartDestination().id) {
         saveState = true
       }
-//      // Pop up to the start destination of the graph to
-//      // avoid building up a large stack of destinations
-//      // on the back stack as users select items
-//      popUpTo(RootNavGraph) {
-//        saveState = true
-//      }
-//
-//      // Avoid multiple copies of the same destination when
-//      // reselecting the same item
-//      launchSingleTop = true
-//      // Restore state when reselecting a previously selected item
-//      restoreState = true
-    }
 
-    val value = navController.currentBackStack.value
-    Log.d(TAG, "size: ${value.size} navControllerBackStack: $value")
+      // Avoid multiple copies of the same destination when
+      // reselecting the same item
+      launchSingleTop = true
+      // Restore state when reselecting a previously selected item
+      restoreState = true
+    }
   }
 }

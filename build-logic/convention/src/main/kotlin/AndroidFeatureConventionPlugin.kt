@@ -23,7 +23,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
       }
 
       extensions.configure<KspExtension> {
-        arg("compose-destinations.mode", "destinations")
+        arg("compose-destinations.mode", "navgraphs")
         arg("compose-destinations.moduleName", moduleName)
         arg("compose-destinations.useComposableVisibility", "true")
       }
