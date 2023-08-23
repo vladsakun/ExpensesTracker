@@ -13,6 +13,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import com.emendo.accounts.destinations.AccountsScreenDestination
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
+import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
@@ -32,8 +33,7 @@ fun ExpeApp(
     sheetContent = {},
     sheetShape = ExpeBottomSheetShape,
   ) {
-    Scaffold(
-      contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ExpeScaffold(
       bottomBar = {
         if (appState.shouldShowBottomBar) {
           ExpeBottomBar(

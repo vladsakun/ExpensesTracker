@@ -27,6 +27,7 @@ import com.emendo.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.data.model.Account
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
+import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.component.ExpeTopAppBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.divider_color
@@ -54,11 +55,10 @@ private fun AccountsListScreenContent(
 ) {
   val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-  Scaffold(
+  ExpeScaffold(
     modifier = Modifier
       .fillMaxSize()
       .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
-    contentWindowInsets = WindowInsets(0, 0, 0, 0),
     topBar = {
       ExpeTopAppBar(
         titleRes = R.string.accounts,
