@@ -42,8 +42,8 @@ private const val OVERVIEW_BLOCK_CATEGORIES_AMOUNT = 8
 inline val CategoryItemType.key
   get() = if (this is CategoryItemType.CategoryItem) category.id else -1
 
-@Destination(start = true)
 @RootNavGraph(start = true)
+@Destination(start = true)
 @Composable
 fun CategoriesListScreen(
   navigator: DestinationsNavigator,

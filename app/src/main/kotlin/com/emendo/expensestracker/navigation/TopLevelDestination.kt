@@ -7,6 +7,7 @@ import com.emendo.categories.destinations.CategoriesListScreenDestination
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
+import com.ramcosta.composedestinations.spec.NavGraphSpec
 import com.emendo.expensestracker.feature.accounts.R as AR
 import com.emendo.expensestracker.feature.categories.R as CR
 import com.emendo.expensestracker.feature.transactions.R as TR
@@ -17,28 +18,28 @@ import com.emendo.expensestracker.feature.transactions.R as TR
  * next within a single destination will be handled directly in composables.
  */
 enum class TopLevelDestination(
-  val direction: DirectionDestinationSpec,
+  val screen: NavGraphSpec,
   val selectedIcon: ImageVector,
   val unselectedIcon: ImageVector,
   @StringRes val iconTextId: Int,
   @StringRes val titleTextId: Int,
 ) {
   ACCOUNTS(
-    direction = AccountsScreenDestination,
+    screen = NavGraphs.accounts,
     selectedIcon = ExpIcons.CreditCard,
     unselectedIcon = ExpIcons.CreditCardBorder,
     iconTextId = AR.string.accounts,
     titleTextId = AR.string.accounts,
   ),
   CATEGORIES(
-    direction = CategoriesListScreenDestination,
+    screen = NavGraphs.categories,
     selectedIcon = ExpIcons.DonutLarge,
     unselectedIcon = ExpIcons.DonutLargeBorder,
     iconTextId = CR.string.categories,
     titleTextId = CR.string.categories,
   ),
   TRANSACTIONS(
-    direction = TransactionsScreenDestination,
+    screen = NavGraphs.transactions,
     selectedIcon = ExpIcons.ReceiptLong,
     unselectedIcon = ExpIcons.ReceiptLongBorder,
     iconTextId = TR.string.transactions,

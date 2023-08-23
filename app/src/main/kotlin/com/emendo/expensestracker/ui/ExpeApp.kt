@@ -74,24 +74,24 @@ private fun ExpeBottomBar(
   modifier: Modifier = Modifier
 ) {
   ExpeNavigationBar(modifier = modifier) {
-    destinations.forEach { destination ->
-      val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
+    destinations.forEach { item ->
+      val selected = currentDestination.isTopLevelDestinationInHierarchy(item)
       ExpeNavigationBarItem(
         selected = selected,
-        onClick = { onNavigateToDestination(destination) },
+        onClick = { onNavigateToDestination(item) },
         icon = {
           Icon(
-            imageVector = destination.unselectedIcon,
+            imageVector = item.unselectedIcon,
             contentDescription = null,
           )
         },
         selectedIcon = {
           Icon(
-            imageVector = destination.selectedIcon,
+            imageVector = item.selectedIcon,
             contentDescription = null,
           )
         },
-        label = { Text(text = stringResource(destination.iconTextId)) }
+        label = { Text(text = stringResource(item.iconTextId)) }
       )
     }
   }

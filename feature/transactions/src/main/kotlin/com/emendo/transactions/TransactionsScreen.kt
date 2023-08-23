@@ -19,16 +19,12 @@ import com.emendo.transactions.destinations.TransactionsScreen2Destination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-private const val TAG = "TransactionsScreen"
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Destination(start = true)
 @Composable
 fun TransactionsScreen(
   navigator: DestinationsNavigator
 ) {
   Scaffold() { padding ->
-    Log.d(TAG, "TransactionsScreen: padding = $padding")
     Column(
       modifier = Modifier
         .fillMaxSize()

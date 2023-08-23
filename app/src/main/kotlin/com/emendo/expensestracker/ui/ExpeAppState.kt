@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.ui
 
-import androidx.compose.material3.*
+import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -13,17 +13,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.emendo.accounts.destinations.AccountsScreenDestination
-import com.emendo.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.categories.destinations.CategoriesListScreenDestination
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.navigation.navigate
-import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
-import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import kotlinx.coroutines.CoroutineScope
-import com.emendo.expensestracker.R as AppR
+
+private const val TAG = "ExpeAppState"
 
 @Composable
 fun rememberExpeAppState(
@@ -86,26 +84,37 @@ class ExpeAppState constructor(
    * @param topLevelDestination: The destination the app needs to navigate to.
    */
   fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
-    val isCurrentDestOnBackStack = navController.isRouteOnBackStack(topLevelDestination.direction)
+//    val isCurrentDestOnBackStack = navController.isRouteOnBackStack(topLevelDestination.screen)
 
-    if (isCurrentDestOnBackStack) {
-      // When we click again on a bottom bar item and it was already selected
-      // we want to pop the back stack until the initial destination of this bottom bar item
-      navController.popBackStack(topLevelDestination.direction, inclusive = false)
-      return
-    }
+//    if (isCurrentDestOnBackStack) {
+//      // When we click again on a bottom bar item and it was already selected
+//      // we want to pop the back stack until the initial destination of this bottom bar item
+//      navController.popBackStack(topLevelDestination.direction, inclusive = false)
+//      return
+//    }
 
-    navController.navigate(topLevelDestination.direction) {
-      // Pop up to the start destination of the graph to
-      // avoid building up a large stack of destinations
-      // on the back stack as users select items
-      popUpTo(navController.graph.findStartDestination().id) {
+    navController.navigate(topLevelDestination.screen) {
+      launchSingleTop = true
+      restoreState = true
+
+      popUpTo(navController.graph.findStartDestination().id){
         saveState = true
       }
-
-      launchSingleTop = true
-
-      restoreState = true
+//      // Pop up to the start destination of the graph to
+//      // avoid building up a large stack of destinations
+//      // on the back stack as users select items
+//      popUpTo(RootNavGraph) {
+//        saveState = true
+//      }
+//
+//      // Avoid multiple copies of the same destination when
+//      // reselecting the same item
+//      launchSingleTop = true
+//      // Restore state when reselecting a previously selected item
+//      restoreState = true
     }
+
+    val value = navController.currentBackStack.value
+    Log.d(TAG, "size: ${value.size} navControllerBackStack: $value")
   }
 }
