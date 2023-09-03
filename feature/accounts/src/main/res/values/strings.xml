@@ -7,5 +7,5 @@
   <string name="icon">Icon</string>
   <string name="color">Color</string>
   <string name="create_account">Create account</string>
-  <string name="initial_balance">Initial balance</string>
+  <string name="balance">Balance</string>
 </resources>

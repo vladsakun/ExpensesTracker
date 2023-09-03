@@ -2,6 +2,7 @@ import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import org.gradle.api.Plugin
 import com.android.build.gradle.LibraryExtension
 import com.emendo.expensestracker.configureKotlinAndroid
+import com.emendo.expensestracker.libs
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
@@ -11,11 +12,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
       with(pluginManager) {
         apply("com.android.library")
         apply("org.jetbrains.kotlin.android")
+        apply("kotlin-parcelize")
       }
 
       extensions.configure<LibraryExtension> {
         configureKotlinAndroid(this)
-        defaultConfig.targetSdk = 33
+        defaultConfig {
+          resourceConfigurations += setOf("en")
+        }
       }
     }
   }

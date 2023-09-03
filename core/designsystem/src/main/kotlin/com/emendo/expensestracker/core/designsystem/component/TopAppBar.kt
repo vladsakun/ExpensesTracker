@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,7 +27,13 @@ fun ExpeTopAppBar(
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
   LargeTopAppBar(
-    title = { Text(text = stringResource(id = titleRes)) },
+    title = {
+      AutoResizedText(
+        text = stringResource(id = titleRes),
+        maxLines = 1,
+        minFontSize = 14.sp,
+      )
+    },
     navigationIcon = navigationIcon,
     actions = {
       actionIcon?.let {

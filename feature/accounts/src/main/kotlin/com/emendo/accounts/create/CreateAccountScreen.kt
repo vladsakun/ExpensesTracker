@@ -26,29 +26,32 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.data.model.AccountIconModel
 import com.emendo.expensestracker.core.data.model.ColorModel
 import com.emendo.expensestracker.core.data.model.CurrencyModel
 import com.emendo.expensestracker.core.designsystem.component.*
-import com.emendo.expensestracker.core.designsystem.component.bottomsheet.ExpeBottomSheet
+import com.emendo.expensestracker.core.designsystem.component.bottomsheet.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.*
 import com.emendo.expensestracker.feature.accounts.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.emendo.expensestracker.core.app.resources.R as AppR
 
-private const val TAG = "CreateAccountScreen"
-private val SELECTED_ICON_BORDER_WIDTH = 3.dp
-private val SELECTED_COLOR_BORDER_WIDTH = 3.dp
+private const val SELECTED_ICON_BORDER_WIDTH = 3
+private const val SELECTED_COLOR_BORDER_WIDTH = 3
+private const val SELECTED_ITEM_ALPHA_BORDER = 0.2f
+private const val ITEM_FIXED_SIZE_DP = 60
 
 @Destination
 @Composable
 fun CreateAccountRoute(
   navigator: DestinationsNavigator,
-  viewModel: CreateAccountViewModel = hiltViewModel()
+  viewModel: CreateAccountViewModel = hiltViewModel(),
 ) {
   CreateAccountScreen(
     state = viewModel.state.collectAsStateWithLifecycle(),
@@ -57,7 +60,20 @@ fun CreateAccountRoute(
     onIconClick = viewModel::setIcon,
     onColorClick = viewModel::setColor,
     onCurrencyClick = viewModel::setCurrency,
-    onCreateAccountClick = viewModel::createNewAccount,
+    onCreateAccountClick = {
+      navigator.navigateUp()
+      viewModel.createNewAccount()
+    },
+    initialBalanceActions = NumKeyboardActions.InitialBalanceActions(
+      onChangeSignClick = viewModel::onChangeSignClick,
+      onCurrencyClick = viewModel::onCurrencyClick,
+      onClearClick = viewModel::onClearClick,
+      onMathOperationClick = viewModel::onMathOperationClick,
+      onNumberClick = viewModel::onNumberClick,
+      onPrecisionClick = viewModel::onPrecisionClick,
+      onDoneClick = viewModel::onConfirmClick,
+      onEqualClick = viewModel::onEqualClick,
+    )
   )
 }
 
@@ -71,42 +87,43 @@ private fun CreateAccountScreen(
   onCurrencyClick: (model: CurrencyModel) -> Unit,
   onCreateAccountClick: () -> Unit,
   onNavigationClick: () -> Unit,
+  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
 ) {
   val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-  val nameTextFieldState by rememberSaveable(stateSaver = AccountNameStateSaver) {
-    mutableStateOf(AccountState())
-  }
-
   val coroutineScope = rememberCoroutineScope()
-  val scaffoldState = rememberBottomSheetScaffoldState(SheetState(skipPartiallyExpanded = true))
-  var currentBottomSheet: BottomSheetType? by remember { mutableStateOf(null) }
-
+  // Todo try go from one BottomSheet to next
+  val currentBottomSheet: MutableState<BottomSheetType> = rememberSaveable { mutableStateOf(BottomSheetType.Initial) }
   val keyboardController = LocalSoftwareKeyboardController.current
   val focusManager = LocalFocusManager.current
+
+  val shouldOpenBottomSheet = rememberSaveable { mutableStateOf(false) }
+  val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   val closeBottomSheet: () -> Unit = {
     hideKeyboard(keyboardController, focusManager)
     coroutineScope.launch {
-      scaffoldState.bottomSheetState.hide()
+      bottomSheetState.hide()
+      shouldOpenBottomSheet.value = false
+      initialBalanceActions.onDoneClick()
     }
   }
 
   val openBottomSheet: (BottomSheetType) -> Unit = {
     hideKeyboard(keyboardController, focusManager)
-    currentBottomSheet = it
+    currentBottomSheet.value = it
     coroutineScope.launch {
-      scaffoldState.bottomSheetState.expand()
+      shouldOpenBottomSheet.value = true
     }
   }
 
   BackHandler {
     when {
-      scaffoldState.bottomSheetState.isVisible -> closeBottomSheet()
+      bottomSheetState.isVisible -> closeBottomSheet()
       else -> onNavigationClick()
     }
   }
 
-  BottomSheetScaffold(
+  ExpeScaffold(
     modifier = Modifier
       .fillMaxSize()
       .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
@@ -117,49 +134,92 @@ private fun CreateAccountScreen(
         scrollBehavior = topAppBarScrollBehavior,
       )
     },
-    scaffoldState = scaffoldState,
-    sheetContent = { BottomSheetContent(currentBottomSheet, closeBottomSheet) },
-    sheetShape = ExpeBottomSheetShape,
   ) { paddingValues ->
     val accountNameState = remember { derivedStateOf { state.value.accountName } }
     val iconState = remember { derivedStateOf { state.value.icon } }
     val colorState = remember { derivedStateOf { state.value.color } }
-    val currencyState = remember { derivedStateOf { state.value.currency } }
+    val currencyModelState = remember { derivedStateOf { state.value.currency } }
+    val currencyState = remember { derivedStateOf { state.value.currency.currencySymbol } }
     val initialBalanceState = remember { derivedStateOf { state.value.initialBalance } }
+    val equalButtonState = remember { derivedStateOf { state.value.equalButtonState } }
+    val decimalSeparator = remember { derivedStateOf { state.value.decimalSeparator } }
+    val isCreateAccountButtonEnabled = remember { derivedStateOf { state.value.isCreateAccountButtonEnabled } }
 
     CreateAccountContent(
       paddingValues = paddingValues,
-      nameTextFieldState = nameTextFieldState,
       nameState = accountNameState,
       iconState = iconState,
       colorState = colorState,
-      currencyState = currencyState,
       initialBalanceState = initialBalanceState,
+      currencyState = currencyState,
+      equalButtonState = equalButtonState,
+      initialBalanceActions = initialBalanceActions.copy(
+        onDoneClick = {
+          closeBottomSheet()
+          initialBalanceActions.onDoneClick()
+        }
+      ),
+      decimalSeparator = decimalSeparator,
+      currencyModelState = currencyModelState,
       onAccountNameChange = onAccountNameChange,
       onIconClick = onIconClick,
       onColorClick = onColorClick,
       onCurrencyClick = onCurrencyClick,
       onCreateAccountClick = onCreateAccountClick,
       openBottomSheet = openBottomSheet,
+      isCreateButtonEnabled = isCreateAccountButtonEnabled,
     )
+  }
+
+  ModalBottomSheet(
+    shouldOpenBottomSheet = shouldOpenBottomSheet,
+    bottomSheetState = bottomSheetState,
+    currentBottomSheet = currentBottomSheet,
+    closeBottomSheet = closeBottomSheet,
+    onDismissRequest = { shouldOpenBottomSheet.value = false },
+  )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun ModalBottomSheet(
+  shouldOpenBottomSheet: MutableState<Boolean>,
+  bottomSheetState: SheetState,
+  currentBottomSheet: MutableState<BottomSheetType>,
+  closeBottomSheet: () -> Unit,
+  onDismissRequest: () -> Unit,
+) {
+  if (shouldOpenBottomSheet.value) {
+    ModalBottomSheet(
+      onDismissRequest = onDismissRequest,
+      sheetState = bottomSheetState,
+      windowInsets = WindowInsets(0),
+      shape = ExpeBottomSheetShape,
+    ) {
+      BottomSheetContent(currentBottomSheet.value, closeBottomSheet)
+    }
   }
 }
 
 @Composable
 private fun CreateAccountContent(
   paddingValues: PaddingValues,
-  nameTextFieldState: TextFieldState,
   nameState: State<String>,
   iconState: State<AccountIconModel>,
   colorState: State<ColorModel>,
-  initialBalanceState: State<Double>,
-  currencyState: State<CurrencyModel>,
+  initialBalanceState: State<String>,
+  currencyState: State<String>,
+  equalButtonState: State<EqualButtonState>,
+  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
+  decimalSeparator: State<String>,
+  currencyModelState: State<CurrencyModel>,
   onAccountNameChange: (model: String) -> Unit,
   onIconClick: (model: AccountIconModel) -> Unit,
   onColorClick: (model: ColorModel) -> Unit,
   onCurrencyClick: (model: CurrencyModel) -> Unit,
   onCreateAccountClick: () -> Unit,
   openBottomSheet: (BottomSheetType) -> Unit,
+  isCreateButtonEnabled: State<Boolean>,
 ) {
   Column(
     modifier = Modifier
@@ -171,7 +231,6 @@ private fun CreateAccountContent(
     verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
   ) {
     AccountName(
-      accountNameState = nameTextFieldState,
       accountName = nameState,
       onAccountNameChange = onAccountNameChange,
     )
@@ -189,75 +248,33 @@ private fun CreateAccountContent(
     Spacer(modifier = Modifier.height(Dimens.margin_large_x))
     InitialBalanceRow(
       initialBalanceState = initialBalanceState,
-      onInitialBalanceClick = {},
+      currencyState = currencyState,
+      equalButtonState = equalButtonState,
+      initialBalanceActions = initialBalanceActions,
+      decimalSeparator = decimalSeparator,
+      openSheet = openBottomSheet,
     )
     CurrencyRow(
       openSheet = openBottomSheet,
       setCurrency = onCurrencyClick,
-      selectedCurrency = currencyState,
+      selectedCurrency = currencyModelState,
     )
     ExpeButton(
       textResId = AppR.string.create,
       onClick = onCreateAccountClick,
+      enabled = isCreateButtonEnabled.value,
     )
-  }
-}
-
-@Composable
-private fun BottomSheetContent(
-  type: BottomSheetType?,
-  hideBottomSheet: () -> Unit,
-) {
-  when (type) {
-    is BottomSheetType.Currency -> {
-      CurrenciesBottomSheet(
-        currencies = CurrencyModel.values().toList(),
-        onSelectCurrency = {
-          type.onSelectCurrency(it)
-          hideBottomSheet()
-        },
-        onCloseClick = hideBottomSheet,
-      )
-    }
-
-    is BottomSheetType.Color -> {
-      ColorsBottomSheet(
-        colors = ColorModel.values().toList(),
-        selectedColor = type.selectedColor,
-        onColorSelect = {
-          type.onSelectColor(it)
-          hideBottomSheet()
-        },
-        onCloseClick = hideBottomSheet,
-      )
-    }
-
-    is BottomSheetType.Icon -> {
-      IconsBottomSheet(
-        icons = AccountIconModel.values().toList(),
-        onIconSelect = {
-          type.onSelectIcon(it)
-          hideBottomSheet()
-        },
-        onCloseClick = hideBottomSheet,
-        selectedIcon = type.selectedIcon,
-      )
-    }
-
-    else -> Spacer(modifier = Modifier.fillMaxSize())
   }
 }
 
 @Composable
 private fun AccountName(
-  accountNameState: TextFieldState,
   accountName: State<String>,
-  onAccountNameChange: (name: String) -> Unit
+  onAccountNameChange: (name: String) -> Unit,
 ) {
   val name = accountName.value
   ExpeTextField(
     label = stringResource(id = R.string.account_name),
-    textFieldState = accountNameState,
     text = name,
     onValueChange = onAccountNameChange,
   )
@@ -308,20 +325,52 @@ private fun ColorRow(
           .clip(shape = CircleShape)
           .background(color = colorState.color)
       )
-    }
+    },
   )
 }
 
 @Composable
 private fun InitialBalanceRow(
-  initialBalanceState: State<Double>,
-  onInitialBalanceClick: () -> Unit,
+  initialBalanceState: State<String>,
+  currencyState: State<String>,
+  equalButtonState: State<EqualButtonState>,
+  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
+  decimalSeparator: State<String>,
+  openSheet: (BottomSheetType) -> Unit,
 ) {
-  val initialBalance = initialBalanceState.value.toString()
+
+  if (IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET) {
+    LaunchedEffect(key1 = Unit) {
+      delay(200)
+      openSheet(
+        BottomSheetType.Calculator(
+          initialBalanceActions = initialBalanceActions,
+          decimalSeparator = decimalSeparator.value
+        ).apply {
+          textState = initialBalanceState
+          this.equalButtonState = equalButtonState
+          this.currencyState = currencyState
+        }
+      )
+    }
+  }
+
   SelectRowWithText(
-    label = stringResource(id = R.string.initial_balance),
-    text = initialBalance,
-    onClick = onInitialBalanceClick,
+    label = stringResource(id = R.string.balance),
+    text = initialBalanceState.value,
+    textStyle = MaterialTheme.typography.bodyLarge,
+    onClick = {
+      openSheet(
+        BottomSheetType.Calculator(
+          initialBalanceActions = initialBalanceActions,
+          decimalSeparator = decimalSeparator.value,
+        ).apply {
+          textState = initialBalanceState
+          this.equalButtonState = equalButtonState
+          this.currencyState = currencyState
+        }
+      )
+    },
   )
 }
 
@@ -329,7 +378,7 @@ private fun InitialBalanceRow(
 private fun CurrencyRow(
   openSheet: (BottomSheetType) -> Unit,
   setCurrency: (model: CurrencyModel) -> Unit,
-  selectedCurrency: State<CurrencyModel>
+  selectedCurrency: State<CurrencyModel>,
 ) {
   val currency = selectedCurrency.value
   SelectRowWithText(
@@ -351,19 +400,20 @@ private fun CurrencyRow(
 private fun CurrenciesBottomSheet(
   currencies: List<CurrencyModel>,
   onSelectCurrency: (currencyModel: CurrencyModel) -> Unit,
-  onCloseClick: () -> Unit
+  onCloseClick: () -> Unit,
 ) {
   ExpeBottomSheet(
     titleResId = R.string.currency,
     onCloseClick = onCloseClick,
     content = {
-      Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn {
-          items(
-            items = currencies,
-            key = { item: CurrencyModel -> item.id },
-            contentType = { _ -> "currencies" },
-          ) { CurrencyItem(currencyModel = it, onSelectCurrency) }
+      LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(
+          items = currencies,
+          key = { item: CurrencyModel -> item.id },
+          contentType = { _ -> "currencies" },
+        ) { CurrencyItem(currencyModel = it, onSelectCurrency) }
+        item(key = "bottom_spacer", contentType = "spacer") {
+          Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
         }
       }
     },
@@ -373,7 +423,7 @@ private fun CurrenciesBottomSheet(
 @Composable
 private fun CurrencyItem(
   currencyModel: CurrencyModel,
-  onCurrencySelect: (currencyModel: CurrencyModel) -> Unit
+  onCurrencySelect: (currencyModel: CurrencyModel) -> Unit,
 ) {
   Column(
     modifier = Modifier.clickable(onClick = { onCurrencySelect(currencyModel) })
@@ -402,7 +452,7 @@ private fun IconsBottomSheet(
   icons: List<AccountIconModel>,
   selectedIcon: AccountIconModel,
   onIconSelect: (color: AccountIconModel) -> Unit,
-  onCloseClick: () -> Unit
+  onCloseClick: () -> Unit,
 ) {
   ExpeBottomSheet(
     titleResId = R.string.icon,
@@ -410,7 +460,7 @@ private fun IconsBottomSheet(
     content = {
       Column(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
-          columns = GridCells.FixedSize(70.dp),
+          columns = GridCells.FixedSize(ITEM_FIXED_SIZE_DP.dp),
           horizontalArrangement = Arrangement.SpaceAround,
         ) {
           itemsIndexed(
@@ -434,21 +484,21 @@ private fun IconsBottomSheet(
 private fun IconItem(
   icon: AccountIconModel,
   isSelected: Boolean,
-  onIconSelect: (icon: AccountIconModel) -> Unit
+  onIconSelect: (icon: AccountIconModel) -> Unit,
 ) {
-  val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+  val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = SELECTED_ITEM_ALPHA_BORDER)
 
   Surface {
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier
         .aspectRatio(1f)
-        .padding(Dimens.margin_small_x)
-        .clip(shape = CircleShape)
+        .padding(Dimens.margin_small_xx)
+        .clip(CircleShape)
         .clickable { onIconSelect(icon) }
         .conditional(isSelected) {
           border(
-            width = SELECTED_ICON_BORDER_WIDTH,
+            width = SELECTED_ICON_BORDER_WIDTH.dp,
             color = borderColor,
             shape = CircleShape,
           )
@@ -475,7 +525,7 @@ private fun ColorsBottomSheet(
     content = {
       Column(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
-          columns = GridCells.FixedSize(70.dp),
+          columns = GridCells.FixedSize(ITEM_FIXED_SIZE_DP.dp),
           horizontalArrangement = Arrangement.SpaceAround,
         ) {
           items(
@@ -504,13 +554,13 @@ private fun ColorItem(
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
-      .padding(Dimens.margin_small_x)
+      .padding(Dimens.margin_small_xx)
       .clip(shape = CircleShape)
       .clickable { onColorSelect(color) }
       .conditional(isSelected) {
         border(
-          width = SELECTED_COLOR_BORDER_WIDTH,
-          color = color.color.copy(alpha = 0.2f),
+          width = SELECTED_COLOR_BORDER_WIDTH.dp,
+          color = color.color.copy(alpha = SELECTED_ITEM_ALPHA_BORDER),
           shape = CircleShape,
         )
       },
@@ -520,8 +570,65 @@ private fun ColorItem(
         .padding(Dimens.margin_large_x)
         .aspectRatio(1f)
         .clip(shape = CircleShape)
-        .background(color = color.color)
+        .background(color = color.color),
     )
+  }
+}
+
+@Composable
+private fun BottomSheetContent(
+  type: BottomSheetType?,
+  hideBottomSheet: () -> Unit,
+) {
+  when (type) {
+    is BottomSheetType.Currency -> {
+      CurrenciesBottomSheet(
+        currencies = CurrencyModel.values().toList(),
+        onSelectCurrency = {
+          type.onSelectCurrency(it)
+          hideBottomSheet()
+        },
+        onCloseClick = hideBottomSheet,
+      )
+    }
+
+    is BottomSheetType.Color -> {
+      ColorsBottomSheet(
+        colors = ColorModel.values().toList(),
+        selectedColor = type.selectedColor,
+        onColorSelect = {
+          type.onSelectColor(it)
+          hideBottomSheet()
+        },
+        onCloseClick = hideBottomSheet,
+      )
+    }
+
+    is BottomSheetType.Icon -> {
+      IconsBottomSheet(
+        icons = AccountIconModel.values().toList(),
+        onIconSelect = {
+          type.onSelectIcon(it)
+          hideBottomSheet()
+        },
+        onCloseClick = hideBottomSheet,
+        selectedIcon = type.selectedIcon,
+      )
+    }
+
+    is BottomSheetType.Calculator -> {
+      type.textState?.let {
+        InitialBalanceBS(
+          text = it,
+          initialBalanceActions = type.initialBalanceActions,
+          equalButtonState = checkNotNull(type.equalButtonState),
+          decimalSeparator = type.decimalSeparator,
+          currency = checkNotNull(type.currencyState),
+        )
+      }
+    }
+
+    else -> Unit
   }
 }
 
@@ -541,6 +648,7 @@ private fun CreateAccountScreenPreview(
       onCurrencyClick = {},
       onCreateAccountClick = {},
       onNavigationClick = {},
+      initialBalanceActions = NumKeyboardActions.InitialBalanceActions.dummyInitialBalanceActions()
     )
   }
 }

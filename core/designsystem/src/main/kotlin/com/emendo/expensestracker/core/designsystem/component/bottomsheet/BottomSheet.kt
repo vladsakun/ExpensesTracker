@@ -16,7 +16,7 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 @Composable
 fun ExpeBottomSheet(
   titleLayout: @Composable (modifier: Modifier) -> Unit,
-  content: @Composable () -> Unit,
+  content: @Composable ColumnScope.() -> Unit,
   onCloseClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -49,7 +49,7 @@ fun ExpeBottomSheet(
 @Composable
 fun ExpeBottomSheet(
   @StringRes titleResId: Int,
-  content: @Composable () -> Unit,
+  content: @Composable ColumnScope.() -> Unit,
   onCloseClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -58,7 +58,7 @@ fun ExpeBottomSheet(
       Text(
         text = stringResource(id = titleResId),
         modifier = it,
-        style = MaterialTheme.typography.titleMedium,
+        style = MaterialTheme.typography.titleLarge,
         textAlign = TextAlign.Center,
       )
     },

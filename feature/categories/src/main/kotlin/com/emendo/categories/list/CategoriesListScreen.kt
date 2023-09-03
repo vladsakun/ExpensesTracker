@@ -1,5 +1,6 @@
 package com.emendo.categories.list
 
+import android.icu.util.Currency
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,6 +36,8 @@ import com.emendo.expensestracker.feature.categories.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.delay
+import timber.log.Timber
 
 private val PADDING_CATEGORY_ITEM_PADDING = 16.dp
 private const val OVERVIEW_BLOCK_CATEGORIES_AMOUNT = 8
@@ -51,13 +54,10 @@ fun CategoriesListScreen(
 ) {
   var isEditMode by remember { mutableStateOf(false) }
 
-  viewModel.registerListener()
-
   LaunchedEffect(true) {
     viewModel.navigationEvent.collect {
       if (it != null) {
         isEditMode = !isEditMode
-        //        navigator.navigate(CreateCategoryScreenDestination)
       }
     }
   }

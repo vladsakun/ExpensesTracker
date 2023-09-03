@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.data.model
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 

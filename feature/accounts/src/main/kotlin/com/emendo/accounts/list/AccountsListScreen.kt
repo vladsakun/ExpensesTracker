@@ -1,6 +1,5 @@
 package com.emendo.accounts.list
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,31 +8,32 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.accounts.destinations.CreateAccountRouteDestination
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.data.model.Account
-import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
-import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
-import com.emendo.expensestracker.core.designsystem.component.ExpeTopAppBar
+import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.divider_color
 import com.emendo.expensestracker.feature.accounts.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.delay
 
 private const val TAG = "AccountsListScreen"
 
@@ -43,11 +43,19 @@ fun AccountsScreen(
   navigator: DestinationsNavigator,
   viewModel: AccountsListViewModel = hiltViewModel(),
 ) {
+
+  if (IS_DEBUG_CREATE_ACCOUNT) {
+    LaunchedEffect(key1 = Unit) {
+      delay(200)
+      navigator.navigate(CreateAccountRouteDestination)
+    }
+  }
+
   val accountsListUiState: AccountsListUiState by viewModel.uiState.collectAsStateWithLifecycle()
   AccountsListScreenContent(accountsListUiState) { navigator.navigate(CreateAccountRouteDestination) }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountsListScreenContent(
   uiState: AccountsListUiState,
@@ -81,15 +89,12 @@ private fun AccountsListScreenContent(
     LazyColumn(
       modifier = Modifier
         .fillMaxSize()
-        .padding(padding)
-        .consumeWindowInsets(padding),
+        .padding(padding),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       when (uiState) {
         is AccountsListUiState.Loading -> item {
-          ExpLoadingWheel(
-            contentDesc = stringResource(id = R.string.accounts_loading)
-          )
+          ExpLoadingWheel(contentDesc = stringResource(id = R.string.accounts_loading))
         }
 
         is AccountsListUiState.Empty -> item {
@@ -118,14 +123,14 @@ private fun AccountsListScreenContent(
 private fun AccountItem(account: Account) {
   Column {
     Row(
-      modifier = Modifier
-        .padding(Dimens.margin_small_x),
+      modifier = Modifier.padding(Dimens.margin_small_x),
       verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)
     ) {
-      Image(
+      Icon(
         modifier = Modifier
           .clip(RoundedCornerShape(Dimens.corner_radius_small))
-          .background(color = account.color.color.copy(alpha = 0.65f))
+          .background(color = account.color.color.copy(alpha = 0.2f))
           .border(
             width = Dimens.border_thickness,
             color = account.color.color,
@@ -134,20 +139,29 @@ private fun AccountItem(account: Account) {
           .padding(Dimens.margin_small_x),
         imageVector = account.icon.imageVector,
         contentDescription = "",
-        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inverseOnSurface),
       )
-      Spacer(modifier = Modifier.width(Dimens.margin_small_x))
       Text(
-        modifier = Modifier.fillMaxHeight(),
         text = account.name,
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.bodyMedium
+        modifier = Modifier
+          .fillMaxHeight()
+          .weight(1f),
+        style = MaterialTheme.typography.bodyMedium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+      )
+      Text(
+        modifier = Modifier
+          .fillMaxHeight()
+          .weight(2f),
+        text = account.formattedBalance,
+        style = MaterialTheme.typography.bodyMedium,
+        textAlign = TextAlign.End,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
       )
     }
     Divider(
-      modifier = Modifier.padding(
-        start = Dimens.icon_size + Dimens.margin_small_x * 4
-      ),
+      modifier = Modifier.padding(start = Dimens.icon_size + Dimens.margin_small_x * 4),
       color = divider_color,
       thickness = Dimens.divider_thickness
     )

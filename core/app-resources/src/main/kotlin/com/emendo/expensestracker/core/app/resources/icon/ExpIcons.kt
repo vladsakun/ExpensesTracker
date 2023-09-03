@@ -17,4 +17,5 @@ object ExpIcons {
   val Check = Icons.Outlined.Check
   val Close = Icons.Outlined.Close
   val CurrencyBitcoin = Icons.Outlined.CurrencyBitcoin
+  val Backspace = Icons.Outlined.Backspace
 }

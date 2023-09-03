@@ -23,7 +23,7 @@ class CreateCategoryViewModel @Inject constructor(
         Category(
           name = categoryName,
           icon = CategoryIconModel.EDUCATION,
-          color = ColorModel.BLACK
+          color = ColorModel.GREEN
         )
       )
     }

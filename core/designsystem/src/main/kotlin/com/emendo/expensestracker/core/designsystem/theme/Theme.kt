@@ -98,13 +98,18 @@ fun ExpensesTrackerTheme(
     else -> LightColorScheme
   }
   val view = LocalView.current
-//  if (!view.isInEditMode) {
-//    SideEffect {
-//      val window = (view.context as Activity).window
-//      window.statusBarColor = colorScheme.primary.toArgb()
-//      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-//    }
-//  }
+  if (!view.isInEditMode) {
+    SideEffect {
+      val window = (view.context as Activity).window
+//      val insetsController = WindowCompat.getInsetsController(window, view)
+//      insetsController.isAppearanceLightStatusBars = !darkTheme
+//      insetsController.isAppearanceLightNavigationBars = !darkTheme
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        window.isNavigationBarContrastEnforced = false
+      }
+
+    }
+  }
 
   MaterialTheme(
     colorScheme = colorScheme,

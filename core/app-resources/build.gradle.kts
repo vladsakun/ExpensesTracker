@@ -9,4 +9,5 @@ android {
 
 dependencies {
   api(libs.androidx.compose.material.iconsExtended)
+  api(libs.timber)
 }

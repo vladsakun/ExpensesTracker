@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.cli.common.arguments.CommonToolArguments
+import org.jetbrains.kotlin.gradle.dsl.copyFreeCompilerArgsToArgs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -25,19 +27,19 @@ dependencies {
 
 gradlePlugin {
   plugins {
-    register("androidApplicationCompose"){
+    register("androidApplicationCompose") {
       id = "expensestracker.android.application.compose"
       implementationClass = "AndroidApplicationComposeConventionPlugin"
     }
-    register("androidApplication"){
+    register("androidApplication") {
       id = "expensestracker.android.application"
       implementationClass = "AndroidApplicationConventionPlugin"
     }
-    register("androidLibraryCompose"){
+    register("androidLibraryCompose") {
       id = "expensestracker.android.library.compose"
       implementationClass = "AndroidLibraryComposeConventionPlugin"
     }
-    register("androidLibrary"){
+    register("androidLibrary") {
       id = "expensestracker.android.library"
       implementationClass = "AndroidLibraryConventionPlugin"
     }
@@ -53,7 +55,7 @@ gradlePlugin {
       id = "expensestracker.android.room"
       implementationClass = "AndroidRoomConventionPlugin"
     }
-    register("jvmLibrary"){
+    register("jvmLibrary") {
       id = "expensestracker.jvm.library"
       implementationClass = "JvmLibraryConventionPlugin"
     }

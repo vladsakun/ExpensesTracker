@@ -13,3 +13,5 @@ data class AccountEntity(
   val iconId: Int,
   val colorId: Int,
 )
+
+fun AccountEntity.getBalanceFormatted() = "%.2f".format(balance)

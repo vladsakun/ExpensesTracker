@@ -19,17 +19,19 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import com.emendo.expensestracker.core.app.resources.R
 
 @Composable
 fun ExpLoadingWheel(
-  contentDesc: String,
   modifier: Modifier = Modifier,
+  contentDesc: String = stringResource(id = R.string.loading),
 ) {
-  val infiniteTransition = rememberInfiniteTransition()
+  val infiniteTransition = rememberInfiniteTransition(label = "Loading")
 
   // Specifies the float animation for slowly drawing out the lines on entering
   val startValue = if (LocalInspectionMode.current) 0F else 1F
@@ -55,7 +57,8 @@ fun ExpLoadingWheel(
     targetValue = 360F,
     animationSpec = infiniteRepeatable(
       animation = tween(durationMillis = ROTATION_TIME, easing = LinearEasing)
-    )
+    ),
+    label = "Rotating",
   )
 
   // Specifies the color animation for the base-to-progress line color change

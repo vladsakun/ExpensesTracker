@@ -19,14 +19,14 @@ class AccountsListViewModel @Inject constructor(
   private val accountsRepository: AccountsRepository,
 ) : ViewModel() {
 
-//  val uiState: StateFlow<AccountsListUiState> = accountsUiState(accountsRepository)
-//    .stateIn(
-//      scope = viewModelScope,
-//      started = SharingStarted.WhileSubscribed(5_000),
-//      initialValue = AccountsListUiState.Loading,
-//    )
+  val uiState: StateFlow<AccountsListUiState> = accountsUiState(accountsRepository)
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = AccountsListUiState.Loading,
+    )
 
-  val uiState: StateFlow<AccountsListUiState> = MutableStateFlow(getMockState())
+//  val uiState: StateFlow<AccountsListUiState> = MutableStateFlow(getMockState())
 }
 
 // Generate the list of 10 items of Account type
@@ -38,7 +38,7 @@ fun generateAccounts(): List<Account> {
       balance = 100.0,
       currencyModel = CurrencyModel.USD,
       icon = AccountIconModel.EDUCATION,
-      color = ColorModel.CYAN
+      color = ColorModel.GREEN
     )
   }
 }

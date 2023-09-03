@@ -24,9 +24,6 @@ class CategoriesListViewModel @Inject constructor(
       started = SharingStarted.WhileSubscribed(5_000),
       initialValue = CategoriesListUiState.Loading
     )
-
-  fun registerListener() {
-  }
 }
 
 private fun categoriesUiState(categoryRepository: CategoryRepository): Flow<CategoriesListUiState> {
