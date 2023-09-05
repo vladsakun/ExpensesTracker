@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.ui
+package com.emendo.expensestracker.core.ui.bottomsheet.calculator
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope

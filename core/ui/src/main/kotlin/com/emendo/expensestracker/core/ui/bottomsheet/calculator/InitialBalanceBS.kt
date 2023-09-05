@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.ui.bottomsheet
+package com.emendo.expensestracker.core.ui.bottomsheet.calculator
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -19,10 +19,10 @@ import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.designsystem.component.AutoSizableText
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.MathOperation
 import com.emendo.expensestracker.core.model.data.NumKeyboardActions
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
-import com.emendo.expensestracker.core.ui.CalculatorRow
 
 private const val MATH_OPERATION_WEIGHT = 3f
 private const val DIGIT_BUTTON_WEIGHT = 5f

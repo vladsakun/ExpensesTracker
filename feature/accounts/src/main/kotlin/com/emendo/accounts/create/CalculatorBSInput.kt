@@ -2,9 +2,9 @@ package com.emendo.accounts.create
 
 import com.emendo.expensestracker.core.app.common.result.AmountFormatter
 import com.emendo.expensestracker.core.app.common.result.appendIfNotNull
+import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.MathOperation
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
-import com.emendo.expensestracker.core.ui.bottomsheet.EqualButtonState
 
 class CalculatorBSInput(
   var number1: StringBuilder,

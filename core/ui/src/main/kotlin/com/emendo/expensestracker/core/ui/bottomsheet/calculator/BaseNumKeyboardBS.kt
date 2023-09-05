@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.ui.bottomsheet
+package com.emendo.expensestracker.core.ui.bottomsheet.calculator
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -14,10 +14,9 @@ import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.ui.CalculatorRow
 
 @Composable
-fun CalculatorBS(
+fun BaseNumKeyboardBS(
   onChangeSignClick: () -> Unit,
   onClearClick: () -> Unit,
   onNumberClick: (number: Int) -> Unit,

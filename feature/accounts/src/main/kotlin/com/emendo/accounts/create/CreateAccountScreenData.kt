@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.ui.bottomsheet.EqualButtonState
+import com.emendo.expensestracker.core.model.data.EqualButtonState
 
 @Stable
 data class CreateAccountScreenData(

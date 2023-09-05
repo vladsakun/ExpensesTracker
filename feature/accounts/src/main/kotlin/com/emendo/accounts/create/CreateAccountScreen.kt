@@ -26,7 +26,7 @@ import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.*
 import com.emendo.expensestracker.core.ui.*
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceBS
+import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.toImmutableList
