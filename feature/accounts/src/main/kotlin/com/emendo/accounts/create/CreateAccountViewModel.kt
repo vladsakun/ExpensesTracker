@@ -155,7 +155,7 @@ class CreateAccountViewModel @Inject constructor(
     }
   }
 
-  fun onDismissRequest() {
+  fun onDismissBottomSheetRequest() {
     if (bottomSheet.value is BottomSheetType.Calculator) {
       onDoneClick()
     }

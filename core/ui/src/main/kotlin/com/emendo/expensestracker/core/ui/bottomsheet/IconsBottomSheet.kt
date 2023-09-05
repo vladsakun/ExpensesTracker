@@ -1,4 +1,4 @@
-package com.emendo.accounts.create.bottomsheet
+package com.emendo.expensestracker.core.ui.bottomsheet
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,22 +15,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.emendo.accounts.create.ITEM_FIXED_SIZE_DP
-import com.emendo.accounts.create.SELECTED_ICON_BORDER_WIDTH
-import com.emendo.accounts.create.SELECTED_ITEM_ALPHA_BORDER
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.designsystem.component.bottomsheet.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.conditional
+import com.emendo.expensestracker.core.ui.Constants.ITEM_FIXED_SIZE_DP
+import com.emendo.expensestracker.core.ui.Constants.SELECTED_ICON_BORDER_WIDTH
+import com.emendo.expensestracker.core.ui.Constants.SELECTED_ITEM_ALPHA_BORDER
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun IconsBottomSheet(
-  icons: ImmutableList<IconModel>,
   selectedIcon: IconModel,
   onIconSelect: (color: IconModel) -> Unit,
   onCloseClick: () -> Unit,
+  icons: ImmutableList<IconModel> = IconModel.entries.toImmutableList(),
 ) {
   ExpeBottomSheet(
     titleResId = R.string.icon,

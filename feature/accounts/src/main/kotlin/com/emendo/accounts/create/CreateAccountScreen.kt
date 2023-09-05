@@ -7,14 +7,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.accounts.create.bottomsheet.ColorsBottomSheet
-import com.emendo.accounts.create.bottomsheet.CurrenciesBottomSheet
-import com.emendo.accounts.create.bottomsheet.IconsBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.ColorsBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.CurrenciesBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.IconsBottomSheet
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
@@ -26,6 +25,7 @@ import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.*
 import com.emendo.expensestracker.core.ui.*
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.ExpeModalBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -33,11 +33,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
-
-const val SELECTED_ICON_BORDER_WIDTH = 3
-const val SELECTED_COLOR_BORDER_WIDTH = 3
-const val SELECTED_ITEM_ALPHA_BORDER = 0.2f
-const val ITEM_FIXED_SIZE_DP = 60
 
 @Destination
 @Composable
@@ -47,7 +42,6 @@ fun CreateAccountRoute(
 ) {
   // Todo ask Pavel Haluza why Remember(viewModel) does not work
   val onAccountNameChange = remember { { model: String -> viewModel.setAccountName(model) } }
-  val onDismissRequest = remember { { viewModel.onDismissRequest() } }
   CreateAccountScreen(
     state = viewModel.state.collectAsStateWithLifecycle(),
     bottomSheetType = viewModel.bottomSheet.collectAsStateWithLifecycle(),
@@ -57,7 +51,7 @@ fun CreateAccountRoute(
     onCreateAccountClick = viewModel::createNewAccount,
     onNavigationClick = navigator::navigateUp,
     onInitialBalanceRowClick = viewModel::onInitialBalanceClick,
-    onDismissRequest = onDismissRequest,
+    onDismissBottomSheetRequest = viewModel::onDismissBottomSheetRequest,
     onIconRowClick = viewModel::onIconRowClick,
     onColorRowClick = viewModel::onColorRowClick,
     onCurrencyRowClick = viewModel::onCurrencyRowClick,
@@ -75,7 +69,7 @@ private fun CreateAccountScreen(
   onCreateAccountClick: () -> Unit,
   onNavigationClick: () -> Unit,
   onInitialBalanceRowClick: () -> Unit,
-  onDismissRequest: () -> Unit,
+  onDismissBottomSheetRequest: () -> Unit,
   onIconRowClick: () -> Unit,
   onColorRowClick: () -> Unit,
   onCurrencyRowClick: () -> Unit,
@@ -102,23 +96,23 @@ private fun CreateAccountScreen(
   LaunchedEffect(Unit) {
     snapshotFlow { bottomSheetState.currentValue }
       .collect {
-        if (it == SheetValue.Hidden) onDismissRequest()
+        if (it == SheetValue.Hidden) onDismissBottomSheetRequest()
       }
   }
 
-  val TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+  val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
   val isCreateButtonEnabled = remember { derivedStateOf { state.value.isCreateAccountButtonEnabled } }
   val scrollState = rememberScrollState()
 
   ExpeScaffold(
     modifier = Modifier
       .fillMaxSize()
-      .nestedScroll(TopAppBarScrollBehavior.nestedScrollConnection),
+      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
     topBar = {
       ExpeTopBar(
         titleRes = R.string.create_account,
         navigationIcon = { NavigationBackIcon(onNavigationClick = onNavigationClick) },
-        scrollBehavior = TopAppBarScrollBehavior,
+        scrollBehavior = topAppBarScrollBehavior,
       )
     },
   ) { paddingValues ->
@@ -161,35 +155,12 @@ private fun CreateAccountScreen(
     }
   }
 
-  CreateAccountModalBottomSheet(
+  ExpeModalBottomSheet(
     bottomSheetState = bottomSheetState,
     bottomSheetType = bottomSheetType,
     closeBottomSheet = closeBottomSheet,
-  ) {
-    BottomSheetContent(bottomSheetType.value, closeBottomSheet)
-  }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun CreateAccountModalBottomSheet(
-  bottomSheetState: SheetState,
-  bottomSheetType: State<BottomSheetType?>,
-  closeBottomSheet: () -> Unit,
-  bottomSheetContent: @Composable ColumnScope.() -> Unit,
-) {
-  val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetType.value != null } }
-  val focusManager = LocalFocusManager.current
-
-  if (shouldOpenBottomSheet.value) {
-    focusManager.clearFocus()
-    ModalBottomSheet(
-      onDismissRequest = {},
-      sheetState = bottomSheetState,
-      windowInsets = WindowInsets(0),
-      shape = ExpeBottomSheetShape,
-      content = bottomSheetContent,
-    )
+  ) { type, closeBottomSheet ->
+    BottomSheetContent(type, closeBottomSheet)
   }
 }
 
@@ -307,8 +278,6 @@ private fun BottomSheetContent(
         currency = type.currency,
       )
     }
-
-    else -> Unit
   }
 }
 
@@ -330,7 +299,7 @@ private fun CreateAccountScreenPreview(
       onCreateAccountClick = {},
       onNavigationClick = {},
       onInitialBalanceRowClick = {},
-      onDismissRequest = {},
+      onDismissBottomSheetRequest = {},
       onIconRowClick = {},
       onColorRowClick = {},
       onCurrencyRowClick = {},

@@ -54,7 +54,13 @@ class CreateCategoryViewModel @Inject constructor(
           color = state.value.color,
         )
       )
+      navigateUpChannel.trySend(Unit)
     }
+  }
+
+  fun onDismissBottomSheetRequest() {
+    hideBottomSheetChannel.trySend(Unit)
+    _bottomSheetState.update { null }
   }
 
   private fun onIconSelected(iconModel: IconModel) {

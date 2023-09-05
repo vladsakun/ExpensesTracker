@@ -55,16 +55,16 @@ private fun AccountsListScreenContent(
   uiState: AccountsListUiState,
   onAddAccountClick: () -> Unit,
 ) {
-  val TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+  val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
   ExpeScaffold(
     modifier = Modifier
       .fillMaxSize()
-      .nestedScroll(TopAppBarScrollBehavior.nestedScrollConnection),
+      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
     topBar = {
       ExpeTopBar(
         titleRes = R.string.accounts,
-        scrollBehavior = TopAppBarScrollBehavior,
+        scrollBehavior = topAppBarScrollBehavior,
       )
     },
     floatingActionButtonPosition = FabPosition.End,

@@ -1,4 +1,4 @@
-package com.emendo.accounts.create.bottomsheet
+package com.emendo.expensestracker.core.ui.bottomsheet
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,12 +15,13 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.bottomsheet.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun CurrenciesBottomSheet(
-  currencies: ImmutableList<CurrencyModel>,
   onSelectCurrency: (currencyModel: CurrencyModel) -> Unit,
   onCloseClick: () -> Unit,
+  currencies: ImmutableList<CurrencyModel> = CurrencyModel.entries.toImmutableList(),
 ) {
   ExpeBottomSheet(
     titleResId = R.string.currency,

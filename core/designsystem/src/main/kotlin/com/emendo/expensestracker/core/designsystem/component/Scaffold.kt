@@ -49,19 +49,19 @@ fun ExpeScaffoldWithTopBar(
   contentColor: Color = contentColorFor(containerColor),
   content: @Composable (PaddingValues) -> Unit,
 ) {
-  val TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+  val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
   ExpeScaffold(
     topBar = {
       ExpeTopBar(
         titleRes = titleResId,
         onNavigationBackClick = onNavigationClick,
-        scrollBehavior = TopAppBarScrollBehavior,
+        scrollBehavior = topAppBarScrollBehavior,
       )
     },
     modifier = modifier
       .fillMaxSize()
-      .nestedScroll(TopAppBarScrollBehavior.nestedScrollConnection),
+      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
     snackbarHost = snackbarHost,
     floatingActionButton = floatingActionButton,
     floatingActionButtonPosition = floatingActionButtonPosition,
