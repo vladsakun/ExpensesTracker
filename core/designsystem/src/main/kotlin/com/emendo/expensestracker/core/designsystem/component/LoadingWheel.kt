@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import com.emendo.expensestracker.core.app.resources.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun ExpLoadingWheel(
@@ -77,6 +77,7 @@ fun ExpLoadingWheel(
         repeatMode = RepeatMode.Restart,
         initialStartOffset = StartOffset(ROTATION_TIME / NUM_OF_LINES / 2 * index),
       ),
+      label = "Color",
     )
   }
 

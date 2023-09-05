@@ -4,13 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
+import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
+import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.model.Account
-import com.emendo.expensestracker.core.data.model.AccountIconModel
-import com.emendo.expensestracker.core.data.model.CurrencyModel
-import com.emendo.expensestracker.core.data.model.ColorModel
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -37,7 +36,7 @@ fun generateAccounts(): List<Account> {
       name = "Account $index",
       balance = 100.0,
       currencyModel = CurrencyModel.USD,
-      icon = AccountIconModel.EDUCATION,
+      icon = IconModel.EDUCATION,
       color = ColorModel.GREEN
     )
   }

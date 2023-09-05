@@ -16,7 +16,7 @@ import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpeTopAppBar(
+fun ExpeTopBar(
   @StringRes titleRes: Int,
   modifier: Modifier = Modifier,
   navigationIcon: @Composable () -> Unit,
@@ -47,17 +47,17 @@ fun ExpeTopAppBar(
       }
     },
     colors = colors,
-    modifier = modifier.testTag("expeTopAppBar"),
+    modifier = modifier.testTag("expeTopBar"),
     scrollBehavior = scrollBehavior,
   )
 }
 
 /**
- * Top app bar with action, displayed on the right
+ * Top  bar with action, displayed on the right
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpeTopAppBar(
+fun ExpeTopBar(
   @StringRes titleRes: Int,
   actionIcon: ImageVector,
   actionIconContentDescription: String,
@@ -65,7 +65,7 @@ fun ExpeTopAppBar(
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   onActionClick: () -> Unit = {},
 ) {
-  ExpeTopAppBar(
+  ExpeTopBar(
     titleRes = titleRes,
     actionIcon = actionIcon,
     actionIconContentDescription = actionIconContentDescription,
@@ -77,22 +77,43 @@ fun ExpeTopAppBar(
 }
 
 /**
- * Top app bar with no actions
+ * Top  bar with no actions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpeTopAppBar(
+fun ExpeTopBar(
   @StringRes titleRes: Int,
   modifier: Modifier = Modifier,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-  ExpeTopAppBar(
+  ExpeTopBar(
     titleRes = titleRes,
     colors = colors,
     modifier = modifier,
     scrollBehavior = scrollBehavior,
     navigationIcon = {},
+  )
+}
+
+/**
+ * Top  bar with back navigation
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExpeTopBar(
+  @StringRes titleRes: Int,
+  onNavigationBackClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+  ExpeTopBar(
+    titleRes = titleRes,
+    colors = colors,
+    modifier = modifier,
+    scrollBehavior = scrollBehavior,
+    navigationIcon = { NavigationBackIcon(onNavigationClick = onNavigationBackClick) },
   )
 }
 
@@ -114,10 +135,10 @@ fun NavigationBackIcon(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview("Top App Bar")
+@Preview("Top  Bar")
 @Composable
-private fun NiaTopAppBarPreview() {
-  ExpeTopAppBar(
+private fun NiaTopBarPreview() {
+  ExpeTopBar(
     titleRes = R.string.untitled,
     navigationIcon = {},
     actionIcon = ExpIcons.Add,

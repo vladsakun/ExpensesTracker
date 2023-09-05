@@ -13,4 +13,16 @@
   <string name="done">Done</string>
   <string name="currency_with_symbol">Currency\n%s</string>
   <string name="loading">Loading</string>
+  <string name="currency">Currency</string>
+  <string name="icon">Icon</string>
+  <string name="color">Color</string>
+  <string name="balance">Balance</string>
+  <string name="accounts">Accounts</string>
+  <string name="accounts_loading">Loading accounts</string>
+  <string name="account_name">Account name</string>
+  <string name="create_account">Create account</string>
+  <string name="categories">Categories</string>
+  <string name="categories_loading">Categories loading</string>
+  <string name="create_category">Create category</string>
+  <string name="transactions">Transactions</string>
 </resources>

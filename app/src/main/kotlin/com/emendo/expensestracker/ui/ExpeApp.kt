@@ -1,28 +1,22 @@
 package com.emendo.expensestracker.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.emendo.accounts.destinations.AccountsScreenDestination
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
-import com.ramcosta.composedestinations.navigation.navigate
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable

@@ -4,12 +4,10 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.accounts.AccountsNavGraph
 import com.emendo.categories.CategoriesNavGraph
+import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
-import com.emendo.expensestracker.feature.accounts.R as AR
-import com.emendo.expensestracker.feature.categories.R as CR
-import com.emendo.expensestracker.feature.transactions.R as TR
 
 /**
  * Type for the top level destinations in the application. Each of these destinations
@@ -27,21 +25,21 @@ enum class TopLevelDestination(
     screen = AccountsNavGraph,
     selectedIcon = ExpIcons.CreditCard,
     unselectedIcon = ExpIcons.CreditCardBorder,
-    iconTextId = AR.string.accounts,
-    titleTextId = AR.string.accounts,
+    iconTextId = R.string.accounts,
+    titleTextId = R.string.accounts,
   ),
   CATEGORIES(
     screen = CategoriesNavGraph,
     selectedIcon = ExpIcons.DonutLarge,
     unselectedIcon = ExpIcons.DonutLargeBorder,
-    iconTextId = CR.string.categories,
-    titleTextId = CR.string.categories,
+    iconTextId = R.string.categories,
+    titleTextId = R.string.categories,
   ),
   TRANSACTIONS(
     screen = TransactionsNavGraph,
     selectedIcon = ExpIcons.ReceiptLong,
     unselectedIcon = ExpIcons.ReceiptLongBorder,
-    iconTextId = TR.string.transactions,
-    titleTextId = TR.string.transactions,
+    iconTextId = R.string.transactions,
+    titleTextId = R.string.transactions,
   ),
 }

@@ -1,8 +1,7 @@
 package com.emendo.transactions
 
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
-import com.emendo.expensestracker.core.data.model.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

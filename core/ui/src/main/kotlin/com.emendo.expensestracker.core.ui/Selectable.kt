@@ -1,14 +1,22 @@
-package com.emendo.expensestracker.core.designsystem.component
+package com.emendo.expensestracker.core.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -18,7 +26,7 @@ import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRad
 
 @Composable
 fun SelectRow(
-  label: String,
+  @StringRes labelResId: Int,
   onClick: () -> Unit,
   labelModifier: @Composable RowScope.() -> Modifier = { Modifier },
   endLayout: @Composable RowScope.() -> Unit = {},
@@ -34,25 +42,35 @@ fun SelectRow(
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(
-      text = label,
-      style = MaterialTheme.typography.bodyLarge,
-      modifier = labelModifier(),
-    )
-    endLayout()
+    SelectRowContent(labelResId, labelModifier, endLayout)
   }
 }
 
 @Composable
+private fun RowScope.SelectRowContent(
+  @StringRes labelResId: Int,
+  labelModifier: @Composable (RowScope.() -> Modifier),
+  endLayout: @Composable (RowScope.() -> Unit),
+) {
+  Text(
+    text = stringResource(id = labelResId),
+    style = MaterialTheme.typography.bodyLarge,
+    modifier = labelModifier(),
+  )
+  endLayout()
+}
+
+@Composable
 fun SelectRowWithIcon(
-  label: String,
+  @StringRes labelResId: Int,
   imageVector: ImageVector,
   onClick: () -> Unit,
 ) {
+  val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
   SelectRow(
-    label = label,
+    labelResId = labelResId,
     onClick = onClick,
-    labelModifier = { Modifier.weight(1f) },
+    labelModifier = labelModifier,
     endLayout = {
       Icon(
         imageVector = imageVector,
@@ -64,13 +82,13 @@ fun SelectRowWithIcon(
 
 @Composable
 fun SelectRowWithText(
-  label: String,
+  @StringRes labelResId: Int,
   text: String,
   onClick: () -> Unit,
   textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
   SelectRow(
-    label = label,
+    labelResId = labelResId,
     onClick = onClick,
     labelModifier = { Modifier.weight(1f) },
     endLayout = {
@@ -80,6 +98,27 @@ fun SelectRowWithText(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.End,
+      )
+    },
+  )
+}
+
+@Composable
+fun SelectRowWithColor(
+  @StringRes labelResId: Int,
+  color: Color,
+  onClick: () -> Unit,
+) {
+  SelectRow(
+    labelResId = labelResId,
+    onClick = onClick,
+    endLayout = {
+      Box(
+        modifier = Modifier
+          .size(Dimens.icon_size)
+          .aspectRatio(1f)
+          .clip(shape = CircleShape)
+          .background(color = color)
       )
     },
   )

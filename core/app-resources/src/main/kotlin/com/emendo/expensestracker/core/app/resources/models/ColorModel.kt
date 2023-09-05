@@ -1,7 +1,9 @@
-package com.emendo.expensestracker.core.data.model
+package com.emendo.expensestracker.core.app.resources.models
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
+@Stable
 enum class ColorModel constructor(
   val id: Int,
   val color: Color,
@@ -39,10 +41,9 @@ enum class ColorModel constructor(
   CLINKER(31, Color(0xff301108));
 
   companion object {
-    private val values = values().associateBy { it.id }
+    private val values = entries.associateBy { it.id }
 
-    fun getById(id: Int): ColorModel {
-      return values[id] ?: throw IllegalArgumentException("No EntityColor with id $id")
-    }
+    fun getById(id: Int) = values[id] ?: throw IllegalArgumentException("No EntityColor with id $id")
+    inline val random get() = entries.random()
   }
 }

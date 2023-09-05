@@ -1,11 +1,8 @@
-package com.emendo.expensestracker.core.designsystem.component.bottomsheet
+package com.emendo.expensestracker.core.ui.bottomsheet
 
-import android.os.Parcelable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,32 +19,20 @@ import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.designsystem.component.AutoSizableText
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import kotlinx.parcelize.Parcelize
+import com.emendo.expensestracker.core.model.data.MathOperation
+import com.emendo.expensestracker.core.model.data.NumKeyboardActions
+import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
+import com.emendo.expensestracker.core.ui.CalculatorRow
 
 private const val MATH_OPERATION_WEIGHT = 3f
 private const val DIGIT_BUTTON_WEIGHT = 5f
 
-@Stable
-sealed interface EqualButtonState : Parcelable {
-  @Parcelize
-  @Stable
-  data object Equal : EqualButtonState
-
-  @Parcelize
-  @Stable
-  data object Done : EqualButtonState
-}
-
-private fun Modifier.applyKeyboardPadding() = this
-  .padding(horizontal = Dimens.margin_small_xx)
-  .fillMaxHeight()
-
 @Composable
 fun InitialBalanceBS(
   text: State<String>,
-  currency: State<String>,
+  currency: String,
   equalButtonState: State<EqualButtonState>,
-  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
+  initialBalanceActions: NumKeyboardActions,
   decimalSeparator: String,
 ) {
   Column(
@@ -69,7 +54,7 @@ fun InitialBalanceBS(
 
     CalculatorRow {
       RoundedCornerSmallButton(
-        onClick = initialBalanceActions.onChangeSignClick,
+        onClick = initialBalanceActions::onChangeSignClick,
         colors = ButtonDefaults.filledTonalButtonColors(),
         modifier = digitModifier,
         contentPadding = PaddingValues(0.dp),
@@ -81,21 +66,21 @@ fun InitialBalanceBS(
         )
       }
       RoundedCornerSmallButton(
-        onClick = initialBalanceActions.onCurrencyClick,
+        onClick = initialBalanceActions::onCurrencyClick,
         enabled = false,
         colors = ButtonDefaults.filledTonalButtonColors(),
         modifier = digitModifier,
         contentPadding = PaddingValues(0.dp),
       ) {
         Text(
-          text = stringResource(id = R.string.currency_with_symbol, currency.value),
+          text = stringResource(id = R.string.currency_with_symbol, currency),
           modifier = Modifier.align(Alignment.CenterVertically),
           textAlign = TextAlign.Center,
           style = LocalTextStyle.current.copy(lineHeight = 15.sp),
         )
       }
       RoundedCornerSmallButton(
-        onClick = initialBalanceActions.onClearClick,
+        onClick = initialBalanceActions::onClearClick,
         colors = ButtonDefaults.filledTonalButtonColors(),
         modifier = digitModifier,
       ) {
@@ -150,7 +135,7 @@ fun InitialBalanceBS(
     }
     CalculatorRow {
       RoundedCornerSmallButton(
-        onClick = initialBalanceActions.onPrecisionClick,
+        onClick = initialBalanceActions::onPrecisionClick,
         colors = ButtonDefaults.filledTonalButtonColors(),
         contentPadding = PaddingValues(0.dp),
         modifier = digitModifier,
@@ -187,7 +172,7 @@ private fun ResultText(text: State<String>) {
 @Composable
 private fun RowScope.DoneButton(
   equalButtonState: State<EqualButtonState>,
-  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
+  initialBalanceActions: NumKeyboardActions,
 ) {
   RoundedCornerSmallButton(
     onClick = {
@@ -219,7 +204,7 @@ private fun RowScope.DoneButton(
 
 @Composable
 private fun MathOperationButton(
-  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
+  initialBalanceActions: NumKeyboardActions,
   mathOperation: MathOperation,
   modifier: Modifier,
   contentDescription: String,
@@ -242,7 +227,7 @@ private fun MathOperationButton(
 
 @Composable
 private fun DigitButton(
-  initialBalanceActions: NumKeyboardActions.InitialBalanceActions,
+  initialBalanceActions: NumKeyboardActions,
   number: NumKeyboardNumber,
   modifier: Modifier,
 ) {
@@ -258,3 +243,7 @@ private fun DigitButton(
     )
   }
 }
+
+private fun Modifier.applyKeyboardPadding() = this
+  .padding(horizontal = Dimens.margin_small_xx)
+  .fillMaxHeight()

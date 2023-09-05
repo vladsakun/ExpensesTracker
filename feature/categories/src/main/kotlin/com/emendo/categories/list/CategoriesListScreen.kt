@@ -1,8 +1,6 @@
 package com.emendo.categories.list
 
-import android.icu.util.Currency
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,15 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.categories.destinations.CreateCategoryScreenDestination
+import com.emendo.categories.destinations.CreateCategoryRouteDestination
+import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
-import com.emendo.expensestracker.feature.categories.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.delay
-import timber.log.Timber
 
 private val PADDING_CATEGORY_ITEM_PADDING = 16.dp
 private const val OVERVIEW_BLOCK_CATEGORIES_AMOUNT = 8
@@ -48,9 +43,9 @@ inline val CategoryItemType.key
 @RootNavGraph(start = true)
 @Destination(start = true)
 @Composable
-fun CategoriesListScreen(
+fun CategoriesListRoute(
   navigator: DestinationsNavigator,
-  viewModel: CategoriesListViewModel = hiltViewModel()
+  viewModel: CategoriesListViewModel = hiltViewModel(),
 ) {
   var isEditMode by remember { mutableStateOf(false) }
 
@@ -71,7 +66,7 @@ fun CategoriesListScreen(
     cellSizeDp,
     isEditMode
   ) {
-    navigator.navigate(CreateCategoryScreenDestination)
+    navigator.navigate(CreateCategoryRouteDestination)
   }
 }
 

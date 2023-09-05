@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.designsystem.component.bottomsheet
+package com.emendo.expensestracker.core.model.data
 
 sealed interface NumKeyboardNumber {
   val number: Int

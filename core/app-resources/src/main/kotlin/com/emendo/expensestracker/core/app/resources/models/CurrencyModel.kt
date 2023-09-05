@@ -1,7 +1,8 @@
-package com.emendo.expensestracker.core.data.model
+package com.emendo.expensestracker.core.app.resources.models
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
+@Stable
 enum class CurrencyModel constructor(
   val id: Int,
   val currencySymbol: String,
@@ -90,7 +91,7 @@ enum class CurrencyModel constructor(
   ZAR(80, "R", "ZAR");
 
   companion object {
-    private val values = CurrencyModel.values().associateBy { it.id }
+    private val values = entries.associateBy { it.id }
 
     fun getById(id: Int): CurrencyModel {
       return values[id] ?: throw IllegalArgumentException("No Currency with id $id")

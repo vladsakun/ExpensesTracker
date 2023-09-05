@@ -1,6 +1,5 @@
-package com.emendo.expensestracker.core.designsystem.component.bottomsheet
+package com.emendo.expensestracker.core.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height

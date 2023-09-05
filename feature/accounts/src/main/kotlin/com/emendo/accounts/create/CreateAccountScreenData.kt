@@ -1,35 +1,36 @@
 package com.emendo.accounts.create
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.emendo.expensestracker.core.data.model.AccountIconModel
-import com.emendo.expensestracker.core.data.model.ColorModel
-import com.emendo.expensestracker.core.data.model.CurrencyModel
-import com.emendo.expensestracker.core.designsystem.component.bottomsheet.EqualButtonState
+import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
+import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.ui.bottomsheet.EqualButtonState
 
-@Immutable
+@Stable
 data class CreateAccountScreenData(
   val accountName: String,
-  val icon: AccountIconModel,
+  val icon: IconModel,
   val color: ColorModel,
   val initialBalance: String,
   val currency: CurrencyModel,
-  @Stable val equalButtonState: EqualButtonState,
+  val equalButtonState: EqualButtonState,
   val decimalSeparator: String,
   val isCreateAccountButtonEnabled: Boolean,
 ) {
 
   companion object {
+    const val DEFAULT_INITIAL_BALANCE = "0"
+
     fun getDefaultState(
-      defaultCurrency: CurrencyModel = CurrencyModel.USD,
+      defaultCurrency: CurrencyModel = CurrencyModel.USD,  // Todo pass favourite currency
       decimalSeparator: String = ".",
     ) = CreateAccountScreenData(
       accountName = "",
-      icon = AccountIconModel.GROCERIES,
-      color = ColorModel.GREEN,
-      initialBalance = "0",
+      icon = IconModel.random,
+      color = ColorModel.random,
+      initialBalance = DEFAULT_INITIAL_BALANCE,
       currency = defaultCurrency,
-      equalButtonState = EqualButtonState.Done,
+      equalButtonState = EqualButtonState.Default,
       decimalSeparator = decimalSeparator,
       isCreateAccountButtonEnabled = false,
     )

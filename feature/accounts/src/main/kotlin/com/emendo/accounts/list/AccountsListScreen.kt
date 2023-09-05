@@ -1,6 +1,5 @@
 package com.emendo.accounts.list
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,38 +13,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
-import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
+import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
 import com.emendo.expensestracker.core.data.model.Account
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.divider_color
-import com.emendo.expensestracker.feature.accounts.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
-private const val TAG = "AccountsListScreen"
-
 @Destination(start = true)
 @Composable
-fun AccountsScreen(
+fun AccountsScreenRoute(
   navigator: DestinationsNavigator,
   viewModel: AccountsListViewModel = hiltViewModel(),
 ) {
 
   if (IS_DEBUG_CREATE_ACCOUNT) {
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
       delay(200)
       navigator.navigate(CreateAccountRouteDestination)
     }
@@ -61,16 +55,16 @@ private fun AccountsListScreenContent(
   uiState: AccountsListUiState,
   onAddAccountClick: () -> Unit,
 ) {
-  val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+  val TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
   ExpeScaffold(
     modifier = Modifier
       .fillMaxSize()
-      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+      .nestedScroll(TopAppBarScrollBehavior.nestedScrollConnection),
     topBar = {
-      ExpeTopAppBar(
+      ExpeTopBar(
         titleRes = R.string.accounts,
-        scrollBehavior = topAppBarScrollBehavior,
+        scrollBehavior = TopAppBarScrollBehavior,
       )
     },
     floatingActionButtonPosition = FabPosition.End,

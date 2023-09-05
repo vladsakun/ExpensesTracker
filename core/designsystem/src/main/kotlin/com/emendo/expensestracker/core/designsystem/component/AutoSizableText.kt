@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.core.designsystem.component
 
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,7 +11,6 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import timber.log.Timber
 
@@ -49,8 +47,7 @@ fun AutoSizableText(
       }
     }
 
-    // Todo discover minIntrinsicWidth
-    // Todo discover maxIntrinsicWidth
+    // Todo discover minIntrinsicWidth, maxIntrinsicWidth
     Text(
       text = text,
       modifier = Modifier

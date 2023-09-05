@@ -1,10 +1,11 @@
-package com.emendo.expensestracker.core.data.model
+package com.emendo.expensestracker.core.app.resources.models
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
 
-enum class AccountIconModel constructor(
+@Stable
+enum class IconModel constructor(
   val id: Int,
   val imageVector: ImageVector,
 ) {
@@ -23,10 +24,9 @@ enum class AccountIconModel constructor(
   OTHERS(13, AccountIcons.Square);
 
   companion object {
-    private val values = values().associateBy { it.id }
+    private val values = entries.associateBy { it.id }
 
-    fun getById(id: Int): AccountIconModel {
-      return values[id] ?: throw IllegalArgumentException("No AccountIconResource with id $id")
-    }
+    fun getById(id: Int) = values[id] ?: throw IllegalArgumentException("No IconResource with id $id")
+    inline val random get() = entries.random()
   }
 }

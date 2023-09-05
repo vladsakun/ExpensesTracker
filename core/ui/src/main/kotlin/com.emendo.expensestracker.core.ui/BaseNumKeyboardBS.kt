@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.designsystem.component.bottomsheet
+package com.emendo.expensestracker.core.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

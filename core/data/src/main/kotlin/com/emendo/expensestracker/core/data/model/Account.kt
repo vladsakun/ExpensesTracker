@@ -1,5 +1,8 @@
 package com.emendo.expensestracker.core.data.model
 
+import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
+import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -9,26 +12,24 @@ data class Account constructor(
   val name: String,
   val balance: Double,
   val currencyModel: CurrencyModel,
-  val icon: AccountIconModel,
+  val icon: IconModel,
   val color: ColorModel,
 ) {
-
-  val decimalFormat = DecimalFormat("#.##").apply {
-    roundingMode = RoundingMode.HALF_UP
-  }
-
   val formattedBalance: String
     get() = decimalFormat.format(balance) + " " + currencyModel.currencySymbol
+
+  private val decimalFormat = DecimalFormat("#.##").apply {
+    roundingMode = RoundingMode.HALF_UP
+  }
 }
 
 fun AccountEntity.toExternalModel(): Account = with(this) {
-  val currencyModel = CurrencyModel.getById(currencyId)
   Account(
     id = id,
     name = name,
     balance = balance,
-    currencyModel = currencyModel,
-    icon = AccountIconModel.getById(iconId),
+    currencyModel = CurrencyModel.getById(currencyId),
+    icon = IconModel.getById(iconId),
     color = ColorModel.getById(colorId),
   )
 }

@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.ui
 
-import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -12,16 +11,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.emendo.accounts.destinations.AccountsScreenDestination
-import com.emendo.categories.destinations.CategoriesListScreenDestination
 import com.emendo.expensestracker.navigation.TopLevelDestination
-import com.emendo.transactions.destinations.TransactionsScreenDestination
 import com.ramcosta.composedestinations.navigation.navigate
-import com.ramcosta.composedestinations.spec.DestinationSpec
-import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import kotlinx.coroutines.CoroutineScope
-
-private const val TAG = "ExpeAppState"
 
 @Composable
 fun rememberExpeAppState(
@@ -52,17 +44,6 @@ class ExpeAppState constructor(
   val currentDestination: NavDestination?
     @Composable get() = navController
       .currentBackStackEntryAsState().value?.destination
-
-  val currentComposableDestination: DestinationSpec<*>?
-    @Composable get() = navController.currentDestinationAsState().value
-
-  val currentTopLevelDestination: TopLevelDestination?
-    @Composable get() = when (navController.currentDestinationAsState().value) {
-      is AccountsScreenDestination -> TopLevelDestination.ACCOUNTS
-      is CategoriesListScreenDestination -> TopLevelDestination.CATEGORIES
-      is TransactionsScreenDestination -> TopLevelDestination.TRANSACTIONS
-      else -> null
-    }
 
   val shouldShowBottomBar: Boolean
     get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact

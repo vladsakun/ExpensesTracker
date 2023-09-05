@@ -23,6 +23,7 @@ include(":core:common")
 include(":core:designsystem")
 include(":core:database")
 include(":core:model")
+include(":core:ui")
 
 include(":feature:accounts")
 include(":feature:categories")

@@ -1,18 +1,18 @@
 package com.emendo.transactions
 
-import com.emendo.expensestracker.core.data.model.AccountIconModel
-import com.emendo.expensestracker.core.data.model.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.IconModel
 
 data class TransactionsScreenData(
   val accountName: String,
-  val icon: AccountIconModel,
+  val icon: IconModel,
   val color: ColorModel,
 ) {
   companion object {
     fun getDefaultState() =
       TransactionsScreenData(
         accountName = "",
-        icon = AccountIconModel.GROCERIES,
+        icon = IconModel.GROCERIES,
         color = ColorModel.GREEN,
       )
   }
