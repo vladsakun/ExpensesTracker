@@ -15,7 +15,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
-import com.emendo.expensestracker.core.designsystem.component.ExpeTextField
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -35,7 +34,6 @@ fun TransactionsScreen(
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      ExpeTextField(label = "Account name", text = state.accountName, onValueChange = viewModel::nameChanged)
       Icon(imageVector = state.icon.imageVector, contentDescription = "Icon")
       ColorBox(onColorClick, state.color)
     }
@@ -68,7 +66,6 @@ private fun TransactionsScreenContent(
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      ExpeTextField(label = "Account name", text = state.value.accountName, onValueChange = onNameChanged)
       Icon(imageVector = state.value.icon.imageVector, contentDescription = "Icon")
       Box(
         modifier = Modifier

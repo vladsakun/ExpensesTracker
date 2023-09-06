@@ -53,6 +53,8 @@ secrets = "2.0.1"
 turbine = "0.12.1"
 composeDestinations = "1.9.51"
 kotlinImmutableCollections = "0.3.5"
+timber = "5.0.1"
+composeStateEvents = "2.0.3"
 # Android SDK versions
 compileSdk = "34"
 targetSdk = "34"
@@ -136,7 +138,8 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 compose-destinations = { group = "io.github.raamcosta.compose-destinations", name = "core", version.ref = "composeDestinations" }
 compose-destinations-ksp = { group = "io.github.raamcosta.compose-destinations", name = "ksp", version.ref = "composeDestinations" }
-timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+compose-state-events = { group = "com.github.leonard-palm", name = "compose-state-events", version.ref = "composeStateEvents" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

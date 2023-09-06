@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.ui.bottomsheet
 
+import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -7,6 +8,7 @@ import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.NumKeyboardActions
 import kotlinx.coroutines.flow.StateFlow
 
+@Stable
 interface BottomSheetType {
   data class Icon(
     val selectedIcon: IconModel,

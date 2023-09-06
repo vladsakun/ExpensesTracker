@@ -1,6 +1,5 @@
 package com.emendo.categories.create
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -8,10 +7,8 @@ import com.emendo.expensestracker.core.data.model.Category
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,22 +16,18 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateCategoryViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
-) : ViewModel() {
+) : BaseBottomSheetViewModel<BottomSheetType>() {
 
   private val _state = MutableStateFlow(CreateCategoryScreenData.getDefault())
   val state = _state.asStateFlow()
 
-  private val _bottomSheetState = MutableStateFlow<BottomSheetType?>(null)
-  val bottomSheetState = _bottomSheetState.asStateFlow()
-
-  private val hideBottomSheetChannel = Channel<Unit>(Channel.CONFLATED)
-  val hideBottomSheetEvent = hideBottomSheetChannel.receiveAsFlow()
-
-  private val navigateUpChannel = Channel<Unit>(Channel.CONFLATED)
-  val navigateUpEvent = navigateUpChannel.receiveAsFlow()
-
   fun onTitleChanged(newTitle: String) {
-    _state.update { it.copy(title = newTitle) }
+    _state.update {
+      it.copy(
+        title = newTitle,
+        isCreateButtonEnabled = newTitle.isNotBlank(),
+      )
+    }
   }
 
   fun onIconSelectClick() {
@@ -56,11 +49,6 @@ class CreateCategoryViewModel @Inject constructor(
       )
       navigateUpChannel.trySend(Unit)
     }
-  }
-
-  fun onDismissBottomSheetRequest() {
-    hideBottomSheetChannel.trySend(Unit)
-    _bottomSheetState.update { null }
   }
 
   private fun onIconSelected(iconModel: IconModel) {

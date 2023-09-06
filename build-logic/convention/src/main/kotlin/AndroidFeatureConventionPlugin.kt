@@ -40,6 +40,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         add("implementation", libs.findLibrary("compose.destinations").get())
         add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
         add("implementation", libs.findLibrary("kotlinx.immutable.collections").get())
+        add("implementation", libs.findLibrary("compose.state.events").get())
 
         add("ksp", libs.findLibrary("compose.destinations.ksp").get())
       }

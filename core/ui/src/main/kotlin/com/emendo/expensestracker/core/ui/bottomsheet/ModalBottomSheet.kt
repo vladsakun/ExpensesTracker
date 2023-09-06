@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.ui.bottomsheet
 
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -16,9 +15,9 @@ import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 @OptIn(ExperimentalMaterial3Api::class)
 fun <BottomSheetType> ExpeModalBottomSheet(
   bottomSheetState: SheetState,
-  bottomSheetType: State<BottomSheetType>,
+  bottomSheetType: State<BottomSheetType?>,
   closeBottomSheet: () -> Unit,
-  bottomSheetContent: @Composable (ColumnScope.(type: BottomSheetType, closeBottomSheet: () -> Unit) -> Unit),
+  bottomSheetContent: @Composable (type: BottomSheetType?, closeBottomSheet: () -> Unit) -> Unit,
 ) {
   val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetType.value != null } }
   val focusManager = LocalFocusManager.current
@@ -30,7 +29,9 @@ fun <BottomSheetType> ExpeModalBottomSheet(
       sheetState = bottomSheetState,
       windowInsets = WindowInsets(0),
       shape = ExpeBottomSheetShape,
-      content = { bottomSheetContent(bottomSheetType.value, closeBottomSheet) },
+      content = {
+        bottomSheetContent(bottomSheetType.value, closeBottomSheet)
+      },
     )
   }
 }

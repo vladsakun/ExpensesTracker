@@ -11,9 +11,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.core.ui.bottomsheet.ColorsBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.CurrenciesBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.IconsBottomSheet
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
@@ -24,14 +21,11 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.*
 import com.emendo.expensestracker.core.ui.*
-import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.ExpeModalBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.*
 import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 @Destination
@@ -42,16 +36,15 @@ fun CreateAccountRoute(
 ) {
   // Todo ask Pavel Haluza why Remember(viewModel) does not work
   val onAccountNameChange = remember { { model: String -> viewModel.setAccountName(model) } }
+  val onDismissBottomSheetRequest = remember { { viewModel.onDismissBottomSheetRequest() } }
   CreateAccountScreen(
     state = viewModel.state.collectAsStateWithLifecycle(),
     bottomSheetType = viewModel.bottomSheet.collectAsStateWithLifecycle(),
-    navigateUpEvent = viewModel.navigateUpEvent,
-    hideBottomSheetEvent = viewModel.hideBottomSheetEvent,
     onAccountNameChange = onAccountNameChange,
     onCreateAccountClick = viewModel::createNewAccount,
     onNavigationClick = navigator::navigateUp,
     onInitialBalanceRowClick = viewModel::onInitialBalanceClick,
-    onDismissBottomSheetRequest = viewModel::onDismissBottomSheetRequest,
+    onDismissBottomSheetRequest = onDismissBottomSheetRequest,
     onIconRowClick = viewModel::onIconRowClick,
     onColorRowClick = viewModel::onColorRowClick,
     onCurrencyRowClick = viewModel::onCurrencyRowClick,
@@ -63,16 +56,14 @@ fun CreateAccountRoute(
 private fun CreateAccountScreen(
   state: State<CreateAccountScreenData>,
   bottomSheetType: State<BottomSheetType?>,
-  hideBottomSheetEvent: Flow<Unit>,
-  navigateUpEvent: Flow<Unit>,
   onAccountNameChange: (model: String) -> Unit,
-  onCreateAccountClick: () -> Unit,
-  onNavigationClick: () -> Unit,
-  onInitialBalanceRowClick: () -> Unit,
-  onDismissBottomSheetRequest: () -> Unit,
-  onIconRowClick: () -> Unit,
-  onColorRowClick: () -> Unit,
-  onCurrencyRowClick: () -> Unit,
+  onCreateAccountClick: () -> Unit = {},
+  onNavigationClick: () -> Unit = {},
+  onInitialBalanceRowClick: () -> Unit = {},
+  onDismissBottomSheetRequest: () -> Unit = {},
+  onIconRowClick: () -> Unit = {},
+  onColorRowClick: () -> Unit = {},
+  onCurrencyRowClick: () -> Unit = {},
 ) {
   val coroutineScope = rememberCoroutineScope()
   val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -91,8 +82,6 @@ private fun CreateAccountScreen(
     }
   }
 
-  LaunchedEffect(Unit) { hideBottomSheetEvent.collect { closeBottomSheet() } }
-  LaunchedEffect(Unit) { navigateUpEvent.collect { onNavigationClick() } }
   LaunchedEffect(Unit) {
     snapshotFlow { bottomSheetState.currentValue }
       .collect {
@@ -131,25 +120,25 @@ private fun CreateAccountScreen(
       )
       IconRow(
         icon = state.value.icon,
-        onClick = onIconRowClick,
+        onClick = { onIconRowClick() },
       )
       ColorRow(
         color = state.value.color,
-        onClick = onColorRowClick,
+        onClick = { onColorRowClick() },
       )
       // Todo ask Anton
       Spacer(modifier = Modifier.height(Dimens.margin_large_x))
       InitialBalanceRow(
         initialBalanceState = state.value.initialBalance,
-        onInitialBalanceRowClick = onInitialBalanceRowClick,
+        onInitialBalanceRowClick = { onInitialBalanceRowClick() },
       )
       CurrencyRow(
         selectedCurrency = state.value.currency,
-        onClick = onCurrencyRowClick,
+        onClick = { onCurrencyRowClick() },
       )
       ExpeButton(
         textResId = R.string.create,
-        onClick = onCreateAccountClick,
+        onClick = { onCreateAccountClick() },
         enabled = isCreateButtonEnabled.value,
       )
     }
@@ -293,8 +282,6 @@ private fun CreateAccountScreenPreview(
     CreateAccountScreen(
       state = state,
       bottomSheetType = bottomSheetState,
-      hideBottomSheetEvent = emptyFlow(),
-      navigateUpEvent = emptyFlow(),
       onAccountNameChange = {},
       onCreateAccountClick = {},
       onNavigationClick = {},

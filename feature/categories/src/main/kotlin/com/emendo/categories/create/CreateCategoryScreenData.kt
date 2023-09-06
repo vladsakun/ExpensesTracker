@@ -7,6 +7,7 @@ data class CreateCategoryScreenData(
   val title: String,
   val icon: IconModel,
   val color: ColorModel,
+  val isCreateButtonEnabled: Boolean = false,
 ) {
   companion object {
     fun getDefault() = CreateCategoryScreenData(
