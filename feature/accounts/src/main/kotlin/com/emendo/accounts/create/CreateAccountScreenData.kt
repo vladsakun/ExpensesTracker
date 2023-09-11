@@ -5,6 +5,8 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.EqualButtonState
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 
 @Stable
 data class CreateAccountScreenData(
@@ -16,6 +18,8 @@ data class CreateAccountScreenData(
   val equalButtonState: EqualButtonState,
   val decimalSeparator: String,
   val isCreateAccountButtonEnabled: Boolean,
+  val hideBottomSheetEvent: StateEvent = consumed,
+  val navigateUpEvent: StateEvent = consumed,
 ) {
 
   companion object {

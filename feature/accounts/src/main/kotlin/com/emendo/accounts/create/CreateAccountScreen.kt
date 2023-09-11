@@ -25,6 +25,8 @@ import com.emendo.expensestracker.core.ui.bottomsheet.*
 import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -35,7 +37,7 @@ fun CreateAccountRoute(
   viewModel: CreateAccountViewModel = hiltViewModel(),
 ) {
   // Todo ask Pavel Haluza why Remember(viewModel) does not work
-  val onAccountNameChange = remember { { model: String -> viewModel.setAccountName(model) } }
+  val onAccountNameChange = remember(viewModel) { { model: String -> viewModel.setAccountName(model) } }
   val onDismissBottomSheetRequest = remember { { viewModel.onDismissBottomSheetRequest() } }
   CreateAccountScreen(
     state = viewModel.state.collectAsStateWithLifecycle(),
@@ -48,6 +50,8 @@ fun CreateAccountRoute(
     onIconRowClick = viewModel::onIconRowClick,
     onColorRowClick = viewModel::onColorRowClick,
     onCurrencyRowClick = viewModel::onCurrencyRowClick,
+    onConsumedNavigateUpEvent = viewModel::onConsumedNavigateUpEvent,
+    onConsumedHideBottomSheetEvent = viewModel::onConsumedHideBottomSheetEvent,
   )
 }
 
@@ -57,13 +61,15 @@ private fun CreateAccountScreen(
   state: State<CreateAccountScreenData>,
   bottomSheetType: State<BottomSheetType?>,
   onAccountNameChange: (model: String) -> Unit,
-  onCreateAccountClick: () -> Unit = {},
-  onNavigationClick: () -> Unit = {},
-  onInitialBalanceRowClick: () -> Unit = {},
-  onDismissBottomSheetRequest: () -> Unit = {},
-  onIconRowClick: () -> Unit = {},
-  onColorRowClick: () -> Unit = {},
-  onCurrencyRowClick: () -> Unit = {},
+  onCreateAccountClick: () -> Unit,
+  onNavigationClick: () -> Unit,
+  onInitialBalanceRowClick: () -> Unit,
+  onDismissBottomSheetRequest: () -> Unit,
+  onIconRowClick: () -> Unit,
+  onColorRowClick: () -> Unit,
+  onCurrencyRowClick: () -> Unit,
+  onConsumedNavigateUpEvent: () -> Unit = {},
+  onConsumedHideBottomSheetEvent: () -> Unit = {},
 ) {
   val coroutineScope = rememberCoroutineScope()
   val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -82,6 +88,13 @@ private fun CreateAccountScreen(
     }
   }
 
+  EventEffects(
+    state = state,
+    onConsumedNavigateUpEvent = onConsumedNavigateUpEvent,
+    onNavigationClick = onNavigationClick,
+    onConsumedHideBottomSheetEvent = onConsumedHideBottomSheetEvent,
+    closeBottomSheet = closeBottomSheet
+  )
   LaunchedEffect(Unit) {
     snapshotFlow { bottomSheetState.currentValue }
       .collect {
@@ -127,7 +140,7 @@ private fun CreateAccountScreen(
         onClick = { onColorRowClick() },
       )
       // Todo ask Anton
-      Spacer(modifier = Modifier.height(Dimens.margin_large_x))
+      //      Spacer(modifier = Modifier.height(Dimens.margin_large_x))
       InitialBalanceRow(
         initialBalanceState = state.value.initialBalance,
         onInitialBalanceRowClick = { onInitialBalanceRowClick() },
@@ -151,6 +164,26 @@ private fun CreateAccountScreen(
   ) { type, closeBottomSheet ->
     BottomSheetContent(type, closeBottomSheet)
   }
+}
+
+@Composable
+private fun EventEffects(
+  state: State<CreateAccountScreenData>,
+  onConsumedNavigateUpEvent: () -> Unit,
+  onNavigationClick: () -> Unit,
+  onConsumedHideBottomSheetEvent: () -> Unit,
+  closeBottomSheet: () -> Unit,
+) {
+  NavigationEventEffect(
+    event = state.value.navigateUpEvent,
+    onConsumed = onConsumedNavigateUpEvent,
+    action = onNavigationClick,
+  )
+  EventEffect(
+    event = state.value.hideBottomSheetEvent,
+    onConsumed = onConsumedHideBottomSheetEvent,
+    action = closeBottomSheet,
+  )
 }
 
 @Composable
@@ -290,6 +323,8 @@ private fun CreateAccountScreenPreview(
       onIconRowClick = {},
       onColorRowClick = {},
       onCurrencyRowClick = {},
+      onConsumedHideBottomSheetEvent = {},
+      onConsumedNavigateUpEvent = {},
     )
   }
 }

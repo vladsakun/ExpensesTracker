@@ -1,5 +1,6 @@
 package com.emendo.accounts.create
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.common.result.AmountFormatter
@@ -14,15 +15,17 @@ import com.emendo.expensestracker.core.model.data.NumKeyboardActions
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+@Stable
 class CreateAccountViewModel @Inject constructor(
   private val accountsRepository: AccountsRepository,
   private val amountFormatter: AmountFormatter,
@@ -42,11 +45,7 @@ class CreateAccountViewModel @Inject constructor(
   private val equalButtonState = MutableStateFlow(EqualButtonState.Default)
   private val initialBalanceState = MutableStateFlow(CreateAccountScreenData.DEFAULT_INITIAL_BALANCE)
 
-  private val hideBottomSheetChannel = Channel<Unit>(Channel.CONFLATED)
-  val hideBottomSheetEvent = hideBottomSheetChannel.receiveAsFlow()
-
-  private val navigateUpChannel = Channel<Unit>(Channel.CONFLATED)
-  val navigateUpEvent = navigateUpChannel.receiveAsFlow()
+  private var createAccountJob: Job? = null
 
   private var calculatorBSInput = CalculatorBSInput(
     number1 = StringBuilder(CreateAccountScreenData.DEFAULT_INITIAL_BALANCE),
@@ -68,11 +67,11 @@ class CreateAccountViewModel @Inject constructor(
   override fun onMathOperationClick(mathOperation: MathOperation) {
     if (calculatorBSInput.doMath(mathOperation)) return
 
-    calculatorBSInput.mMathOperation = mathOperation
+    calculatorBSInput.input(mathOperation)
   }
 
   override fun onNumberClick(numKeyboardNumber: NumKeyboardNumber) {
-    calculatorBSInput.endNumber(numKeyboardNumber)
+    calculatorBSInput.input(numKeyboardNumber)
   }
 
   override fun onPrecisionClick() {
@@ -80,8 +79,8 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   override fun onDoneClick() {
-    calculatorBSInput.doOnDoneClick()
-    hideBottomSheetChannel.trySend(Unit)
+    calculatorBSInput.doMathAndCleanMathOperation()
+    _state.update { it.copy(hideBottomSheetEvent = triggered) }
   }
 
   override fun onEqualClick() {
@@ -91,18 +90,22 @@ class CreateAccountViewModel @Inject constructor(
   override fun onCurrencyClick() {}
 
   fun createNewAccount() {
-    viewModelScope.launch {
+    if (createAccountJob != null) {
+      return
+    }
+
+    createAccountJob = viewModelScope.launch {
       with(state.value) {
         accountsRepository.upsertAccount(
           Account(
             name = accountName,
-            balance = amountFormatter.toAmount(initialBalance, currency.currencyName).toBigDecimal().toDouble(),
+            balance = amountFormatter.toAmount(initialBalance).toBigDecimal().toDouble(),
             currencyModel = currency,
             icon = icon,
             color = color,
           )
         )
-        navigateUpChannel.send(Unit)
+        _state.update { it.copy(navigateUpEvent = triggered) }
       }
     }
   }
@@ -160,6 +163,14 @@ class CreateAccountViewModel @Inject constructor(
       onDoneClick()
     }
     _bottomSheetState.update { null }
+  }
+
+  fun onConsumedHideBottomSheetEvent() {
+    _state.update { it.copy(hideBottomSheetEvent = consumed) }
+  }
+
+  fun onConsumedNavigateUpEvent() {
+    _state.update { it.copy(navigateUpEvent = consumed) }
   }
 
   private fun setCurrency(currency: CurrencyModel) {

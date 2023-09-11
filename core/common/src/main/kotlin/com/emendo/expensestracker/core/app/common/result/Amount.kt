@@ -12,7 +12,6 @@ import kotlin.math.pow
 data class Amount(
   var value: Long,
   val precision: Int,
-  var currency: String
 ) : Parcelable, Comparable<Amount> {
 
   fun isZero() = value == 0L
@@ -29,7 +28,6 @@ data class Amount(
   fun getValueWithPrecision() = value / TEN.pow(precision.toDouble())
 
   override fun compareTo(other: Amount): Int {
-    assert(this.currency == other.currency)
     return toBigDecimal().compareTo(other.toBigDecimal())
   }
 
@@ -39,43 +37,38 @@ data class Amount(
   // Note: if precision values are not equal result amount has bigger precision value
   operator fun plus(increment: Amount?): Amount =
     increment?.let { incAmount ->
-      checkInputCurrency(incAmount)
       val originalValue = value.toBigDecimal().divide(BigDecimal.TEN.pow(precision))
       val incrementValue = incAmount.value.toBigDecimal().divide(BigDecimal.TEN.pow(incAmount.precision))
       val resultPrecision = max(precision, incAmount.precision)
       val resultValue = (originalValue + incrementValue) * BigDecimal.TEN.pow(resultPrecision)
-      return Amount(resultValue.toLong(), resultPrecision, currency)
+      return Amount(resultValue.toLong(), resultPrecision)
     } ?: this
 
   // Note: decrement null is considered to be zero
   // Note: if precision values are not equal result amount has bigger precision value
   operator fun minus(decrement: Amount?): Amount =
     decrement?.let { decAmount ->
-      checkInputCurrency(decAmount)
       val originalValue = value.toBigDecimal().divide(BigDecimal.TEN.pow(precision))
       val decrementValue = decAmount.value.toBigDecimal().divide(BigDecimal.TEN.pow(decAmount.precision))
       val resultPrecision = max(precision, decAmount.precision)
       val resultValue = (originalValue - decrementValue) * BigDecimal.TEN.pow(resultPrecision)
-      return Amount(resultValue.toLong(), resultPrecision, currency)
+      return Amount(resultValue.toLong(), resultPrecision)
     } ?: this
 
   fun abs(): Amount = copy(value = abs(value))
 
   override fun equals(other: Any?): Boolean = when (other) {
     is Amount -> {
-      if (currency != other.currency) {
-        false
-      } else {
-        var thisValue = value
-        var comparatorValue = other.value
-        if (precision > other.precision) {
-          comparatorValue = other.value * TEN.pow(precision - other.precision).toLong()
-        } else if (precision < other.precision) {
-          thisValue = value * TEN.pow(other.precision - precision).toLong()
-        }
-        thisValue == comparatorValue
+      var thisValue = value
+      var comparatorValue = other.value
+      if (precision > other.precision) {
+        comparatorValue = other.value * TEN.pow(precision - other.precision).toLong()
+      } else if (precision < other.precision) {
+        thisValue = value * TEN.pow(other.precision - precision).toLong()
       }
+      thisValue == comparatorValue
     }
+
     else -> false
   }
 
@@ -84,12 +77,8 @@ data class Amount(
     val decimal = BigDecimal(value.toBigInteger() * BigInteger.TEN.pow(shift), HASH_CODE_PRECISION)
 
     var result = decimal.hashCode()
-    result = 31 * result + currency.hashCode()
+    result *= 31
     return result
-  }
-
-  private fun checkInputCurrency(amount: Amount) {
-    require(amount.currency.isEmpty() || currency == amount.currency) { "Amount currency not matching" }
   }
 
   companion object {
@@ -105,7 +94,6 @@ data class Amount(
     fun fromBigDecimalWithScale(value: BigDecimal, currency: String, scale: Int = value.scale()) = Amount(
       value = value.setScale(scale).unscaledValue().toLong(),
       precision = scale,
-      currency = currency
     )
   }
 }

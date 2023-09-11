@@ -12,8 +12,8 @@ data class CreateCategoryScreenData(
   companion object {
     fun getDefault() = CreateCategoryScreenData(
       title = "",
-      icon = IconModel.GOVERNMENT,
-      color = ColorModel.GREEN,
+      icon = IconModel.random,
+      color = ColorModel.random,
     )
   }
 }

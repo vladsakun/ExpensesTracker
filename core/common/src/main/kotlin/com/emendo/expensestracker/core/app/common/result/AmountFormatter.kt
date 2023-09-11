@@ -2,11 +2,10 @@ package com.emendo.expensestracker.core.app.common.result
 
 import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
-import android.icu.util.Currency
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Singleton
 
 interface AmountFormatter {
 
@@ -36,7 +35,7 @@ interface AmountFormatter {
    */
   fun format(amount: Amount?): String
 
-  fun format(amount: Amount?, includeCurrency: Boolean = true, includeDecimals: Boolean = true): String
+  fun format(amount: Amount?, includeDecimals: Boolean = true): String
 
   /**
    * @param amount
@@ -44,48 +43,21 @@ interface AmountFormatter {
    */
   fun format(amount: BigDecimal): String
 
+  fun format(amount: String): String
+
   /**
    * @return true if currency should be displayed before amount.
    */
   fun displayCurrencyFirst(): Boolean
 
-  /**
-   * @return formatted amount for accessibility
-   */
-  fun amountForAccessibility(amount: Amount?): String
+  fun toAmount(from: String): Amount
 
-  /**
-   * @param currencyCode ISO 4217 currency code
-   * @return the symbol of the currency or the currency code if the symbol is not available or
-   * is not a supported ISO 4217 currency code
-   */
-  fun getCurrencySymbol(currencyCode: String): String
-
-  fun toAmount(from: String, currency: String): Amount {
-    val fromTrimmed = from.trim()
-
-    if (fromTrimmed.isEmpty()) return Amount(0, 0, currency)
-
-    val minPrecision = if (containsDecimal(fromTrimmed)) 1 else 0
-
-    val precision = fromTrimmed.substringAfterLast(decimalSeparator, "").length
-    val value = fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toLong()
-
-    return Amount(
-      value = value,
-      precision = precision,
-      currency = currency,
-    )
-  }
-
-  fun containsDecimal(value: StringBuilder?) = value?.contains(decimalSeparator) ?: false
-  fun containsDecimal(value: String?) = value?.contains(decimalSeparator) ?: false
-
+  fun containsDecimalSeparator(value: StringBuilder?): Boolean
 }
 
+@Singleton
 class AmountFormatterImpl @Inject constructor() : AmountFormatter {
 
-  private val useIsoCurrency: Boolean = false
   private val currencyLocale: Locale = Locale.getDefault()
 
   companion object {
@@ -124,18 +96,15 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
   }
 
   override fun format(amount: Amount?): String {
-    return format(amount, true, true)
+    return format(amount, true)
   }
 
-  override fun format(amount: Amount?, includeCurrency: Boolean, includeDecimals: Boolean): String {
-    return formatWithSpace(amount, includeCurrency, includeDecimals).replace(' ', '\u00A0')
+  override fun format(amount: Amount?, includeDecimals: Boolean): String {
+    return formatWithSpace(amount, includeDecimals).replace(' ', '\u00A0')
   }
 
-  private fun formatWithSpace(amount: Amount?, includeCurrency: Boolean, includeDecimals: Boolean): String {
+  private fun formatWithSpace(amount: Amount?, includeDecimals: Boolean): String {
     if (amount == null) return ""
-
-    val currency = if (includeCurrency) getCurrency(amount.currency) else null
-    currency?.let { currencyNumberFormatter.currency = it }
 
     // Use specific unicode character for minus and space https://issues.beeone.at/browse/GCUI-3748
     currencyNumberFormatter.negativePrefix = "\u2212\u00A0"
@@ -143,11 +112,7 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
     currencyNumberFormatter.minimumFractionDigits = if (includeDecimals) amount.precision else 0
     val s = currencyNumberFormatter.format(amount.toBigDecimal())
 
-    if (currency == null && includeCurrency || useIsoCurrency) {
-      return removeCurrency(s) + " " + amount.currency
-    }
-
-    return if (includeCurrency) s else removeCurrency(s)
+    return removeCurrency(s)
   }
 
   /**
@@ -159,14 +124,27 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
     return removeCurrency(currencyNumberFormatter.format(amount))
   }
 
-  private fun getCurrency(currency: String): Currency? {
-    try {
-      return Currency.getInstance(currency)
-    } catch (e: IllegalArgumentException) {
-      Timber.e(e)
-      return null
-    }
+  override fun format(amount: String): String {
+    return format(toAmount(amount))
   }
+
+  override fun toAmount(from: String): Amount {
+    val fromTrimmed = from.trim()
+
+    if (fromTrimmed.isEmpty()) {
+      return Amount(0, 0)
+    }
+
+    val precision = fromTrimmed.substringAfterLast(decimalSeparator, "").length
+    val value = fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toLong()
+
+    return Amount(
+      value = value,
+      precision = precision,
+    )
+  }
+
+  override fun containsDecimalSeparator(value: StringBuilder?) = value?.contains(decimalSeparator) ?: false
 
   //removes currency symbol and possible space between currency and amount
   private fun removeCurrency(s: String): String {
@@ -180,32 +158,5 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
 
 
     return symbol
-  }
-
-  override fun getCurrencySymbol(currencyCode: String): String {
-    val currency = getCurrency(currencyCode)
-    return if (currency != null)
-      currency.getSymbol(currencyLocale)
-    else
-      currencyCode
-  }
-
-  override fun amountForAccessibility(amount: Amount?): String {
-    if (amount != null) {
-      val numberFormatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
-        this.currency = getCurrency(amount.currency)
-      }
-      val currency = if (amount.currency == "RON") {
-        Currency.getInstance(amount.currency).displayName
-      } else {
-        amount.currency
-      }
-      val formattedAmount = numberFormatter.format(amount.toBigDecimal())
-      return if (currency.isBlank()) {
-        formattedAmount
-      } else {
-        "$formattedAmount $currency"
-      }
-    } else return ""
   }
 }

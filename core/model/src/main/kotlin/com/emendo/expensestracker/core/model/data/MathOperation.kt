@@ -7,34 +7,23 @@ sealed interface MathOperation {
   val symbolWithWhiteSpaces: String
     get() = " $symbol "
 
-  fun doMath(first: BigDecimal, second: BigDecimal): BigDecimal
+  fun doUnformattedMath(first: BigDecimal, second: BigDecimal): BigDecimal
+  fun doMath(first: BigDecimal, second: BigDecimal): BigDecimal =
+    doUnformattedMath(first, second).setScale(BIG_DECIMAL_SCALE)
 
   data class Add(override val symbol: String = "+") : MathOperation {
-    override fun doMath(first: BigDecimal, second: BigDecimal) = first + second
+    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first + second
   }
 
   data class Substract(override val symbol: String = "-") : MathOperation {
-    override fun doMath(first: BigDecimal, second: BigDecimal) = first - second
+    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first - second
   }
 
   data class Multiply(override val symbol: String = "×") : MathOperation {
-    override fun doMath(first: BigDecimal, second: BigDecimal) = first * second
+    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first * second
   }
 
   data class Divide(override val symbol: String = "÷") : MathOperation {
-    override fun doMath(first: BigDecimal, second: BigDecimal) = first / second
-  }
-
-  companion object {
-    //    fun String.toMathOperation() = first().toMathOperation()
-
-    fun Char.toMathOperation(): MathOperation =
-      when (this) {
-        '+' -> Add()
-        '-' -> Substract()
-        '×' -> Multiply()
-        '÷' -> Divide()
-        else -> throw IllegalArgumentException("Unknown math operation")
-      }
+    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first / second
   }
 }
