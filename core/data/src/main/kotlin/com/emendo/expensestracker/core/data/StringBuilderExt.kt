@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.app.common.result
+package com.emendo.expensestracker.core.data
 
 fun StringBuilder.appendIfNotNull(value: String?): StringBuilder {
   if (value != null) {

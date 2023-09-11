@@ -1,5 +1,7 @@
 package com.emendo.expensestracker.core.data.di
 
+import com.emendo.expensestracker.core.data.amount.AmountFormatter
+import com.emendo.expensestracker.core.data.amount.AmountFormatterImpl
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import com.emendo.expensestracker.core.data.repository.OfflineFirstAccountsRepository
@@ -14,12 +16,11 @@ import dagger.hilt.components.SingletonComponent
 interface DataModule {
 
   @Binds
-  fun bindsAccountsRepository(
-    accountsRepository: OfflineFirstAccountsRepository,
-  ): AccountsRepository
+  fun bindsAccountsRepository(accountsRepository: OfflineFirstAccountsRepository): AccountsRepository
 
   @Binds
-  fun bindsCategoriesRepository(
-    categoriesRepository: OfflineFirstCategoryRepository,
-  ): CategoryRepository
+  fun bindsCategoriesRepository(categoriesRepository: OfflineFirstCategoryRepository): CategoryRepository
+
+  @Binds
+  fun bindsAmountFormatter(amountFormatterImpl: AmountFormatterImpl): AmountFormatter
 }

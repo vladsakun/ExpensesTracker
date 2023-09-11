@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.data.CalculatorBSInput.Companion.DEFAULT_INITIAL_BALANCE
 import com.emendo.expensestracker.core.model.data.EqualButtonState
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
@@ -23,8 +24,6 @@ data class CreateAccountScreenData(
 ) {
 
   companion object {
-    const val DEFAULT_INITIAL_BALANCE = "0"
-
     fun getDefaultState(
       defaultCurrency: CurrencyModel = CurrencyModel.USD,  // Todo pass favourite currency
       decimalSeparator: String = ".",

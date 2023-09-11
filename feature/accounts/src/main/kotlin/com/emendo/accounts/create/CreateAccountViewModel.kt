@@ -3,7 +3,8 @@ package com.emendo.accounts.create
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.app.common.result.AmountFormatter
+import com.emendo.expensestracker.core.data.amount.AmountFormatter
+import com.emendo.expensestracker.core.data.CalculatorBSInput
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -43,12 +44,12 @@ class CreateAccountViewModel @Inject constructor(
   val bottomSheet = _bottomSheetState.asStateFlow()
 
   private val equalButtonState = MutableStateFlow(EqualButtonState.Default)
-  private val initialBalanceState = MutableStateFlow(CreateAccountScreenData.DEFAULT_INITIAL_BALANCE)
+  private val initialBalanceState = MutableStateFlow(CalculatorBSInput.DEFAULT_INITIAL_BALANCE)
 
   private var createAccountJob: Job? = null
 
   private var calculatorBSInput = CalculatorBSInput(
-    number1 = StringBuilder(CreateAccountScreenData.DEFAULT_INITIAL_BALANCE),
+    number1 = StringBuilder(CalculatorBSInput.DEFAULT_INITIAL_BALANCE),
     amountFormatter = amountFormatter,
     doOnValueChange = { formattedValue, equalButtonState ->
       _state.update { it.copy(initialBalance = formattedValue) }

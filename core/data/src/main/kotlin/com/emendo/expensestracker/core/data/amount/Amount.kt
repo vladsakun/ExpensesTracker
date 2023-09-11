@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.app.common.result
+package com.emendo.expensestracker.core.data.amount
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

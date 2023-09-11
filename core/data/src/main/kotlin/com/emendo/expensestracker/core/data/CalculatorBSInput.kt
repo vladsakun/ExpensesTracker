@@ -1,7 +1,6 @@
-package com.emendo.accounts.create
+package com.emendo.expensestracker.core.data
 
-import com.emendo.expensestracker.core.app.common.result.AmountFormatter
-import com.emendo.expensestracker.core.app.common.result.appendIfNotNull
+import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.MathOperation
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
@@ -68,10 +67,10 @@ class CalculatorBSInput(
       }
 
       number1.isBlank() || number1.length == 1 -> {
-        number1 = StringBuilder(CreateAccountScreenData.DEFAULT_INITIAL_BALANCE)
+        number1 = StringBuilder(DEFAULT_INITIAL_BALANCE)
       }
 
-      number1 != StringBuilder(CreateAccountScreenData.DEFAULT_INITIAL_BALANCE) -> {
+      number1 != StringBuilder(DEFAULT_INITIAL_BALANCE) -> {
         number1 = number1.deleteAt(number1.lastIndex)
       }
     }
@@ -120,7 +119,7 @@ class CalculatorBSInput(
   }
 
   private fun appendNum1(value: String) {
-    if (number1.toString() == CreateAccountScreenData.DEFAULT_INITIAL_BALANCE) {
+    if (number1.toString() == DEFAULT_INITIAL_BALANCE) {
       number1 = StringBuilder(value)
       refreshValue()
       return
@@ -191,4 +190,8 @@ class CalculatorBSInput(
 
   private fun StringBuilder?.endsWithDecimalSeparator() = this?.endsWith(decimalSeparatorString) ?: false
   private fun StringBuilder?.containsDecimalSeparator() = amountFormatter.containsDecimalSeparator(this)
+
+  companion object {
+    const val DEFAULT_INITIAL_BALANCE = "0"
+  }
 }
