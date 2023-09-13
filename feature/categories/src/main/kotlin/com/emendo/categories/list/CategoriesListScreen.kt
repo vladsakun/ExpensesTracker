@@ -2,24 +2,26 @@ package com.emendo.categories.list
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,18 +29,18 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.data.model.Category
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
+import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
+import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 private val PADDING_CATEGORY_ITEM_PADDING = 16.dp
-private const val OVERVIEW_BLOCK_CATEGORIES_AMOUNT = 8
-
-inline val CategoryItemType.key
-  get() = if (this is CategoryItemType.CategoryItem) category.id else -1
+private const val MIN_ITEM_HEIGHT = 130
 
 @RootNavGraph(start = true)
 @Destination(start = true)
@@ -47,183 +49,140 @@ fun CategoriesListRoute(
   navigator: DestinationsNavigator,
   viewModel: CategoriesListViewModel = hiltViewModel(),
 ) {
-  var isEditMode by remember { mutableStateOf(false) }
-
-  LaunchedEffect(true) {
-    viewModel.navigationEvent.collect {
-      if (it != null) {
-        isEditMode = !isEditMode
-      }
-    }
-  }
-
-  val categories by viewModel.uiState.collectAsStateWithLifecycle()
-
-  val cellSizeDp = (LocalConfiguration.current.screenWidthDp / 4).dp
-
   CategoriesListScreenContent(
-    categories,
-    cellSizeDp,
-    isEditMode
-  ) {
-    navigator.navigate(CreateCategoryRouteDestination)
-  }
+    uiState = viewModel.uiState.collectAsStateWithLifecycle(),
+    onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination) } }
+  )
 }
 
 @Composable
 private fun CategoriesListScreenContent(
-  uiState: CategoriesListUiState,
-  cellSizeDp: Dp,
-  isEditMode: Boolean,
-  onClick: () -> Unit,
+  uiState: State<CategoriesListUiState>,
+  onCreateCategoryClick: () -> Unit,
 ) {
-  LazyColumn(
+  ExpeScaffoldWithTopBar(
+    titleResId = com.emendo.expensestracker.core.app.resources.R.string.categories,
+  ) { paddingValues ->
+    Box(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues),
+      contentAlignment = Alignment.Center,
+    ) {
+      when (val state = uiState.value) {
+        is CategoriesListUiState.Loading -> ExpLoadingWheel()
+        is CategoriesListUiState.Error -> Text(text = state.message)
+        is CategoriesListUiState.DisplayCategoriesList -> CategoriesList(state, onCreateCategoryClick)
+      }
+    }
+  }
+}
+
+@Composable
+private fun CategoriesList(
+  uiState: CategoriesListUiState.DisplayCategoriesList,
+  onCreateCategoryClick: () -> Unit,
+) {
+  LazyVerticalGrid(
     modifier = Modifier.fillMaxSize(),
-    horizontalAlignment = Alignment.CenterHorizontally,
+    columns = GridCells.Fixed(4),
+    verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+    contentPadding = PaddingValues(Dimens.margin_large_x),
   ) {
-    when (uiState) {
-      is CategoriesListUiState.Loading -> item {
-        ExpLoadingWheel(
-          contentDesc = stringResource(id = R.string.categories_loading)
-        )
-      }
-
-      is CategoriesListUiState.Error -> item {
-        Text(text = uiState.message)
-      }
-
-      is CategoriesListUiState.DisplayCategoriesList -> {
-        val categories = uiState.categories
-        val categoriesAfterOverviewAmount = categories.size - OVERVIEW_BLOCK_CATEGORIES_AMOUNT
-
-        item(key = 0) {
-          Row(
-            modifier = Modifier.fillMaxWidth()
-          ) {
-            categories.take(4).forEach {
-              CategoryScreenItem(
-                categoryItemType = it,
-                cellSizeDp = cellSizeDp,
-                onClick = onClick,
-                isEditMode = isEditMode
-              )
-            }
-          }
-        }
-
-        item(key = 1) {
-          Row(
-            modifier = Modifier
-              .width(cellSizeDp * 4)
-              .wrapContentHeight()
-          ) {
-            Column(
-              modifier = Modifier
-                .width(cellSizeDp)
-                .wrapContentHeight(),
-              verticalArrangement = Arrangement.Top
-            ) {
-              categories.getOrNull(4)?.let {
-                CategoryScreenItem(it, cellSizeDp, onClick, isEditMode)
-              }
-              categories.getOrNull(6)?.let {
-                CategoryScreenItem(it, cellSizeDp, onClick, isEditMode)
-              }
-            }
-            Box(
-              modifier = Modifier
-                .width(cellSizeDp * 2)
-                .height(cellSizeDp * 2)
-                .padding(PADDING_CATEGORY_ITEM_PADDING)
-                .padding(top = PADDING_CATEGORY_ITEM_PADDING)
-                .background(Color.Blue)
-                .aspectRatio(1f)
-            )
-            Column(
-              modifier = Modifier
-                .width(cellSizeDp)
-                .wrapContentHeight(),
-              verticalArrangement = Arrangement.SpaceBetween
-            ) {
-              categories.getOrNull(5)?.let {
-                CategoryScreenItem(it, cellSizeDp, onClick, isEditMode)
-              }
-              categories.getOrNull(7)?.let {
-                CategoryScreenItem(it, cellSizeDp, onClick, isEditMode)
-              }
-            }
-          }
-        }
-
-        if (categoriesAfterOverviewAmount > 0) {
-          categories.takeLast(categoriesAfterOverviewAmount).chunked(4).forEach { categories ->
-            item(key = categories.first().key) {
-              Row(modifier = Modifier.fillMaxWidth()) {
-                categories.forEach {
-                  CategoryScreenItem(it, cellSizeDp, onClick, isEditMode)
-                }
-              }
-            }
-          }
-        }
-      }
+    items(
+      items = uiState.categories,
+      key = { it.id },
+      contentType = { "category" },
+    ) { CategoryItem(it) }
+    uniqueItem("addCategory") {
+      AddCategoryItem(onClick = onCreateCategoryClick)
     }
   }
 }
 
 @Composable
-private fun CategoryScreenItem(
-  categoryItemType: CategoryItemType,
-  cellSizeDp: Dp,
-  onClick: () -> Unit,
-  isEditMode: Boolean,
-) {
-  when (categoryItemType) {
-    is CategoryItemType.AddCategoryItemType ->
-      AddCategoryItem(
-        cellSizeDp = cellSizeDp,
-        onClick = onClick,
+private fun CategoryItem(category: Category) {
+  Box(
+    modifier = Modifier
+      .fillMaxWidth()
+      .heightIn(min = MIN_ITEM_HEIGHT.dp)
+      .padding(Dimens.margin_small_x),
+    contentAlignment = Alignment.Center
+  ) {
+    Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+      Text(
+        text = category.name,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.labelMedium,
       )
-
-    is CategoryItemType.CategoryItem -> {
-      CategoryItem(
-        category = categoryItemType,
-        cellSizeDp = cellSizeDp,
-        isEditMode = isEditMode,
+      ColoredBorderIcon(
+        color = category.color.color,
+        imageVector = category.icon.imageVector,
+        onClick = {},
+      )
+      Text(
+        text = "$ 8,485",
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.labelSmall,
       )
     }
   }
 }
 
 @Composable
-fun CategoryItem(
-  category: CategoryItemType.CategoryItem,
-  cellSizeDp: Dp,
-  isEditMode: Boolean,
+private fun ColoredBorderIcon(
+  color: Color,
+  imageVector: ImageVector,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-  RoundedRectangleItem(
-    cellSizeDp = cellSizeDp,
-    icon = category.category.icon.imageVector,
-    backgroundColor = Color.Red,
-    text = category.category.name,
-    isEditMode = isEditMode,
+  Icon(
+    imageVector = imageVector,
+    contentDescription = "icon",
+    modifier = modifier
+      .clip(CircleShape)
+      .aspectRatio(1f)
+      .clickable(onClick = onClick)
+      .background(color = color.copy(alpha = 0.15f))
+      .border(
+        width = Dimens.border_thickness,
+        color = color,
+        shape = CircleShape,
+      )
+      .padding(Dimens.margin_large_x),
   )
 }
 
 @Composable
-fun AddCategoryItem(
-  cellSizeDp: Dp,
+private fun AddCategoryItem(
   onClick: () -> Unit,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
 ) {
-  RoundedRectangleItem(
-    cellSizeDp = cellSizeDp,
-    icon = ExpIcons.Add,
-    backgroundColor = Color.Green,
-    modifier = modifier,
-    onClick = onClick,
-    isEditMode = false
-  )
+  // Todo do custom ripple effect animation
+  Box(
+    modifier = Modifier
+      .heightIn(min = MIN_ITEM_HEIGHT.dp)
+      .padding(Dimens.margin_small_x),
+    contentAlignment = Alignment.Center,
+  ) {
+    Icon(
+      imageVector = ExpIcons.Add,
+      contentDescription = "icon",
+      modifier = modifier
+        .clip(CircleShape)
+        .aspectRatio(1f)
+        .clickable(onClick = onClick)
+        .background(color = MaterialTheme.colorScheme.primaryContainer)
+        .padding(Dimens.margin_large_x),
+    )
+  }
 }
 
 @Composable
@@ -236,14 +195,15 @@ fun RoundedRectangleItem(
   text: String = "",
   isEditMode: Boolean,
 ) {
-  val infiniteTransition = rememberInfiniteTransition()
+  val infiniteTransition = rememberInfiniteTransition(label = "infiniteTransition")
   val rotation by infiniteTransition.animateFloat(
     initialValue = -3f,
     targetValue = 3f,
     animationSpec = infiniteRepeatable(
       animation = tween(200, easing = LinearEasing),
       repeatMode = RepeatMode.Reverse
-    )
+    ),
+    label = "rotation"
   )
 
   Column(
@@ -271,23 +231,7 @@ fun RoundedRectangleItem(
             .align(Alignment.TopStart)
         )
       }
-      Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(4.dp)
-          .aspectRatio(1f)
-          .clip(RoundedCornerShape(16.dp))
-          .background(backgroundColor, RectangleShape)
-          .clickable(onClick = onClick)
-      ) {
-        Icon(
-          imageVector = icon,
-          contentDescription = "category icon",
-          modifier = Modifier
-            .fillMaxSize(0.6f)
-            .align(Alignment.Center)
-        )
-      }
+
     }
     Spacer(modifier = Modifier.height(4.dp))
     Text(

@@ -1,22 +1,20 @@
 package com.emendo.accounts.create
 
-import androidx.compose.runtime.Stable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.data.amount.AmountFormatter
-import com.emendo.expensestracker.core.data.CalculatorBSInput
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.data.CalculatorBSInput
+import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.model.Account
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
 import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.MathOperation
 import com.emendo.expensestracker.core.model.data.NumKeyboardActions
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
-import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,11 +24,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-@Stable
 class CreateAccountViewModel @Inject constructor(
   private val accountsRepository: AccountsRepository,
   private val amountFormatter: AmountFormatter,
-) : ViewModel(), NumKeyboardActions {
+) : BaseBottomSheetViewModel<BottomSheetType>(), NumKeyboardActions {
 
   private val _state = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
@@ -39,9 +36,6 @@ class CreateAccountViewModel @Inject constructor(
     )
   )
   val state = _state.asStateFlow()
-
-  private val _bottomSheetState = MutableStateFlow<BottomSheetType?>(null)
-  val bottomSheet = _bottomSheetState.asStateFlow()
 
   private val equalButtonState = MutableStateFlow(EqualButtonState.Default)
   private val initialBalanceState = MutableStateFlow(CalculatorBSInput.DEFAULT_INITIAL_BALANCE)
@@ -59,6 +53,7 @@ class CreateAccountViewModel @Inject constructor(
   )
 
   override fun onChangeSignClick() {
+    // Todo
   }
 
   override fun onClearClick() {
@@ -81,7 +76,7 @@ class CreateAccountViewModel @Inject constructor(
 
   override fun onDoneClick() {
     calculatorBSInput.doMathAndCleanMathOperation()
-    _state.update { it.copy(hideBottomSheetEvent = triggered) }
+    hideBottomSheet()
   }
 
   override fun onEqualClick() {
@@ -89,6 +84,13 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   override fun onCurrencyClick() {}
+
+  override fun onDismissBottomSheetRequest() {
+    if (bottomSheetState.value.bottomSheetState is BottomSheetType.Calculator) {
+      onDoneClick()
+    }
+    super.onDismissBottomSheetRequest()
+  }
 
   fun createNewAccount() {
     if (createAccountJob != null) {
@@ -112,30 +114,30 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun onIconRowClick() {
-    _bottomSheetState.update {
+    updateBottomSheet(
       BottomSheetType.Icon(
         selectedIcon = state.value.icon,
         onSelectIcon = ::setIcon,
       )
-    }
+    )
   }
 
   fun onColorRowClick() {
-    _bottomSheetState.update {
+    updateBottomSheet(
       BottomSheetType.Color(
         selectedColor = state.value.color,
         onSelectColor = ::setColor,
       )
-    }
+    )
   }
 
   fun onCurrencyRowClick() {
-    _bottomSheetState.update {
+    updateBottomSheet(
       BottomSheetType.Currency(
         selectedCurrency = state.value.currency,
         onSelectCurrency = ::setCurrency,
       )
-    }
+    )
   }
 
   fun setAccountName(accountName: String) {
@@ -148,7 +150,7 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun onInitialBalanceClick() {
-    _bottomSheetState.update {
+    updateBottomSheet(
       BottomSheetType.Calculator(
         text = initialBalanceState.asStateFlow(),
         initialBalanceActions = this,
@@ -156,22 +158,7 @@ class CreateAccountViewModel @Inject constructor(
         equalButtonState = equalButtonState.asStateFlow(),
         currency = state.value.currency.currencyName,
       )
-    }
-  }
-
-  fun onDismissBottomSheetRequest() {
-    if (bottomSheet.value is BottomSheetType.Calculator) {
-      onDoneClick()
-    }
-    _bottomSheetState.update { null }
-  }
-
-  fun onConsumedHideBottomSheetEvent() {
-    _state.update { it.copy(hideBottomSheetEvent = consumed) }
-  }
-
-  fun onConsumedNavigateUpEvent() {
-    _state.update { it.copy(navigateUpEvent = consumed) }
+    )
   }
 
   private fun setCurrency(currency: CurrencyModel) {

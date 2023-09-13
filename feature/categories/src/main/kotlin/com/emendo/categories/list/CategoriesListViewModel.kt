@@ -6,7 +6,7 @@ import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -14,9 +14,6 @@ import javax.inject.Inject
 class CategoriesListViewModel @Inject constructor(
   categoryRepository: CategoryRepository,
 ) : ViewModel() {
-
-  private val _navigationChannel = Channel<Unit?>(Channel.CONFLATED)
-  val navigationEvent: Flow<Unit?> = _navigationChannel.receiveAsFlow()
 
   val uiState: StateFlow<CategoriesListUiState> = categoriesUiState(categoryRepository)
     .stateIn(
@@ -29,24 +26,9 @@ class CategoriesListViewModel @Inject constructor(
 private fun categoriesUiState(categoryRepository: CategoryRepository): Flow<CategoriesListUiState> {
   return categoryRepository.getCategories().asResult().map { categoriesResult ->
     when (categoriesResult) {
-      is Result.Success -> {
-        val categoriesMutable: MutableList<CategoryItemType> = ArrayList<CategoryItemType>(
-          categoriesResult.data.map {
-            CategoryItemType.CategoryItem(it)
-          }).apply {
-          add(CategoryItemType.AddCategoryItemType)
-        }
-
-        CategoriesListUiState.DisplayCategoriesList(categoriesMutable)
-      }
-
-      is Result.Error -> {
-        CategoriesListUiState.Error("Error")
-      }
-
-      is Result.Loading -> {
-        CategoriesListUiState.Loading
-      }
+      is Result.Success -> CategoriesListUiState.DisplayCategoriesList(categoriesResult.data.toImmutableList())
+      is Result.Error -> CategoriesListUiState.Error("Error")
+      is Result.Loading -> CategoriesListUiState.Loading
     }
   }
 }

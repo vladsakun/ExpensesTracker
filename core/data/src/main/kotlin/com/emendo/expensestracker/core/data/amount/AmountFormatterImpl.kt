@@ -81,7 +81,7 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
   }
 
   override fun toAmount(from: String): Amount {
-    val fromTrimmed = from.trim()
+    val fromTrimmed = from.trim().replace(" ", "")
 
     if (fromTrimmed.isEmpty()) {
       return Amount(0, 0)

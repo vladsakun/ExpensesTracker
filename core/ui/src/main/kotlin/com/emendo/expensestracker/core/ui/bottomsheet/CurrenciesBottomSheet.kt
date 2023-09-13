@@ -14,6 +14,7 @@ import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.bottomsheet.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -33,7 +34,7 @@ fun CurrenciesBottomSheet(
           key = { item: CurrencyModel -> item.id },
           contentType = { _ -> "currencies" },
         ) { CurrencyItem(currencyModel = it, onSelectCurrency) }
-        item(key = "bottom_spacer", contentType = "spacer") {
+        uniqueItem(key = "bottom_spacer") {
           Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
         }
       }

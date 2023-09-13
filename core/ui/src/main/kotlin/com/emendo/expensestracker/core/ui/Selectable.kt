@@ -42,28 +42,19 @@ fun SelectRow(
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    SelectRowContent(labelResId, labelModifier, endLayout)
+    Text(
+      text = stringResource(id = labelResId),
+      style = MaterialTheme.typography.bodyLarge,
+      modifier = labelModifier(),
+    )
+    endLayout()
   }
-}
-
-@Composable
-private fun RowScope.SelectRowContent(
-  @StringRes labelResId: Int,
-  labelModifier: @Composable (RowScope.() -> Modifier),
-  endLayout: @Composable (RowScope.() -> Unit),
-) {
-  Text(
-    text = stringResource(id = labelResId),
-    style = MaterialTheme.typography.bodyLarge,
-    modifier = labelModifier(),
-  )
-  endLayout()
 }
 
 @Composable
 fun SelectRowWithIcon(
   @StringRes labelResId: Int,
-  imageVector: ImageVector,
+  imageVectorProvider: () -> ImageVector,
   onClick: () -> Unit,
 ) {
   val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
@@ -73,40 +64,43 @@ fun SelectRowWithIcon(
     labelModifier = labelModifier,
     endLayout = {
       Icon(
-        imageVector = imageVector,
+        imageVector = imageVectorProvider(),
         contentDescription = "label",
       )
     },
   )
 }
 
+// Todo make work without recomposition
 @Composable
 fun SelectRowWithText(
   @StringRes labelResId: Int,
-  text: String,
+  textProvider: () -> String,
   onClick: () -> Unit,
   textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
+  val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
+  val text = textProvider()
   SelectRow(
     labelResId = labelResId,
     onClick = onClick,
-    labelModifier = { Modifier.weight(1f) },
+    labelModifier = labelModifier,
     endLayout = {
       Text(
-        text = text,
+        text = "text",
         style = textStyle,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.End,
       )
-    },
+    }
   )
 }
 
 @Composable
 fun SelectRowWithColor(
   @StringRes labelResId: Int,
-  color: Color,
+  colorProvider: () -> Color,
   onClick: () -> Unit,
 ) {
   SelectRow(
@@ -118,7 +112,7 @@ fun SelectRowWithColor(
           .size(Dimens.icon_size)
           .aspectRatio(1f)
           .clip(shape = CircleShape)
-          .background(color = color)
+          .background(color = colorProvider())
       )
     },
   )

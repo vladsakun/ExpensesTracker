@@ -35,12 +35,10 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         add("implementation", project(":core:ui"))
 
         add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
-        add("implementation", libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
         add("implementation", libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
         add("implementation", libs.findLibrary("compose.destinations").get())
         add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
         add("implementation", libs.findLibrary("kotlinx.immutable.collections").get())
-        add("implementation", libs.findLibrary("compose.state.events").get())
 
         add("ksp", libs.findLibrary("compose.destinations.ksp").get())
       }

@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.core.designsystem.component.bottomsheet
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -43,6 +44,17 @@ fun ExpeBottomSheet(
         content()
       }
     }
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .windowInsetsBottomHeight(WindowInsets.safeDrawing)
+        .background(
+          MaterialTheme.colorScheme
+            .surfaceColorAtElevation(3.dp)
+            .copy(alpha = 0.7f)
+        )
+        .align(Alignment.BottomCenter),
+    )
   }
 }
 

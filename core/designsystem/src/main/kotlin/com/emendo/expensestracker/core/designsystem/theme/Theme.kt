@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
   primary = md_theme_light_primary,
@@ -96,13 +95,12 @@ fun ExpensesTrackerTheme(
   if (!view.isInEditMode) {
     SideEffect {
       val window = (view.context as Activity).window
-      val insetsController = WindowCompat.getInsetsController(window, view)
-      insetsController.isAppearanceLightStatusBars = !darkTheme
-      insetsController.isAppearanceLightNavigationBars = !darkTheme
+      //      val insetsController = WindowCompat.getInsetsController(window, view)
+      //      insetsController.isAppearanceLightStatusBars = !darkTheme
+      //      insetsController.isAppearanceLightNavigationBars = !darkTheme
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         window.isNavigationBarContrastEnforced = false
       }
-
     }
   }
 

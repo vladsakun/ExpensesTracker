@@ -38,10 +38,10 @@ class MainActivity : ComponentActivity() {
             android.graphics.Color.TRANSPARENT,
             android.graphics.Color.TRANSPARENT,
           ) { darkTheme },
-          navigationBarStyle = SystemBarStyle.auto(
-            lightScrim,
-            darkScrim,
-          ) { darkTheme },
+          //          navigationBarStyle = SystemBarStyle.auto(
+          //            lightScrim,
+          //            darkScrim,
+          //          ) { darkTheme },
         )
         onDispose {}
       }

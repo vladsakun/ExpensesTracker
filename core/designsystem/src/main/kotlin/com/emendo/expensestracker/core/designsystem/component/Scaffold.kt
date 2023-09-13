@@ -69,3 +69,35 @@ fun ExpeScaffoldWithTopBar(
     contentColor = contentColor,
   ) { content(it) }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExpeScaffoldWithTopBar(
+  @StringRes titleResId: Int,
+  modifier: Modifier = Modifier,
+  snackbarHost: @Composable () -> Unit = {},
+  floatingActionButton: @Composable () -> Unit = {},
+  floatingActionButtonPosition: FabPosition = FabPosition.End,
+  containerColor: Color = MaterialTheme.colorScheme.background,
+  contentColor: Color = contentColorFor(containerColor),
+  content: @Composable (PaddingValues) -> Unit,
+) {
+  val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+  ExpeScaffold(
+    topBar = {
+      ExpeTopBar(
+        titleRes = titleResId,
+        scrollBehavior = topAppBarScrollBehavior,
+      )
+    },
+    modifier = modifier
+      .fillMaxSize()
+      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+    snackbarHost = snackbarHost,
+    floatingActionButton = floatingActionButton,
+    floatingActionButtonPosition = floatingActionButtonPosition,
+    containerColor = containerColor,
+    contentColor = contentColor,
+  ) { content(it) }
+}

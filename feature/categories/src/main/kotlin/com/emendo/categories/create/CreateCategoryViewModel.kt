@@ -5,7 +5,8 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.model.Category
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
-import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,11 +32,11 @@ class CreateCategoryViewModel @Inject constructor(
   }
 
   fun onIconSelectClick() {
-    _bottomSheetState.update { BottomSheetType.Icon(state.value.icon, ::onIconSelected) }
+    updateBottomSheet(BottomSheetType.Icon(state.value.icon, ::onIconSelected))
   }
 
   fun onColorSelectClick() {
-    _bottomSheetState.update { BottomSheetType.Color(state.value.color, ::onColorSelected) }
+    updateBottomSheet(BottomSheetType.Color(state.value.color, ::onColorSelected))
   }
 
   fun onCreateCategoryClick() {
@@ -47,7 +48,7 @@ class CreateCategoryViewModel @Inject constructor(
           color = state.value.color,
         )
       )
-      navigateUpChannel.trySend(Unit)
+      navigateUp()
     }
   }
 
