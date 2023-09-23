@@ -1,6 +1,9 @@
 package com.emendo.expensestracker.core.data.amount
 
+import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import java.math.BigDecimal
+
+// Todo refactor
 
 interface AmountFormatter {
 
@@ -36,17 +39,10 @@ interface AmountFormatter {
    * @param amount
    * @return the formatted amount without the currency symbol
    */
-  fun format(amount: BigDecimal): String
+  fun format(amount: BigDecimal, currencyModel: CurrencyModel? = null): String
 
   fun format(amount: String): String
 
-  /**
-   * @return true if currency should be displayed before amount.
-   */
-  fun displayCurrencyFirst(): Boolean
-
   fun toAmount(from: String): Amount
-
-  fun containsDecimalSeparator(value: StringBuilder?): Boolean
 }
 
