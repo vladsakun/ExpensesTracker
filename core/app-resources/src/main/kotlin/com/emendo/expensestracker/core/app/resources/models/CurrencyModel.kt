@@ -93,6 +93,9 @@ enum class CurrencyModel constructor(
   companion object {
     private val values = entries.associateBy { it.id }
 
+    // Todo remove hardcode
+    val DEFAULT = USD
+
     fun getById(id: Int): CurrencyModel {
       return values[id] ?: throw IllegalArgumentException("No Currency with id $id")
     }

@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.designsystem.component.bottomsheet
+package com.emendo.expensestracker.core.designsystem.component
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background

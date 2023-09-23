@@ -1,4 +1,4 @@
-package com.emendo.transactions
+package com.emendo.transactions.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

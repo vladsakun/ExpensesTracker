@@ -43,8 +43,8 @@ fun CreateCategoryRoute(
         onCreateCategoryClick = viewModel::onCreateCategoryClick,
       )
     },
-    bottomSheetContent = { type, closeBottomSheet ->
-      BottomSheetContent(type, closeBottomSheet)
+    bottomSheetContent = { type, hideBottomSheet ->
+      BottomSheetContent(type, hideBottomSheet)
     },
   )
 }

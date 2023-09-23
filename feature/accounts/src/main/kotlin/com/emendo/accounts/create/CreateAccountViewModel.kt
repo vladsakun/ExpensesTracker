@@ -4,18 +4,19 @@ import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.CalculatorBSInput
+import com.emendo.expensestracker.core.data.CalculatorInput
+import com.emendo.expensestracker.core.data.CalculatorInputCallbacks
+import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_NUM_1
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
-import com.emendo.expensestracker.core.data.model.Account
+import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
 import com.emendo.expensestracker.core.model.data.EqualButtonState
+import com.emendo.expensestracker.core.model.data.InitialBalanceKeyboardActions
 import com.emendo.expensestracker.core.model.data.MathOperation
-import com.emendo.expensestracker.core.model.data.NumKeyboardActions
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +28,11 @@ import javax.inject.Inject
 class CreateAccountViewModel @Inject constructor(
   private val accountsRepository: AccountsRepository,
   private val amountFormatter: AmountFormatter,
-) : BaseBottomSheetViewModel<BottomSheetType>(), NumKeyboardActions {
+  private val calculatorInput: CalculatorInput,
+) : BaseBottomSheetViewModel<BottomSheetType>(),
+    // Todo extract to commons
+    InitialBalanceKeyboardActions,
+    CalculatorInputCallbacks {
 
   private val _state = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
@@ -38,55 +43,55 @@ class CreateAccountViewModel @Inject constructor(
   val state = _state.asStateFlow()
 
   private val equalButtonState = MutableStateFlow(EqualButtonState.Default)
-  private val initialBalanceState = MutableStateFlow(CalculatorBSInput.DEFAULT_INITIAL_BALANCE)
+  private val initialBalanceState = MutableStateFlow(DEFAULT_CALCULATOR_NUM_1)
 
   private var createAccountJob: Job? = null
 
-  private var calculatorBSInput = CalculatorBSInput(
-    number1 = StringBuilder(CalculatorBSInput.DEFAULT_INITIAL_BALANCE),
-    amountFormatter = amountFormatter,
-    doOnValueChange = { formattedValue, equalButtonState ->
-      _state.update { it.copy(initialBalance = formattedValue) }
-      initialBalanceState.update { formattedValue }
-      this.equalButtonState.update { equalButtonState }
-    }
-  )
+  // Todo extract to commons
+  init {
+    calculatorInput.initCallbacks(this)
+  }
+
+  // Todo extract to commons
+  override fun doOnValueChange(formattedValue: String, equalButtonState: EqualButtonState) {
+    _state.update { it.copy(initialBalance = formattedValue) }
+    initialBalanceState.update { formattedValue }
+    this.equalButtonState.update { equalButtonState }
+  }
 
   override fun onChangeSignClick() {
     // Todo
   }
 
   override fun onClearClick() {
-    calculatorBSInput.onClearClick()
+    calculatorInput.onClearClick()
   }
 
   override fun onMathOperationClick(mathOperation: MathOperation) {
-    if (calculatorBSInput.doMath(mathOperation)) return
+    if (calculatorInput.doMath(mathOperation)) return
 
-    calculatorBSInput.input(mathOperation)
+    calculatorInput.input(mathOperation)
   }
 
   override fun onNumberClick(numKeyboardNumber: NumKeyboardNumber) {
-    calculatorBSInput.input(numKeyboardNumber)
+    calculatorInput.input(numKeyboardNumber)
   }
 
   override fun onPrecisionClick() {
-    calculatorBSInput.addDecimalSeparator()
+    calculatorInput.onPrecisionClick()
   }
 
   override fun onDoneClick() {
-    calculatorBSInput.doMathAndCleanMathOperation()
+    calculatorInput.onDoneClick()
     hideBottomSheet()
   }
 
   override fun onEqualClick() {
-    calculatorBSInput.doMath()
+    calculatorInput.doMath()
   }
 
-  override fun onCurrencyClick() {}
-
   override fun onDismissBottomSheetRequest() {
-    if (bottomSheetState.value.bottomSheetState is BottomSheetType.Calculator) {
+    if (bottomSheetState.value.bottomSheetState is BottomSheetType.InitialBalance) {
       onDoneClick()
     }
     super.onDismissBottomSheetRequest()
@@ -100,21 +105,21 @@ class CreateAccountViewModel @Inject constructor(
     createAccountJob = viewModelScope.launch {
       with(state.value) {
         accountsRepository.upsertAccount(
-          Account(
+          AccountModel(
             name = accountName,
-            balance = amountFormatter.toAmount(initialBalance).toBigDecimal().toDouble(),
+            balance = amountFormatter.toAmount(initialBalance).toBigDecimal(),
             currencyModel = currency,
             icon = icon,
             color = color,
           )
         )
-        _state.update { it.copy(navigateUpEvent = triggered) }
+        navigateUp()
       }
     }
   }
 
   fun onIconRowClick() {
-    updateBottomSheet(
+    showBottomSheet(
       BottomSheetType.Icon(
         selectedIcon = state.value.icon,
         onSelectIcon = ::setIcon,
@@ -123,7 +128,7 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun onColorRowClick() {
-    updateBottomSheet(
+    showBottomSheet(
       BottomSheetType.Color(
         selectedColor = state.value.color,
         onSelectColor = ::setColor,
@@ -132,7 +137,7 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun onCurrencyRowClick() {
-    updateBottomSheet(
+    showBottomSheet(
       BottomSheetType.Currency(
         selectedCurrency = state.value.currency,
         onSelectCurrency = ::setCurrency,
@@ -150,10 +155,10 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun onInitialBalanceClick() {
-    updateBottomSheet(
-      BottomSheetType.Calculator(
+    showBottomSheet(
+      BottomSheetType.InitialBalance(
         text = initialBalanceState.asStateFlow(),
-        initialBalanceActions = this,
+        actions = this,
         decimalSeparator = amountFormatter.decimalSeparator.toString(),
         equalButtonState = equalButtonState.asStateFlow(),
         currency = state.value.currency.currencyName,

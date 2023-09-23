@@ -17,8 +17,8 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetState
 fun <BottomSheetType> ExpeModalBottomSheet(
   modalBottomSheetState: SheetState,
   bottomSheetState: State<BaseBottomSheetState<BottomSheetType?>>,
-  closeBottomSheet: () -> Unit,
-  bottomSheetContent: @Composable (type: BottomSheetType?, closeBottomSheet: () -> Unit) -> Unit,
+  hideBottomSheet: () -> Unit,
+  bottomSheetContent: @Composable (type: BottomSheetType?, hideBottomSheet: () -> Unit) -> Unit,
 ) {
   val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState.value.bottomSheetState != null } }
   val focusManager = LocalFocusManager.current
@@ -31,7 +31,7 @@ fun <BottomSheetType> ExpeModalBottomSheet(
       windowInsets = WindowInsets(0),
       shape = ExpeBottomSheetShape,
       content = {
-        bottomSheetContent(bottomSheetState.value.bottomSheetState, closeBottomSheet)
+        bottomSheetContent(bottomSheetState.value.bottomSheetState, hideBottomSheet)
       },
     )
   }

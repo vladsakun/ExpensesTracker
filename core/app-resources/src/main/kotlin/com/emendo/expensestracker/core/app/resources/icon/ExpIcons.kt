@@ -6,6 +6,9 @@ import androidx.compose.material.icons.rounded.*
 
 object ExpIcons {
   val ArrowBack = Icons.Rounded.ArrowBack
+  val ArrowUpward = Icons.Rounded.ArrowUpward
+  val ArrowDownward = Icons.Rounded.ArrowDownward
+  val ArrowForward = Icons.Rounded.ArrowForward
   val DonutLarge = Icons.Rounded.DonutLarge
   val DonutLargeBorder = Icons.Outlined.DonutLarge
   val CreditCard = Icons.Rounded.CreditCard

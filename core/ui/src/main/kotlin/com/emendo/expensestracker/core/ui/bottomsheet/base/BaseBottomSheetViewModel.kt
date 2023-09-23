@@ -1,5 +1,7 @@
 package com.emendo.expensestracker.core.ui.bottomsheet.base
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
 import androidx.lifecycle.ViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -13,8 +15,11 @@ abstract class BaseBottomSheetViewModel<BSType> : ViewModel() {
   val bottomSheetState = _bottomSheetState.asStateFlow()
 
   open fun onDismissBottomSheetRequest() {
-    updateBottomSheet(null)
+    showBottomSheet(null)
   }
+
+  @OptIn(ExperimentalMaterial3Api::class)
+  open fun confirmValueChange(sheetValue: SheetValue): Boolean = true
 
   fun hideBottomSheet() {
     _bottomSheetState.update { it.copy(hideBottomSheetEvent = triggered) }
@@ -28,7 +33,7 @@ abstract class BaseBottomSheetViewModel<BSType> : ViewModel() {
     _bottomSheetState.update { it.copy(navigateUpEvent = consumed) }
   }
 
-  protected fun updateBottomSheet(bottomSheet: BSType?) {
+  protected fun showBottomSheet(bottomSheet: BSType?) {
     _bottomSheetState.update { it.copy(bottomSheetState = bottomSheet) }
   }
 

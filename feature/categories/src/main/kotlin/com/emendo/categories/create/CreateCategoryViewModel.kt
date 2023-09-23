@@ -2,8 +2,10 @@ package com.emendo.categories.create
 
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.model.Category
+import com.emendo.expensestracker.core.data.model.CategoryType
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
@@ -32,11 +34,11 @@ class CreateCategoryViewModel @Inject constructor(
   }
 
   fun onIconSelectClick() {
-    updateBottomSheet(BottomSheetType.Icon(state.value.icon, ::onIconSelected))
+    showBottomSheet(BottomSheetType.Icon(state.value.icon, ::onIconSelected))
   }
 
   fun onColorSelectClick() {
-    updateBottomSheet(BottomSheetType.Color(state.value.color, ::onColorSelected))
+    showBottomSheet(BottomSheetType.Color(state.value.color, ::onColorSelected))
   }
 
   fun onCreateCategoryClick() {
@@ -46,6 +48,8 @@ class CreateCategoryViewModel @Inject constructor(
           name = state.value.title,
           icon = state.value.icon,
           color = state.value.color,
+          type = CategoryType.EXPENSE,
+          currencyModel = CurrencyModel.DEFAULT
         )
       )
       navigateUp()

@@ -12,21 +12,23 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <BSType> BaseScreenWithModalBottomSheetWithViewModel(
   viewModel: BaseBottomSheetViewModel<BSType>,
   onNavigateUpClick: () -> Unit,
   content: @Composable () -> Unit,
-  bottomSheetContent: @Composable (bottomSheetType: BSType?, closeBottomSheet: () -> Unit) -> Unit,
+  bottomSheetContent: @Composable (bottomSheetType: BSType?, hideBottomSheet: () -> Unit) -> Unit,
 ) {
   BaseScreenWithModalBottomSheet(
     bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle(),
     onNavigationClick = onNavigateUpClick,
     onBottomSheetDismissRequest = viewModel::onDismissBottomSheetRequest,
-    content = content,
-    bottomSheetContent = bottomSheetContent,
     onConsumedNavigateUpEvent = viewModel::onConsumedNavigateUpEvent,
     onConsumedHideBottomSheetEvent = viewModel::onConsumedHideBottomSheetEvent,
+    confirmValueChange = viewModel::confirmValueChange,
+    bottomSheetContent = bottomSheetContent,
+    content = content,
   )
 }
 
@@ -38,12 +40,17 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
   onBottomSheetDismissRequest: () -> Unit,
   onConsumedNavigateUpEvent: () -> Unit,
   onConsumedHideBottomSheetEvent: () -> Unit,
-  bottomSheetContent: @Composable (bottomSheetType: BSType?, closeBottomSheet: () -> Unit) -> Unit,
+  confirmValueChange: (SheetValue) -> Boolean,
+  bottomSheetContent: @Composable (bottomSheetType: BSType?, hideBottomSheet: () -> Unit) -> Unit,
   content: @Composable () -> Unit,
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-  val closeBottomSheet: () -> Unit = remember(modalBottomSheetState) {
+  val modalBottomSheetState =
+    rememberModalBottomSheetState(
+      skipPartiallyExpanded = true,
+      confirmValueChange = confirmValueChange
+    )
+  val hideBottomSheet: () -> Unit = remember(modalBottomSheetState) {
     {
       coroutineScope.launch {
         modalBottomSheetState.hide()
@@ -52,7 +59,7 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
   }
   BackHandler {
     when {
-      modalBottomSheetState.isVisible -> closeBottomSheet()
+      modalBottomSheetState.isVisible -> hideBottomSheet()
       else -> onNavigationClick()
     }
   }
@@ -61,7 +68,7 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
     onConsumedNavigateUpEvent = onConsumedNavigateUpEvent,
     onNavigationClick = onNavigationClick,
     onConsumedHideBottomSheetEvent = onConsumedHideBottomSheetEvent,
-    closeBottomSheet = closeBottomSheet,
+    hideBottomSheet = hideBottomSheet,
     modalBottomSheetState = modalBottomSheetState,
     onBottomSheetDismissRequest = onBottomSheetDismissRequest
   )
@@ -71,7 +78,7 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
   ExpeModalBottomSheet(
     modalBottomSheetState = modalBottomSheetState,
     bottomSheetState = bottomSheetState,
-    closeBottomSheet = closeBottomSheet,
+    hideBottomSheet = hideBottomSheet,
     bottomSheetContent = bottomSheetContent,
   )
 }
@@ -83,7 +90,7 @@ private fun Effects(
   onConsumedNavigateUpEvent: () -> Unit,
   onNavigationClick: () -> Unit,
   onConsumedHideBottomSheetEvent: () -> Unit,
-  closeBottomSheet: () -> Unit,
+  hideBottomSheet: () -> Unit,
   modalBottomSheetState: SheetState,
   onBottomSheetDismissRequest: () -> Unit,
 ) {
@@ -95,7 +102,7 @@ private fun Effects(
   EventEffect(
     event = bottomSheetState.value.hideBottomSheetEvent,
     onConsumed = onConsumedHideBottomSheetEvent,
-    action = closeBottomSheet,
+    action = hideBottomSheet,
   )
   LaunchedEffect(Unit) {
     snapshotFlow { modalBottomSheetState.currentValue }

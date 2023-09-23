@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.designsystem.component.bottomsheet.ExpeBottomSheet
+import com.emendo.expensestracker.core.designsystem.component.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.conditional
 import com.emendo.expensestracker.core.ui.Constants.ITEM_FIXED_SIZE_DP
