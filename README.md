@@ -11,7 +11,7 @@ Features:
 1) Credits
 2) Scheduled transactions (payments, transfers, etc.)
 3) Accounts grouping
-4) Shared expenses management (Users can create shared expenses groups)
+4) Shared expenses management (Users can create shared expenses groups) (Backend needed)
 5) Intelligent Categorization: The app automatically categorizes expenses based on patterns and user input, saving time and effort.
 6) Receipt Scanning: Users can capture and scan receipts, which the app then extracts relevant details from for easy expense entry.
 7) Bill Reminders: The app sends reminders for upcoming bills, ensuring timely payments and avoiding late fees.
@@ -37,3 +37,5 @@ Features:
 27) Sign in with google, apple, facebook
 28) Transactions map
 29) Export data to excel or other formats
+30) Pin code for app (biometrics)
+31) Transactions period like 1Money instead of MoneyFlow

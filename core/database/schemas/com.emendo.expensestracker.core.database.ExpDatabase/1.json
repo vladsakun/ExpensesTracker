@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "317c9dcf57197c849f059024cb7cfae6",
+    "identityHash": "47bc85bb2ddde1e12993c2a091e13f69",
     "entities": [
       {
         "tableName": "account",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` REAL NOT NULL, `currencyId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` TEXT NOT NULL, `currencyId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -23,7 +23,7 @@
           {
             "fieldPath": "balance",
             "columnName": "balance",
-            "affinity": "REAL",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -55,8 +55,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "categories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)",
+        "tableName": "category",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `currencyId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -81,6 +81,68 @@
             "columnName": "colorId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyId",
+            "columnName": "currencyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "transaction",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sourceId` INTEGER NOT NULL, `targetId` INTEGER NOT NULL, `value` TEXT NOT NULL, `currencyId` INTEGER NOT NULL, `type` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "sourceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetId",
+            "columnName": "targetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyId",
+            "columnName": "currencyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -96,7 +158,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '317c9dcf57197c849f059024cb7cfae6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '47bc85bb2ddde1e12993c2a091e13f69')"
     ]
   }
 }

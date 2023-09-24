@@ -1,7 +1,5 @@
 package com.emendo.expensestracker.core.designsystem.theme
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF6750A4)
@@ -67,6 +65,3 @@ val md_theme_dark_outlineVariant = Color(0xFF49454F)
 val md_theme_dark_scrim = Color(0xFF000000)
 
 val seed = Color(0xFF6750A4)
-
-val divider_color
-  @Composable get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)

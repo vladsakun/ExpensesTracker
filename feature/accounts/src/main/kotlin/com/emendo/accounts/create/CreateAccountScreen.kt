@@ -1,9 +1,13 @@
 package com.emendo.accounts.create
 
-import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -12,11 +16,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.designsystem.component.*
-import com.emendo.expensestracker.core.designsystem.component.bottomsheet.*
+import com.emendo.expensestracker.core.designsystem.component.ExpeButton
+import com.emendo.expensestracker.core.designsystem.component.ExpePreview
+import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
+import com.emendo.expensestracker.core.designsystem.component.ExpeTextField
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.designsystem.utils.*
-import com.emendo.expensestracker.core.ui.*
+import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
+import com.emendo.expensestracker.core.ui.SelectRow
+import com.emendo.expensestracker.core.ui.SelectRowWithColor
+import com.emendo.expensestracker.core.ui.SelectRowWithIcon
 import com.emendo.expensestracker.core.ui.bottomsheet.ColorsBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.CurrenciesBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.IconsBottomSheet
@@ -25,8 +33,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.NavigationEventEffect
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Destination
@@ -52,8 +59,8 @@ fun CreateAccountRoute(
         onCurrencyRowClick = viewModel::onCurrencyRowClick,
       )
     },
-    bottomSheetContent = { type, closeBottomSheet ->
-      BottomSheetContent(type, closeBottomSheet)
+    bottomSheetContent = { type, hideBottomSheet ->
+      BottomSheetContent(type, hideBottomSheet)
     },
   )
 }
@@ -99,7 +106,7 @@ private fun CreateAccountContent(
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { state.value.color.color },
+        colorProvider = { state.value.color.darkColor },
         onClick = onColorRowClick,
       )
       //       Todo ask Anton
@@ -143,26 +150,6 @@ private fun CreateAccountContent(
 }
 
 @Composable
-private fun EventEffects(
-  state: State<CreateAccountScreenData>,
-  onConsumedNavigateUpEvent: () -> Unit,
-  onNavigationClick: () -> Unit,
-  onConsumedHideBottomSheetEvent: () -> Unit,
-  closeBottomSheet: () -> Unit,
-) {
-  NavigationEventEffect(
-    event = state.value.navigateUpEvent,
-    onConsumed = onConsumedNavigateUpEvent,
-    action = onNavigationClick,
-  )
-  EventEffect(
-    event = state.value.hideBottomSheetEvent,
-    onConsumed = onConsumedHideBottomSheetEvent,
-    action = closeBottomSheet,
-  )
-}
-
-@Composable
 private fun BottomSheetContent(
   type: BottomSheetType?,
   hideBottomSheet: () -> Unit,
@@ -200,12 +187,12 @@ private fun BottomSheetContent(
       )
     }
 
-    is BottomSheetType.Calculator -> {
+    is BottomSheetType.InitialBalance -> {
       val text = type.text.collectAsStateWithLifecycle()
       val equalButtonState = type.equalButtonState.collectAsStateWithLifecycle()
       InitialBalanceBS(
         text = text,
-        initialBalanceActions = type.initialBalanceActions,
+        actions = type.actions,
         equalButtonState = equalButtonState,
         decimalSeparator = type.decimalSeparator,
         currency = type.currency,
@@ -219,23 +206,18 @@ private fun BottomSheetContent(
 private fun CreateAccountScreenPreview(
   @PreviewParameter(CreateAccountPreviewData::class) previewData: CreateAccountScreenData,
 ) {
-  val state = remember { mutableStateOf(previewData) }
-  val bottomSheetState = remember { mutableStateOf(null) }
+  val state = MutableStateFlow(previewData)
 
-  //  ExpensesTrackerTheme {
-  //    CreateAccountScreen(
-  //      state = state,
-  //      bottomSheetType = bottomSheetState,
-  //      onAccountNameChange = {},
-  //      onCreateAccountClick = {},
-  //      onNavigationClick = {},
-  //      onInitialBalanceRowClick = {},
-  //      onDismissBottomSheetRequest = {},
-  //      onIconRowClick = {},
-  //      onColorRowClick = {},
-  //      onCurrencyRowClick = {},
-  //      onConsumedHideBottomSheetEvent = {},
-  //      onConsumedNavigateUpEvent = {},
-  //    )
-  //  }
+  ExpensesTrackerTheme {
+    CreateAccountContent(
+      stateFlow = state,
+      onAccountNameChange = {},
+      onCreateAccountClick = {},
+      onNavigationClick = {},
+      onInitialBalanceRowClick = {},
+      onIconRowClick = {},
+      onColorRowClick = {},
+      onCurrencyRowClick = {},
+    )
+  }
 }

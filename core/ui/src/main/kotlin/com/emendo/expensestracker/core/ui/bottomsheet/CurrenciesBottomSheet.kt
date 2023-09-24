@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
+import com.emendo.expensestracker.core.designsystem.component.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
-import com.emendo.expensestracker.core.designsystem.component.bottomsheet.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import kotlinx.collections.immutable.ImmutableList

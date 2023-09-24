@@ -4,10 +4,8 @@ import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.CalculatorBSInput.Companion.DEFAULT_INITIAL_BALANCE
+import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_NUM_1
 import com.emendo.expensestracker.core.model.data.EqualButtonState
-import de.palm.composestateevents.StateEvent
-import de.palm.composestateevents.consumed
 
 @Stable
 data class CreateAccountScreenData(
@@ -19,19 +17,17 @@ data class CreateAccountScreenData(
   val equalButtonState: EqualButtonState,
   val decimalSeparator: String,
   val isCreateAccountButtonEnabled: Boolean,
-  val hideBottomSheetEvent: StateEvent = consumed,
-  val navigateUpEvent: StateEvent = consumed,
 ) {
 
   companion object {
     fun getDefaultState(
+      decimalSeparator: String,
       defaultCurrency: CurrencyModel = CurrencyModel.USD,  // Todo pass favourite currency
-      decimalSeparator: String = ".",
     ) = CreateAccountScreenData(
       accountName = "",
       icon = IconModel.random,
       color = ColorModel.random,
-      initialBalance = DEFAULT_INITIAL_BALANCE,
+      initialBalance = DEFAULT_CALCULATOR_NUM_1,
       currency = defaultCurrency,
       equalButtonState = EqualButtonState.Default,
       decimalSeparator = decimalSeparator,

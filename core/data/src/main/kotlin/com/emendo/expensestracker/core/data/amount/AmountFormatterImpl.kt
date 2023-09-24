@@ -2,10 +2,14 @@ package com.emendo.expensestracker.core.data.amount
 
 import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
+import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
+import com.emendo.expensestracker.core.data.isFloatingPointNumber
 import java.math.BigDecimal
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
+
+// Todo refactor
 
 @Singleton
 class AmountFormatterImpl @Inject constructor() : AmountFormatter {
@@ -15,6 +19,8 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
   companion object {
     private const val MAX_DIGITS_BEFORE_DECIMAL = 11
     private const val MAX_DIGITS_AFTER_DECIMAL = 2
+    private const val NEGATIVE_PREFIX = "\u2212\u00A0"
+    private const val SPACE = '\u00A0'
   }
 
   // If for some reason Default Locale changes (in phone settings, or from within the app -
@@ -26,8 +32,13 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
   //this is because for instance de-at locale would result in 1.234,23 in currencyformatter
   // but 1 234,23 in regular formatter
   //and since we only format amounts we want it to be the same everywhere (with or without currency symbol)
-  private val currencyNumberFormatter = NumberFormat.getCurrencyInstance(currencyLocale) as DecimalFormat
-  private val isCurrencyFirst: Boolean
+  private val currencyNumberFormatter = (NumberFormat.getCurrencyInstance(currencyLocale) as DecimalFormat).apply {
+    // Use specific unicode character for minus and space
+    negativePrefix = NEGATIVE_PREFIX
+  }
+  private val numberFormatter = (NumberFormat.getInstance(currencyLocale) as DecimalFormat).apply {
+    negativePrefix = NEGATIVE_PREFIX
+  }
 
   override val decimalSeparator: Char
     get() = currencyNumberFormatter.decimalFormatSymbols.monetaryDecimalSeparator
@@ -40,63 +51,72 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
 
   init {
     currencyNumberFormatter.minimumFractionDigits = 2
-    isCurrencyFirst = currencyNumberFormatter.toLocalizedPattern().indexOf('\u00A4') <= 0
-  }
-
-  override fun displayCurrencyFirst(): Boolean {
-    return isCurrencyFirst
-  }
-
-  override fun format(amount: Amount?): String {
-    return format(amount, true)
-  }
-
-  override fun format(amount: Amount?, includeDecimals: Boolean): String {
-    return formatWithSpace(amount, includeDecimals).replace(' ', '\u00A0')
-  }
-
-  private fun formatWithSpace(amount: Amount?, includeDecimals: Boolean): String {
-    if (amount == null) return ""
-
-    // Use specific unicode character for minus and space https://issues.beeone.at/browse/GCUI-3748
-    currencyNumberFormatter.negativePrefix = "\u2212\u00A0"
-
-    currencyNumberFormatter.minimumFractionDigits = if (includeDecimals) amount.precision else 0
-    val s = currencyNumberFormatter.format(amount.toBigDecimal())
-
-    return removeCurrency(s)
+    numberFormatter.minimumFractionDigits = 2
   }
 
   /**
    * @param amount
    * @return the formatted amount value using the rules of number format of default Locale
    */
-  override fun format(amount: BigDecimal): String {
-    currencyNumberFormatter.minimumFractionDigits = amount.scale().coerceAtLeast(0)
-    return removeCurrency(currencyNumberFormatter.format(amount))
+  override fun format(amount: BigDecimal, currencyModel: CurrencyModel): String {
+    currencyNumberFormatter.apply {
+      if (amount.isFloatingPointNumber) {
+        maximumFractionDigits = 2
+        minimumFractionDigits = 2
+      } else {
+        maximumFractionDigits = 0
+      }
+
+      decimalFormatSymbols.currencySymbol = currencyModel.currencySymbol
+    }
+
+    return currencyNumberFormatter.format(amount)
+  }
+
+  override fun format(amount: BigDecimal?): String {
+    return formatWithSpace(amount).replace(' ', SPACE)
   }
 
   override fun format(amount: String): String {
-    return format(toAmount(amount))
+    return format(toBigDecimal(amount))
   }
 
-  override fun toAmount(from: String): Amount {
-    val fromTrimmed = from.trim().replace(" ", "")
+  override fun formatFinal(amount: BigDecimal?): String {
+    if (amount == null) {
+      return ""
+    }
+
+    if (amount.scale() != 0) {
+      numberFormatter.minimumFractionDigits = amount.scale().coerceAtLeast(2)
+    } else {
+      numberFormatter.minimumFractionDigits = 0
+    }
+
+    return numberFormatter.format(amount)
+  }
+
+  override fun toBigDecimal(from: String): BigDecimal {
+    val fromTrimmed = from.trim().replace(SPACE.toString(), "").replace('−', '-')
 
     if (fromTrimmed.isEmpty()) {
-      return Amount(0, 0)
+      return BigDecimal.ZERO
     }
 
     val precision = fromTrimmed.substringAfterLast(decimalSeparator, "").length
     val value = fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toLong()
 
-    return Amount(
-      value = value,
-      precision = precision,
-    )
+    return BigDecimal(value.toBigInteger(), precision)
   }
 
-  override fun containsDecimalSeparator(value: StringBuilder?) = value?.contains(decimalSeparator) ?: false
+  private fun formatWithSpace(amount: BigDecimal?): String {
+    if (amount == null) {
+      return ""
+    }
+
+    numberFormatter.minimumFractionDigits = amount.scale()
+
+    return numberFormatter.format(amount)
+  }
 
   //removes currency symbol and possible space between currency and amount
   private fun removeCurrency(s: String): String {

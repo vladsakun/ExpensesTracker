@@ -1,4 +1,4 @@
-package com.emendo.transactions
+package com.emendo.transactions.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,7 +48,7 @@ private fun ColorBox(
   Box(
     modifier = Modifier
       .size(40.dp)
-      .background(colorModel.color)
+      .background(colorModel.darkColor)
       .clickable(onClick = onColorClick)
   )
 }
@@ -70,7 +70,7 @@ private fun TransactionsScreenContent(
       Box(
         modifier = Modifier
           .size(40.dp)
-          .background(state.value.color.color),
+          .background(state.value.color.darkColor),
       )
     }
   }

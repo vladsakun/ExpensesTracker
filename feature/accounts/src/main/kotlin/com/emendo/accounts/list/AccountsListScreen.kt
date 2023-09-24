@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,10 +22,12 @@ import com.emendo.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
-import com.emendo.expensestracker.core.data.model.Account
-import com.emendo.expensestracker.core.designsystem.component.*
+import com.emendo.expensestracker.core.data.model.AccountModel
+import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
+import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
+import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
+import com.emendo.expensestracker.core.designsystem.component.ExpeTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.designsystem.theme.divider_color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
@@ -87,21 +88,11 @@ private fun AccountsListScreenContent(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       when (uiState) {
-        is AccountsListUiState.Loading -> item {
-          ExpLoadingWheel(contentDesc = stringResource(id = R.string.accounts_loading))
-        }
-
-        is AccountsListUiState.Empty -> item {
-          Text(text = "Empty")
-        }
-
-        is AccountsListUiState.Error -> item {
-          Text(text = uiState.message)
-        }
-
+        is AccountsListUiState.Loading -> item { ExpLoadingWheel() }
+        is AccountsListUiState.Error -> item { Text(text = uiState.message) }
         is AccountsListUiState.DisplayAccountsList -> {
           items(
-            items = uiState.accounts,
+            items = uiState.accountModels,
             key = { it.id },
             contentType = { _ -> "accounts" }
           ) { account ->
@@ -114,28 +105,28 @@ private fun AccountsListScreenContent(
 }
 
 @Composable
-private fun AccountItem(account: Account) {
+private fun AccountItem(accountModel: AccountModel) {
   Column {
     Row(
-      modifier = Modifier.padding(Dimens.margin_small_x),
+      modifier = Modifier.padding(horizontal = Dimens.margin_large_x, vertical = Dimens.margin_small_x),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)
     ) {
       Icon(
         modifier = Modifier
           .clip(RoundedCornerShape(Dimens.corner_radius_small))
-          .background(color = account.color.color.copy(alpha = 0.2f))
+          .background(color = accountModel.color.darkColor.copy(alpha = 0.2f))
           .border(
             width = Dimens.border_thickness,
-            color = account.color.color,
+            color = accountModel.color.darkColor,
             shape = RoundedCornerShape(Dimens.corner_radius_small)
           )
           .padding(Dimens.margin_small_x),
-        imageVector = account.icon.imageVector,
+        imageVector = accountModel.icon.imageVector,
         contentDescription = "",
       )
       Text(
-        text = account.name,
+        text = accountModel.name,
         modifier = Modifier
           .fillMaxHeight()
           .weight(1f),
@@ -147,17 +138,16 @@ private fun AccountItem(account: Account) {
         modifier = Modifier
           .fillMaxHeight()
           .weight(2f),
-        text = account.formattedBalance,
+        text = accountModel.balanceFormatted,
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.End,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
       )
     }
-    Divider(
-      modifier = Modifier.padding(start = Dimens.icon_size + Dimens.margin_small_x * 4),
-      color = divider_color,
-      thickness = Dimens.divider_thickness
+    ExpeDivider(
+      modifier = Modifier
+        .padding(start = Dimens.icon_size + Dimens.margin_small_x * 2 + Dimens.margin_large_x)
     )
   }
 }

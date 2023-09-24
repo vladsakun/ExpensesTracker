@@ -2,10 +2,7 @@ package com.emendo.expensestracker.core.data.di
 
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.AmountFormatterImpl
-import com.emendo.expensestracker.core.data.repository.AccountsRepository
-import com.emendo.expensestracker.core.data.repository.CategoryRepository
-import com.emendo.expensestracker.core.data.repository.OfflineFirstAccountsRepository
-import com.emendo.expensestracker.core.data.repository.OfflineFirstCategoryRepository
+import com.emendo.expensestracker.core.data.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,4 +20,7 @@ interface DataModule {
 
   @Binds
   fun bindsAmountFormatter(amountFormatterImpl: AmountFormatterImpl): AmountFormatter
+
+  @Binds
+  fun bindsTransactionRepository(transactionRepository: OfflineFirstTransactionRepository): TransactionRepository
 }

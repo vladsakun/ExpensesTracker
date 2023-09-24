@@ -7,23 +7,21 @@ sealed interface MathOperation {
   val symbolWithWhiteSpaces: String
     get() = " $symbol "
 
-  fun doUnformattedMath(first: BigDecimal, second: BigDecimal): BigDecimal
-  fun doMath(first: BigDecimal, second: BigDecimal): BigDecimal =
-    doUnformattedMath(first, second).setScale(BIG_DECIMAL_SCALE)
+  fun doMath(first: BigDecimal, second: BigDecimal): BigDecimal
 
   data class Add(override val symbol: String = "+") : MathOperation {
-    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first + second
+    override fun doMath(first: BigDecimal, second: BigDecimal) = first + second
   }
 
   data class Substract(override val symbol: String = "-") : MathOperation {
-    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first - second
+    override fun doMath(first: BigDecimal, second: BigDecimal) = first - second
   }
 
   data class Multiply(override val symbol: String = "×") : MathOperation {
-    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first * second
+    override fun doMath(first: BigDecimal, second: BigDecimal) = first * second
   }
 
   data class Divide(override val symbol: String = "÷") : MathOperation {
-    override fun doUnformattedMath(first: BigDecimal, second: BigDecimal) = first / second
+    override fun doMath(first: BigDecimal, second: BigDecimal) = first / second
   }
 }

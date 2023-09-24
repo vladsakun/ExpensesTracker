@@ -4,14 +4,27 @@ import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.MathOperation
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
+import java.math.BigDecimal
+import javax.inject.Inject
 
-class CalculatorBSInput(
-  private var number1: StringBuilder,
+// Todo refactor
+
+class CalculatorInputImpl @Inject constructor(
   private val amountFormatter: AmountFormatter,
-  private val doOnValueChange: (formattedValue: String, equalButtonState: EqualButtonState) -> Unit,
-  private var mathOperation: MathOperation? = null,
-) {
+) : CalculatorInput {
+
+  override val currentValue: BigDecimal
+    get() {
+      doMath()
+      return amountFormatter.toBigDecimal(number1.toString())
+    }
+
+  private var number1: StringBuilder = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
   private var number2: StringBuilder? = null
+  private var mathOperation: MathOperation? = null
+  private var doOnValueChange: (formattedValue: String, equalButtonState: EqualButtonState) -> Unit =
+    { _, _ -> throw IllegalStateException("doOnValueChange is not initialized! Initialize it via initCallbacks() method ") }
+
   private val maxNumberLength = amountFormatter.maxDigitsBeforeDecimal
   private val maxDecimalLength = amountFormatter.maxDigitsAfterDecimal
   private val decimalSeparator = amountFormatter.decimalSeparator
@@ -19,6 +32,7 @@ class CalculatorBSInput(
 
   private val formatted: String
     get() {
+      // Todo refactor
       val isNum1EndsWithDecimalSeparator = number1.endsWithDecimalSeparator()
       val isNum2EndsWithDecimalSeparator = number2.endsWithDecimalSeparator()
 
@@ -36,24 +50,27 @@ class CalculatorBSInput(
       else -> EqualButtonState.Done
     }
 
-  fun input(mathOperation: MathOperation) {
+  private val numberToOperate: StringBuilder?
+    get() = if (mathOperation == null) number1 else number2
+
+  override fun initCallbacks(callbacks: CalculatorInputCallbacks) {
+    this.doOnValueChange = callbacks::doOnValueChange
+  }
+
+  override fun input(mathOperation: MathOperation) {
     this.mathOperation = mathOperation
     refreshValue()
   }
 
-  fun input(number: NumKeyboardNumber) {
+  override fun input(number: NumKeyboardNumber) {
     appendNumber(number)
   }
 
-  fun addDecimalSeparator() {
-    if (mathOperation == null) {
-      appendDecimalSeparatorNum1()
-    } else {
-      appendDecimalSeparatorNum2()
-    }
+  override fun onPrecisionClick() {
+    numberToOperate?.appendDecimalSeparator()
   }
 
-  fun onClearClick() {
+  override fun onClearClick() {
     when {
       number2 != null -> {
         number2 = when (number2!!.length) {
@@ -67,10 +84,10 @@ class CalculatorBSInput(
       }
 
       number1.isBlank() || number1.length == 1 -> {
-        number1 = StringBuilder(DEFAULT_INITIAL_BALANCE)
+        number1 = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
       }
 
-      number1 != StringBuilder(DEFAULT_INITIAL_BALANCE) -> {
+      number1 != StringBuilder(DEFAULT_CALCULATOR_NUM_1) -> {
         number1 = number1.deleteAt(number1.lastIndex)
       }
     }
@@ -78,9 +95,13 @@ class CalculatorBSInput(
     refreshValue()
   }
 
-  fun doMath(
-    nextMathOperation: MathOperation? = null,
-    shouldCleanMathOperationIfCantDoMath: Boolean = false,
+  override fun onDoneClick() {
+    doMath(null, true)
+  }
+
+  override fun doMath(
+    nextMathOperation: MathOperation?,
+    shouldCleanMathOperationIfCantDoMath: Boolean,
   ): Boolean {
     if (!canDoMath()) {
       if (shouldCleanMathOperationIfCantDoMath) {
@@ -91,14 +112,11 @@ class CalculatorBSInput(
       return false
     }
 
-    val decimal1 = number1.toString().toBigDecimal()
-    val decimal2 = checkNotNull(number2).toString().toBigDecimal()
-
+    val decimal1 = amountFormatter.toBigDecimal(number1.toString())
+    val decimal2 = amountFormatter.toBigDecimal(checkNotNull(number2?.toString()))
     val result = checkNotNull(mathOperation).doMath(decimal1, decimal2)
-      .toString()
-      .dropLastWhile { it == '0' }
-      .dropLastWhile { it == decimalSeparatorString.last() }
-    number1 = StringBuilder(result)
+
+    number1 = StringBuilder(amountFormatter.formatFinal(result))
     number2 = null
     mathOperation = nextMathOperation
     refreshValue()
@@ -106,8 +124,20 @@ class CalculatorBSInput(
     return true
   }
 
-  fun doMathAndCleanMathOperation(nextMathOperation: MathOperation? = null): Boolean {
-    return doMath(nextMathOperation, shouldCleanMathOperationIfCantDoMath = true)
+  override fun setNumber1(number: StringBuilder) {
+    this.number1 = number
+  }
+
+  override fun isEmpty() =
+    this.number1.toString() == DEFAULT_CALCULATOR_NUM_1 && mathOperation == null && number2 == null
+
+  override fun isNotEmpty() = !isEmpty()
+
+  override fun clear() {
+    number1 = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
+    mathOperation = null
+    number2 = null
+    refreshValue()
   }
 
   private fun appendNumber(number: NumKeyboardNumber) {
@@ -119,7 +149,7 @@ class CalculatorBSInput(
   }
 
   private fun appendNum1(value: String) {
-    if (number1.toString() == DEFAULT_INITIAL_BALANCE) {
+    if (number1.toString() == DEFAULT_CALCULATOR_NUM_1) {
       number1 = StringBuilder(value)
       refreshValue()
       return
@@ -157,16 +187,9 @@ class CalculatorBSInput(
     }
   }
 
-  private fun appendDecimalSeparatorNum1() {
-    if (number1.containsDecimalSeparator().not()) {
-      number1.append(decimalSeparatorString)
-      refreshValue()
-    }
-  }
-
-  private fun appendDecimalSeparatorNum2() {
-    if (number2.containsDecimalSeparator().not()) {
-      number2?.append(decimalSeparatorString)
+  private fun StringBuilder.appendDecimalSeparator() {
+    if (containsDecimalSeparator().not()) {
+      append(decimalSeparatorString)
       refreshValue()
     }
   }
@@ -187,11 +210,6 @@ class CalculatorBSInput(
   }
 
   private fun canDoMath() = mathOperation != null && number2 != null
-
   private fun StringBuilder?.endsWithDecimalSeparator() = this?.endsWith(decimalSeparatorString) ?: false
-  private fun StringBuilder?.containsDecimalSeparator() = amountFormatter.containsDecimalSeparator(this)
-
-  companion object {
-    const val DEFAULT_INITIAL_BALANCE = "0"
-  }
+  private fun StringBuilder?.containsDecimalSeparator() = this?.contains(decimalSeparator) ?: false
 }

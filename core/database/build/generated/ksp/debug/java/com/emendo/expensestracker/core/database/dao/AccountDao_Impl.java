@@ -12,12 +12,14 @@ import androidx.room.util.CursorUtil;
 import androidx.room.util.DBUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
 import com.emendo.expensestracker.core.database.model.AccountEntity;
+import com.emendo.expensestracker.core.database.util.Converter;
 import java.lang.Class;
 import java.lang.Exception;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.SuppressWarnings;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +37,8 @@ public final class AccountDao_Impl extends AccountDao {
   private final EntityDeletionOrUpdateAdapter<AccountEntity> __deletionAdapterOfAccountEntity;
 
   private final SharedSQLiteStatement __preparedStmtOfDeleteAll;
+
+  private final SharedSQLiteStatement __preparedStmtOfUpdateBalance;
 
   private final EntityUpsertionAdapter<AccountEntity> __upsertionAdapterOfAccountEntity;
 
@@ -58,6 +62,13 @@ public final class AccountDao_Impl extends AccountDao {
         return _query;
       }
     };
+    this.__preparedStmtOfUpdateBalance = new SharedSQLiteStatement(__db) {
+      @Override
+      public String createQuery() {
+        final String _query = "UPDATE account SET balance = ? WHERE id = ?";
+        return _query;
+      }
+    };
     this.__upsertionAdapterOfAccountEntity = new EntityUpsertionAdapter<AccountEntity>(new EntityInsertionAdapter<AccountEntity>(__db) {
       @Override
       public String createQuery() {
@@ -72,7 +83,12 @@ public final class AccountDao_Impl extends AccountDao {
         } else {
           stmt.bindString(2, value.getName());
         }
-        stmt.bindDouble(3, value.getBalance());
+        final String _tmp = Converter.fromBigDecimal(value.getBalance());
+        if (_tmp == null) {
+          stmt.bindNull(3);
+        } else {
+          stmt.bindString(3, _tmp);
+        }
         stmt.bindLong(4, value.getCurrencyId());
         stmt.bindLong(5, value.getIconId());
         stmt.bindLong(6, value.getColorId());
@@ -91,7 +107,12 @@ public final class AccountDao_Impl extends AccountDao {
         } else {
           stmt.bindString(2, value.getName());
         }
-        stmt.bindDouble(3, value.getBalance());
+        final String _tmp = Converter.fromBigDecimal(value.getBalance());
+        if (_tmp == null) {
+          stmt.bindNull(3);
+        } else {
+          stmt.bindString(3, _tmp);
+        }
         stmt.bindLong(4, value.getCurrencyId());
         stmt.bindLong(5, value.getIconId());
         stmt.bindLong(6, value.getColorId());
@@ -134,6 +155,29 @@ public final class AccountDao_Impl extends AccountDao {
         }
       }
     }, continuation);
+  }
+
+  @Override
+  public void updateBalance(final long id, final BigDecimal balance) {
+    __db.assertNotSuspendingTransaction();
+    final SupportSQLiteStatement _stmt = __preparedStmtOfUpdateBalance.acquire();
+    int _argIndex = 1;
+    final String _tmp = Converter.fromBigDecimal(balance);
+    if (_tmp == null) {
+      _stmt.bindNull(_argIndex);
+    } else {
+      _stmt.bindString(_argIndex, _tmp);
+    }
+    _argIndex = 2;
+    _stmt.bindLong(_argIndex, id);
+    __db.beginTransaction();
+    try {
+      _stmt.executeUpdateDelete();
+      __db.setTransactionSuccessful();
+    } finally {
+      __db.endTransaction();
+      __preparedStmtOfUpdateBalance.release(_stmt);
+    }
   }
 
   @Override
@@ -197,8 +241,14 @@ public final class AccountDao_Impl extends AccountDao {
             } else {
               _tmpName = _cursor.getString(_cursorIndexOfName);
             }
-            final double _tmpBalance;
-            _tmpBalance = _cursor.getDouble(_cursorIndexOfBalance);
+            final BigDecimal _tmpBalance;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfBalance)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfBalance);
+            }
+            _tmpBalance = Converter.toBigDecimal(_tmp);
             final int _tmpCurrencyId;
             _tmpCurrencyId = _cursor.getInt(_cursorIndexOfCurrencyId);
             final int _tmpIconId;
@@ -222,15 +272,11 @@ public final class AccountDao_Impl extends AccountDao {
   }
 
   @Override
-  public Flow<AccountEntity> getById(final String id) {
+  public Flow<AccountEntity> getById(final long id) {
     final String _sql = "SELECT * FROM account WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
-    if (id == null) {
-      _statement.bindNull(_argIndex);
-    } else {
-      _statement.bindString(_argIndex, id);
-    }
+    _statement.bindLong(_argIndex, id);
     return CoroutinesRoom.createFlow(__db, false, new String[]{"account"}, new Callable<AccountEntity>() {
       @Override
       public AccountEntity call() throws Exception {
@@ -252,8 +298,14 @@ public final class AccountDao_Impl extends AccountDao {
             } else {
               _tmpName = _cursor.getString(_cursorIndexOfName);
             }
-            final double _tmpBalance;
-            _tmpBalance = _cursor.getDouble(_cursorIndexOfBalance);
+            final BigDecimal _tmpBalance;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfBalance)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfBalance);
+            }
+            _tmpBalance = Converter.toBigDecimal(_tmp);
             final int _tmpCurrencyId;
             _tmpCurrencyId = _cursor.getInt(_cursorIndexOfCurrencyId);
             final int _tmpIconId;

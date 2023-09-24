@@ -43,8 +43,8 @@ fun CreateCategoryRoute(
         onCreateCategoryClick = viewModel::onCreateCategoryClick,
       )
     },
-    bottomSheetContent = { type, closeBottomSheet ->
-      BottomSheetContent(type, closeBottomSheet)
+    bottomSheetContent = { type, hideBottomSheet ->
+      BottomSheetContent(type, hideBottomSheet)
     },
   )
 }
@@ -87,7 +87,7 @@ private fun CreateCategoryContent(
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { state.value.color.color },
+        colorProvider = { state.value.color.darkColor },
         onClick = onColorSelectClick,
       )
       ExpeButton(
