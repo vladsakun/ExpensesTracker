@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeAlertDialog

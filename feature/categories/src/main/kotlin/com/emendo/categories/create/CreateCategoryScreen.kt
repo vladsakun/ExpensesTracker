@@ -87,7 +87,7 @@ private fun CreateCategoryContent(
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { state.value.color.color },
+        colorProvider = { state.value.color.darkColor },
         onClick = onColorSelectClick,
       )
       ExpeButton(

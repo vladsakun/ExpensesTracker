@@ -107,7 +107,7 @@ class CreateAccountViewModel @Inject constructor(
         accountsRepository.upsertAccount(
           AccountModel(
             name = accountName,
-            balance = amountFormatter.toAmount(initialBalance).toBigDecimal(),
+            balance = amountFormatter.toBigDecimal(initialBalance),
             currencyModel = currency,
             icon = icon,
             color = color,

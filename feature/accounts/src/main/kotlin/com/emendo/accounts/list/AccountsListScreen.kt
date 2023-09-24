@@ -115,10 +115,10 @@ private fun AccountItem(accountModel: AccountModel) {
       Icon(
         modifier = Modifier
           .clip(RoundedCornerShape(Dimens.corner_radius_small))
-          .background(color = accountModel.color.color.copy(alpha = 0.2f))
+          .background(color = accountModel.color.darkColor.copy(alpha = 0.2f))
           .border(
             width = Dimens.border_thickness,
-            color = accountModel.color.color,
+            color = accountModel.color.darkColor,
             shape = RoundedCornerShape(Dimens.corner_radius_small)
           )
           .padding(Dimens.margin_small_x),

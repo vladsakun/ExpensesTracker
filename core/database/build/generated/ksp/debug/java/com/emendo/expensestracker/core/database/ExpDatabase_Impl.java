@@ -21,6 +21,8 @@ import com.emendo.expensestracker.core.database.dao.AccountDao;
 import com.emendo.expensestracker.core.database.dao.AccountDao_Impl;
 import com.emendo.expensestracker.core.database.dao.CategoryDao;
 import com.emendo.expensestracker.core.database.dao.CategoryDao_Impl;
+import com.emendo.expensestracker.core.database.dao.TransactionDao;
+import com.emendo.expensestracker.core.database.dao.TransactionDao_Impl;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
@@ -40,21 +42,25 @@ public final class ExpDatabase_Impl extends ExpDatabase {
 
   private volatile CategoryDao _categoryDao;
 
+  private volatile TransactionDao _transactionDao;
+
   @Override
   protected SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration configuration) {
     final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(configuration, new RoomOpenHelper.Delegate(1) {
       @Override
       public void createAllTables(SupportSQLiteDatabase _db) {
-        _db.execSQL("CREATE TABLE IF NOT EXISTS `account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` REAL NOT NULL, `currencyId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)");
-        _db.execSQL("CREATE TABLE IF NOT EXISTS `categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)");
+        _db.execSQL("CREATE TABLE IF NOT EXISTS `account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` TEXT NOT NULL, `currencyId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)");
+        _db.execSQL("CREATE TABLE IF NOT EXISTS `category` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `currencyId` INTEGER NOT NULL)");
+        _db.execSQL("CREATE TABLE IF NOT EXISTS `transaction` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sourceId` INTEGER NOT NULL, `targetId` INTEGER NOT NULL, `value` TEXT NOT NULL, `currencyId` INTEGER NOT NULL, `type` INTEGER NOT NULL)");
         _db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        _db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '317c9dcf57197c849f059024cb7cfae6')");
+        _db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '47bc85bb2ddde1e12993c2a091e13f69')");
       }
 
       @Override
       public void dropAllTables(SupportSQLiteDatabase _db) {
         _db.execSQL("DROP TABLE IF EXISTS `account`");
-        _db.execSQL("DROP TABLE IF EXISTS `categories`");
+        _db.execSQL("DROP TABLE IF EXISTS `category`");
+        _db.execSQL("DROP TABLE IF EXISTS `transaction`");
         if (mCallbacks != null) {
           for (int _i = 0, _size = mCallbacks.size(); _i < _size; _i++) {
             mCallbacks.get(_i).onDestructiveMigration(_db);
@@ -96,7 +102,7 @@ public final class ExpDatabase_Impl extends ExpDatabase {
         final HashMap<String, TableInfo.Column> _columnsAccount = new HashMap<String, TableInfo.Column>(6);
         _columnsAccount.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsAccount.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsAccount.put("balance", new TableInfo.Column("balance", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsAccount.put("balance", new TableInfo.Column("balance", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsAccount.put("currencyId", new TableInfo.Column("currencyId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsAccount.put("iconId", new TableInfo.Column("iconId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsAccount.put("colorId", new TableInfo.Column("colorId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -109,23 +115,41 @@ public final class ExpDatabase_Impl extends ExpDatabase {
                   + " Expected:\n" + _infoAccount + "\n"
                   + " Found:\n" + _existingAccount);
         }
-        final HashMap<String, TableInfo.Column> _columnsCategories = new HashMap<String, TableInfo.Column>(4);
-        _columnsCategories.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsCategories.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsCategories.put("iconId", new TableInfo.Column("iconId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsCategories.put("colorId", new TableInfo.Column("colorId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        final HashSet<TableInfo.ForeignKey> _foreignKeysCategories = new HashSet<TableInfo.ForeignKey>(0);
-        final HashSet<TableInfo.Index> _indicesCategories = new HashSet<TableInfo.Index>(0);
-        final TableInfo _infoCategories = new TableInfo("categories", _columnsCategories, _foreignKeysCategories, _indicesCategories);
-        final TableInfo _existingCategories = TableInfo.read(_db, "categories");
-        if (! _infoCategories.equals(_existingCategories)) {
-          return new RoomOpenHelper.ValidationResult(false, "categories(com.emendo.expensestracker.core.database.model.CategoryEntity).\n"
-                  + " Expected:\n" + _infoCategories + "\n"
-                  + " Found:\n" + _existingCategories);
+        final HashMap<String, TableInfo.Column> _columnsCategory = new HashMap<String, TableInfo.Column>(6);
+        _columnsCategory.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategory.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategory.put("iconId", new TableInfo.Column("iconId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategory.put("colorId", new TableInfo.Column("colorId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategory.put("type", new TableInfo.Column("type", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCategory.put("currencyId", new TableInfo.Column("currencyId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysCategory = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesCategory = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoCategory = new TableInfo("category", _columnsCategory, _foreignKeysCategory, _indicesCategory);
+        final TableInfo _existingCategory = TableInfo.read(_db, "category");
+        if (! _infoCategory.equals(_existingCategory)) {
+          return new RoomOpenHelper.ValidationResult(false, "category(com.emendo.expensestracker.core.database.model.CategoryEntity).\n"
+                  + " Expected:\n" + _infoCategory + "\n"
+                  + " Found:\n" + _existingCategory);
+        }
+        final HashMap<String, TableInfo.Column> _columnsTransaction = new HashMap<String, TableInfo.Column>(6);
+        _columnsTransaction.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTransaction.put("sourceId", new TableInfo.Column("sourceId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTransaction.put("targetId", new TableInfo.Column("targetId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTransaction.put("value", new TableInfo.Column("value", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTransaction.put("currencyId", new TableInfo.Column("currencyId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTransaction.put("type", new TableInfo.Column("type", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysTransaction = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesTransaction = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoTransaction = new TableInfo("transaction", _columnsTransaction, _foreignKeysTransaction, _indicesTransaction);
+        final TableInfo _existingTransaction = TableInfo.read(_db, "transaction");
+        if (! _infoTransaction.equals(_existingTransaction)) {
+          return new RoomOpenHelper.ValidationResult(false, "transaction(com.emendo.expensestracker.core.database.model.TransactionEntity).\n"
+                  + " Expected:\n" + _infoTransaction + "\n"
+                  + " Found:\n" + _existingTransaction);
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "317c9dcf57197c849f059024cb7cfae6", "b4829d75e9c8dfbf9a93f9121a0e599a");
+    }, "47bc85bb2ddde1e12993c2a091e13f69", "d0e95d5044816b5a8ebac3acc74996bc");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(configuration.context)
         .name(configuration.name)
         .callback(_openCallback)
@@ -138,7 +162,7 @@ public final class ExpDatabase_Impl extends ExpDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "account","categories");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "account","category","transaction");
   }
 
   @Override
@@ -148,7 +172,8 @@ public final class ExpDatabase_Impl extends ExpDatabase {
     try {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `account`");
-      _db.execSQL("DELETE FROM `categories`");
+      _db.execSQL("DELETE FROM `category`");
+      _db.execSQL("DELETE FROM `transaction`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -164,6 +189,7 @@ public final class ExpDatabase_Impl extends ExpDatabase {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(AccountDao.class, AccountDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(CategoryDao.class, CategoryDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(TransactionDao.class, TransactionDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -203,6 +229,20 @@ public final class ExpDatabase_Impl extends ExpDatabase {
           _categoryDao = new CategoryDao_Impl(this);
         }
         return _categoryDao;
+      }
+    }
+  }
+
+  @Override
+  public TransactionDao transactionDao() {
+    if (_transactionDao != null) {
+      return _transactionDao;
+    } else {
+      synchronized(this) {
+        if(_transactionDao == null) {
+          _transactionDao = new TransactionDao_Impl(this);
+        }
+        return _transactionDao;
       }
     }
   }

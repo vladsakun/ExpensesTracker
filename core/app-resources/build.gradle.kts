@@ -13,4 +13,5 @@ dependencies {
 
   // Todo consider moving to core:uimodels
   implementation(project(":core:model"))
+  implementation(libs.androidx.compose.foundation)
 }

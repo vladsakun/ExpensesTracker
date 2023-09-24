@@ -20,6 +20,7 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
     private const val MAX_DIGITS_BEFORE_DECIMAL = 11
     private const val MAX_DIGITS_AFTER_DECIMAL = 2
     private const val NEGATIVE_PREFIX = "\u2212\u00A0"
+    private const val SPACE = '\u00A0'
   }
 
   // If for some reason Default Locale changes (in phone settings, or from within the app -
@@ -32,10 +33,11 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
   // but 1 234,23 in regular formatter
   //and since we only format amounts we want it to be the same everywhere (with or without currency symbol)
   private val currencyNumberFormatter = (NumberFormat.getCurrencyInstance(currencyLocale) as DecimalFormat).apply {
+    // Use specific unicode character for minus and space
     negativePrefix = NEGATIVE_PREFIX
   }
-  private val bigDecimalFormatter = currencyNumberFormatter.apply {
-    isParseBigDecimal = true
+  private val numberFormatter = (NumberFormat.getInstance(currencyLocale) as DecimalFormat).apply {
+    negativePrefix = NEGATIVE_PREFIX
   }
 
   override val decimalSeparator: Char
@@ -49,60 +51,71 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
 
   init {
     currencyNumberFormatter.minimumFractionDigits = 2
-  }
-
-  override fun format(amount: Amount?): String {
-    return format(amount, true)
-  }
-
-  override fun format(amount: Amount?, includeDecimals: Boolean): String {
-    return formatWithSpace(amount).replace(' ', '\u00A0')
-  }
-
-  private fun formatWithSpace(amount: Amount?): String {
-    if (amount == null) {
-      return ""
-    }
-
-    // Use specific unicode character for minus and space
-    currencyNumberFormatter.minimumFractionDigits = amount.precision
-
-    return currencyNumberFormatter.format(amount.toBigDecimal())
+    numberFormatter.minimumFractionDigits = 2
   }
 
   /**
    * @param amount
    * @return the formatted amount value using the rules of number format of default Locale
    */
-  override fun format(amount: BigDecimal, currencyModel: CurrencyModel?): String {
-    val floatingPattern = "0.00"
-    val exactPattern = "0"
-
-    bigDecimalFormatter.apply {
-      applyPattern(if (amount.isFloatingPointNumber) floatingPattern else exactPattern)
-      currencyModel?.currencySymbol?.let {
-        decimalFormatSymbols.currencySymbol = it
+  override fun format(amount: BigDecimal, currencyModel: CurrencyModel): String {
+    currencyNumberFormatter.apply {
+      if (amount.isFloatingPointNumber) {
+        maximumFractionDigits = 2
+        minimumFractionDigits = 2
+      } else {
+        maximumFractionDigits = 0
       }
+
+      decimalFormatSymbols.currencySymbol = currencyModel.currencySymbol
     }
 
-    return bigDecimalFormatter.format(amount)
+    return currencyNumberFormatter.format(amount)
+  }
+
+  override fun format(amount: BigDecimal?): String {
+    return formatWithSpace(amount).replace(' ', SPACE)
   }
 
   override fun format(amount: String): String {
-    return format(toAmount(amount))
+    return format(toBigDecimal(amount))
   }
 
-  override fun toAmount(from: String): Amount {
-    val fromTrimmed = from.trim().replace(" ", "")
+  override fun formatFinal(amount: BigDecimal?): String {
+    if (amount == null) {
+      return ""
+    }
+
+    if (amount.scale() != 0) {
+      numberFormatter.minimumFractionDigits = amount.scale().coerceAtLeast(2)
+    } else {
+      numberFormatter.minimumFractionDigits = 0
+    }
+
+    return numberFormatter.format(amount)
+  }
+
+  override fun toBigDecimal(from: String): BigDecimal {
+    val fromTrimmed = from.trim().replace(SPACE.toString(), "").replace('−', '-')
 
     if (fromTrimmed.isEmpty()) {
-      return Amount(0, 0)
+      return BigDecimal.ZERO
     }
 
     val precision = fromTrimmed.substringAfterLast(decimalSeparator, "").length
     val value = fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toLong()
 
-    return Amount(value, precision)
+    return BigDecimal(value.toBigInteger(), precision)
+  }
+
+  private fun formatWithSpace(amount: BigDecimal?): String {
+    if (amount == null) {
+      return ""
+    }
+
+    numberFormatter.minimumFractionDigits = amount.scale()
+
+    return numberFormatter.format(amount)
   }
 
   //removes currency symbol and possible space between currency and amount

@@ -29,35 +29,31 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   abstract override suspend fun deleteAll()
 
   @Query(
-    //    "SELECT `transaction`.id, " +
-    //      "`transaction`.currencyId, " +
-    //      "`transaction`.sourceId, " +
-    //      "`transaction`.targetId, " +
-    //      "`transaction`.type, " +
-    //      "`transaction`.value, " +
-    "SELECT *, " +
-      "account.id AS source_account_id, " +
-      "account.name AS source_account_name, " +
-      "account.balance AS source_account_balance, " +
-      "account.currencyId AS source_account_currencyId, " +
-      "account.iconId AS source_account_iconId, " +
-      "account.colorId AS source_account_colorId, " +
-      "target_account.id AS target_account_id, " +
-      "target_account.name AS target_account_name, " +
-      "target_account.balance AS target_account_balance, " +
-      "target_account.currencyId AS target_account_currencyId, " +
-      "target_account.iconId AS target_account_iconId, " +
-      "target_account.colorId AS target_account_colorId, " +
-      "target_category.id AS target_category_id, " +
-      "target_category.name AS target_category_name, " +
-      "target_category.iconId AS target_category_iconId, " +
-      "target_category.colorId AS target_category_colorId, " +
-      "target_category.type AS target_category_type, " +
-      "target_category.currencyId AS target_category_currencyId " +
-      "FROM $TABLE_NAME " +
-      "LEFT JOIN $TABLE_ACCOUNT ON `transaction`.sourceId = account.id " +
-      "LEFT JOIN $TABLE_ACCOUNT AS target_account ON `transaction`.targetId = target_account.id AND `transaction`.type = 2 " +
-      "LEFT JOIN $TABLE_CATEGORY AS target_category ON `transaction`.targetId = target_category.id AND `transaction`.type = 1 "
+    value = """
+      SELECT *,
+      account.id AS source_account_id,
+      account.name AS source_account_name,  
+      account.balance AS source_account_balance,  
+      account.currencyId AS source_account_currencyId,  
+      account.iconId AS source_account_iconId,  
+      account.colorId AS source_account_colorId,  
+      target_account.id AS target_account_id,  
+      target_account.name AS target_account_name,  
+      target_account.balance AS target_account_balance,  
+      target_account.currencyId AS target_account_currencyId,  
+      target_account.iconId AS target_account_iconId,  
+      target_account.colorId AS target_account_colorId,  
+      target_category.id AS target_category_id,  
+      target_category.name AS target_category_name,  
+      target_category.iconId AS target_category_iconId,  
+      target_category.colorId AS target_category_colorId,  
+      target_category.type AS target_category_type,  
+      target_category.currencyId AS target_category_currencyId  
+      FROM $TABLE_NAME  
+      LEFT JOIN $TABLE_ACCOUNT ON `transaction`.sourceId = account.id  
+      LEFT JOIN $TABLE_ACCOUNT AS target_account ON `transaction`.targetId = target_account.id AND `transaction`.type = 2  
+      LEFT JOIN $TABLE_CATEGORY AS target_category ON `transaction`.targetId = target_category.id AND `transaction`.type = 1 
+    """
   )
   abstract fun getTransactionFull(): Flow<List<TransactionFull>>
 

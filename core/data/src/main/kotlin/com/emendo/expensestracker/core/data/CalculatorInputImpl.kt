@@ -16,7 +16,7 @@ class CalculatorInputImpl @Inject constructor(
   override val currentValue: BigDecimal
     get() {
       doMath()
-      return amountFormatter.toAmount(number1.toString()).toBigDecimal()
+      return amountFormatter.toBigDecimal(number1.toString())
     }
 
   private var number1: StringBuilder = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
@@ -32,6 +32,7 @@ class CalculatorInputImpl @Inject constructor(
 
   private val formatted: String
     get() {
+      // Todo refactor
       val isNum1EndsWithDecimalSeparator = number1.endsWithDecimalSeparator()
       val isNum2EndsWithDecimalSeparator = number2.endsWithDecimalSeparator()
 
@@ -49,6 +50,9 @@ class CalculatorInputImpl @Inject constructor(
       else -> EqualButtonState.Done
     }
 
+  private val numberToOperate: StringBuilder?
+    get() = if (mathOperation == null) number1 else number2
+
   override fun initCallbacks(callbacks: CalculatorInputCallbacks) {
     this.doOnValueChange = callbacks::doOnValueChange
   }
@@ -63,7 +67,7 @@ class CalculatorInputImpl @Inject constructor(
   }
 
   override fun onPrecisionClick() {
-    getNumberToOperate()?.appendDecimalSeparator()
+    numberToOperate?.appendDecimalSeparator()
   }
 
   override fun onClearClick() {
@@ -108,14 +112,11 @@ class CalculatorInputImpl @Inject constructor(
       return false
     }
 
-    val decimal1 = number1.toString().toBigDecimal()
-    val decimal2 = checkNotNull(number2).toString().toBigDecimal()
-
+    val decimal1 = amountFormatter.toBigDecimal(number1.toString())
+    val decimal2 = amountFormatter.toBigDecimal(checkNotNull(number2?.toString()))
     val result = checkNotNull(mathOperation).doMath(decimal1, decimal2)
-      .toString()
-      .dropLastWhile { it == '0' }
-      .dropLastWhile { it == decimalSeparatorString.last() }
-    number1 = StringBuilder(result)
+
+    number1 = StringBuilder(amountFormatter.formatFinal(result))
     number2 = null
     mathOperation = nextMathOperation
     refreshValue()
@@ -209,8 +210,6 @@ class CalculatorInputImpl @Inject constructor(
   }
 
   private fun canDoMath() = mathOperation != null && number2 != null
-  private fun getNumberToOperate(): StringBuilder? = if (mathOperation == null) number1 else number2
-
   private fun StringBuilder?.endsWithDecimalSeparator() = this?.endsWith(decimalSeparatorString) ?: false
   private fun StringBuilder?.containsDecimalSeparator() = this?.contains(decimalSeparator) ?: false
 }

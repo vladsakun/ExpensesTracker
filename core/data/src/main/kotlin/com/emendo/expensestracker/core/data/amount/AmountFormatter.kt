@@ -29,20 +29,28 @@ interface AmountFormatter {
 
   /**
    * @param amount
-   * @return the formatted amount along with the currency symbol and decimals (optional).
+   * @return the formatted amount with the currency symbol and decimals.
    */
-  fun format(amount: Amount?): String
-
-  fun format(amount: Amount?, includeDecimals: Boolean = true): String
+  fun format(amount: BigDecimal, currencyModel: CurrencyModel): String
 
   /**
    * @param amount
-   * @return the formatted amount without the currency symbol
+   * @return the formatted amount with decimals and without the currency symbol.
    */
-  fun format(amount: BigDecimal, currencyModel: CurrencyModel? = null): String
+  fun format(amount: BigDecimal?): String
 
+  /**
+   * @param amount
+   * @return the formatted amount with decimals and without the currency symbol.
+   */
+  fun formatFinal(amount: BigDecimal?): String
+
+  /**
+   * @param amount
+   * @return the formatted amount with decimals and without the currency symbol.
+   */
   fun format(amount: String): String
 
-  fun toAmount(from: String): Amount
+  fun toBigDecimal(from: String): BigDecimal
 }
 

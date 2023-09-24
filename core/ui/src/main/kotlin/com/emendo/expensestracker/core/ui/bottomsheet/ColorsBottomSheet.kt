@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.designsystem.component.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.conditional
@@ -63,6 +64,7 @@ private fun ColorItem(
   isSelected: Boolean,
   onColorSelect: (color: ColorModel) -> Unit,
 ) {
+  val colorValue = color.color
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
@@ -70,11 +72,12 @@ private fun ColorItem(
       .clip(shape = CircleShape)
       .clickable { onColorSelect(color) }
       .conditional(isSelected) {
-        border(
+        val border = border(
           width = SELECTED_COLOR_BORDER_WIDTH.dp,
-          color = color.color.copy(alpha = SELECTED_ITEM_ALPHA_BORDER),
+          color = colorValue.copy(alpha = SELECTED_ITEM_ALPHA_BORDER),
           shape = CircleShape,
         )
+        border
       },
   ) {
     Box(
@@ -82,7 +85,7 @@ private fun ColorItem(
         .padding(Dimens.margin_large_x)
         .aspectRatio(1f)
         .clip(shape = CircleShape)
-        .background(color = color.color),
+        .background(color = colorValue),
     )
   }
 }

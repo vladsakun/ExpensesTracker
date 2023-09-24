@@ -7,7 +7,7 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.database.model.CategoryEntity
 import com.emendo.expensestracker.core.model.data.TransactionTarget
 
-data class Category constructor(
+data class Category(
   override val id: Long = 0,
   val name: String,
   val icon: IconModel,
