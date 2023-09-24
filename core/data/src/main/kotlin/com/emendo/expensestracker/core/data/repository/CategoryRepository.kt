@@ -1,12 +1,12 @@
 package com.emendo.expensestracker.core.data.repository
 
-import com.emendo.expensestracker.core.data.model.Category
+import com.emendo.expensestracker.core.data.model.CategoryModel
 import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {
-  fun getCategories(): Flow<List<Category>>
+  fun getCategories(): Flow<List<CategoryModel>>
   fun getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>>
-  suspend fun upsertCategory(category: Category)
-  suspend fun deleteCategory(category: Category)
+  suspend fun upsertCategory(categoryModel: CategoryModel)
+  suspend fun deleteCategory(categoryModel: CategoryModel)
 }

@@ -88,6 +88,7 @@ private fun AccountsListScreenContent(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       when (uiState) {
+        is AccountsListUiState.Empty -> Unit
         is AccountsListUiState.Loading -> item { ExpLoadingWheel() }
         is AccountsListUiState.Error -> item { Text(text = uiState.message) }
         is AccountsListUiState.DisplayAccountsList -> {

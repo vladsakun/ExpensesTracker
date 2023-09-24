@@ -87,9 +87,7 @@ private fun CategoriesListScreenContent(
 ) {
   val uiState = uiStateFlow.collectAsStateWithLifecycle()
   val alertDialogState = alertDialogStateFlow.collectAsStateWithLifecycle()
-  ExpeScaffoldWithTopBar(
-    titleResId = com.emendo.expensestracker.core.app.resources.R.string.categories,
-  ) { paddingValues ->
+  ExpeScaffoldWithTopBar(titleResId = com.emendo.expensestracker.core.app.resources.R.string.categories) { paddingValues ->
     Box(
       modifier = Modifier
         .fillMaxSize()
@@ -97,6 +95,7 @@ private fun CategoriesListScreenContent(
       contentAlignment = Alignment.Center,
     ) {
       when (val state = uiState.value) {
+        is CategoriesListUiState.Empty -> Unit
         is CategoriesListUiState.Loading -> ExpLoadingWheel()
         is CategoriesListUiState.Error -> Text(text = state.message)
         is CategoriesListUiState.DisplayCategoriesList -> CategoriesList(
@@ -149,7 +148,7 @@ private fun CategoriesList(
   ) {
     items(
       items = uiState.categories,
-      key = { it.category.id },
+      key = { it.categoryModel.id },
       contentType = { "category" },
     ) {
       CategoryItem(
@@ -279,14 +278,14 @@ private fun CategoryItem(
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Text(
-        text = category.category.name,
+        text = category.categoryModel.name,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.labelSmall,
       )
       ColoredBorderIcon(
-        color = category.category.color.color,
-        imageVector = category.category.icon.imageVector,
+        color = category.categoryModel.color.color,
+        imageVector = category.categoryModel.icon.imageVector,
         onClick = { onClick(category) },
       )
       Text(

@@ -18,7 +18,7 @@ class AccountsListViewModel @Inject constructor(
     .stateIn(
       scope = viewModelScope,
       started = SharingStarted.Lazily,
-      initialValue = AccountsListUiState.Loading,
+      initialValue = AccountsListUiState.Empty,
     )
 }
 
@@ -28,6 +28,7 @@ private fun accountsUiState(accountsRepository: AccountsRepository): Flow<Accoun
       is Result.Success -> AccountsListUiState.DisplayAccountsList(accountsResult.data)
       is Result.Error -> AccountsListUiState.Error("Error loading accounts")
       is Result.Loading -> AccountsListUiState.Loading
+      is Result.Empty -> AccountsListUiState.Empty
     }
   }
 }

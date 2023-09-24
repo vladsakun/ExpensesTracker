@@ -6,14 +6,14 @@ import com.emendo.expensestracker.core.database.model.CategoryFull
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 
 data class CategoryWithTransactions(
-  val category: Category,
+  val categoryModel: CategoryModel,
   val transactions: List<TransactionEntity>,
   val totalFormatted: String,
 )
 
 fun CategoryFull.asExternalModel(amountFormatter: AmountFormatter): CategoryWithTransactions {
   return CategoryWithTransactions(
-    category = category.asExternalModel(),
+    categoryModel = category.asExternalModel(),
     transactions = transactions,
     totalFormatted = amountFormatter.format(
       amount = transactions.sumOf { it.value },

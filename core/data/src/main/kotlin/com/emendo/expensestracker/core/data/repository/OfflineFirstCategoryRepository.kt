@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.data.repository
 
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
-import com.emendo.expensestracker.core.data.model.Category
+import com.emendo.expensestracker.core.data.model.CategoryModel
 import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
 import com.emendo.expensestracker.core.data.model.asEntity
 import com.emendo.expensestracker.core.data.model.asExternalModel
@@ -17,7 +17,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
   private val amountFormatter: AmountFormatter,
 ) : CategoryRepository {
 
-  override fun getCategories(): Flow<List<Category>> {
+  override fun getCategories(): Flow<List<CategoryModel>> {
     return categoryDao.getAll().map { categoryEntities ->
       categoryEntities.map { it.asExternalModel() }
     }
@@ -29,15 +29,15 @@ class OfflineFirstCategoryRepository @Inject constructor(
     }
   }
 
-  override suspend fun upsertCategory(category: Category) {
+  override suspend fun upsertCategory(categoryModel: CategoryModel) {
     withContext(Dispatchers.IO) {
-      categoryDao.save(category.asEntity())
+      categoryDao.save(categoryModel.asEntity())
     }
   }
 
-  override suspend fun deleteCategory(category: Category) {
+  override suspend fun deleteCategory(categoryModel: CategoryModel) {
     withContext(Dispatchers.IO) {
-      categoryDao.delete(category.asEntity())
+      categoryDao.delete(categoryModel.asEntity())
     }
   }
 }

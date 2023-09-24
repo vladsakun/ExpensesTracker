@@ -30,7 +30,12 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
 
   @Query(
     value = """
-      SELECT *,
+      SELECT $TABLE_NAME.id, 
+      $TABLE_NAME.currencyId, 
+      $TABLE_NAME.sourceId, 
+      $TABLE_NAME.targetId, 
+      $TABLE_NAME.type, 
+      $TABLE_NAME.value,
       account.id AS source_account_id,
       account.name AS source_account_name,  
       account.balance AS source_account_balance,  

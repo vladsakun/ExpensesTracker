@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.model.Category
+import com.emendo.expensestracker.core.data.model.CategoryModel
 import com.emendo.expensestracker.core.data.model.CategoryType
 import com.emendo.expensestracker.core.data.repository.CategoryRepository
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
@@ -44,7 +44,7 @@ class CreateCategoryViewModel @Inject constructor(
   fun onCreateCategoryClick() {
     viewModelScope.launch {
       categoryRepository.upsertCategory(
-        Category(
+        CategoryModel(
           name = state.value.title,
           icon = state.value.icon,
           color = state.value.color,

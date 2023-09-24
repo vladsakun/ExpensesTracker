@@ -29,6 +29,7 @@ import com.emendo.expensestracker.core.model.data.BaseNumKeyboardActions
 import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.MathOperation
 import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
+import timber.log.Timber
 
 const val MATH_OPERATION_WEIGHT = 3f
 const val DIGIT_BUTTON_WEIGHT = 5f
@@ -146,6 +147,8 @@ fun BaseNumKeyboardBS(
       DoneButton(equalButtonState, actions)
     }
   }
+  Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
+  Timber.d("Bottompadding: ${Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing)}")
 }
 
 @Composable

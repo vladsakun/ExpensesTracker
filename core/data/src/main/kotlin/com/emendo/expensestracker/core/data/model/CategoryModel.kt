@@ -7,7 +7,7 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.database.model.CategoryEntity
 import com.emendo.expensestracker.core.model.data.TransactionTarget
 
-data class Category(
+data class CategoryModel(
   override val id: Long = 0,
   val name: String,
   val icon: IconModel,
@@ -16,8 +16,8 @@ data class Category(
   val currencyModel: CurrencyModel,
 ) : TransactionTarget
 
-fun CategoryEntity.asExternalModel(): Category {
-  return Category(
+fun CategoryEntity.asExternalModel(): CategoryModel {
+  return CategoryModel(
     id = id,
     name = name,
     icon = IconModel.getById(iconId),
@@ -27,7 +27,7 @@ fun CategoryEntity.asExternalModel(): Category {
   )
 }
 
-fun Category.asEntity(): CategoryEntity {
+fun CategoryModel.asEntity(): CategoryEntity {
   return CategoryEntity(
     id = id,
     name = name,
@@ -38,7 +38,7 @@ fun Category.asEntity(): CategoryEntity {
   )
 }
 
-fun Category.asTransactionUiModel(): CalculatorTransactionUiModel {
+fun CategoryModel.asTransactionUiModel(): CalculatorTransactionUiModel {
   return CalculatorTransactionUiModel(
     name = name,
     icon = icon.imageVector,

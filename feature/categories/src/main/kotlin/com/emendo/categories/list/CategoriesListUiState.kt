@@ -1,12 +1,13 @@
 package com.emendo.categories.list
 
 import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.model.Category
+import com.emendo.expensestracker.core.data.model.CategoryModel
 import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface CategoriesListUiState {
   data object Loading : CategoriesListUiState
+  data object Empty : CategoriesListUiState
   data class Error(val message: String) : CategoriesListUiState
   data class DisplayCategoriesList(val categories: ImmutableList<CategoryWithTransactions>) : CategoriesListUiState
 }
@@ -25,7 +26,7 @@ sealed interface CategoriesListDialogData {
   ) : CategoriesListDialogData
 
   data class Categories(
-    val categories: ImmutableList<Category>,
-    val onSelectCategory: (Category) -> Unit,
+    val categories: ImmutableList<CategoryModel>,
+    val onSelectCategory: (CategoryModel) -> Unit,
   ) : CategoriesListDialogData
 }

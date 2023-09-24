@@ -10,7 +10,7 @@ import com.emendo.expensestracker.core.model.data.TransactionSource
 import com.emendo.expensestracker.core.model.data.TransactionTarget
 import java.math.BigDecimal
 
-data class AccountModel constructor(
+data class AccountModel(
   override val id: Long = 0,
   val name: String,
   val balance: BigDecimal,

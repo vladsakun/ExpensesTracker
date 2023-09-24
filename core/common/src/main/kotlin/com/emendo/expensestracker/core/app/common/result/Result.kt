@@ -9,6 +9,7 @@ sealed interface Result<out T> {
   data class Success<T>(val data: T) : Result<T>
   data class Error(val exception: Throwable? = null) : Result<Nothing>
   data object Loading : Result<Nothing>
+  data object Empty : Result<Nothing>
 }
 
 fun <T> Flow<T>.asResult(isLocalOnly: Boolean = true): Flow<Result<T>> {

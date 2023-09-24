@@ -11,7 +11,7 @@ import com.emendo.expensestracker.core.data.CalculatorInputCallbacks
 import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_NUM_1
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.model.Category
+import com.emendo.expensestracker.core.data.model.CategoryModel
 import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
 import com.emendo.expensestracker.core.data.model.asTransactionUiModel
 import com.emendo.expensestracker.core.data.repository.AccountsRepository
@@ -42,7 +42,7 @@ class CategoriesListViewModel @Inject constructor(
     .stateIn(
       scope = viewModelScope,
       started = SharingStarted.WhileSubscribed(5_000),
-      initialValue = CategoriesListUiState.Loading
+      initialValue = CategoriesListUiState.Empty
     )
 
   private val accountDialogUiState = accountsDialogUiState(accountsRepository, ::onAccountSelected)
@@ -151,7 +151,7 @@ class CategoriesListViewModel @Inject constructor(
   }
 
   fun onCategoryClick(category: CategoryWithTransactions) {
-    targetUiModel.update { category.category.asTransactionUiModel() }
+    targetUiModel.update { category.categoryModel.asTransactionUiModel() }
 
     showBottomSheet(
       BottomSheetType.Calculator(
@@ -183,9 +183,9 @@ class CategoriesListViewModel @Inject constructor(
     sourceUiModel.update { accountModel.asTransactionUiModel() }
   }
 
-  private fun onCategorySelected(category: Category) {
+  private fun onCategorySelected(categoryModel: CategoryModel) {
     hideAlertDialog()
-    targetUiModel.update { category.asTransactionUiModel() }
+    targetUiModel.update { categoryModel.asTransactionUiModel() }
   }
 
   private fun hideAlertDialog() {
@@ -203,6 +203,7 @@ private fun categoriesUiState(categoryRepository: CategoryRepository): Flow<Cate
       is Result.Success -> CategoriesListUiState.DisplayCategoriesList(categoriesResult.data.toImmutableList())
       is Result.Error -> CategoriesListUiState.Error("No categories found")
       is Result.Loading -> CategoriesListUiState.Loading
+      is Result.Empty -> CategoriesListUiState.Empty
     }
   }
 }
@@ -222,19 +223,20 @@ private fun accountsDialogUiState(
 
       is Result.Error -> BaseDialogListUiState.Error("No accounts found")
       is Result.Loading -> BaseDialogListUiState.Loading
+      is Result.Empty -> BaseDialogListUiState.Empty
     }
   }
 }
 
 private fun categoriesDialogUiState(
   categoriesState: StateFlow<CategoriesListUiState>,
-  onCategorySelected: (Category) -> Unit,
+  onCategorySelected: (CategoryModel) -> Unit,
 ): Flow<BaseDialogListUiState<CategoriesListDialogData.Categories>> {
   return categoriesState.map { state ->
     when (state) {
       is CategoriesListUiState.DisplayCategoriesList -> BaseDialogListUiState.DisplayList(
         CategoriesListDialogData.Categories(
-          categories = state.categories.map { it.category }.toImmutableList(),
+          categories = state.categories.map { it.categoryModel }.toImmutableList(),
           onSelectCategory = onCategorySelected,
         )
       )
