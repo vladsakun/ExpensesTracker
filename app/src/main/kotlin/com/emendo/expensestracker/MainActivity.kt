@@ -38,15 +38,17 @@ class MainActivity : ComponentActivity() {
             android.graphics.Color.TRANSPARENT,
             android.graphics.Color.TRANSPARENT,
           ) { darkTheme },
-          //          navigationBarStyle = SystemBarStyle.auto(
-          //            lightScrim,
-          //            darkScrim,
-          //          ) { darkTheme },
+          navigationBarStyle = SystemBarStyle.auto(
+            lightScrim,
+            darkScrim,
+          ) { darkTheme },
         )
         onDispose {}
       }
 
-      ExpensesTrackerTheme {
+      ExpensesTrackerTheme(
+        darkTheme = darkTheme,
+      ) {
         ExpeApp(windowSizeClass = calculateWindowSizeClass(this))
       }
     }

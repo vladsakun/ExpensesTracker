@@ -35,7 +35,6 @@ fun InitialBalanceBS(
   Column(
     modifier = Modifier
       .fillMaxWidth()
-      .wrapContentHeight()
       .padding(Dimens.margin_small_xx)
       .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
     verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),

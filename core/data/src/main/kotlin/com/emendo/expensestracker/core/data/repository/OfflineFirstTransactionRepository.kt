@@ -5,7 +5,6 @@ import com.emendo.expensestracker.core.data.model.*
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.TransactionEntity
-import com.emendo.expensestracker.core.database.model.TransactionType
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.TransactionSource
 import com.emendo.expensestracker.core.model.data.TransactionTarget
@@ -53,11 +52,10 @@ class OfflineFirstTransactionRepository @Inject constructor(
         accountDao.updateBalance(source.id, newBalance)
         transactionDao.save(
           TransactionEntity(
-            sourceId = source.id,
-            targetId = target.id,
+            sourceAccountId = source.id,
+            targetCategoryId = target.id,
             value = amount,
             currencyId = 1,
-            type = TransactionType.EXPENSE.ordinal
           )
         )
       }
@@ -71,11 +69,10 @@ class OfflineFirstTransactionRepository @Inject constructor(
         accountDao.updateBalance(source.id, newBalance)
         transactionDao.save(
           TransactionEntity(
-            sourceId = source.id,
-            targetId = target.id,
+            sourceAccountId = source.id,
+            targetCategoryId = target.id,
             value = amount,
             currencyId = 1,
-            type = TransactionType.INCOME.ordinal
           )
         )
       }
@@ -92,11 +89,10 @@ class OfflineFirstTransactionRepository @Inject constructor(
         accountDao.updateBalance(target.id, newTargetBalance)
         transactionDao.save(
           TransactionEntity(
-            sourceId = source.id,
-            targetId = target.id,
+            sourceAccountId = source.id,
+            targetAccountId = target.id,
             value = amount,
             currencyId = 1,
-            type = TransactionType.TRANSFER.ordinal
           )
         )
       }

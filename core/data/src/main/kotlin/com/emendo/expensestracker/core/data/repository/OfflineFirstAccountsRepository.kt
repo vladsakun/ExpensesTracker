@@ -29,7 +29,7 @@ class OfflineFirstAccountsRepository @Inject constructor(
 
   override fun getLastUsedAccount(): Flow<AccountModel?> {
     return transactionDao.getAll().flatMapLatest { transactions ->
-      val sourceId = transactions.lastOrNull()?.sourceId ?: return@flatMapLatest getFirstAccount()
+      val sourceId = transactions.lastOrNull()?.sourceAccountId ?: return@flatMapLatest getFirstAccount()
       accountsDao.getById(sourceId).map { it.asExternalModel(amountFormatter) }
     }
   }

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Theme.ExpensesTracker" parent="android:Theme.Material.Light.NoActionBar"></style>
+  <!-- Allows us to override night specific attributes in the
+        values-night folder. -->
+  <style name="NightAdjusted.Theme.ExpensesTracker" parent="android:Theme.Material.Light.NoActionBar" />
+
+  <!-- The final theme we use -->
+  <style name="Theme.ExpensesTracker" parent="NightAdjusted.Theme.ExpensesTracker" />
 </resources>

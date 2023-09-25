@@ -2,7 +2,6 @@ package com.emendo.categories.list
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -283,7 +282,7 @@ private fun CategoryItem(
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.labelSmall,
       )
-      ColoredBorderIcon(
+      CategoryIcon(
         color = category.categoryModel.color.color,
         imageVector = category.categoryModel.icon.imageVector,
         onClick = { onClick(category) },
@@ -299,7 +298,7 @@ private fun CategoryItem(
 }
 
 @Composable
-private fun ColoredBorderIcon(
+private fun CategoryIcon(
   color: Color,
   imageVector: ImageVector,
   onClick: () -> Unit,
@@ -312,14 +311,8 @@ private fun ColoredBorderIcon(
       .clip(CircleShape)
       .aspectRatio(1f)
       .clickable(onClick = onClick)
-      .background(color = color.copy(alpha = 0.15f))
-      .border(
-        width = Dimens.border_thickness,
-        color = color,
-        shape = CircleShape,
-      )
+      .background(color = color)
       .padding(Dimens.margin_large_x),
-    tint = color,
   )
 }
 

@@ -5,6 +5,9 @@ import androidx.room.Relation
 
 data class CategoryFull(
   @Embedded val category: CategoryEntity,
-  @Relation(entity = TransactionEntity::class, parentColumn = "id", entityColumn = "targetId")
+  @Relation(
+    parentColumn = "id",
+    entityColumn = "targetCategoryId",
+  )
   val transactions: List<TransactionEntity>,
 )

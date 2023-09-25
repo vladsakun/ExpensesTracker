@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.ui.bottomsheet
 
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -28,7 +27,8 @@ fun <BottomSheetType> ExpeModalBottomSheet(
     ModalBottomSheet(
       onDismissRequest = {},
       sheetState = modalBottomSheetState,
-      windowInsets = WindowInsets(0),
+      // Todo uncomment when fixed https://issuetracker.google.com/issues/275849044
+      // windowInsets = WindowInsets(0),
       shape = ExpeBottomSheetShape,
       content = {
         bottomSheetContent(bottomSheetState.value.bottomSheetState, hideBottomSheet)

@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.core.designsystem.theme
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -100,6 +101,9 @@ fun ExpensesTrackerTheme(
       //      insetsController.isAppearanceLightNavigationBars = !darkTheme
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         window.isNavigationBarContrastEnforced = false
+      } else {
+        window.navigationBarColor = Color.TRANSPARENT
+        window.statusBarColor = Color.TRANSPARENT
       }
     }
   }

@@ -4,7 +4,9 @@ import androidx.compose.ui.unit.dp
 
 object Dimens {
   val icon_button_size = 48.dp
+  val icon_size_large = 32.dp
   val icon_size = 24.dp
+  val icon_size_small = 12.dp
   val divider_thickness = 0.5.dp
   val border_thickness = 1.dp
   val corner_radius_normal = 16.dp

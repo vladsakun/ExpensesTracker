@@ -1,6 +1,7 @@
 package com.emendo.accounts.create
 
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -18,6 +19,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewMo
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -50,6 +52,21 @@ class CreateAccountViewModel @Inject constructor(
   // Todo extract to commons
   init {
     calculatorInput.initCallbacks(this)
+
+    if (IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET) {
+      viewModelScope.launch {
+        delay(100)
+        showBottomSheet(
+          BottomSheetType.InitialBalance(
+            text = initialBalanceState.asStateFlow(),
+            actions = this@CreateAccountViewModel,
+            decimalSeparator = amountFormatter.decimalSeparator.toString(),
+            equalButtonState = equalButtonState.asStateFlow(),
+            currency = state.value.currency.currencyName,
+          )
+        )
+      }
+    }
   }
 
   // Todo extract to commons
