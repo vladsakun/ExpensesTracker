@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.navigation.navigate
+import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -35,7 +36,7 @@ fun rememberExpeAppState(
 }
 
 @Stable
-class ExpeAppState constructor(
+class ExpeAppState(
   val navController: NavHostController,
   val coroutineScope: CoroutineScope,
   val windowSizeClass: WindowSizeClass,
@@ -44,6 +45,11 @@ class ExpeAppState constructor(
   val currentDestination: NavDestination?
     @Composable get() = navController
       .currentBackStackEntryAsState().value?.destination
+
+  val shouldShowNavigation: Boolean
+    @Composable get() = TopLevelDestination.entries.any {
+      navController.currentDestinationAsState().value == it.screen.startRoute
+    }
 
   val shouldShowBottomBar: Boolean
     get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
@@ -55,7 +61,7 @@ class ExpeAppState constructor(
    * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
    * route.
    */
-  val topLevelDestination: List<TopLevelDestination> = TopLevelDestination.values().asList()
+  val topLevelDestination: List<TopLevelDestination> = TopLevelDestination.entries
 
   /**
    * UI logic for navigating to a top level destination in the app. Top level destinations have

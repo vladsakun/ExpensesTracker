@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.database.dao
 
-import android.database.Cursor
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -21,15 +20,12 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   @Query("SELECT * FROM $TABLE_NAME WHERE $PRIMARY_KEY = :id")
   abstract fun getById(id: Long): Flow<TransactionEntity>
 
-  @Query("SELECT * FROM $TABLE_NAME")
-  abstract fun getAllCursor(): Cursor
-
-  @Query("DELETE FROM $TABLE_NAME")
-  abstract override suspend fun deleteAll()
-
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME")
   abstract fun getTransactionFull(): Flow<List<TransactionFull>>
+
+  @Query("DELETE FROM $TABLE_NAME")
+  abstract override suspend fun deleteAll()
 
   @Upsert
   abstract fun upsert(transaction: TransactionEntity)

@@ -16,9 +16,7 @@ object DatabaseModule {
   @Singleton
   fun providesExpDatabase(
     @ApplicationContext context: Context,
-  ): ExpDatabase = Room.databaseBuilder(
-    context,
-    ExpDatabase::class.java,
-    "expensestracker-database",
-  ).build()
+  ): ExpDatabase = Room
+    .databaseBuilder(context, ExpDatabase::class.java, "expe-database")
+    .build()
 }

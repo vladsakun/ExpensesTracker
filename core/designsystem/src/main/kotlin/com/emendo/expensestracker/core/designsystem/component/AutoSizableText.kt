@@ -12,7 +12,6 @@ import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
-import timber.log.Timber
 
 @Composable
 fun AutoSizableText(
@@ -25,7 +24,6 @@ fun AutoSizableText(
   scaleFactor: Float = 0.9f,
 ) {
   BoxWithConstraints(modifier = modifier) {
-    Timber.d("maxHeight: $maxHeight")
     var nFontSize = textStyle.fontSize
     val calculateParagraph = @Composable {
       Paragraph(

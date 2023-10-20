@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.AutoSizableText
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
@@ -81,7 +81,7 @@ fun BaseNumKeyboardBS(
         modifier = digitModifier,
       ) {
         Icon(
-          imageVector = ExpIcons.Backspace,
+          imageVector = ExpeIcons.Backspace,
           contentDescription = stringResource(R.string.clear)
         )
       }
@@ -90,7 +90,7 @@ fun BaseNumKeyboardBS(
         mathOperation = MathOperation.Add(),
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.add),
-        imageVector = ExpIcons.Add,
+        imageVector = ExpeIcons.Add,
       )
     }
     CalculatorRow {
@@ -102,7 +102,7 @@ fun BaseNumKeyboardBS(
         mathOperation = MathOperation.Substract(),
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.substract),
-        imageVector = ExpIcons.Remove,
+        imageVector = ExpeIcons.Remove,
       )
     }
     CalculatorRow {
@@ -114,7 +114,7 @@ fun BaseNumKeyboardBS(
         mathOperation = MathOperation.Multiply(),
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.multiply),
-        imageVector = ExpIcons.Close,
+        imageVector = ExpeIcons.Close,
       )
     }
     CalculatorRow {

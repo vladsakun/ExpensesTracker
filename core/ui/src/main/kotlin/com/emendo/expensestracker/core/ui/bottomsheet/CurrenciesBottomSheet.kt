@@ -9,20 +9,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.designsystem.component.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun CurrenciesBottomSheet(
   onSelectCurrency: (currencyModel: CurrencyModel) -> Unit,
   onCloseClick: () -> Unit,
-  currencies: ImmutableList<CurrencyModel> = CurrencyModel.entries.toImmutableList(),
+  currencies: ImmutableList<CurrencyModel>,
 ) {
   ExpeBottomSheet(
     titleResId = R.string.currency,
@@ -31,8 +31,8 @@ fun CurrenciesBottomSheet(
       LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(
           items = currencies,
-          key = { item: CurrencyModel -> item.id },
-          contentType = { _ -> "currencies" },
+          key = { item: CurrencyModel -> item.currencyCode },
+          contentType = { _ -> "currency" },
         ) { CurrencyItem(currencyModel = it, onSelectCurrency) }
         uniqueItem(key = "bottom_spacer") {
           Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
@@ -55,15 +55,28 @@ private fun CurrencyItem(
       horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x)
     ) {
       Text(
-        text = currencyModel.currencyName, style = MaterialTheme.typography.bodyLarge.copy(
+        text = currencyModel.currencyCode,
+        style = MaterialTheme.typography.bodyLarge.copy(
           color = MaterialTheme.colorScheme.secondary,
-          fontWeight = FontWeight.Bold
+          fontWeight = FontWeight.Bold,
         )
       )
       Text(
-        text = currencyModel.currencySymbol,
-        style = MaterialTheme.typography.bodyLarge
+        text = currencyModel.currencyName,
+        style = MaterialTheme.typography.bodyLarge,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
       )
+      currencyModel.currencySymbol?.let {
+        Text(
+          text = it,
+          style = MaterialTheme.typography.bodyLarge.copy(
+            color = MaterialTheme.colorScheme.secondary,
+            fontWeight = FontWeight.Bold,
+          ),
+          modifier = Modifier.wrapContentSize(),
+        )
+      }
     }
     ExpeDivider()
   }

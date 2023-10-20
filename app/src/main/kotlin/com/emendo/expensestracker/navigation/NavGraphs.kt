@@ -1,8 +1,9 @@
 package com.emendo.expensestracker.navigation
 
-import com.emendo.accounts.AccountsNavGraph
-import com.emendo.categories.CategoriesNavGraph
-import com.emendo.transactions.TransactionsNavGraph
+import com.emendo.expensestracker.accounts.AccountsNavGraph
+import com.emendo.expensestracker.categories.CategoriesNavGraph
+import com.emendo.expensestracker.settings.SettingsNavGraph
+import com.emendo.expensestracker.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 
@@ -16,6 +17,7 @@ object NavGraphs {
       CategoriesNavGraph,
       AccountsNavGraph,
       TransactionsNavGraph,
+      SettingsNavGraph,
     )
   }
 

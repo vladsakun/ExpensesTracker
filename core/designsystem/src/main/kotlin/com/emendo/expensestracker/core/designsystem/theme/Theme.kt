@@ -1,13 +1,15 @@
 package com.emendo.expensestracker.core.designsystem.theme
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 
@@ -42,7 +44,6 @@ private val LightColorScheme = lightColorScheme(
   outlineVariant = md_theme_light_outlineVariant,
   scrim = md_theme_light_scrim,
 )
-
 
 private val DarkColorScheme = darkColorScheme(
   primary = md_theme_dark_primary,
@@ -81,7 +82,7 @@ fun ExpensesTrackerTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
   // Dynamic color is available on Android 12+
   dynamicColor: Boolean = false, // Todo change to true before release
-  content: @Composable () -> Unit
+  content: @Composable () -> Unit,
 ) {
   val colorScheme = when {
     dynamicColor && supportsDynamicTheming() -> {
@@ -102,17 +103,22 @@ fun ExpensesTrackerTheme(
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         window.isNavigationBarContrastEnforced = false
       } else {
-        window.navigationBarColor = Color.TRANSPARENT
-        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.Transparent.toArgb()
+        window.statusBarColor = Color.Transparent.toArgb()
       }
     }
   }
 
-  MaterialTheme(
-    colorScheme = colorScheme,
-    typography = Typography,
-    content = content
-  )
+  val customColorsPalette = if (darkTheme) DarkCustomColorsPalette else LightCustomColorsPalette
+
+  CompositionLocalProvider(LocalCustomColorsPalette provides customColorsPalette) {
+    MaterialTheme(
+      colorScheme = colorScheme,
+      typography = Typography,
+      content = content
+    )
+  }
+
 }
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)

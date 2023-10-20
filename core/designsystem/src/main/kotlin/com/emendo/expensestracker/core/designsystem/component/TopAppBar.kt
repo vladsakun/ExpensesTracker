@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,7 +127,7 @@ fun NavigationBackIcon(
     modifier = modifier,
   ) {
     Icon(
-      imageVector = ExpIcons.ArrowBack,
+      imageVector = ExpeIcons.ArrowBack,
       contentDescription = "navigate back",
       //      tint = MaterialTheme.colorScheme.onSurface,
     )
@@ -141,7 +141,7 @@ private fun NiaTopBarPreview() {
   ExpeTopBar(
     titleRes = R.string.untitled,
     navigationIcon = {},
-    actionIcon = ExpIcons.Add,
+    actionIcon = ExpeIcons.Add,
     actionIconContentDescription = "Action icon",
   )
 }

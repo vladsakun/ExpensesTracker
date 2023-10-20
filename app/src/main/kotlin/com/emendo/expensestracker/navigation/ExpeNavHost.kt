@@ -3,7 +3,7 @@ package com.emendo.expensestracker.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.emendo.accounts.destinations.AccountsScreenRouteDestination
+import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_ACCOUNT
 import com.emendo.expensestracker.ui.ExpeAppState
 import com.ramcosta.composedestinations.DestinationsNavHost

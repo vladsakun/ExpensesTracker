@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.model.data.EqualButtonState
@@ -81,7 +81,7 @@ fun InitialBalanceBS(
         modifier = digitModifier,
       ) {
         Icon(
-          imageVector = ExpIcons.Backspace,
+          imageVector = ExpeIcons.Backspace,
           contentDescription = stringResource(R.string.clear)
         )
       }
@@ -90,7 +90,7 @@ fun InitialBalanceBS(
         mathOperation = MathOperation.Add(),
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.add),
-        imageVector = ExpIcons.Add,
+        imageVector = ExpeIcons.Add,
       )
     }
     CalculatorRow {
@@ -102,7 +102,7 @@ fun InitialBalanceBS(
         mathOperation = MathOperation.Substract(),
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.substract),
-        imageVector = ExpIcons.Remove,
+        imageVector = ExpeIcons.Remove,
       )
     }
     CalculatorRow {
@@ -114,7 +114,7 @@ fun InitialBalanceBS(
         mathOperation = MathOperation.Multiply(),
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.multiply),
-        imageVector = ExpIcons.Close,
+        imageVector = ExpeIcons.Close,
       )
     }
     CalculatorRow {

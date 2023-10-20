@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.emendo.expensestracker.core.database.util.ACCOUNT_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.CATEGORY_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_TRANSACTION
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
 
 @Entity(
@@ -36,12 +37,16 @@ import java.math.BigDecimal
 data class TransactionEntity(
   @PrimaryKey(autoGenerate = true)
   val id: Long = 0,
-  val value: BigDecimal,
-  val currencyId: Int,
+  val date: Instant,
   @ColumnInfo(index = true)
   val sourceAccountId: Long,
   @ColumnInfo(index = true)
   val targetAccountId: Long? = null,
   @ColumnInfo(index = true)
   val targetCategoryId: Long? = null,
+  val value: BigDecimal,
+  val currencyCode: String,
+
+  val transferReceivedCurrencyCode: String? = null,
+  val transferReceivedValue: BigDecimal? = null,
 )

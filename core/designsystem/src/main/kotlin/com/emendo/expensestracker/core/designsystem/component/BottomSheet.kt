@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 
 @Composable
@@ -32,7 +32,7 @@ fun ExpeBottomSheet(
       ) {
         IconButton(onClick = onCloseClick) {
           Icon(
-            imageVector = ExpIcons.Close,
+            imageVector = ExpeIcons.Close,
             contentDescription = stringResource(id = R.string.close),
             tint = MaterialTheme.colorScheme.onSurface,
           )

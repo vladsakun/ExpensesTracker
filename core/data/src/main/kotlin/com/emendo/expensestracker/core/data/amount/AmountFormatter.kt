@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.data.amount
 
-import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import java.math.BigDecimal
 
 // Todo refactor
@@ -31,7 +31,7 @@ interface AmountFormatter {
    * @param amount
    * @return the formatted amount with the currency symbol and decimals.
    */
-  fun format(amount: BigDecimal, currencyModel: CurrencyModel): String
+  fun format(amount: BigDecimal, currency: CurrencyModel): String
 
   /**
    * @param amount

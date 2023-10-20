@@ -2,10 +2,8 @@ package com.emendo.expensestracker.core.data.model
 
 import com.emendo.expensestracker.core.app.resources.models.CalculatorTransactionUiModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
-import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.database.model.CategoryEntity
-import com.emendo.expensestracker.core.model.data.TransactionTarget
 
 data class CategoryModel(
   override val id: Long = 0,
@@ -13,7 +11,6 @@ data class CategoryModel(
   val icon: IconModel,
   val color: ColorModel,
   val type: CategoryType,
-  val currencyModel: CurrencyModel,
 ) : TransactionTarget
 
 fun CategoryEntity.asExternalModel(): CategoryModel {
@@ -23,7 +20,6 @@ fun CategoryEntity.asExternalModel(): CategoryModel {
     icon = IconModel.getById(iconId),
     color = ColorModel.getById(colorId),
     type = CategoryType.getById(type),
-    currencyModel = CurrencyModel.getById(currencyId),
   )
 }
 
@@ -34,7 +30,6 @@ fun CategoryModel.asEntity(): CategoryEntity {
     iconId = icon.id,
     colorId = color.id,
     type = type.id,
-    currencyId = currencyModel.id,
   )
 }
 
@@ -42,7 +37,6 @@ fun CategoryModel.asTransactionUiModel(): CalculatorTransactionUiModel {
   return CalculatorTransactionUiModel(
     name = name,
     icon = icon.imageVector,
-    element = this,
   )
 }
 

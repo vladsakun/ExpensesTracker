@@ -2,8 +2,8 @@ package com.emendo.expensestracker.core.data.amount
 
 import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
-import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.data.isFloatingPointNumber
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import java.math.BigDecimal
 import java.util.Locale
 import javax.inject.Inject
@@ -58,7 +58,7 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
    * @param amount
    * @return the formatted amount value using the rules of number format of default Locale
    */
-  override fun format(amount: BigDecimal, currencyModel: CurrencyModel): String {
+  override fun format(amount: BigDecimal, currency: CurrencyModel): String {
     currencyNumberFormatter.apply {
       if (amount.isFloatingPointNumber) {
         maximumFractionDigits = 2
@@ -67,7 +67,7 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
         maximumFractionDigits = 0
       }
 
-      decimalFormatSymbols.currencySymbol = currencyModel.currencySymbol
+      decimalFormatSymbols.currencySymbol = currency.currencySymbol
     }
 
     return currencyNumberFormatter.format(amount)

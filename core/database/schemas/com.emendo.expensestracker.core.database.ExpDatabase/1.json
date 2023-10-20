@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d4c36ca5581dfce24eb036ae83827249",
+    "identityHash": "b082209a43e62c15245c6b17006e25af",
     "entities": [
       {
         "tableName": "account",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` TEXT NOT NULL, `currencyId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `balance` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -27,9 +27,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "currencyId",
-            "columnName": "currencyId",
-            "affinity": "INTEGER",
+            "fieldPath": "currencyCode",
+            "columnName": "currencyCode",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "category",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `currencyId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `colorId` INTEGER NOT NULL, `type` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -87,12 +87,6 @@
             "columnName": "type",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "currencyId",
-            "columnName": "currencyId",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -106,7 +100,7 @@
       },
       {
         "tableName": "transaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `value` TEXT NOT NULL, `currencyId` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -115,14 +109,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "value",
-            "columnName": "value",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "currencyId",
-            "columnName": "currencyId",
+            "fieldPath": "date",
+            "columnName": "date",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -142,6 +130,30 @@
             "fieldPath": "targetCategoryId",
             "columnName": "targetCategoryId",
             "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyCode",
+            "columnName": "currencyCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transferReceivedCurrencyCode",
+            "columnName": "transferReceivedCurrencyCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transferReceivedValue",
+            "columnName": "transferReceivedValue",
+            "affinity": "TEXT",
             "notNull": false
           }
         ],
@@ -220,7 +232,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd4c36ca5581dfce24eb036ae83827249')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b082209a43e62c15245c6b17006e25af')"
     ]
   }
 }

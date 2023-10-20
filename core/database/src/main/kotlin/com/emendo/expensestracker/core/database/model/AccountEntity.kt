@@ -11,7 +11,7 @@ data class AccountEntity(
   val id: Long = 0,
   val name: String,
   val balance: BigDecimal,
-  val currencyId: Int,
+  val currencyCode: String,
   val iconId: Int,
   val colorId: Int,
 )

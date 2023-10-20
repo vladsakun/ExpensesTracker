@@ -3,11 +3,13 @@ package com.emendo.expensestracker.core.ui.bottomsheet.base
 import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.CalculatorTransactionUiModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
-import com.emendo.expensestracker.core.app.resources.models.CurrencyModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.CalculatorKeyboardActions
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.EqualButtonState
 import com.emendo.expensestracker.core.model.data.InitialBalanceKeyboardActions
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 @Stable
@@ -25,6 +27,7 @@ interface BottomSheetType {
   data class Currency(
     val selectedCurrency: CurrencyModel,
     val onSelectCurrency: (currencyModel: CurrencyModel) -> Unit,
+    val currencies: ImmutableList<CurrencyModel>,
   ) : BottomSheetType
 
   data class InitialBalance(
@@ -40,8 +43,8 @@ interface BottomSheetType {
     val actions: CalculatorKeyboardActions,
     val equalButtonState: StateFlow<EqualButtonState>,
     val decimalSeparator: String,
-    val currencyState: StateFlow<String>,
-    val source: StateFlow<CalculatorTransactionUiModel?>,
-    val target: StateFlow<CalculatorTransactionUiModel?>,
+    val currencyState: Flow<String?>,
+    val source: Flow<CalculatorTransactionUiModel?>,
+    val target: Flow<CalculatorTransactionUiModel?>,
   ) : BottomSheetType
 }

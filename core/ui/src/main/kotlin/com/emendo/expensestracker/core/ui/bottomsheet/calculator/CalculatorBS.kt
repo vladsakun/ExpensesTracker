@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.icon.ExpIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.CalculatorTransactionUiModel
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
@@ -22,7 +22,7 @@ import com.emendo.expensestracker.core.model.data.EqualButtonState
 @Composable
 fun CalculatorBS(
   textState: State<String>,
-  currencyState: State<String>,
+  currencyState: State<String?>,
   equalButtonState: State<EqualButtonState>,
   actions: CalculatorKeyboardActions,
   decimalSeparator: String,
@@ -56,12 +56,14 @@ fun CalculatorBS(
         modifier = modifier,
         contentPadding = PaddingValues(0.dp),
       ) {
-        Text(
-          text = stringResource(id = R.string.currency_with_symbol, currencyState.value),
-          modifier = Modifier.align(Alignment.CenterVertically),
-          textAlign = TextAlign.Center,
-          style = LocalTextStyle.current.copy(lineHeight = 15.sp),
-        )
+        currencyState.value?.let {
+          Text(
+            text = stringResource(id = R.string.currency_with_symbol, it),
+            modifier = Modifier.align(Alignment.CenterVertically),
+            textAlign = TextAlign.Center,
+            style = LocalTextStyle.current.copy(lineHeight = 15.sp),
+          )
+        }
       }
     },
     headerRows = listOf {
@@ -75,7 +77,7 @@ fun CalculatorBS(
       ) {
         TransactionItem(source, actions::onChangeSourceClick)
         Spacer(modifier = Modifier.width(Dimens.margin_small_x))
-        Icon(imageVector = ExpIcons.ArrowForward, contentDescription = null)
+        Icon(imageVector = ExpeIcons.ArrowForward, contentDescription = null)
         Spacer(modifier = Modifier.width(Dimens.margin_small_x))
         TransactionItem(target, actions::onChangeTargetClick)
       }

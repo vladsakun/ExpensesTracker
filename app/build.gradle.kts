@@ -1,3 +1,5 @@
+import com.emendo.expensestracker.ExpeBuildType
+
 plugins {
   id("expensestracker.android.application")
   id("expensestracker.android.application.compose")
@@ -9,8 +11,6 @@ android {
 
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
-    minSdk = libs.versions.minSdk.get().toInt()
-    targetSdk = libs.versions.targetSdk.get().toInt()
     versionCode = 1
     versionName = "1.0"
 
@@ -19,9 +19,14 @@ android {
   }
 
   buildTypes {
-    release {
+    debug {
+      applicationIdSuffix = ExpeBuildType.DEBUG.applicationIdSuffix
+      isDebuggable = true
+    }
+    val release by getting {
       isMinifyEnabled = true
       isShrinkResources = true
+      isDebuggable = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
@@ -31,23 +36,6 @@ android {
     targetCompatibility = JavaVersion.VERSION_18
   }
 
-  kotlinOptions {
-    jvmTarget = "18"
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
-  }
-
-  packagingOptions {
-    resources {
-      excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-    }
-  }
   namespace = "com.emendo.expensestracker"
 }
 
@@ -55,6 +43,7 @@ dependencies {
   implementation(project(":feature:accounts"))
   implementation(project(":feature:transactions"))
   implementation(project(":feature:categories"))
+  implementation(project(":feature:settings"))
 
   implementation(project(":core:common"))
   implementation(project(":core:data"))
@@ -73,11 +62,4 @@ dependencies {
   implementation(libs.compose.destinations)
 
   ksp(libs.compose.destinations.ksp)
-
-  testImplementation("junit:junit:4.13.2")
-  androidTestImplementation("androidx.test.ext:junit:1.1.5")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-  androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-  debugImplementation("androidx.compose.ui:ui-tooling")
-  debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

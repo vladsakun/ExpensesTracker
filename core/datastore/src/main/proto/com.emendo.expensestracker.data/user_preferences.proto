@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_package = "com.emendo.expensestracker.core.datastore";
+option java_multiple_files = true;
+
+message UserPreferences {
+  // Settings
+  bool use_dynamic_color = 1;
+  bool should_show_notifications = 2;
+  bool is_password_enabled = 3;
+  bool is_fingerprint_enabled = 4;
+  bool is_backup_enabled = 5;
+
+  // Currencies
+  string general_currency_code = 6;
+  map<string, bool> favourite_currency_codes = 7;
+}
