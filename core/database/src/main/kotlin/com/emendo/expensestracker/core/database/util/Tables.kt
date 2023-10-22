@@ -8,3 +8,6 @@ const val CATEGORY_PRIMARY_KEY = "id"
 
 const val TABLE_TRANSACTION = "transaction"
 const val TRANSACTION_PRIMARY_KEY = "id"
+
+const val TABLE_CURRENCY_RATE = "currency_rate"
+const val CURRENCY_RATE_PRIMARY_KEY = "currencyCode"

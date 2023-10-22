@@ -67,7 +67,9 @@ class AmountFormatterImpl @Inject constructor() : AmountFormatter {
         maximumFractionDigits = 0
       }
 
-      decimalFormatSymbols.currencySymbol = currency.currencySymbol
+      decimalFormatSymbols = decimalFormatSymbols.apply {
+        currencySymbol = currency.currencySymbolOrCode
+      }
     }
 
     return currencyNumberFormatter.format(amount)

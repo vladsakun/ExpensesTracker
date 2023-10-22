@@ -58,7 +58,8 @@ private fun TransactionsListScreenContent(
         is TransactionScreenUiState.Loading -> ExpLoadingWheel()
         is TransactionScreenUiState.Error -> Text(text = state.message)
         is TransactionScreenUiState.DisplayTransactionsList -> TransactionsList(
-          transactions = state.transactionList
+          transactions = state.transactionList,
+          { /* TODO */ }
         )
       }
     }
@@ -66,26 +67,36 @@ private fun TransactionsListScreenContent(
 }
 
 @Composable
-private fun TransactionsList(transactions: ImmutableList<TransactionModel>) {
+private fun TransactionsList(
+  transactions: ImmutableList<TransactionModel>,
+  onTransactionClick: (TransactionModel) -> Unit,
+) {
   LazyColumn(modifier = Modifier.fillMaxSize()) {
     items(
       items = transactions,
       key = { it.id },
       contentType = { "transaction" }
     ) { transaction ->
-      TransactionItem(transaction)
+      TransactionItem(
+        transaction = transaction,
+        onItemClick = { onTransactionClick(transaction) },
+      )
     }
   }
 }
 
 @Composable
-private fun TransactionItem(transaction: TransactionModel) {
+private fun TransactionItem(
+  transaction: TransactionModel,
+  onItemClick: () -> Unit,
+) {
   val fontSize = MaterialTheme.typography.bodyLarge
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .clickable { /*TODO go to transaction details*/ }
-      .padding(horizontal = Dimens.margin_large_x, vertical = Dimens.margin_small_x),
+      .clickable(onClick = onItemClick)
+      .padding(horizontal = Dimens.margin_large_x)
+      .padding(top = Dimens.margin_small_x),
     horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
   ) {
     Icon(
@@ -95,7 +106,6 @@ private fun TransactionItem(transaction: TransactionModel) {
         .size(Dimens.icon_size_large)
         .clip(CircleShape)
         .aspectRatio(1f)
-        .clickable(onClick = {})
         .background(color = transaction.target.color.color)
         .padding(Dimens.margin_small_x),
     )
@@ -138,17 +148,17 @@ private fun TransactionItem(transaction: TransactionModel) {
           color = transaction.textColor()
         )
         if (transaction.target is TransactionTargetUiModel.Account) {
-
+          Text(
+            text = transaction.transferReceivedValue.toString(),
+            style = fontSize,
+            modifier = Modifier.align(Alignment.CenterVertically),
+          )
         }
-        Text(
-          text = transaction.transferReceivedValue.toString(),
-          style = fontSize,
-          modifier = Modifier.align(Alignment.CenterVertically),
-        )
       }
       Text(
         text = "Comment a bit long, but okay",
         style = fontSize.copy(fontStyle = FontStyle.Italic),
+        modifier = Modifier.padding(bottom = Dimens.margin_small_x)
       )
       ExpeDivider()
     }

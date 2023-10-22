@@ -1,6 +1,8 @@
 package com.emendo.expensestracker.accounts.create
 
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.core.app.common.network.Dispatcher
+import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -16,6 +18,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewMo
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +33,7 @@ class CreateAccountViewModel @Inject constructor(
   private val amountFormatter: AmountFormatter,
   private val calculatorInput: CalculatorInput,
   private val currencyRepository: CurrencyRepository,
+  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : BaseBottomSheetViewModel<BottomSheetType>(),
     // Todo extract to commons
     InitialBalanceKeyboardActions,
@@ -119,7 +123,7 @@ class CreateAccountViewModel @Inject constructor(
       return
     }
 
-    createAccountJob = viewModelScope.launch {
+    createAccountJob = viewModelScope.launch(ioDispatcher) {
       with(state.value) {
         accountsRepository.upsertAccount(
           AccountModel(

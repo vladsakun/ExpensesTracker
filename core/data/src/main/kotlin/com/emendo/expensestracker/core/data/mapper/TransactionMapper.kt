@@ -23,7 +23,8 @@ class TransactionMapper @Inject constructor(
       ?: throw IllegalStateException("Transaction must have target"))
 
     val type = target.transactionType
-    val formattedValue = amountFormatter.format(transactionEntity.value)
+    val currencyModel = currencyRepository.findCurrencyModel(transactionEntity.currencyCode)
+    val formattedValue = amountFormatter.format(transactionEntity.value, currencyModel)
     val formattedTransactionValue = if (type == TransactionType.INCOME) "+ $formattedValue" else formattedValue
 
     return TransactionModel(
@@ -32,7 +33,6 @@ class TransactionMapper @Inject constructor(
       target = target,
       formattedValue = formattedTransactionValue,
       value = transactionEntity.value,
-      currencyModel = currencyRepository.findCurrencyModel(transactionEntity.currencyCode),
       type = type,
       transferReceivedValue = transactionEntity.transferReceivedValue,
       transferCurrencyModel = transactionEntity.transferReceivedCurrencyCode?.run(currencyRepository::findCurrencyModel),

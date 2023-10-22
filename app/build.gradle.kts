@@ -50,6 +50,8 @@ dependencies {
   implementation(project(":core:model"))
   implementation(project(":core:designsystem"))
 
+  implementation(project(":sync:work"))
+
   implementation(libs.accompanist.systemuicontroller)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.appcompat)

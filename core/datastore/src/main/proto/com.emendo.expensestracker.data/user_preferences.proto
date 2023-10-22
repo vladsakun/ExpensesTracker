@@ -14,4 +14,5 @@ message UserPreferences {
   // Currencies
   string general_currency_code = 6;
   map<string, bool> favourite_currency_codes = 7;
+  int64 currency_rates_change_list_instant_seconds = 8;
 }

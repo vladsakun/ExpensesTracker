@@ -32,7 +32,7 @@ internal fun SettingsRoute(
   ExpeScaffoldWithTopBar(titleResId = R.string.settings) {
     SettingsScreen(
       uiStateProvider = { uiState.value },
-      onItemClick = { TODO() },
+      onItemClick = viewModel::onItemClick,
       modifier = Modifier.padding(it),
     )
   }

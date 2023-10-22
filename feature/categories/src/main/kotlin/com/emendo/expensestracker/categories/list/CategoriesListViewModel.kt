@@ -21,7 +21,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -206,11 +205,7 @@ private fun categoriesUiState(getCategoriesWithTotalTransactionsUseCase: GetCate
   return getCategoriesWithTotalTransactionsUseCase().asResult().map { categoriesResult ->
     when (categoriesResult) {
       is Result.Success -> CategoriesListUiState.DisplayCategoriesList(categoriesResult.data.toImmutableList())
-      is Result.Error -> {
-        Timber.e(categoriesResult.exception)
-        CategoriesListUiState.Error("No categories found")
-      }
-
+      is Result.Error -> CategoriesListUiState.Error("No categories found")
       is Result.Loading -> CategoriesListUiState.Loading
       is Result.Empty -> CategoriesListUiState.Empty
     }

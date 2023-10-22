@@ -6,6 +6,9 @@ import com.emendo.expensestracker.core.model.data.UserData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
+import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 class ExpePreferencesDataStore @Inject constructor(
@@ -59,6 +62,35 @@ class ExpePreferencesDataStore @Inject constructor(
       it.copy {
         favouriteCurrencyCodes.put(currencyCode, true)
       }
+    }
+  }
+
+  suspend fun getChangeListVersions() = userPreferences.data
+    .map {
+      ChangeListVersions(
+        currencyRatesLastUpdateInstant = Instant.fromEpochSeconds(it.currencyRatesChangeListInstantSeconds),
+      )
+    }
+    .firstOrNull() ?: ChangeListVersions()
+
+  /**
+   * Update the [ChangeListVersions] using [update].
+   */
+  suspend fun updateChangeListVersion(update: ChangeListVersions.() -> ChangeListVersions) {
+    try {
+      userPreferences.updateData { currentPreferences ->
+        val updatedChangeListVersions = update(
+          ChangeListVersions(
+            currencyRatesLastUpdateInstant = Instant.fromEpochSeconds(currentPreferences.currencyRatesChangeListInstantSeconds),
+          ),
+        )
+
+        currentPreferences.copy {
+          currencyRatesChangeListInstantSeconds = updatedChangeListVersions.currencyRatesLastUpdateInstant.epochSeconds
+        }
+      }
+    } catch (ioException: IOException) {
+      Timber.e(ioException, "Failed to update user preferences")
     }
   }
 }

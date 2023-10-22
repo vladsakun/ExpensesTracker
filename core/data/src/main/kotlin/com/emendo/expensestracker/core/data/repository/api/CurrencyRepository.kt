@@ -11,4 +11,5 @@ interface CurrencyRepository {
   suspend fun markAsFavourite(currencyModel: CurrencyModel)
   fun getLastGeneralCurrency(): CurrencyModel?
   fun findCurrencyModel(currencyCode: String): CurrencyModel
+  fun initCurrenciesMap(supportedCurrencyCodes: List<String>)
 }

@@ -31,4 +31,6 @@ object CurrencyModels {
 
   val localCurrencyCode: String
     get() = Currency.getInstance(Locale.getDefault()).currencyCode
+
+  const val CURRENCY_RATES_BASE = "USD"
 }

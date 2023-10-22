@@ -9,7 +9,6 @@ data class TransactionModel(
   val target: TransactionTargetUiModel,
   val formattedValue: String,
   val value: BigDecimal,
-  val currencyModel: CurrencyModel,
   val type: TransactionType,
   val transferReceivedValue: BigDecimal? = null,
   val transferCurrencyModel: CurrencyModel? = null,

@@ -29,7 +29,11 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
     return combinedFlow.transform { (transactions, currency) ->
       val remappedTransactions: List<CategoryWithTotalTransactions> = transactions.map { categoryWithTransactions ->
         val totalSum = categoryWithTransactions.transactions.map {
-          currencyConverter.convert(it.value, it.currencyModel.currencyCode, currency.currencyCode)
+          currencyConverter.convert(
+            value = it.value,
+            fromCurrencyCode = it.currencyModel.currencyCode,
+            toCurrencyCode = currency.currencyCode,
+          )
         }.sumOf { it }
 
         CategoryWithTotalTransactions(

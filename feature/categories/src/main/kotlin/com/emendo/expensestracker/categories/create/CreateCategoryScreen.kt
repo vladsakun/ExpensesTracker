@@ -37,10 +37,10 @@ fun CreateCategoryRoute(
       CreateCategoryContent(
         stateFlow = viewModel.state,
         onNavigationClick = navigator::navigateUp,
-        onTitleChanged = viewModel::onTitleChanged,
-        onIconSelectClick = viewModel::onIconSelectClick,
-        onColorSelectClick = viewModel::onColorSelectClick,
-        onCreateCategoryClick = viewModel::onCreateCategoryClick,
+        onTitleChanged = viewModel::changeTitle,
+        onIconSelectClick = viewModel::showIconBottomSheet,
+        onColorSelectClick = viewModel::showColorBottomSheet,
+        onCreateCategoryClick = viewModel::createCategory,
       )
     },
     bottomSheetContent = { type, hideBottomSheet ->

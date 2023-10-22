@@ -1,5 +1,7 @@
 package com.emendo.expensestracker.core.data.repository
 
+import com.emendo.expensestracker.core.app.common.network.Dispatcher
+import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.data.model.*
 import com.emendo.expensestracker.core.data.repository.api.TransactionsRepository
@@ -8,6 +10,7 @@ import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -22,6 +25,7 @@ class OfflineFirstTransactionsRepository @Inject constructor(
   private val transactionDao: TransactionDao,
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
+  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : TransactionsRepository {
 
   override suspend fun createTransaction(
@@ -32,16 +36,18 @@ class OfflineFirstTransactionsRepository @Inject constructor(
     targetCurrency: CurrencyModel?,
     transferAmount: BigDecimal?,
   ) {
-    when {
-      source is AccountModel && target is CategoryModel -> {
-        when (target.type) {
-          CategoryType.EXPENSE -> createExpenseTransaction(source, target, amount)
-          CategoryType.INCOME -> createIncomeTransaction(source, target, amount)
+    withContext(ioDispatcher) {
+      when {
+        source is AccountModel && target is CategoryModel -> {
+          when (target.type) {
+            CategoryType.EXPENSE -> createExpenseTransaction(source, target, amount)
+            CategoryType.INCOME -> createIncomeTransaction(source, target, amount)
+          }
         }
-      }
 
-      source is AccountModel && target is AccountModel -> createTransferTransaction(source, target, amount)
-      else -> throw IllegalArgumentException("Unsupported transaction type")
+        source is AccountModel && target is AccountModel -> createTransferTransaction(source, target, amount)
+        else -> throw IllegalArgumentException("Unsupported transaction type")
+      }
     }
   }
 

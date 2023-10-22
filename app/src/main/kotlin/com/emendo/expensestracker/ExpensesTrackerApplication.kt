@@ -2,6 +2,7 @@ package com.emendo.expensestracker
 
 import android.app.Application
 import com.emendo.expensestracker.core.data.manager.AppInitManager
+import com.emendo.expensestracker.sync.initializers.Sync
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -21,6 +22,8 @@ class ExpensesTrackerApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    // Initialize Sync; the system responsible for keeping data in the app up to date.
+    Sync.initialize(context = this)
     applicationScope.launch {
       appInitializer.init()
     }

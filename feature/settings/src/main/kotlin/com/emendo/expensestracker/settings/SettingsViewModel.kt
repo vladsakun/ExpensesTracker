@@ -2,20 +2,25 @@ package com.emendo.expensestracker.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.core.app.common.network.Dispatcher
+import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.data.repository.api.UserDataRepository
 import com.emendo.expensestracker.core.model.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.emendo.expensestracker.core.app.resources.R as AppR
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
   private val userDataRepository: UserDataRepository,
+  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
   val state = getSettingsScreenData(userDataRepository, ::mapState)
@@ -30,8 +35,8 @@ class SettingsViewModel @Inject constructor(
       settingsItems = persistentListOf(
         SettingsItemModel(
           id = GENERAL_CURRENCY_ID,
-          titleResId = AppR.string.settings,
-          value = userData?.generalCurrencyCode?.let { SettingsItemValue.StringValue(it) },
+          titleResId = AppR.string.general_currency,
+          value = userData?.generalCurrencyCode?.let(SettingsItemValue::StringValue),
           icon = ExpeIcons.Currency,
         ),
         SettingsItemModel(
@@ -72,6 +77,20 @@ class SettingsViewModel @Inject constructor(
 
   private fun getSettingsItemStringRes(it: Boolean) =
     if (it) AppR.string.on_label else AppR.string.off_label
+
+  fun onItemClick(settingsItemModel: SettingsItemModel) {
+    viewModelScope.launch(ioDispatcher) {
+      when (settingsItemModel.id) {
+        GENERAL_CURRENCY_ID -> {
+          if (userDataRepository.getGeneralCurrencyCode() == "USD") {
+            userDataRepository.setGeneralCurrencyCode("EUR")
+          } else {
+            userDataRepository.setGeneralCurrencyCode("USD")
+          }
+        }
+      }
+    }
+  }
 
   companion object {
     const val GENERAL_CURRENCY_ID = 1

@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.database
 
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.CategoryDao
+import com.emendo.expensestracker.core.database.dao.CurrencyRateDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
 import dagger.Module
 import dagger.Provides
@@ -19,4 +20,7 @@ object DaosModule {
 
   @Provides
   fun providesTransactionDao(database: ExpDatabase): TransactionDao = database.transactionDao()
+
+  @Provides
+  fun providesCurrencyRateDao(database: ExpDatabase): CurrencyRateDao = database.currencyRateDao()
 }
