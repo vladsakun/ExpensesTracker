@@ -3,10 +3,10 @@ package com.emendo.expensestracker.core.data.repository
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.data.mapper.CategoryFullMapper
-import com.emendo.expensestracker.core.data.model.CategoryModel
-import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
-import com.emendo.expensestracker.core.data.model.asEntity
-import com.emendo.expensestracker.core.data.model.asExternalModel
+import com.emendo.expensestracker.core.data.model.category.CategoryModel
+import com.emendo.expensestracker.core.data.model.category.CategoryWithTransactions
+import com.emendo.expensestracker.core.data.model.category.asEntity
+import com.emendo.expensestracker.core.data.model.category.asExternalModel
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.database.dao.CategoryDao
 import kotlinx.coroutines.CoroutineDispatcher

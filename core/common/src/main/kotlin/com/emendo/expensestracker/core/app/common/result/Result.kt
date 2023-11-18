@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.app.common.result
 
+import com.emendo.expensestracker.core.model.data.exception.ActionableException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -20,5 +21,11 @@ fun <T> Flow<T>.asResult(isLocalOnly: Boolean = true): Flow<Result<T>> {
     // Todo pass Loading if needed from server some time.
     // Now it emits Empty, so the screen will be blank without loader flickering
     .onStart { if (!isLocalOnly) emit(Result.Loading) }
-    .catch { emit(Result.Error(it)) }
+    .catch { throwable ->
+      if (throwable is ActionableException) {
+        throw throwable
+      }
+
+      emit(Result.Error(throwable))
+    }
 }

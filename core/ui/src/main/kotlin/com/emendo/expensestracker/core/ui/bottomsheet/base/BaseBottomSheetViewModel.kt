@@ -2,14 +2,14 @@ package com.emendo.expensestracker.core.ui.bottomsheet.base
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
-import androidx.lifecycle.ViewModel
+import com.emendo.expensestracker.core.app.base.ui.BaseViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-abstract class BaseBottomSheetViewModel<BSType> : ViewModel() {
+abstract class BaseBottomSheetViewModel<BSType> : BaseViewModel() {
 
   private val _bottomSheetState = MutableStateFlow<BaseBottomSheetState<BSType?>>(BaseBottomSheetState())
   val bottomSheetState = _bottomSheetState.asStateFlow()

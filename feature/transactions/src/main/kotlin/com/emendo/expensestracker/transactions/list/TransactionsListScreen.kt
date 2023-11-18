@@ -20,9 +20,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
-import com.emendo.expensestracker.core.data.model.TransactionModel
-import com.emendo.expensestracker.core.data.model.TransactionTargetUiModel
-import com.emendo.expensestracker.core.data.model.TransactionType
+import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionTargetUiModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar

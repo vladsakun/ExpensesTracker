@@ -10,6 +10,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,8 +30,11 @@ class MainActivity : ComponentActivity() {
     // This also sets up the initial system bar style based on the platform theme
     enableEdgeToEdge()
 
+    viewModel.errorState.collectWhenStarted(this) {}
+
     setContent {
       val darkTheme = isSystemInDarkTheme()
+      val appUiState = viewModel.uiSState.collectAsStateWithLifecycle()
 
       // Update the dark content of the system bars to match the theme
       DisposableEffect(darkTheme) {
@@ -49,7 +54,11 @@ class MainActivity : ComponentActivity() {
       ExpensesTrackerTheme(
         darkTheme = darkTheme,
       ) {
-        ExpeApp(windowSizeClass = calculateWindowSizeClass(this))
+        ExpeApp(
+          windowSizeClass = calculateWindowSizeClass(this),
+          appUiState = appUiState::value,
+          appStateCommander = viewModel,
+        )
       }
     }
   }

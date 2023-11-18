@@ -2,10 +2,8 @@ package com.emendo.expensestracker.core.app.resources.models
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
-@Stable
 enum class ColorModel(
   val id: Int,
   val darkColor: Color,

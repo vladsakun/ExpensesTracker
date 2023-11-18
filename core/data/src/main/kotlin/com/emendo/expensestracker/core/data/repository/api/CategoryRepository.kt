@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.data.repository.api
 
-import com.emendo.expensestracker.core.data.model.CategoryModel
-import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
+import com.emendo.expensestracker.core.data.model.category.CategoryModel
+import com.emendo.expensestracker.core.data.model.category.CategoryWithTransactions
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {

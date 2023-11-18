@@ -1,12 +1,13 @@
 package com.emendo.expensestracker.categories.create
 
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.SavedStateHandle
+import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.model.CategoryModel
-import com.emendo.expensestracker.core.data.model.CategoryType
+import com.emendo.expensestracker.core.data.model.category.CategoryModel
+import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
@@ -21,6 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateCategoryViewModel @Inject constructor(
+  savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : BaseBottomSheetViewModel<BottomSheetType>() {
@@ -29,6 +31,8 @@ class CreateCategoryViewModel @Inject constructor(
   val state = _state.asStateFlow()
 
   private var createCategoryJob: Job? = null
+
+  private val categoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name] ?: CategoryType.EXPENSE
 
   fun changeTitle(newTitle: String) {
     _state.update {
@@ -52,13 +56,13 @@ class CreateCategoryViewModel @Inject constructor(
       return
     }
 
-    createCategoryJob = viewModelScope.launch(ioDispatcher) {
+    createCategoryJob = vmScope.launch(ioDispatcher) {
       categoryRepository.upsertCategory(
         CategoryModel(
           name = state.value.title,
           icon = state.value.icon,
           color = state.value.color,
-          type = CategoryType.EXPENSE,
+          type = categoryType,
         )
       )
       navigateUp()

@@ -1,9 +1,9 @@
 package com.emendo.expensestracker.core.data
 
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
-import com.emendo.expensestracker.core.model.data.EqualButtonState
-import com.emendo.expensestracker.core.model.data.MathOperation
-import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
+import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
+import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
+import com.emendo.expensestracker.core.model.data.keyboard.NumKeyboardNumber
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -19,7 +19,7 @@ class CalculatorInputImpl @Inject constructor(
       return amountFormatter.toBigDecimal(number1.toString())
     }
 
-  private var number1: StringBuilder = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
+  private var number1: StringBuilder = StringBuilder(DEFAULT_CALCULATOR_TEXT)
   private var number2: StringBuilder? = null
   private var mathOperation: MathOperation? = null
   private var doOnValueChange: (formattedValue: String, equalButtonState: EqualButtonState) -> Unit =
@@ -53,7 +53,7 @@ class CalculatorInputImpl @Inject constructor(
   private val numberToOperate: StringBuilder?
     get() = if (mathOperation == null) number1 else number2
 
-  override fun initCallbacks(callbacks: CalculatorInputCallbacks) {
+  override fun initCallbacks(callbacks: KeyboardCallbacks) {
     this.doOnValueChange = callbacks::doOnValueChange
   }
 
@@ -84,10 +84,10 @@ class CalculatorInputImpl @Inject constructor(
       }
 
       number1.isBlank() || number1.length == 1 -> {
-        number1 = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
+        number1 = StringBuilder(DEFAULT_CALCULATOR_TEXT)
       }
 
-      number1 != StringBuilder(DEFAULT_CALCULATOR_NUM_1) -> {
+      number1 != StringBuilder(DEFAULT_CALCULATOR_TEXT) -> {
         number1 = number1.deleteAt(number1.lastIndex)
       }
     }
@@ -129,12 +129,12 @@ class CalculatorInputImpl @Inject constructor(
   }
 
   override fun isEmpty() =
-    this.number1.toString() == DEFAULT_CALCULATOR_NUM_1 && mathOperation == null && number2 == null
+    this.number1.toString() == DEFAULT_CALCULATOR_TEXT && mathOperation == null && number2 == null
 
   override fun isNotEmpty() = !isEmpty()
 
   override fun clear() {
-    number1 = StringBuilder(DEFAULT_CALCULATOR_NUM_1)
+    number1 = StringBuilder(DEFAULT_CALCULATOR_TEXT)
     mathOperation = null
     number2 = null
     refreshValue()
@@ -149,7 +149,7 @@ class CalculatorInputImpl @Inject constructor(
   }
 
   private fun appendNum1(value: String) {
-    if (number1.toString() == DEFAULT_CALCULATOR_NUM_1) {
+    if (number1.toString() == DEFAULT_CALCULATOR_TEXT) {
       number1 = StringBuilder(value)
       refreshValue()
       return

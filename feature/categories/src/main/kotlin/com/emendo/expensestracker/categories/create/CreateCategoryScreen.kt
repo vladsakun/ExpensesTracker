@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeTextField
@@ -22,45 +23,43 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBo
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.StateFlow
 
 @Destination
 @Composable
 fun CreateCategoryRoute(
   navigator: DestinationsNavigator,
+  @Suppress("UNUSED_PARAMETER") categoryType: CategoryType, // retrieved in VM via SavedStateHandle
   viewModel: CreateCategoryViewModel = hiltViewModel(),
 ) {
+  val uiState = viewModel.state.collectAsStateWithLifecycle()
+
   BaseScreenWithModalBottomSheetWithViewModel(
     viewModel = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    content = {
-      CreateCategoryContent(
-        stateFlow = viewModel.state,
-        onNavigationClick = navigator::navigateUp,
-        onTitleChanged = viewModel::changeTitle,
-        onIconSelectClick = viewModel::showIconBottomSheet,
-        onColorSelectClick = viewModel::showColorBottomSheet,
-        onCreateCategoryClick = viewModel::createCategory,
-      )
-    },
-    bottomSheetContent = { type, hideBottomSheet ->
-      BottomSheetContent(type, hideBottomSheet)
-    },
-  )
+    bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
+  ) {
+    CreateCategoryContent(
+      stateProvider = uiState::value,
+      onNavigationClick = navigator::navigateUp,
+      onTitleChanged = viewModel::changeTitle,
+      onIconSelectClick = viewModel::showIconBottomSheet,
+      onColorSelectClick = viewModel::showColorBottomSheet,
+      onCreateCategoryClick = viewModel::createCategory,
+    )
+  }
 }
 
 @Composable
 private fun CreateCategoryContent(
-  stateFlow: StateFlow<CreateCategoryScreenData>,
+  stateProvider: () -> CreateCategoryScreenData,
   onNavigationClick: () -> Unit,
   onTitleChanged: (String) -> Unit,
   onIconSelectClick: () -> Unit,
   onColorSelectClick: () -> Unit,
   onCreateCategoryClick: () -> Unit,
 ) {
-  val state = stateFlow.collectAsStateWithLifecycle()
   val scrollState = rememberScrollState()
-  val isCreateButtonEnabled = remember { derivedStateOf { state.value.isCreateButtonEnabled } }
+  val isCreateButtonEnabled = remember { derivedStateOf { stateProvider().isCreateButtonEnabled } }
 
   ExpeScaffoldWithTopBar(
     titleResId = R.string.create_category,
@@ -77,17 +76,17 @@ private fun CreateCategoryContent(
     ) {
       ExpeTextField(
         label = "Title",
-        text = state.value.title,
+        text = stateProvider().title,
         onValueChange = onTitleChanged,
       )
       SelectRowWithIcon(
         labelResId = R.string.icon,
-        imageVectorProvider = { state.value.icon.imageVector },
+        imageVectorProvider = { stateProvider().icon.imageVector },
         onClick = onIconSelectClick,
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { state.value.color.darkColor },
+        colorProvider = { stateProvider().color.darkColor },
         onClick = onColorSelectClick,
       )
       ExpeButton(

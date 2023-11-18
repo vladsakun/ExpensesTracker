@@ -14,7 +14,10 @@ fun ExpeAlertDialog(
   onAlertDialogDismissRequest: () -> Unit,
   onCloseClick: () -> Unit,
   onConfirmClick: () -> Unit,
-  content: @Composable () -> Unit,
+  title: String? = null,
+  confirmActionText: String? = null,
+  dismissActionText: String? = null,
+  content: @Composable BoxScope.() -> Unit,
 ) {
   AlertDialog(onDismissRequest = onAlertDialogDismissRequest) {
     Surface(
@@ -26,13 +29,15 @@ fun ExpeAlertDialog(
         modifier = Modifier
           .padding(vertical = Dimens.margin_large_xxx)
       ) {
-        Text(
-          text = "Select Account",
-          style = MaterialTheme.typography.headlineSmall,
-          modifier = Modifier
-            .padding(horizontal = Dimens.margin_large_xxx)
-            .padding(bottom = Dimens.margin_large_x)
-        )
+        title?.let {
+          Text(
+            text = it,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier
+              .padding(horizontal = Dimens.margin_large_xxx)
+              .padding(bottom = Dimens.margin_large_x)
+          )
+        }
         Box(
           modifier = Modifier
             .heightIn(max = screenHeightDp / 2)
@@ -40,13 +45,19 @@ fun ExpeAlertDialog(
         ) {
           content()
         }
-        Box(modifier = Modifier.align(Alignment.End)) {
-          FlowRow(horizontalArrangement = Arrangement.End) {
-            TextButton(onClick = onCloseClick) {
-              Text("Close")
-            }
-            TextButton(onClick = onConfirmClick) {
-              Text("Confirm")
+        if (confirmActionText != null || dismissActionText != null) {
+          Box(modifier = Modifier.align(Alignment.End)) {
+            FlowRow(horizontalArrangement = Arrangement.End) {
+              dismissActionText?.let {
+                TextButton(onClick = onCloseClick) {
+                  Text(it)
+                }
+              }
+              confirmActionText?.let {
+                TextButton(onClick = onConfirmClick) {
+                  Text(it)
+                }
+              }
             }
           }
         }

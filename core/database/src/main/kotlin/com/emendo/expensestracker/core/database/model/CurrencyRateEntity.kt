@@ -9,5 +9,5 @@ import java.math.BigDecimal
 data class CurrencyRateEntity(
   @PrimaryKey
   val currencyCode: String,
-  val rate: BigDecimal,
+  val rate: BigDecimal? = null,
 )

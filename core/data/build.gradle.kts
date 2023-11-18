@@ -1,6 +1,5 @@
 plugins {
   id("expensestracker.android.library")
-  id("expensestracker.android.library.compose")
   id("expensestracker.android.hilt")
 }
 
@@ -10,6 +9,7 @@ android {
 
 dependencies {
   api(project(":core:app-resources"))
+  implementation(project(":core:app-base-ui"))
   implementation(project(":core:common"))
   implementation(project(":core:database"))
   implementation(project(":core:datastore"))
@@ -20,5 +20,4 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.datetime)
   implementation(libs.kotlinx.serialization.json)
-  implementation(libs.androidx.compose.material3)
 }

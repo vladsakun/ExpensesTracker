@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.transactions.list
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.core.app.base.ui.BaseViewModel
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.repository.api.TransactionsRepository
@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionsScreenViewModel @Inject constructor(
   transactionsRepository: TransactionsRepository,
-) : ViewModel() {
+) : BaseViewModel() {
 
   val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionsRepository)
     .stateIn(

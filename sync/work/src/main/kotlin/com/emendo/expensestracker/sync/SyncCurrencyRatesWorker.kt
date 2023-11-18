@@ -2,15 +2,17 @@ package com.emendo.expensestracker.sync
 
 import android.content.Context
 import androidx.tracing.traceAsync
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkerParameters
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.data.Synchronizer
-import com.emendo.expensestracker.core.data.repository.api.CurrencyRatesRepository
+import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepository
 import com.emendo.expensestracker.core.datastore.ChangeListVersions
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
 import com.emendo.expensestracker.sync.initializers.SyncConstraints
-import com.emendo.expensestracker.sync.initializers.syncForegroundInfo
 import com.emendo.expensestracker.sync.workers.DelegatingWorker
 import com.emendo.expensestracker.sync.workers.delegatedData
 import dagger.assisted.Assisted
@@ -26,18 +28,15 @@ import java.util.concurrent.TimeUnit
 class SyncCurrencyRatesWorker @AssistedInject constructor(
   @Assisted private val appContext: Context,
   @Assisted workerParams: WorkerParameters,
-  private val currencyRatesRepository: CurrencyRatesRepository,
+  private val currencyRateRepository: CurrencyRateRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   private val expePreferencesDataStore: ExpePreferencesDataStore,
 ) : CoroutineWorker(appContext, workerParams), Synchronizer {
 
-  override suspend fun getForegroundInfo(): ForegroundInfo =
-    appContext.syncForegroundInfo()
-
   override suspend fun doWork(): Result = withContext(ioDispatcher) {
     traceAsync("Sync", 0) {
       val syncedSuccessfully = awaitAll(
-        async { currencyRatesRepository.sync() },
+        async { currencyRateRepository.sync() },
       ).all { it }
 
       if (syncedSuccessfully) {
@@ -74,7 +73,6 @@ class SyncCurrencyRatesWorker @AssistedInject constructor(
 
       return PeriodicWorkRequestBuilder<DelegatingWorker>(24, TimeUnit.HOURS)
         .setInitialDelay(minutes, TimeUnit.MINUTES)
-        // Todo check expedited
         .setConstraints(SyncConstraints)
         .setInputData(SyncCurrencyRatesWorker::class.delegatedData())
         .build()

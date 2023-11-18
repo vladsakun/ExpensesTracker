@@ -41,6 +41,5 @@ class RetrofitCurrencyRatesNetwork @Inject constructor(
     .build()
     .create(RetrofitCurrencyNetworkApi::class.java)
 
-  override suspend fun getCurrencyRates(): CurrencyRates =
-    networkApi.getCurrencyRates()
+  override suspend fun getCurrencyRates(): CurrencyRates = networkApi.getCurrencyRates()
 }

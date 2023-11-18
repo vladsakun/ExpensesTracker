@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.transactions.list
 
-import com.emendo.expensestracker.core.data.model.TransactionModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface TransactionScreenUiState {

@@ -49,6 +49,8 @@ dependencies {
   implementation(project(":core:data"))
   implementation(project(":core:model"))
   implementation(project(":core:designsystem"))
+  implementation(project(":core:app-base-ui"))
+  implementation(project(":core:ui"))
 
   implementation(project(":sync:work"))
 

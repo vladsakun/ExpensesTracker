@@ -17,6 +17,7 @@ object DatabaseModule {
   fun providesExpDatabase(
     @ApplicationContext context: Context,
   ): ExpDatabase = Room
-    .databaseBuilder(context, ExpDatabase::class.java, "expe-database")
+    .databaseBuilder(context, ExpDatabase::class.java, "expe-database.db")
+    .createFromAsset("database/expe-database.db")
     .build()
 }

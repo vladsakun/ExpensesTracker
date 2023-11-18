@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun ExpeScaffold(
@@ -42,6 +43,7 @@ fun ExpeScaffoldWithTopBar(
   @StringRes titleResId: Int,
   onNavigationClick: () -> Unit,
   modifier: Modifier = Modifier,
+  actions: ImmutableList<MenuAction>? = null,
   snackbarHost: @Composable () -> Unit = {},
   floatingActionButton: @Composable () -> Unit = {},
   floatingActionButtonPosition: FabPosition = FabPosition.End,
@@ -57,6 +59,7 @@ fun ExpeScaffoldWithTopBar(
         titleRes = titleResId,
         onNavigationBackClick = onNavigationClick,
         scrollBehavior = topAppBarScrollBehavior,
+        actions = actions,
       )
     },
     modifier = modifier
@@ -75,6 +78,7 @@ fun ExpeScaffoldWithTopBar(
 fun ExpeScaffoldWithTopBar(
   @StringRes titleResId: Int,
   modifier: Modifier = Modifier,
+  actions: ImmutableList<MenuAction>? = null,
   snackbarHost: @Composable () -> Unit = {},
   floatingActionButton: @Composable () -> Unit = {},
   floatingActionButtonPosition: FabPosition = FabPosition.End,
@@ -89,6 +93,7 @@ fun ExpeScaffoldWithTopBar(
       ExpeTopBar(
         titleRes = titleResId,
         scrollBehavior = topAppBarScrollBehavior,
+        actions = actions,
       )
     },
     modifier = modifier

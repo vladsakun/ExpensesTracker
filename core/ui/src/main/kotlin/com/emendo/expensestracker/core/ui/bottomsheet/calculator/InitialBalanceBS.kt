@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,10 +20,14 @@ import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.model.data.EqualButtonState
-import com.emendo.expensestracker.core.model.data.InitialBalanceKeyboardActions
-import com.emendo.expensestracker.core.model.data.MathOperation
-import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
+import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
+import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
+import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardActions
+
+@Stable
+interface InitialBalanceKeyboardActions : NumericKeyboardActions {
+  fun onChangeSignClick()
+}
 
 @Composable
 fun InitialBalanceBS(
@@ -39,7 +44,7 @@ fun InitialBalanceBS(
       .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
     verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
   ) {
-    Row { ResultText(text) }
+    Row { ResultText(text::value) }
     val mathOperationModifier = Modifier
       .weight(MATH_OPERATION_WEIGHT)
       .applyKeyboardPadding()
@@ -86,44 +91,49 @@ fun InitialBalanceBS(
         )
       }
       MathOperationButton(
-        initialBalanceActions = actions,
-        mathOperation = MathOperation.Add(),
+        onClick = { actions.onMathOperationClick(MathOperation.Add()) },
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.add),
         imageVector = ExpeIcons.Add,
       )
     }
     CalculatorRow {
-      DigitButton(actions, NumKeyboardNumber.Seven(), digitModifier)
-      DigitButton(actions, NumKeyboardNumber.Eight(), digitModifier)
-      DigitButton(actions, NumKeyboardNumber.Nine(), digitModifier)
+      keyboardRows[0].forEach { number ->
+        DigitButton(
+          onClick = { actions.onNumberClick(number) },
+          text = number.number.toString(),
+        )
+      }
       MathOperationButton(
-        initialBalanceActions = actions,
-        mathOperation = MathOperation.Substract(),
+        onClick = { actions.onMathOperationClick(MathOperation.Substract()) },
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.substract),
         imageVector = ExpeIcons.Remove,
       )
     }
     CalculatorRow {
-      DigitButton(actions, NumKeyboardNumber.Four(), digitModifier)
-      DigitButton(actions, NumKeyboardNumber.Five(), digitModifier)
-      DigitButton(actions, NumKeyboardNumber.Six(), digitModifier)
+      keyboardRows[1].forEach { number ->
+        DigitButton(
+          onClick = { actions.onNumberClick(number) },
+          text = number.number.toString(),
+        )
+      }
       MathOperationButton(
-        initialBalanceActions = actions,
-        mathOperation = MathOperation.Multiply(),
+        onClick = { actions.onMathOperationClick(MathOperation.Multiply()) },
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.multiply),
         imageVector = ExpeIcons.Close,
       )
     }
     CalculatorRow {
-      DigitButton(actions, NumKeyboardNumber.One(), digitModifier)
-      DigitButton(actions, NumKeyboardNumber.Two(), digitModifier)
-      DigitButton(actions, NumKeyboardNumber.Three(), digitModifier)
+      keyboardRows[2].forEach { number ->
+        DigitButton(
+          onClick = { actions.onNumberClick(number) },
+          text = number.number.toString(),
+        )
+      }
       MathOperationButton(
-        initialBalanceActions = actions,
-        mathOperation = MathOperation.Divide(),
+        onClick = { actions.onMathOperationClick(MathOperation.Divide()) },
         modifier = mathOperationModifier,
         contentDescription = stringResource(R.string.divide),
         imageVector = ImageVector.vectorResource(R.drawable.division),
@@ -142,8 +152,21 @@ fun InitialBalanceBS(
           textAlign = TextAlign.Center,
         )
       }
-      DigitButton(actions, NumKeyboardNumber.Zero(), digitModifier)
-      DoneButton(equalButtonState, actions)
+      keyboardRows[3].forEach { number ->
+        DigitButton(
+          onClick = { actions.onNumberClick(number) },
+          text = number.number.toString(),
+        )
+      }
+      DoneButton(
+        equalButtonStateProvider = equalButtonState::value,
+        onClick = {
+          when (equalButtonState.value) {
+            EqualButtonState.Done -> actions.onDoneClick()
+            EqualButtonState.Equal -> actions.onEqualClick()
+          }
+        },
+      )
     }
   }
 }

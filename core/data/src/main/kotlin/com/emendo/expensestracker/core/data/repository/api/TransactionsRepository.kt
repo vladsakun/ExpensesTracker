@@ -1,8 +1,8 @@
 package com.emendo.expensestracker.core.data.repository.api
 
-import com.emendo.expensestracker.core.data.model.TransactionModel
-import com.emendo.expensestracker.core.data.model.TransactionSource
-import com.emendo.expensestracker.core.data.model.TransactionTarget
+import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
+import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal

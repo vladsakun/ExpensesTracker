@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 fun <BSType> BaseScreenWithModalBottomSheetWithViewModel(
   viewModel: BaseBottomSheetViewModel<BSType>,
   onNavigateUpClick: () -> Unit,
-  content: @Composable () -> Unit,
   bottomSheetContent: @Composable (bottomSheetType: BSType?, hideBottomSheet: () -> Unit) -> Unit,
+  content: @Composable () -> Unit,
 ) {
   BaseScreenWithModalBottomSheet(
     bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle(),

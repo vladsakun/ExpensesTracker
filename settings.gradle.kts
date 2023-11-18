@@ -19,6 +19,8 @@ dependencyResolutionManagement {
 rootProject.name = "expensestracker"
 include(":app")
 include(":core:app-resources")
+include(":core:app-base")
+include(":core:app-base-ui")
 include(":core:data")
 include(":core:common")
 include(":core:domain")

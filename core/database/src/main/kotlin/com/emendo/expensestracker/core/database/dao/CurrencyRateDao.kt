@@ -15,14 +15,20 @@ abstract class CurrencyRateDao : BaseDao<CurrencyRateEntity>() {
   @Query("SELECT * FROM $TABLE_NAME")
   abstract override fun getAll(): Flow<List<CurrencyRateEntity>>
 
-  @Query("SELECT * FROM $TABLE_NAME")
-  abstract suspend fun retrieveAll(): List<CurrencyRateEntity>
+  @Query("SELECT currencyCode FROM $TABLE_NAME")
+  abstract fun getCurrencyCodes(): Flow<List<String>>
 
   @Query("SELECT currencyCode FROM $TABLE_NAME")
   abstract suspend fun retrieveAllCurrencyCodes(): List<String>
 
+  @Query("SELECT * FROM $TABLE_NAME WHERE $PRIMARY_KEY = :currencyCode")
+  abstract suspend fun retrieveCurrencyRate(currencyCode: String): CurrencyRateEntity
+
+  @Query("SELECT * FROM $TABLE_NAME")
+  abstract suspend fun retrieveAllCurrencyRates(): List<CurrencyRateEntity>
+
   @Query("SELECT rate FROM $TABLE_NAME WHERE $PRIMARY_KEY = :currencyCode")
-  abstract suspend fun getRate(currencyCode: String): BigDecimal
+  abstract suspend fun getRate(currencyCode: String): BigDecimal?
 
   @Query("SELECT (SELECT COUNT(*) FROM $TABLE_NAME) == 0")
   abstract suspend fun isEmpty(): Boolean

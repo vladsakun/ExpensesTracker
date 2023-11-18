@@ -67,8 +67,9 @@ class ExpePreferencesDataStore @Inject constructor(
 
   suspend fun getChangeListVersions() = userPreferences.data
     .map {
+      val instant = it.getCurrencyRatesChangeInstant()
       ChangeListVersions(
-        currencyRatesLastUpdateInstant = Instant.fromEpochSeconds(it.currencyRatesChangeListInstantSeconds),
+        currencyRatesLastUpdateInstant = instant
       )
     }
     .firstOrNull() ?: ChangeListVersions()
@@ -81,16 +82,25 @@ class ExpePreferencesDataStore @Inject constructor(
       userPreferences.updateData { currentPreferences ->
         val updatedChangeListVersions = update(
           ChangeListVersions(
-            currencyRatesLastUpdateInstant = Instant.fromEpochSeconds(currentPreferences.currencyRatesChangeListInstantSeconds),
+            currencyRatesLastUpdateInstant = currentPreferences.getCurrencyRatesChangeInstant(),
           ),
         )
 
         currentPreferences.copy {
-          currencyRatesChangeListInstantSeconds = updatedChangeListVersions.currencyRatesLastUpdateInstant.epochSeconds
+          currencyRatesChangeListInstantSeconds =
+            updatedChangeListVersions.currencyRatesLastUpdateInstant?.epochSeconds ?: 0L
         }
       }
     } catch (ioException: IOException) {
       Timber.e(ioException, "Failed to update user preferences")
     }
+  }
+
+  private fun UserPreferences.getCurrencyRatesChangeInstant(): Instant? {
+    if (currencyRatesChangeListInstantSeconds == 0L) {
+      return null
+    }
+
+    return Instant.fromEpochSeconds(currencyRatesChangeListInstantSeconds)
   }
 }

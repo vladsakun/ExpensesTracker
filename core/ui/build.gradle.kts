@@ -26,6 +26,7 @@ dependencies {
   implementation(project(":core:designsystem"))
   implementation(project(":core:domain"))
   implementation(project(":core:model"))
+  implementation(project(":core:app-base-ui"))
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.ktx)
   implementation(libs.coil.kt)

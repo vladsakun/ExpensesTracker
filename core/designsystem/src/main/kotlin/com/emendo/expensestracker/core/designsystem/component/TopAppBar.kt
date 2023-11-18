@@ -7,12 +7,13 @@ import androidx.annotation.StringRes
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,10 +21,8 @@ fun ExpeTopBar(
   @StringRes titleRes: Int,
   modifier: Modifier = Modifier,
   navigationIcon: @Composable () -> Unit,
-  actionIcon: ImageVector? = null,
-  actionIconContentDescription: String? = null,
+  actions: ImmutableList<MenuAction>? = null,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
-  onActionClick: () -> Unit = {},
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
   LargeTopAppBar(
@@ -36,11 +35,11 @@ fun ExpeTopBar(
     },
     navigationIcon = navigationIcon,
     actions = {
-      actionIcon?.let {
-        IconButton(onClick = onActionClick) {
+      actions?.forEach { action ->
+        IconButton(onClick = action.onClick) {
           Icon(
-            imageVector = it,
-            contentDescription = actionIconContentDescription,
+            imageVector = action.icon,
+            contentDescription = action.text,
             tint = MaterialTheme.colorScheme.onSurface,
           )
         }
@@ -59,17 +58,13 @@ fun ExpeTopBar(
 @Composable
 fun ExpeTopBar(
   @StringRes titleRes: Int,
-  actionIcon: ImageVector,
-  actionIconContentDescription: String,
+  actions: ImmutableList<MenuAction>,
   modifier: Modifier = Modifier,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
-  onActionClick: () -> Unit = {},
 ) {
   ExpeTopBar(
     titleRes = titleRes,
-    actionIcon = actionIcon,
-    actionIconContentDescription = actionIconContentDescription,
-    onActionClick = onActionClick,
+    actions = actions,
     colors = colors,
     modifier = modifier,
     navigationIcon = {},
@@ -86,6 +81,7 @@ fun ExpeTopBar(
   modifier: Modifier = Modifier,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
+  actions: ImmutableList<MenuAction>? = null,
 ) {
   ExpeTopBar(
     titleRes = titleRes,
@@ -93,6 +89,7 @@ fun ExpeTopBar(
     modifier = modifier,
     scrollBehavior = scrollBehavior,
     navigationIcon = {},
+    actions = actions,
   )
 }
 
@@ -107,6 +104,7 @@ fun ExpeTopBar(
   modifier: Modifier = Modifier,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
+  actions: ImmutableList<MenuAction>? = null,
 ) {
   ExpeTopBar(
     titleRes = titleRes,
@@ -114,6 +112,7 @@ fun ExpeTopBar(
     modifier = modifier,
     scrollBehavior = scrollBehavior,
     navigationIcon = { NavigationBackIcon(onNavigationClick = onNavigationBackClick) },
+    actions = actions,
   )
 }
 
@@ -140,8 +139,13 @@ fun NavigationBackIcon(
 private fun NiaTopBarPreview() {
   ExpeTopBar(
     titleRes = R.string.untitled,
+    actions = persistentListOf(
+      MenuAction(
+        icon = ExpeIcons.Add,
+        text = "Action icon",
+        onClick = {}
+      )
+    ),
     navigationIcon = {},
-    actionIcon = ExpeIcons.Add,
-    actionIconContentDescription = "Action icon",
   )
 }

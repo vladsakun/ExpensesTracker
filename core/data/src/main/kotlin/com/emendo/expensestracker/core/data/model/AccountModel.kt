@@ -3,6 +3,8 @@ package com.emendo.expensestracker.core.data.model
 import com.emendo.expensestracker.core.app.resources.models.CalculatorTransactionUiModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
+import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import java.math.BigDecimal

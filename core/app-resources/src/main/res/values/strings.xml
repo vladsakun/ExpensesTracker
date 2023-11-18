@@ -12,6 +12,7 @@
   <!--General-->
 
   <string name="expense">Expense</string>
+  <string name="income">Income</string>
   <string name="substract">Subtract</string>
   <string name="multiply">Multiply</string>
   <string name="divide">Divide</string>

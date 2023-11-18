@@ -33,8 +33,6 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @Destination
 @Composable
@@ -43,13 +41,14 @@ fun CreateAccountRoute(
   viewModel: CreateAccountViewModel = hiltViewModel(),
 ) {
   val onAccountNameChange = remember { { model: String -> viewModel.setAccountName(model) } }
+  val state = viewModel.state.collectAsStateWithLifecycle()
 
   BaseScreenWithModalBottomSheetWithViewModel(
     viewModel = viewModel,
     onNavigateUpClick = navigator::navigateUp,
     content = {
       CreateAccountContent(
-        stateFlow = viewModel.state,
+        stateProvider = state::value,
         onAccountNameChange = onAccountNameChange,
         onCreateAccountClick = viewModel::createNewAccount,
         onNavigationClick = navigator::navigateUp,
@@ -67,7 +66,7 @@ fun CreateAccountRoute(
 
 @Composable
 private fun CreateAccountContent(
-  stateFlow: StateFlow<CreateAccountScreenData>,
+  stateProvider: () -> CreateAccountScreenData,
   onNavigationClick: () -> Unit,
   onAccountNameChange: (model: String) -> Unit,
   onIconRowClick: () -> Unit,
@@ -76,8 +75,7 @@ private fun CreateAccountContent(
   onCurrencyRowClick: () -> Unit,
   onCreateAccountClick: () -> Unit,
 ) {
-  val state = stateFlow.collectAsStateWithLifecycle()
-  val isCreateButtonEnabled = remember { derivedStateOf { state.value.isCreateAccountButtonEnabled } }
+  val isCreateButtonEnabled = remember { derivedStateOf { stateProvider().isCreateAccountButtonEnabled } }
   val scrollState = rememberScrollState()
   val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
 
@@ -96,17 +94,17 @@ private fun CreateAccountContent(
     ) {
       ExpeTextField(
         label = stringResource(id = R.string.account_name),
-        text = state.value.accountName,
+        text = stateProvider().accountName,
         onValueChange = onAccountNameChange,
       )
       SelectRowWithIcon(
         labelResId = R.string.icon,
-        imageVectorProvider = { state.value.icon.imageVector },
+        imageVectorProvider = { stateProvider().icon.imageVector },
         onClick = onIconRowClick,
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { state.value.color.darkColor },
+        colorProvider = { stateProvider().color.darkColor },
         onClick = onColorRowClick,
       )
       //       Todo ask Anton
@@ -117,7 +115,7 @@ private fun CreateAccountContent(
         labelModifier = labelModifier,
         endLayout = {
           Text(
-            text = state.value.initialBalance,
+            text = stateProvider().initialBalance,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -131,7 +129,7 @@ private fun CreateAccountContent(
         labelModifier = labelModifier,
         endLayout = {
           Text(
-            text = state.value.currency.currencySymbolOrCode,
+            text = stateProvider().currency.currencySymbolOrCode,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -141,7 +139,7 @@ private fun CreateAccountContent(
       )
       ExpeButton(
         textResId = R.string.create,
-        onClick = { onCreateAccountClick() },
+        onClick = onCreateAccountClick,
         enabled = isCreateButtonEnabled.value,
       )
     }
@@ -206,11 +204,9 @@ private fun BottomSheetContent(
 private fun CreateAccountScreenPreview(
   @PreviewParameter(CreateAccountPreviewData::class) previewData: CreateAccountScreenData,
 ) {
-  val state = MutableStateFlow(previewData)
-
   ExpensesTrackerTheme {
     CreateAccountContent(
-      stateFlow = state,
+      stateProvider = { previewData },
       onAccountNameChange = {},
       onCreateAccountClick = {},
       onNavigationClick = {},

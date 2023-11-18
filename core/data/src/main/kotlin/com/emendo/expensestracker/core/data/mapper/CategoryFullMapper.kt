@@ -1,28 +1,28 @@
 package com.emendo.expensestracker.core.data.mapper
 
-import com.emendo.expensestracker.core.data.model.CategoryTransactionModel
-import com.emendo.expensestracker.core.data.model.CategoryWithTransactions
-import com.emendo.expensestracker.core.data.model.asExternalModel
-import com.emendo.expensestracker.core.data.repository.api.CurrencyRepository
+import com.emendo.expensestracker.core.data.mapper.base.Mapper
+import com.emendo.expensestracker.core.data.model.category.CategoryTransactionModel
+import com.emendo.expensestracker.core.data.model.category.CategoryWithTransactions
+import com.emendo.expensestracker.core.data.model.category.asExternalModel
 import com.emendo.expensestracker.core.database.model.CategoryFull
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import javax.inject.Inject
 
 class CategoryFullMapper @Inject constructor(
-  private val currencyRepository: CurrencyRepository,
+  private val currencyMapper: CurrencyMapper,
 ) : Mapper<CategoryFull, CategoryWithTransactions> {
 
   override suspend fun map(from: CategoryFull): CategoryWithTransactions = with(from) {
     return CategoryWithTransactions(
       categoryModel = category.asExternalModel(),
-      transactions = transactions.map(::toCategoryTransactionModel),
+      transactions = transactions.map { toCategoryTransactionModel(it) },
     )
   }
 
-  private fun toCategoryTransactionModel(entity: TransactionEntity) =
+  private suspend fun toCategoryTransactionModel(entity: TransactionEntity) =
     CategoryTransactionModel(
       id = entity.id,
       value = entity.value,
-      currencyModel = currencyRepository.findCurrencyModel(entity.currencyCode),
+      currencyModel = currencyMapper.map(entity.currencyCode),
     )
 }

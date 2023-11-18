@@ -1,16 +1,20 @@
 package com.emendo.expensestracker.core.data.manager
 
-import com.emendo.expensestracker.core.data.repository.api.CurrencyRatesRepository
-import com.emendo.expensestracker.core.data.repository.api.CurrencyRepository
+import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
+import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepository
 import javax.inject.Inject
 
 class AppInitManagerImpl @Inject constructor(
-  private val currencyRatesRepository: CurrencyRatesRepository,
-  private val currencyRepository: CurrencyRepository,
+  private val currencyRateRepository: CurrencyRateRepository,
+  private val currencyCacheManager: CurrencyCacheManager,
 ) : AppInitManager {
 
   override suspend fun init() {
-    val currencyCodes = currencyRatesRepository.populateCurrencyRatesIfEmpty()
-    currencyRepository.initCurrenciesMap(currencyCodes)
+    initCurrency()
+  }
+
+  private suspend fun initCurrency() {
+    currencyRateRepository.populateCurrencyRatesIfEmpty()
+    currencyCacheManager.startCaching()
   }
 }

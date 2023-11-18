@@ -7,15 +7,19 @@ import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.CalculatorInput
-import com.emendo.expensestracker.core.data.CalculatorInputCallbacks
-import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_NUM_1
+import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_TEXT
+import com.emendo.expensestracker.core.data.KeyboardCallbacks
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
+import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.repository.api.AccountsRepository
-import com.emendo.expensestracker.core.data.repository.api.CurrencyRepository
-import com.emendo.expensestracker.core.model.data.*
+import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
+import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
+import com.emendo.expensestracker.core.model.data.keyboard.NumKeyboardNumber
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceKeyboardActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,24 +36,24 @@ class CreateAccountViewModel @Inject constructor(
   private val accountsRepository: AccountsRepository,
   private val amountFormatter: AmountFormatter,
   private val calculatorInput: CalculatorInput,
-  private val currencyRepository: CurrencyRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+  private val currencyCacheManager: CurrencyCacheManager,
 ) : BaseBottomSheetViewModel<BottomSheetType>(),
     // Todo extract to commons
     InitialBalanceKeyboardActions,
-    CalculatorInputCallbacks {
+    KeyboardCallbacks {
 
   //Todo maybe allow screen state with nullable currency
   private val _state = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
-      currency = checkNotNull(currencyRepository.getLastGeneralCurrency()) { "General currency is not set" }
+      currency = currencyCacheManager.getGeneralCurrencySnapshot()
     )
   )
 
   val state = _state.asStateFlow()
 
   private val equalButtonState = MutableStateFlow(EqualButtonState.Default)
-  private val initialBalanceState = MutableStateFlow(DEFAULT_CALCULATOR_NUM_1)
+  private val initialBalanceState = MutableStateFlow(DEFAULT_CALCULATOR_TEXT)
 
   private var createAccountJob: Job? = null
 
@@ -162,7 +166,7 @@ class CreateAccountViewModel @Inject constructor(
       BottomSheetType.Currency(
         selectedCurrency = state.value.currency,
         onSelectCurrency = ::setCurrency,
-        currencies = currencyRepository.currenciesList.values.toImmutableList(),
+        currencies = currencyCacheManager.getCurrenciesBlocking().values.toImmutableList(),
       )
     )
   }

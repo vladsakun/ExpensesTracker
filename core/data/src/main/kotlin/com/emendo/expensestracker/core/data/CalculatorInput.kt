@@ -1,16 +1,16 @@
 package com.emendo.expensestracker.core.data
 
-import com.emendo.expensestracker.core.model.data.EqualButtonState
-import com.emendo.expensestracker.core.model.data.MathOperation
-import com.emendo.expensestracker.core.model.data.NumKeyboardNumber
+import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
+import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
+import com.emendo.expensestracker.core.model.data.keyboard.NumKeyboardNumber
 import java.math.BigDecimal
 
-const val DEFAULT_CALCULATOR_NUM_1 = "0"
+const val DEFAULT_CALCULATOR_TEXT = "0"
 
 interface CalculatorInput {
   val currentValue: BigDecimal
 
-  fun initCallbacks(callbacks: CalculatorInputCallbacks)
+  fun initCallbacks(callbacks: KeyboardCallbacks)
   fun input(mathOperation: MathOperation)
   fun input(number: NumKeyboardNumber)
   fun onPrecisionClick()
@@ -28,6 +28,6 @@ interface CalculatorInput {
   fun clear()
 }
 
-interface CalculatorInputCallbacks {
+interface KeyboardCallbacks {
   fun doOnValueChange(formattedValue: String, equalButtonState: EqualButtonState)
 }

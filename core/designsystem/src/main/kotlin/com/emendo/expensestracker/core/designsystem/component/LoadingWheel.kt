@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.emendo.expensestracker.core.app.resources.R
 import kotlinx.coroutines.launch
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 fun ExpLoadingWheel(
   modifier: Modifier = Modifier,
   contentDesc: String = stringResource(id = R.string.loading),
+  wheelSize: Dp = 48.dp,
 ) {
   val infiniteTransition = rememberInfiniteTransition(label = "Loading")
 
@@ -84,7 +86,7 @@ fun ExpLoadingWheel(
   // Draws out the LoadingWheel Canvas composable and sets the animations
   Canvas(
     modifier = modifier
-      .size(48.dp)
+      .size(wheelSize)
       .padding(8.dp)
       .graphicsLayer { rotationZ = rotationAnim }
       .semantics { contentDescription = contentDesc }
@@ -110,16 +112,19 @@ fun ExpLoadingWheel(
 fun ExpOverlayLoadingWheel(
   contentDesc: String,
   modifier: Modifier = Modifier,
+  size: Dp = 60.dp,
+  wheelSize: Dp = 48.dp,
 ) {
   Surface(
     shape = RoundedCornerShape(60.dp),
     shadowElevation = 8.dp,
     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.83f),
     modifier = modifier
-      .size(60.dp)
+      .size(size)
   ) {
     ExpLoadingWheel(
       contentDesc = contentDesc,
+      wheelSize = wheelSize,
     )
   }
 }

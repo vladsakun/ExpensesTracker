@@ -11,9 +11,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.emendo.expensestracker.AppStateCommander
+import com.emendo.expensestracker.MainActivityUiState
+import com.emendo.expensestracker.core.designsystem.component.ExpeAlertDialog
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
+import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.ui.dialog.LoadingDialog
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 
@@ -21,6 +26,8 @@ import com.emendo.expensestracker.navigation.TopLevelDestination
 @Composable
 fun ExpeApp(
   windowSizeClass: WindowSizeClass,
+  appUiState: () -> MainActivityUiState?,
+  appStateCommander: AppStateCommander,
   appState: ExpeAppState = rememberExpeAppState(windowSizeClass = windowSizeClass),
 ) {
   ExpeScaffold(
@@ -47,6 +54,33 @@ fun ExpeApp(
           return@ExpeNavHost true
         }
       )
+
+      when (val state = appUiState()) {
+        is MainActivityUiState.Loading -> LoadingDialog()
+        is MainActivityUiState.ErrorDialog -> ErrorDialog(state, appStateCommander)
+        else -> {}
+      }
+    }
+  }
+}
+
+@Composable
+fun ErrorDialog(
+  state: MainActivityUiState.ErrorDialog,
+  commander: AppStateCommander,
+) {
+  ExpeAlertDialog(
+    onAlertDialogDismissRequest = commander::onAlertDialogDismissRequest,
+    onCloseClick = commander::onNegativeActionClick,
+    onConfirmClick = commander::onPositiveActionClick,
+    title = state.error.title,
+    confirmActionText = state.error.positiveAction.text,
+    dismissActionText = state.error.negativeAction.text,
+  ) {
+    Column(
+      modifier = Modifier.padding(horizontal = Dimens.margin_large_xxx)
+    ) {
+      Text(text = state.error.message)
     }
   }
 }

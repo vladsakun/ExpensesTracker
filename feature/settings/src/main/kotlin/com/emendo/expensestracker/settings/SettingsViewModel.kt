@@ -27,7 +27,7 @@ class SettingsViewModel @Inject constructor(
     .stateIn(
       scope = viewModelScope,
       started = SharingStarted.WhileSubscribed(5_000L),
-      initialValue = mapState(userDataRepository.getLastUserData())
+      initialValue = mapState(userDataRepository.getUserDataSnapshot())
     )
 
   private fun mapState(userData: UserData? = null): SettingsScreenData =

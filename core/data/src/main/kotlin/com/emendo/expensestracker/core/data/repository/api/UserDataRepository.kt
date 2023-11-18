@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.data.repository.api
 
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.UserData
 import kotlinx.coroutines.flow.Flow
 
@@ -11,19 +12,19 @@ interface UserDataRepository {
   val userData: Flow<UserData>
 
   /**
-   * Stream of general currency code
+   * Stream of general currency
    */
-  val generalCurrencyCode: Flow<String>
+  val generalCurrency: Flow<CurrencyModel>
 
   /**
-   * Stream of favourite currency codes
+   * Stream of favourite currencies
    */
-  val favouriteCurrencies: Flow<Set<String>>
+  val favouriteCurrencies: Flow<Set<CurrencyModel>>
 
   /**
    * Last cached [UserData] value
    */
-  fun getLastUserData(): UserData?
+  fun getUserDataSnapshot(): UserData?
 
   suspend fun shouldUseDynamicColor(): Boolean
   suspend fun setUseDynamicColor(useDynamicColor: Boolean)

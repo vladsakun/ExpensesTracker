@@ -1,10 +1,8 @@
 package com.emendo.expensestracker.core.app.resources.models
 
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
 
-@Stable
 enum class IconModel constructor(
   val id: Int,
   val imageVector: ImageVector,

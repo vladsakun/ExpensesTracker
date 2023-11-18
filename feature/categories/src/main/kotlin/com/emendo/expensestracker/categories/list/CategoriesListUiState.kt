@@ -1,15 +1,19 @@
 package com.emendo.expensestracker.categories.list
 
+import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.model.CategoryModel
-import com.emendo.expensestracker.core.data.model.CategoryWithTotalTransactions
+import com.emendo.expensestracker.core.data.model.category.CategoryModel
+import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 
 sealed interface CategoriesListUiState {
   data object Loading : CategoriesListUiState
   data object Empty : CategoriesListUiState
   data class Error(val message: String) : CategoriesListUiState
-  data class DisplayCategoriesList(val categories: ImmutableList<CategoryWithTotalTransactions>) : CategoriesListUiState
+  data class DisplayCategoriesList(
+    val categories: ImmutableMap<Int, ImmutableList<CategoryWithTotalTransactions>>,
+  ) : CategoriesListUiState
 }
 
 sealed interface BaseDialogListUiState<out T> {
@@ -19,6 +23,7 @@ sealed interface BaseDialogListUiState<out T> {
   data object Empty : BaseDialogListUiState<Nothing>
 }
 
+@Stable
 sealed interface CategoriesListDialogData {
   data class Accounts(
     val accountModels: ImmutableList<AccountModel>,
