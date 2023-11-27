@@ -30,54 +30,49 @@ import com.emendo.expensestracker.core.ui.bottomsheet.CurrenciesBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.IconsBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceBS
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardBottomSheet
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Destination
 @Composable
-fun CreateAccountRoute(
+internal fun CreateAccountRoute(
   navigator: DestinationsNavigator,
   viewModel: CreateAccountViewModel = hiltViewModel(),
 ) {
-  val onAccountNameChange = remember { { model: String -> viewModel.setAccountName(model) } }
-  val state = viewModel.state.collectAsStateWithLifecycle()
-
   BaseScreenWithModalBottomSheetWithViewModel(
     viewModel = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    content = {
-      CreateAccountContent(
-        stateProvider = state::value,
-        onAccountNameChange = onAccountNameChange,
-        onCreateAccountClick = viewModel::createNewAccount,
-        onNavigationClick = navigator::navigateUp,
-        onInitialBalanceRowClick = viewModel::onInitialBalanceClick,
-        onIconRowClick = viewModel::onIconRowClick,
-        onColorRowClick = viewModel::onColorRowClick,
-        onCurrencyRowClick = viewModel::onCurrencyRowClick,
-      )
-    },
-    bottomSheetContent = { type, hideBottomSheet ->
-      BottomSheetContent(type, hideBottomSheet)
-    },
-  )
+    bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
+  ) {
+    CreateAccountContent(
+      stateFlow = viewModel.state,
+      onAccountNameChange = viewModel::setAccountName,
+      onCreateAccountClick = viewModel::createNewAccount,
+      onNavigationClick = navigator::navigateUp,
+      onInitialBalanceRowClick = viewModel::onInitialBalanceClick,
+      onIconRowClick = viewModel::onIconRowClick,
+      onColorRowClick = viewModel::onColorRowClick,
+      onCurrencyRowClick = viewModel::onCurrencyRowClick,
+    )
+  }
 }
 
 @Composable
 private fun CreateAccountContent(
-  stateProvider: () -> CreateAccountScreenData,
+  stateFlow: StateFlow<CreateAccountScreenData>,
   onNavigationClick: () -> Unit,
-  onAccountNameChange: (model: String) -> Unit,
+  onAccountNameChange: (String) -> Unit,
   onIconRowClick: () -> Unit,
   onColorRowClick: () -> Unit,
   onInitialBalanceRowClick: () -> Unit,
   onCurrencyRowClick: () -> Unit,
   onCreateAccountClick: () -> Unit,
 ) {
-  val isCreateButtonEnabled = remember { derivedStateOf { stateProvider().isCreateAccountButtonEnabled } }
-  val scrollState = rememberScrollState()
-  val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
+  val stateProvider = stateFlow.collectAsStateWithLifecycle()
+  val isCreateButtonEnabled = remember { derivedStateOf { stateProvider.value.isCreateAccountButtonEnabled } }
 
   ExpeScaffoldWithTopBar(
     titleResId = R.string.create_account,
@@ -87,35 +82,33 @@ private fun CreateAccountContent(
       modifier = Modifier
         .fillMaxSize()
         .imePadding()
-        .verticalScroll(scrollState)
+        .verticalScroll(rememberScrollState())
         .padding(paddingValues)
         .padding(Dimens.margin_large_x),
       verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     ) {
       ExpeTextField(
         label = stringResource(id = R.string.account_name),
-        text = stateProvider().accountName,
+        text = stateProvider.value.accountName,
         onValueChange = onAccountNameChange,
       )
       SelectRowWithIcon(
         labelResId = R.string.icon,
-        imageVectorProvider = { stateProvider().icon.imageVector },
+        imageVectorProvider = { stateProvider.value.icon.imageVector },
         onClick = onIconRowClick,
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { stateProvider().color.darkColor },
+        colorProvider = { stateProvider.value.color.darkColor },
         onClick = onColorRowClick,
       )
-      //       Todo ask Anton
-      //       Spacer(modifier = Modifier.height(200.dp))
       SelectRow(
         labelResId = R.string.balance,
         onClick = onInitialBalanceRowClick,
-        labelModifier = labelModifier,
+        labelModifier = { Modifier.weight(1f) },
         endLayout = {
           Text(
-            text = stateProvider().initialBalance,
+            text = stateProvider.value.initialBalance,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -126,10 +119,10 @@ private fun CreateAccountContent(
       SelectRow(
         labelResId = R.string.currency,
         onClick = onCurrencyRowClick,
-        labelModifier = labelModifier,
+        labelModifier = { Modifier.weight(1f) },
         endLayout = {
           Text(
-            text = stateProvider().currency.currencySymbolOrCode,
+            text = stateProvider.value.currency.currencySymbolOrCode,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -188,12 +181,14 @@ private fun BottomSheetContent(
     is BottomSheetType.InitialBalance -> {
       val text = type.text.collectAsStateWithLifecycle()
       val equalButtonState = type.equalButtonState.collectAsStateWithLifecycle()
-      InitialBalanceBS(
-        text = text,
+
+      NumericKeyboardBottomSheet(
+        textProvider = text::value,
         actions = type.actions,
-        equalButtonState = equalButtonState,
+        equalButtonStateProvider = equalButtonState::value,
         decimalSeparator = type.decimalSeparator,
         currency = type.currency,
+        numericKeyboardActions = type.numericKeyboardActions,
       )
     }
   }
@@ -206,7 +201,7 @@ private fun CreateAccountScreenPreview(
 ) {
   ExpensesTrackerTheme {
     CreateAccountContent(
-      stateProvider = { previewData },
+      stateFlow = MutableStateFlow(previewData),
       onAccountNameChange = {},
       onCreateAccountClick = {},
       onNavigationClick = {},

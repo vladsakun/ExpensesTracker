@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.categories.list
 
 import androidx.compose.runtime.Stable
+import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
@@ -12,6 +13,7 @@ sealed interface CategoriesListUiState {
   data object Empty : CategoriesListUiState
   data class Error(val message: String) : CategoriesListUiState
   data class DisplayCategoriesList(
+    val tabs: ImmutableList<TabData>,
     val categories: ImmutableMap<Int, ImmutableList<CategoryWithTotalTransactions>>,
   ) : CategoriesListUiState
 }

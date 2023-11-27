@@ -1,20 +1,23 @@
 package com.emendo.expensestracker.core.data.model.category
 
-import com.emendo.expensestracker.core.app.resources.models.CalculatorTransactionUiModel
+import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
+import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetExpenseId
+import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.core.database.model.CategoryEntity
 
 data class CategoryModel(
   override val id: Long = 0,
-  val name: String,
-  val icon: IconModel,
-  val color: ColorModel,
+  override val name: TransactionElementName,
+  override val icon: IconModel,
+  override val color: ColorModel,
   val type: CategoryType,
 ) : TransactionTarget
 
-fun CategoryEntity.asExternalModel(): CategoryModel {
+private fun CategoryEntity.toExternalModel(name: TransactionElementName = TransactionElementName.Name(this.name)): CategoryModel {
   return CategoryModel(
     id = id,
     name = name,
@@ -24,19 +27,9 @@ fun CategoryEntity.asExternalModel(): CategoryModel {
   )
 }
 
-fun CategoryModel.asEntity(): CategoryEntity {
-  return CategoryEntity(
-    id = id,
-    name = name,
-    iconId = icon.id,
-    colorId = color.id,
-    type = type.id,
-  )
-}
-
-fun CategoryModel.asTransactionUiModel(): CalculatorTransactionUiModel {
-  return CalculatorTransactionUiModel(
-    name = name,
-    icon = icon.imageVector,
-  )
-}
+fun CategoryEntity.asExternalModel() =
+  if (id == DefaultTransactionTargetIncomeId || id == DefaultTransactionTargetExpenseId) {
+    toExternalModel(TransactionElementName.NameStringRes(R.string.uncategorized))
+  } else {
+    toExternalModel()
+  }

@@ -1,13 +1,11 @@
 package com.emendo.expensestracker.accounts.create
 
-import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_TEXT
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.keyboard.CalculatorConstants.INITIAL_CALCULATOR_TEXT
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 
-@Stable
 data class CreateAccountScreenData(
   val accountName: String,
   val icon: IconModel,
@@ -24,7 +22,7 @@ data class CreateAccountScreenData(
         accountName = "",
         icon = IconModel.random,
         color = ColorModel.random,
-        initialBalance = DEFAULT_CALCULATOR_TEXT,
+        initialBalance = INITIAL_CALCULATOR_TEXT,
         currency = currency,
         equalButtonState = EqualButtonState.Default,
         isCreateAccountButtonEnabled = false,

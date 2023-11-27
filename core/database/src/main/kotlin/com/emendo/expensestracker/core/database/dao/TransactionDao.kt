@@ -24,6 +24,14 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   @Query("SELECT * FROM $TABLE_NAME")
   abstract fun getTransactionFull(): Flow<List<TransactionFull>>
 
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY id LIMIT 1")
+  abstract fun getLastTransaction(): Flow<TransactionFull?>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY id LIMIT 1")
+  abstract suspend fun retrieveLastTransaction(): TransactionFull?
+
   @Query("DELETE FROM $TABLE_NAME")
   abstract override suspend fun deleteAll()
 

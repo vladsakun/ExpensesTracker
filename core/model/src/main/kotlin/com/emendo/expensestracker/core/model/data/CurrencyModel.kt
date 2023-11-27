@@ -5,6 +5,14 @@ data class CurrencyModel(
   val currencyName: String,
   val currencySymbol: String? = null,
 ) {
-  inline val currencySymbolOrCode: String
+  val currencySymbolOrCode: String
     get() = currencySymbol ?: currencyCode
+
+  companion object {
+    val EMPTY = CurrencyModel(
+      currencyCode = "",
+      currencyName = "",
+      currencySymbol = null,
+    )
+  }
 }

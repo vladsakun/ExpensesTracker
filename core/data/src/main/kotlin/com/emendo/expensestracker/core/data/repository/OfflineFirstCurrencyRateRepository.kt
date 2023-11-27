@@ -1,7 +1,9 @@
 package com.emendo.expensestracker.core.data.repository
 
+import com.emendo.expensestracker.core.app.common.ext.stateInLazyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
+import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.data.Synchronizer
 import com.emendo.expensestracker.core.data.model.CurrencyRateModel
 import com.emendo.expensestracker.core.data.model.toCurrencyRateEntity
@@ -13,7 +15,9 @@ import com.emendo.expensestracker.core.database.model.CurrencyRateEntity
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
 import com.emendo.expensestracker.core.network.CurrencyRatesNetworkDataSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
@@ -26,15 +30,20 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
   private val currencyRatesDao: CurrencyRateDao,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   private val expePreferencesDataStore: ExpePreferencesDataStore,
+  @ApplicationScope private val scope: CoroutineScope,
 ) : CurrencyRateRepository {
 
-  override fun getRates(): Flow<List<CurrencyRateModel>> =
-    currencyRatesDao.getAll().map {
-      it.mapNotNull(::toCurrencyRateModel)
-    }
+  private val stateFlow: StateFlow<List<CurrencyRateModel>> =
+    currencyRatesDao
+      .getAll()
+      .map { it.mapNotNull(::toCurrencyRateModel) }
+      .stateInLazyList(scope)
 
-  override fun getCurrencyCodes(): Flow<List<String>> =
-    currencyRatesDao.getCurrencyCodes()
+  override val rates: Flow<List<CurrencyRateModel>>
+    get() = stateFlow
+
+  override val currencyCodes: Flow<List<String>>
+    get() = currencyRatesDao.getCurrencyCodes()
 
   override suspend fun retrieveAllCurrencyCodes(): List<String> = withContext(ioDispatcher) {
     currencyRatesDao.retrieveAllCurrencyCodes()

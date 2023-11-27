@@ -11,7 +11,7 @@ import javax.inject.Inject
 class UserPreferencesSerializer @Inject constructor() : Serializer<UserPreferences> {
   override val defaultValue: UserPreferences = UserPreferences.getDefaultInstance()
     .toBuilder()
-    .setGeneralCurrencyCode(CurrencyModels.localCurrencyCode)
+    .setGeneralCurrencyCode(CurrencyModels.localCurrency.currencyCode)
     .build()
 
   override suspend fun readFrom(input: InputStream): UserPreferences =

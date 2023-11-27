@@ -4,4 +4,10 @@ enum class TransactionType {
   INCOME,
   EXPENSE,
   TRANSFER;
+
+  companion object {
+    val DEFAULT = EXPENSE
+
+    fun Int.toTransactionType(): TransactionType = entries[this]
+  }
 }

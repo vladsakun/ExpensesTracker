@@ -25,15 +25,11 @@ interface DataModule {
 
   @Binds
   @Singleton
-  fun bindsTransactionRepository(transactionRepository: OfflineFirstTransactionsRepository): TransactionsRepository
+  fun bindsTransactionRepository(transactionRepository: OfflineFirstTransactionRepository): TransactionRepository
 
   @Binds
   @Singleton
   fun bindsUserDataRepository(userDataRepository: OfflineFirstUserDataRepository): UserDataRepository
-
-  @Binds
-  @Singleton
-  fun bindsAppInitManager(appInitManagerImpl: AppInitManagerImpl): AppInitManager
 
   @Binds
   @Singleton

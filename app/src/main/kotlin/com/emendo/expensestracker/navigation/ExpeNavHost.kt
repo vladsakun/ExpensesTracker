@@ -26,7 +26,7 @@ fun ExpeNavHost(
   }
 
   DestinationsNavHost(
-    navController = navController,
+    navController = appState.navController,
     navGraph = NavGraphs.root,
     modifier = modifier,
   )

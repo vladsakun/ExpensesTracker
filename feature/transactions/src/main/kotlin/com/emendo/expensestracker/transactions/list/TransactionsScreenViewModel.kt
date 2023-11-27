@@ -1,10 +1,10 @@
 package com.emendo.expensestracker.transactions.list
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.app.base.ui.BaseViewModel
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
-import com.emendo.expensestracker.core.data.repository.api.TransactionsRepository
+import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
@@ -12,10 +12,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TransactionsScreenViewModel @Inject constructor(
-  transactionsRepository: TransactionsRepository,
-) : BaseViewModel() {
+  transactionRepository: TransactionRepository,
+) : ViewModel() {
 
-  val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionsRepository)
+  val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository)
     .stateIn(
       scope = viewModelScope,
       started = SharingStarted.Eagerly,
@@ -23,8 +23,8 @@ class TransactionsScreenViewModel @Inject constructor(
     )
 }
 
-private fun transactionUiState(transactionsRepository: TransactionsRepository): Flow<TransactionScreenUiState> {
-  return transactionsRepository.getTransactionsFull().asResult().map {
+private fun transactionUiState(transactionRepository: TransactionRepository): Flow<TransactionScreenUiState> {
+  return transactionRepository.getTransactionsFull().asResult().map {
     when (it) {
       is Result.Loading -> TransactionScreenUiState.Loading
       is Result.Error -> TransactionScreenUiState.Error("Error loading transactions")

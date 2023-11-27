@@ -1,44 +1,40 @@
 package com.emendo.expensestracker.accounts.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.data.model.AccountModel
+import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.component.ExpeTopBar
-import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.ui.AccountItem
+import com.emendo.expensestracker.core.ui.stringValue
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
-@Destination(start = true)
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun AccountsScreenRoute(
   navigator: DestinationsNavigator,
   viewModel: AccountsListViewModel = hiltViewModel(),
 ) {
-
   if (IS_DEBUG_CREATE_ACCOUNT) {
     LaunchedEffect(Unit) {
       delay(200)
@@ -46,14 +42,17 @@ fun AccountsScreenRoute(
     }
   }
 
-  val accountsListUiState: AccountsListUiState by viewModel.uiState.collectAsStateWithLifecycle()
-  AccountsListScreenContent(accountsListUiState) { navigator.navigate(CreateAccountRouteDestination) }
+  val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+  AccountsListScreenContent(
+    uiStateProvider = uiState::value,
+    onAddAccountClick = { navigator.navigate(CreateAccountRouteDestination) }
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountsListScreenContent(
-  uiState: AccountsListUiState,
+  uiStateProvider: () -> AccountsListUiState,
   onAddAccountClick: () -> Unit,
 ) {
   val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -87,68 +86,26 @@ private fun AccountsListScreenContent(
         .padding(padding),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      when (uiState) {
+      when (val state = uiStateProvider()) {
         is AccountsListUiState.Empty -> Unit
         is AccountsListUiState.Loading -> item { ExpLoadingWheel() }
-        is AccountsListUiState.Error -> item { Text(text = uiState.message) }
+        is AccountsListUiState.Error -> item { Text(text = state.message) }
         is AccountsListUiState.DisplayAccountsList -> {
           items(
-            items = uiState.accountModels,
+            items = state.accountModels,
             key = { it.id },
-            contentType = { _ -> "accounts" }
+            contentType = { _ -> "account" }
           ) { account ->
-            AccountItem(account)
+            AccountItem(
+              color = account.color.color,
+              icon = account.icon.imageVector,
+              name = account.name.stringValue(),
+              balance = account.balanceFormatted,
+            )
+            ExpeDivider()
           }
         }
       }
     }
-  }
-}
-
-@Composable
-private fun AccountItem(accountModel: AccountModel) {
-  Column {
-    Row(
-      modifier = Modifier.padding(horizontal = Dimens.margin_large_x, vertical = Dimens.margin_small_x),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)
-    ) {
-      Icon(
-        modifier = Modifier
-          .clip(RoundedCornerShape(Dimens.corner_radius_small))
-          .background(color = accountModel.color.darkColor.copy(alpha = 0.2f))
-          .border(
-            width = Dimens.border_thickness,
-            color = accountModel.color.darkColor,
-            shape = RoundedCornerShape(Dimens.corner_radius_small)
-          )
-          .padding(Dimens.margin_small_x),
-        imageVector = accountModel.icon.imageVector,
-        contentDescription = "",
-      )
-      Text(
-        text = accountModel.name,
-        modifier = Modifier
-          .fillMaxHeight()
-          .weight(1f),
-        style = MaterialTheme.typography.bodyMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-      )
-      Text(
-        modifier = Modifier
-          .fillMaxHeight()
-          .weight(2f),
-        text = accountModel.balanceFormatted,
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.End,
-        overflow = TextOverflow.Ellipsis,
-        maxLines = 1,
-      )
-    }
-    ExpeDivider(
-      modifier = Modifier
-        .padding(start = Dimens.icon_size + Dimens.margin_small_x * 2 + Dimens.margin_large_x)
-    )
   }
 }

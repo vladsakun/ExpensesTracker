@@ -2,8 +2,8 @@ package com.emendo.expensestracker.core.data.di
 
 import com.emendo.expensestracker.core.data.CalculatorInput
 import com.emendo.expensestracker.core.data.CalculatorInputImpl
-import com.emendo.expensestracker.core.data.helper.CalculatorCommander
-import com.emendo.expensestracker.core.data.helper.CalculatorCommanderImpl
+import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
+import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommanderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,5 +17,5 @@ interface ViewModelScopedModule {
   fun bindsCalculatorInput(calculatorInput: CalculatorInputImpl): CalculatorInput
 
   @Binds
-  fun calculatorCommander(calculatorCommanderImpl: CalculatorCommanderImpl): CalculatorCommander
+  fun calculatorCommander(calculatorCommanderImpl: NumericKeyboardCommanderImpl): NumericKeyboardCommander
 }

@@ -4,7 +4,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
@@ -15,23 +14,24 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetState
 @OptIn(ExperimentalMaterial3Api::class)
 fun <BottomSheetType> ExpeModalBottomSheet(
   modalBottomSheetState: SheetState,
-  bottomSheetState: State<BaseBottomSheetState<BottomSheetType?>>,
+  bottomSheetState: () -> BaseBottomSheetState<BottomSheetType?>,
   hideBottomSheet: () -> Unit,
+  onDismissRequest: () -> Unit,
   bottomSheetContent: @Composable (type: BottomSheetType?, hideBottomSheet: () -> Unit) -> Unit,
 ) {
-  val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState.value.bottomSheetState != null } }
+  val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState().bottomSheetState != null } }
   val focusManager = LocalFocusManager.current
 
   if (shouldOpenBottomSheet.value) {
     focusManager.clearFocus()
     ModalBottomSheet(
-      onDismissRequest = {},
+      onDismissRequest = onDismissRequest,
       sheetState = modalBottomSheetState,
       // Todo uncomment when fixed https://issuetracker.google.com/issues/275849044
       // windowInsets = WindowInsets(0),
       shape = ExpeBottomSheetShape,
       content = {
-        bottomSheetContent(bottomSheetState.value.bottomSheetState, hideBottomSheet)
+        bottomSheetContent(bottomSheetState().bottomSheetState, hideBottomSheet)
       },
     )
   }

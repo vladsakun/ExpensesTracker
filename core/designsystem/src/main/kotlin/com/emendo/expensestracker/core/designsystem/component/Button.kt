@@ -26,6 +26,31 @@ fun ExpeButton(
   contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+  ExpeButton(
+    text = stringResource(id = textResId),
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    colors = colors,
+    elevation = elevation,
+    border = border,
+    contentPadding = contentPadding,
+    interactionSource = interactionSource,
+  )
+}
+
+@Composable
+fun ExpeButton(
+  text: String,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  colors: ButtonColors = ButtonDefaults.buttonColors(),
+  elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+  border: BorderStroke? = null,
+  contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
   Button(
     onClick = onClick,
     modifier = modifier
@@ -40,7 +65,7 @@ fun ExpeButton(
     interactionSource = interactionSource,
   ) {
     Text(
-      text = stringResource(id = textResId),
+      text = text,
       modifier = Modifier.padding(Dimens.margin_small_x),
       style = MaterialTheme.typography.bodyLarge,
     )

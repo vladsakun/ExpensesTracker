@@ -1,19 +1,16 @@
 package com.emendo.expensestracker.core.designsystem.component
 
 import android.content.res.Configuration
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 
 @Preview(
   uiMode = Configuration.UI_MODE_NIGHT_NO,
   name = "Light theme",
-  device = Devices.PIXEL_4_XL,
   showBackground = true,
 )
 @Preview(
   uiMode = Configuration.UI_MODE_NIGHT_YES,
   name = "Dark theme",
-  device = Devices.PIXEL_4_XL,
   showBackground = true,
 )
 annotation class ThemePreviews

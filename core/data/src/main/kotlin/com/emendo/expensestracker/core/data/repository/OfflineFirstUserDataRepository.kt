@@ -7,10 +7,7 @@ import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.UserData
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class OfflineFirstUserDataRepository @Inject constructor(
@@ -27,14 +24,12 @@ class OfflineFirstUserDataRepository @Inject constructor(
   override val userData: Flow<UserData> =
     expePreferencesDataStore.userData
 
-  // Todo remove workaround
   private var lastUserData: UserData? = null
 
-  // Todo remove workaround
   init {
     userData
       .onEach { lastUserData = it }
-      .launchIn(scope)
+      .stateIn(scope, SharingStarted.WhileSubscribed(), null)
   }
 
   override val favouriteCurrencies: Flow<Set<CurrencyModel>> =

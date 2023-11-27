@@ -23,9 +23,21 @@ fun <T> Flow<T>.asResult(isLocalOnly: Boolean = true): Flow<Result<T>> {
     .onStart { if (!isLocalOnly) emit(Result.Loading) }
     .catch { throwable ->
       if (throwable is ActionableException) {
-        throw throwable
+        //        throw throwable
       }
 
       emit(Result.Error(throwable))
     }
 }
+
+// expeRunCatching {
+//  fetchCurrencies()
+// }
+
+// ExpeRunCatching {
+//   getCurrenciesList()
+// }
+
+// if no internet -> Show NO INTERNET dialog with retry action (lambda)
+// if io exception -> Show ERROR dialog with retry action (lambda)
+// else -> Show GENERAL ERROR

@@ -2,6 +2,7 @@ package com.emendo.expensestracker.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
@@ -10,9 +11,7 @@ import com.emendo.expensestracker.core.model.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.emendo.expensestracker.core.app.resources.R as AppR
@@ -24,11 +23,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
   val state = getSettingsScreenData(userDataRepository, ::mapState)
-    .stateIn(
-      scope = viewModelScope,
-      started = SharingStarted.WhileSubscribed(5_000L),
-      initialValue = mapState(userDataRepository.getUserDataSnapshot())
-    )
+    .stateInWhileSubscribed(scope = viewModelScope, initialValue = mapState(userDataRepository.getUserDataSnapshot()))
 
   private fun mapState(userData: UserData? = null): SettingsScreenData =
     SettingsScreenData(
@@ -82,6 +77,34 @@ class SettingsViewModel @Inject constructor(
     viewModelScope.launch(ioDispatcher) {
       when (settingsItemModel.id) {
         GENERAL_CURRENCY_ID -> {
+          //          if(empty()){
+          //
+          //          }
+          //          try{
+          //            getCurrenciesList()
+          //          }catch (exception: IOException){
+          //            errorHandlingManager.showDialog(
+          //              title, description, action,
+          //            )
+          //          }
+          //
+          //          viewModelScope.launch {
+          //
+          //          }
+          //
+          //          //errorHandlingManager.
+          //          expoRunCatching {
+          //            showLoader()
+          //            callBE()
+          //            showSuccess()
+          //          }
+          //            .onFailure {}
+          //            .onUnhandledException { showScreenErrorState() }
+          //
+          //          Result.success(2)
+          //            .onFailure {  }
+          //            .onSuccess {  }
+
           if (userDataRepository.getGeneralCurrencyCode() == "USD") {
             userDataRepository.setGeneralCurrencyCode("EUR")
           } else {

@@ -2,6 +2,8 @@ package com.emendo.expensestracker.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
@@ -11,28 +13,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.emendo.expensestracker.AppStateCommander
-import com.emendo.expensestracker.MainActivityUiState
-import com.emendo.expensestracker.core.designsystem.component.ExpeAlertDialog
+import androidx.navigation.NavHostController
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.ui.dialog.LoadingDialog
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
+import com.ramcosta.composedestinations.spec.DestinationSpec
+import timber.log.Timber
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ExpeApp(
   windowSizeClass: WindowSizeClass,
-  appUiState: () -> MainActivityUiState?,
-  appStateCommander: AppStateCommander,
-  appState: ExpeAppState = rememberExpeAppState(windowSizeClass = windowSizeClass),
+  navController: NavHostController,
+  appState: ExpeAppState = rememberExpeAppState(
+    windowSizeClass = windowSizeClass,
+    navController = navController,
+  ),
 ) {
   ExpeScaffold(
     bottomBar = {
       if (appState.shouldShowBottomBar) {
+      }
+      if (appState.currentDestinationSpec.isTopLevelDestination()) {
       }
       ExpeBottomBar(
         destinations = appState.topLevelDestination,
@@ -54,36 +60,29 @@ fun ExpeApp(
           return@ExpeNavHost true
         }
       )
-
-      when (val state = appUiState()) {
-        is MainActivityUiState.Loading -> LoadingDialog()
-        is MainActivityUiState.ErrorDialog -> ErrorDialog(state, appStateCommander)
-        else -> {}
-      }
     }
   }
 }
 
-@Composable
-fun ErrorDialog(
-  state: MainActivityUiState.ErrorDialog,
-  commander: AppStateCommander,
-) {
-  ExpeAlertDialog(
-    onAlertDialogDismissRequest = commander::onAlertDialogDismissRequest,
-    onCloseClick = commander::onNegativeActionClick,
-    onConfirmClick = commander::onPositiveActionClick,
-    title = state.error.title,
-    confirmActionText = state.error.positiveAction.text,
-    dismissActionText = state.error.negativeAction.text,
-  ) {
-    Column(
-      modifier = Modifier.padding(horizontal = Dimens.margin_large_xxx)
-    ) {
-      Text(text = state.error.message)
-    }
-  }
-}
+//@Composable
+//fun ErrorDialog(
+//  commander: AppStateCommander,
+//) {
+//  ExpeAlertDialog(
+//    onAlertDialogDismissRequest = commander::onAlertDialogDismissRequest,
+//    onCloseClick = commander::onNegativeActionClick,
+//    onConfirmClick = commander::onPositiveActionClick,
+//    title = state.error.title,
+//    confirmActionText = state.error.positiveAction.text,
+//    dismissActionText = state.error.negativeAction.text,
+//  ) {
+//    Column(
+//      modifier = Modifier.padding(horizontal = Dimens.margin_large_xxx)
+//    ) {
+//      Text(text = state.error.message)
+//    }
+//  }
+//}
 
 @Composable
 private fun ExpeBottomBar(
@@ -94,6 +93,23 @@ private fun ExpeBottomBar(
 ) {
   ExpeNavigationBar(modifier = modifier) {
     destinations.forEach { item ->
+      if (item == TopLevelDestination.CREATE_TRANSACTION) {
+        NavigationBarItem(
+          onClick = { onNavigateToDestination(item) },
+          selected = false,
+          icon = {
+            Icon(
+              imageVector = ExpeIcons.AddCircle,
+              contentDescription = "add",
+              modifier = Modifier.size(Dimens.icon_button_size),
+              tint = MaterialTheme.colorScheme.primary,
+            )
+          },
+        )
+
+        return@forEach
+      }
+
       val selected = currentDestination.isTopLevelDestinationInHierarchy(item)
       ExpeNavigationBarItem(
         selected = selected,
@@ -111,12 +127,14 @@ private fun ExpeBottomBar(
           )
         },
         label = {
-          Text(
-            text = stringResource(item.iconTextId),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-          )
+          item.titleTextId?.let { title ->
+            Text(
+              text = stringResource(title),
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              textAlign = TextAlign.Center,
+            )
+          }
         }
       )
     }
@@ -127,4 +145,16 @@ private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: TopLev
   return this?.hierarchy?.any {
     it.route?.contains(destination.name, true) ?: false
   } ?: false
+}
+
+private fun DestinationSpec<*>?.isTopLevelDestination(): Boolean {
+  Timber.d(
+    "NavDestinationRoute: %s, screenRoute: %s",
+    this?.route,
+    TopLevelDestination.CATEGORIES.screen.startRoute.route
+  )
+  return TopLevelDestination.entries.any { it.screen.startRoute.route == this?.route }
+  //  return this?.hierarchy?.any {
+  //    it.route?.contains(destination.name, true) ?: false
+  //  } ?: false
 }

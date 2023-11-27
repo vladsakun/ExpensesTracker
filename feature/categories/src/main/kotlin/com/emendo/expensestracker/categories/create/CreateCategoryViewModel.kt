@@ -1,12 +1,12 @@
 package com.emendo.expensestracker.categories.create
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
@@ -56,14 +56,12 @@ class CreateCategoryViewModel @Inject constructor(
       return
     }
 
-    createCategoryJob = vmScope.launch(ioDispatcher) {
+    createCategoryJob = viewModelScope.launch(ioDispatcher) {
       categoryRepository.upsertCategory(
-        CategoryModel(
-          name = state.value.title,
-          icon = state.value.icon,
-          color = state.value.color,
-          type = categoryType,
-        )
+        name = state.value.title,
+        icon = state.value.icon,
+        color = state.value.color,
+        type = categoryType,
       )
       navigateUp()
     }

@@ -26,6 +26,13 @@ abstract class CategoryDao : BaseDao<CategoryEntity>() {
   @Query("SELECT * FROM $TABLE_NAME")
   abstract fun getCategoriesFull(): Flow<List<CategoryFull>>
 
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE category.type = :categoryType")
+  abstract fun getCategoriesFullByType(categoryType: Int): Flow<List<CategoryFull>>
+
+  @Query("DELETE FROM $TABLE_NAME WHERE id = :id")
+  abstract fun deleteById(id: Long)
+
   companion object {
     private const val TABLE_NAME = TABLE_CATEGORY
     private const val PRIMARY_KEY = CATEGORY_PRIMARY_KEY

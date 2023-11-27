@@ -25,7 +25,6 @@
             <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/build-logic/convention" />
             <option value="$PROJECT_DIR$/core" />
-            <option value="$PROJECT_DIR$/core/app-base" />
             <option value="$PROJECT_DIR$/core/app-base-ui" />
             <option value="$PROJECT_DIR$/core/app-resources" />
             <option value="$PROJECT_DIR$/core/common" />
@@ -40,6 +39,7 @@
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/accounts" />
             <option value="$PROJECT_DIR$/feature/categories" />
+            <option value="$PROJECT_DIR$/feature/create-transaction" />
             <option value="$PROJECT_DIR$/feature/settings" />
             <option value="$PROJECT_DIR$/feature/transactions" />
             <option value="$PROJECT_DIR$/sync" />

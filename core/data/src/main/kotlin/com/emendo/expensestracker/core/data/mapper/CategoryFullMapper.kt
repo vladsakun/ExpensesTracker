@@ -13,7 +13,7 @@ class CategoryFullMapper @Inject constructor(
 ) : Mapper<CategoryFull, CategoryWithTransactions> {
 
   override suspend fun map(from: CategoryFull): CategoryWithTransactions = with(from) {
-    return CategoryWithTransactions(
+    CategoryWithTransactions(
       categoryModel = category.asExternalModel(),
       transactions = transactions.map { toCategoryTransactionModel(it) },
     )

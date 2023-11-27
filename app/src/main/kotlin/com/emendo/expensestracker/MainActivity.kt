@@ -10,10 +10,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.compose.rememberNavController
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
+import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -30,11 +31,15 @@ class MainActivity : ComponentActivity() {
     // This also sets up the initial system bar style based on the platform theme
     enableEdgeToEdge()
 
-    viewModel.errorState.collectWhenStarted(this) {}
-
     setContent {
       val darkTheme = isSystemInDarkTheme()
-      val appUiState = viewModel.uiSState.collectAsStateWithLifecycle()
+      val navController = rememberNavController()
+
+      LaunchedEffect(viewModel.navigationEvent) {
+        viewModel.navigationEvent.collect { direction ->
+          navController.navigate(direction)
+        }
+      }
 
       // Update the dark content of the system bars to match the theme
       DisposableEffect(darkTheme) {
@@ -51,13 +56,10 @@ class MainActivity : ComponentActivity() {
         onDispose {}
       }
 
-      ExpensesTrackerTheme(
-        darkTheme = darkTheme,
-      ) {
+      ExpensesTrackerTheme(darkTheme = darkTheme) {
         ExpeApp(
           windowSizeClass = calculateWindowSizeClass(this),
-          appUiState = appUiState::value,
-          appStateCommander = viewModel,
+          navController = navController,
         )
       }
     }

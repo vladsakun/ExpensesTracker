@@ -44,12 +44,13 @@ dependencies {
   implementation(project(":feature:transactions"))
   implementation(project(":feature:categories"))
   implementation(project(":feature:settings"))
+  implementation(project(":feature:create-transaction"))
 
+  implementation(project(":core:app-base-ui"))
   implementation(project(":core:common"))
   implementation(project(":core:data"))
   implementation(project(":core:model"))
   implementation(project(":core:designsystem"))
-  implementation(project(":core:app-base-ui"))
   implementation(project(":core:ui"))
 
   implementation(project(":sync:work"))

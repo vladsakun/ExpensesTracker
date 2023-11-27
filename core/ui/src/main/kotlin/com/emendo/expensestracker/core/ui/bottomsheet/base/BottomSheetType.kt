@@ -6,9 +6,9 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardActions
-import com.emendo.expensestracker.core.ui.bottomsheet.calculator.CalculatorBottomSheetState
-import com.emendo.expensestracker.core.ui.bottomsheet.calculator.CalculatorKeyboardActions
-import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceKeyboardActions
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.InitialBalanceKeyboardActions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
@@ -33,6 +33,7 @@ interface BottomSheetType {
   data class InitialBalance(
     val text: StateFlow<String>,
     val actions: InitialBalanceKeyboardActions,
+    val numericKeyboardActions: NumericKeyboardActions,
     val equalButtonState: StateFlow<EqualButtonState>,
     val decimalSeparator: String,
     val currency: String,

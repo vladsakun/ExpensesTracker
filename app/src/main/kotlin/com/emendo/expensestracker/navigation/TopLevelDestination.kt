@@ -6,6 +6,7 @@ import com.emendo.expensestracker.accounts.AccountsNavGraph
 import com.emendo.expensestracker.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
+import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.emendo.expensestracker.settings.SettingsNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
@@ -20,7 +21,7 @@ enum class TopLevelDestination(
   val selectedIcon: ImageVector,
   val unselectedIcon: ImageVector,
   @StringRes val iconTextId: Int,
-  @StringRes val titleTextId: Int,
+  @StringRes val titleTextId: Int?,
 ) {
   ACCOUNTS(
     screen = AccountsNavGraph,
@@ -35,6 +36,13 @@ enum class TopLevelDestination(
     unselectedIcon = ExpeIcons.DonutLargeBorder,
     iconTextId = R.string.categories,
     titleTextId = R.string.categories,
+  ),
+  CREATE_TRANSACTION(
+    screen = CreatetransactionNavGraph,
+    selectedIcon = ExpeIcons.AddCircle,
+    unselectedIcon = ExpeIcons.AddCircle,
+    iconTextId = R.string.add,
+    titleTextId = null,
   ),
   TRANSACTIONS(
     screen = TransactionsNavGraph,

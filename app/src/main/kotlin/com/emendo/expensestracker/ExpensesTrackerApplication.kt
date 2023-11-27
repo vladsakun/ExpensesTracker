@@ -1,7 +1,7 @@
 package com.emendo.expensestracker
 
 import android.app.Application
-import com.emendo.expensestracker.core.data.manager.AppInitManager
+import com.emendo.expensestracker.core.app.base.manager.AppInitManager
 import com.emendo.expensestracker.sync.initializers.Sync
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.MainScope
@@ -17,16 +17,10 @@ class ExpensesTrackerApplication : Application() {
     var applicationScope = MainScope()
   }
 
-  @Inject
-  lateinit var appInitializer: AppInitManager
-
   override fun onCreate() {
     super.onCreate()
     // Initialize Sync; the system responsible for keeping data in the app up to date.
     Sync.initialize(context = this)
-    applicationScope.launch {
-      appInitializer.init()
-    }
     Timber.plant(Timber.DebugTree())
   }
 
@@ -34,5 +28,12 @@ class ExpensesTrackerApplication : Application() {
     super.onLowMemory()
     applicationScope.cancel("onLowMemory() called by system")
     applicationScope = MainScope()
+  }
+
+  @Inject
+  fun initApp(appInitManager: AppInitManager) {
+    applicationScope.launch {
+      appInitManager.init()
+    }
   }
 }

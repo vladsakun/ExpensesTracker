@@ -31,9 +31,9 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
   operator fun invoke(): Flow<List<CategoryWithTotalTransactions>> {
     val combinedFlow: Flow<CategoryWithTotalTransactionsAndCurrencies> =
       combine(
-        categoryRepository.getCategoriesWithTransactions(),
+        categoryRepository.categoriesWithTransactions,
         userDataRepository.generalCurrency,
-        currencyRateRepository.getRates(),
+        currencyRateRepository.rates,
       ) { transactions, currency, rates ->
         CategoryWithTotalTransactionsAndCurrencies(
           categoryWithTransactions = transactions,

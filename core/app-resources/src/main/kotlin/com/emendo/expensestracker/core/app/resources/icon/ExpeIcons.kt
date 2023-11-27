@@ -16,6 +16,7 @@ object ExpeIcons {
   val ReceiptLong = Icons.Rounded.ReceiptLong
   val ReceiptLongBorder = Icons.Outlined.ReceiptLong
   val Add = Icons.Outlined.Add
+  val AddCircle = Icons.Outlined.AddCircle
   val Remove = Icons.Outlined.Remove
   val Check = Icons.Outlined.Check
   val Close = Icons.Outlined.Close
@@ -28,4 +29,5 @@ object ExpeIcons {
   val Backup = Icons.Outlined.Backup
   val Help = Icons.Outlined.Help
   val AdvancedSettings = Icons.Outlined.BuildCircle
+  val HideSource = Icons.Outlined.HideSource
 }

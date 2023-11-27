@@ -2,11 +2,13 @@ package com.emendo.expensestracker.core.app.resources.models
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 
-enum class IconModel constructor(
+enum class IconModel(
   val id: Int,
   val imageVector: ImageVector,
 ) {
+  UNKNOWN(-1, ExpeIcons.HideSource),
   GOVERNMENT(1, AccountIcons.AccountBalance),
   GROCERIES(2, AccountIcons.ShoppingCart),
   TRANSPORT(3, AccountIcons.FireTruck),
@@ -22,9 +24,11 @@ enum class IconModel constructor(
   OTHERS(13, AccountIcons.Square);
 
   companion object {
+    private val icons: List<IconModel> = entries.toMutableList().apply { remove(UNKNOWN) }
     private val values = entries.associateBy { it.id }
 
     fun getById(id: Int) = values[id] ?: throw IllegalArgumentException("No IconResource with id $id")
-    inline val random get() = entries.random()
+    val random
+      get() = icons.random()
   }
 }

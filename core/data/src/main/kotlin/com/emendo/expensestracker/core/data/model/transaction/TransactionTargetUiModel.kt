@@ -2,20 +2,21 @@ package com.emendo.expensestracker.core.data.model.transaction
 
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 
 sealed interface TransactionTargetUiModel {
   val id: Long
-  val name: String
+  val name: TransactionElementName
   val icon: IconModel
   val color: ColorModel
   val transactionType: TransactionType
 
   class Account(account: AccountModel) : TransactionTargetUiModel {
     override val id: Long = account.id
-    override val name: String = account.name
+    override val name: TransactionElementName = account.name
     override val icon: IconModel = account.icon
     override val color: ColorModel = account.color
     override val transactionType: TransactionType = TransactionType.TRANSFER
@@ -23,7 +24,7 @@ sealed interface TransactionTargetUiModel {
 
   class Category(category: CategoryModel) : TransactionTargetUiModel {
     override val id: Long = category.id
-    override val name: String = category.name
+    override val name: TransactionElementName = category.name
     override val icon: IconModel = category.icon
     override val color: ColorModel = category.color
     override val transactionType: TransactionType = getTransactionType(category)

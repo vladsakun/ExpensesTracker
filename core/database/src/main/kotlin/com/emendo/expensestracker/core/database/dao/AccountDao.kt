@@ -15,8 +15,17 @@ abstract class AccountDao : BaseDao<AccountEntity>() {
   @Query("SELECT * FROM $TABLE_NAME")
   abstract override fun getAll(): Flow<List<AccountEntity>>
 
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY $PRIMARY_KEY LIMIT 1")
+  abstract fun getLastAccount(): Flow<AccountEntity?>
+
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY $PRIMARY_KEY LIMIT 1")
+  abstract suspend fun retrieveLastAccount(): AccountEntity?
+
   @Query("SELECT * FROM $TABLE_NAME WHERE $PRIMARY_KEY = :id")
   abstract fun getById(id: Long): Flow<AccountEntity>
+
+  @Query("SELECT * FROM $TABLE_NAME WHERE $PRIMARY_KEY = :id")
+  abstract suspend fun retrieveById(id: Long): AccountEntity?
 
   @Query("DELETE FROM $TABLE_NAME")
   abstract override suspend fun deleteAll()

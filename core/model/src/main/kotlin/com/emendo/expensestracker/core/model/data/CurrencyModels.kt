@@ -4,8 +4,8 @@ import java.util.Currency
 import java.util.Locale
 
 object CurrencyModels {
-  val localCurrencyCode: String
-    get() = Currency.getInstance(Locale.getDefault()).currencyCode
+  val localCurrency: Currency
+    get() = Currency.getInstance(Locale.getDefault())
 
   const val CURRENCY_RATES_BASE = "USD"
 }

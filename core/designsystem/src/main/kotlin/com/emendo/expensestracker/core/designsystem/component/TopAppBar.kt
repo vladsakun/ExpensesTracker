@@ -17,6 +17,36 @@ import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun ExpeMediumTopBar(
+  modifier: Modifier = Modifier,
+  title: @Composable () -> Unit,
+  navigationIcon: @Composable () -> Unit,
+  actions: ImmutableList<MenuAction>? = null,
+  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+  CenterAlignedTopAppBar(
+    title = title,
+    navigationIcon = navigationIcon,
+    actions = {
+      actions?.forEach { action ->
+        IconButton(onClick = action.onClick) {
+          Icon(
+            imageVector = action.icon,
+            contentDescription = action.text,
+            tint = MaterialTheme.colorScheme.onSurface,
+          )
+        }
+      }
+    },
+    colors = colors,
+    modifier = modifier.testTag("expeTopBar"),
+    scrollBehavior = scrollBehavior,
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun ExpeTopBar(
   @StringRes titleRes: Int,
   modifier: Modifier = Modifier,

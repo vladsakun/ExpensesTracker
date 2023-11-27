@@ -10,17 +10,17 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.navigation.navigate
+import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun rememberExpeAppState(
   windowSizeClass: WindowSizeClass,
+  navController: NavHostController,
   coroutineScope: CoroutineScope = rememberCoroutineScope(),
-  navController: NavHostController = rememberNavController(),
 ): ExpeAppState {
   return remember(
     navController,
@@ -46,10 +46,8 @@ class ExpeAppState(
     @Composable get() = navController
       .currentBackStackEntryAsState().value?.destination
 
-  val shouldShowNavigation: Boolean
-    @Composable get() = TopLevelDestination.entries.any {
-      navController.currentDestinationAsState().value == it.screen.startRoute
-    }
+  val currentDestinationSpec: DestinationSpec<*>?
+    @Composable get() = navController.currentDestinationAsState().value
 
   val shouldShowBottomBar: Boolean
     get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
@@ -71,12 +69,23 @@ class ExpeAppState(
    * @param topLevelDestination: The destination the app needs to navigate to.
    */
   fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
+    if (navController.currentDestination?.parent?.route == topLevelDestination.screen.route) {
+      return
+    }
+
+    navController.popBackStack(
+      route = TopLevelDestination.CREATE_TRANSACTION.screen.route,
+      inclusive = true,
+    )
+
     navController.navigate(topLevelDestination.screen) {
       // Pop up to the start destination of the graph to
       // avoid building up a large stack of destinations
       // on the back stack as users select items
-      popUpTo(navController.graph.findStartDestination().id) {
-        saveState = true
+      if (topLevelDestination != TopLevelDestination.CREATE_TRANSACTION) {
+        popUpTo(navController.graph.findStartDestination().id) {
+          saveState = true
+        }
       }
 
       // Avoid multiple copies of the same destination when

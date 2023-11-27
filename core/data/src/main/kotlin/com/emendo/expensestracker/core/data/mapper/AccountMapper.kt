@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
 import com.emendo.expensestracker.core.data.model.AccountModel
@@ -19,7 +20,7 @@ class AccountMapper @Inject constructor(
     val currencyModel = currencyMapper.map(currencyCode)
     return AccountModel(
       id = id,
-      name = name,
+      name = TransactionElementName.Name(name),
       balance = balance,
       balanceFormatted = amountFormatter.format(balance, currencyModel),
       currency = currencyModel,

@@ -28,6 +28,7 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
+import com.emendo.expensestracker.core.ui.stringValue
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.ImmutableList
@@ -122,7 +123,7 @@ private fun TransactionItem(
           verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
         ) {
           Text(
-            text = transaction.target.name,
+            text = transaction.target.name.stringValue(),
             style = fontSize,
           )
           Row(
@@ -135,7 +136,7 @@ private fun TransactionItem(
               modifier = Modifier.size(Dimens.icon_size_small)
             )
             Text(
-              text = transaction.source.name,
+              text = transaction.source.name.stringValue(),
               style = fontSize,
             )
           }

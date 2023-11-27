@@ -42,7 +42,7 @@ class ExpePreferencesDataStore @Inject constructor(
   }
 
   suspend fun getGeneralCurrencyCode(): String =
-    userPreferences.data.map { it.generalCurrencyCode }.firstOrNull() ?: CurrencyModels.localCurrencyCode
+    userPreferences.data.map { it.generalCurrencyCode }.firstOrNull() ?: CurrencyModels.localCurrency.currencyCode
 
   suspend fun setGeneralCurrencyCode(generalCurrencyCode: String) {
     require(generalCurrencyCode.length == 3) { "Currency code length must be 3" }

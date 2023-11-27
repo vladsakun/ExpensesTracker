@@ -8,9 +8,7 @@ android {
 }
 
 dependencies {
-  api(project(":core:app-base"))
-
-  implementation(project(":core:model"))
-  implementation(libs.kotlinx.coroutines.android)
-  implementation(libs.androidx.lifecycle.viewmodel.ktx)
+  implementation(project(":core:data"))
+  implementation(project(":core:domain"))
+  implementation(project(":core:common"))
 }

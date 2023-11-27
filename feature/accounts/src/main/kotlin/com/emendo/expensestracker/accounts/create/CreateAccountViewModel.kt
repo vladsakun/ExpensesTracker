@@ -3,28 +3,21 @@ package com.emendo.expensestracker.accounts.create
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
-import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.CalculatorInput
-import com.emendo.expensestracker.core.data.DEFAULT_CALCULATOR_TEXT
-import com.emendo.expensestracker.core.data.KeyboardCallbacks
-import com.emendo.expensestracker.core.data.amount.AmountFormatter
+import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
+import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
-import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.repository.api.AccountsRepository
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
-import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
-import com.emendo.expensestracker.core.model.data.keyboard.NumKeyboardNumber
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.calculator.InitialBalanceKeyboardActions
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.InitialBalanceKeyboardActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,16 +27,12 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
   private val accountsRepository: AccountsRepository,
-  private val amountFormatter: AmountFormatter,
-  private val calculatorInput: CalculatorInput,
+  private val calculatorFormatter: CalculatorFormatter,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   private val currencyCacheManager: CurrencyCacheManager,
-) : BaseBottomSheetViewModel<BottomSheetType>(),
-    // Todo extract to commons
-    InitialBalanceKeyboardActions,
-    KeyboardCallbacks {
+  private val numericKeyboardCommander: NumericKeyboardCommander,
+) : BaseBottomSheetViewModel<BottomSheetType>(), InitialBalanceKeyboardActions {
 
-  //Todo maybe allow screen state with nullable currency
   private val _state = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
       currency = currencyCacheManager.getGeneralCurrencySnapshot()
@@ -52,74 +41,46 @@ class CreateAccountViewModel @Inject constructor(
 
   val state = _state.asStateFlow()
 
-  private val equalButtonState = MutableStateFlow(EqualButtonState.Default)
-  private val initialBalanceState = MutableStateFlow(DEFAULT_CALCULATOR_TEXT)
-
   private var createAccountJob: Job? = null
 
-  // Todo extract to commons
   init {
-    calculatorInput.initCallbacks(this)
+    numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, valueChanged = ::updateValue)
 
-    if (IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET) {
-      viewModelScope.launch {
-        delay(100)
-        showBottomSheet(
-          BottomSheetType.InitialBalance(
-            text = initialBalanceState.asStateFlow(),
-            actions = this@CreateAccountViewModel,
-            decimalSeparator = amountFormatter.decimalSeparator.toString(),
-            equalButtonState = equalButtonState.asStateFlow(),
-            currency = state.value.currency.currencyName,
-          )
-        )
-      }
-    }
+    //    if (IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET) {
+    //      viewModelScope.launch {
+    //        delay(100)
+    //        showBottomSheet(
+    //          BottomSheetType.InitialBalance(
+    //            text = initialBalanceState.asStateFlow(),
+    //            actions = this@CreateAccountViewModel,
+    //            decimalSeparator = amountFormatter.decimalSeparator.toString(),
+    //            equalButtonState = equalButtonState.asStateFlow(),
+    //            currency = state.value.currency.currencyName,
+    //          )
+    //        )
+    //      }
+    //    }
   }
 
-  // Todo extract to commons
-  override fun doOnValueChange(formattedValue: String, equalButtonState: EqualButtonState) {
+  private fun updateValue(formattedValue: String, equalButtonState: EqualButtonState): Boolean {
     _state.update { it.copy(initialBalance = formattedValue) }
-    initialBalanceState.update { formattedValue }
-    this.equalButtonState.update { equalButtonState }
+    return false
   }
 
   override fun onChangeSignClick() {
     // Todo
   }
 
-  override fun onClearClick() {
-    calculatorInput.onClearClick()
-  }
-
-  override fun onMathOperationClick(mathOperation: MathOperation) {
-    if (calculatorInput.doMath(mathOperation)) return
-
-    calculatorInput.input(mathOperation)
-  }
-
-  override fun onNumberClick(numKeyboardNumber: NumKeyboardNumber) {
-    calculatorInput.input(numKeyboardNumber)
-  }
-
-  override fun onPrecisionClick() {
-    calculatorInput.onPrecisionClick()
-  }
-
-  override fun onDoneClick() {
-    calculatorInput.onDoneClick()
+  private fun doneClick(): Boolean {
     hideBottomSheet()
+    return false
   }
 
-  override fun onEqualClick() {
-    calculatorInput.doMath()
-  }
-
-  override fun onDismissBottomSheetRequest() {
+  override fun dismissBottomSheet() {
     if (bottomSheetState.value.bottomSheetState is BottomSheetType.InitialBalance) {
-      onDoneClick()
+      numericKeyboardCommander.onDoneClick()
     }
-    super.onDismissBottomSheetRequest()
+    super.dismissBottomSheet()
   }
 
   fun createNewAccount() {
@@ -129,14 +90,12 @@ class CreateAccountViewModel @Inject constructor(
 
     createAccountJob = viewModelScope.launch(ioDispatcher) {
       with(state.value) {
-        accountsRepository.upsertAccount(
-          AccountModel(
-            name = accountName,
-            balance = amountFormatter.toBigDecimal(initialBalance),
-            currency = currency,
-            icon = icon,
-            color = color,
-          )
+        accountsRepository.createAccount(
+          name = accountName,
+          balance = calculatorFormatter.toBigDecimal(initialBalance),
+          currency = currency,
+          icon = icon,
+          color = color,
         )
         navigateUp()
       }
@@ -183,11 +142,12 @@ class CreateAccountViewModel @Inject constructor(
   fun onInitialBalanceClick() {
     showBottomSheet(
       BottomSheetType.InitialBalance(
-        text = initialBalanceState.asStateFlow(),
+        text = numericKeyboardCommander.calculatorTextState,
         actions = this,
-        decimalSeparator = amountFormatter.decimalSeparator.toString(),
-        equalButtonState = equalButtonState.asStateFlow(),
+        decimalSeparator = calculatorFormatter.decimalSeparator.toString(),
+        equalButtonState = numericKeyboardCommander.equalButtonState,
         currency = state.value.currency.currencyName,
+        numericKeyboardActions = numericKeyboardCommander,
       )
     )
   }

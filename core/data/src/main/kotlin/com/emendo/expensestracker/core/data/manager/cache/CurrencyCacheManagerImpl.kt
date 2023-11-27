@@ -31,7 +31,7 @@ class CurrencyCacheManagerImpl @Inject constructor(
 
   override fun startCaching() {
     currencyRatesRepository
-      .getCurrencyCodes()
+      .currencyCodes
       .onEach { rates ->
         cachedCurrenciesMap = rates.toCurrenciesMap()
       }
