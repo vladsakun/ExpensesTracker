@@ -131,11 +131,9 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun setAccountName(accountName: String) {
-    _state.update {
-      it.copy(
-        accountName = accountName,
-        isCreateAccountButtonEnabled = accountName.isNotBlank(),
-      )
+    _state.update { it.copy(accountName = accountName) }
+    _state.update { state ->
+      state.copy(isCreateAccountButtonEnabled = state.accountName.isNotBlank())
     }
   }
 

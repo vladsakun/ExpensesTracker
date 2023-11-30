@@ -4,7 +4,6 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.keyboard.CalculatorConstants.INITIAL_CALCULATOR_TEXT
-import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 
 data class CreateAccountScreenData(
   val accountName: String,
@@ -12,7 +11,6 @@ data class CreateAccountScreenData(
   val color: ColorModel,
   val initialBalance: String,
   val currency: CurrencyModel,
-  val equalButtonState: EqualButtonState,
   val isCreateAccountButtonEnabled: Boolean,
 ) {
 
@@ -24,7 +22,6 @@ data class CreateAccountScreenData(
         color = ColorModel.random,
         initialBalance = INITIAL_CALCULATOR_TEXT,
         currency = currency,
-        equalButtonState = EqualButtonState.Default,
         isCreateAccountButtonEnabled = false,
       )
   }

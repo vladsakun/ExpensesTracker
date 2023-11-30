@@ -6,7 +6,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,8 +32,6 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardBottomSheet
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @Destination
 @Composable
@@ -47,22 +44,24 @@ internal fun CreateAccountRoute(
     onNavigateUpClick = navigator::navigateUp,
     bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
   ) {
+    val state = viewModel.state.collectAsStateWithLifecycle()
+
     CreateAccountContent(
-      stateFlow = viewModel.state,
-      onAccountNameChange = viewModel::setAccountName,
-      onCreateAccountClick = viewModel::createNewAccount,
+      stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
-      onInitialBalanceRowClick = viewModel::onInitialBalanceClick,
-      onIconRowClick = viewModel::onIconRowClick,
-      onColorRowClick = viewModel::onColorRowClick,
-      onCurrencyRowClick = viewModel::onCurrencyRowClick,
+      onAccountNameChange = remember { viewModel::setAccountName },
+      onIconRowClick = remember { viewModel::onIconRowClick },
+      onColorRowClick = remember { viewModel::onColorRowClick },
+      onInitialBalanceRowClick = remember { viewModel::onInitialBalanceClick },
+      onCurrencyRowClick = remember { viewModel::onCurrencyRowClick },
+      onCreateAccountClick = remember { viewModel::createNewAccount },
     )
   }
 }
 
 @Composable
 private fun CreateAccountContent(
-  stateFlow: StateFlow<CreateAccountScreenData>,
+  stateProvider: () -> CreateAccountScreenData,
   onNavigationClick: () -> Unit,
   onAccountNameChange: (String) -> Unit,
   onIconRowClick: () -> Unit,
@@ -71,9 +70,6 @@ private fun CreateAccountContent(
   onCurrencyRowClick: () -> Unit,
   onCreateAccountClick: () -> Unit,
 ) {
-  val stateProvider = stateFlow.collectAsStateWithLifecycle()
-  val isCreateButtonEnabled = remember { derivedStateOf { stateProvider.value.isCreateAccountButtonEnabled } }
-
   ExpeScaffoldWithTopBar(
     titleResId = R.string.create_account,
     onNavigationClick = onNavigationClick,
@@ -89,17 +85,17 @@ private fun CreateAccountContent(
     ) {
       ExpeTextField(
         label = stringResource(id = R.string.account_name),
-        text = stateProvider.value.accountName,
+        text = stateProvider().accountName,
         onValueChange = onAccountNameChange,
       )
       SelectRowWithIcon(
         labelResId = R.string.icon,
-        imageVectorProvider = { stateProvider.value.icon.imageVector },
+        imageVectorProvider = { stateProvider().icon.imageVector },
         onClick = onIconRowClick,
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { stateProvider.value.color.darkColor },
+        colorProvider = { stateProvider().color },
         onClick = onColorRowClick,
       )
       SelectRow(
@@ -108,7 +104,7 @@ private fun CreateAccountContent(
         labelModifier = { Modifier.weight(1f) },
         endLayout = {
           Text(
-            text = stateProvider.value.initialBalance,
+            text = stateProvider().initialBalance,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -122,7 +118,7 @@ private fun CreateAccountContent(
         labelModifier = { Modifier.weight(1f) },
         endLayout = {
           Text(
-            text = stateProvider.value.currency.currencySymbolOrCode,
+            text = stateProvider().currency.currencySymbolOrCode,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -133,7 +129,7 @@ private fun CreateAccountContent(
       ExpeButton(
         textResId = R.string.create,
         onClick = onCreateAccountClick,
-        enabled = isCreateButtonEnabled.value,
+        enabled = stateProvider().isCreateAccountButtonEnabled,
       )
     }
   }
@@ -201,7 +197,7 @@ private fun CreateAccountScreenPreview(
 ) {
   ExpensesTrackerTheme {
     CreateAccountContent(
-      stateFlow = MutableStateFlow(previewData),
+      stateProvider = { previewData },
       onAccountNameChange = {},
       onCreateAccountClick = {},
       onNavigationClick = {},
