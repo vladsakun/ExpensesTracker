@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
-import com.emendo.expensestracker.core.app.common.ext.stateInLazyList
+import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
@@ -30,7 +30,7 @@ class OfflineFirstAccountsRepository @Inject constructor(
 
   private val accountsList = accountsDao.getAll()
     .map { accountEntities -> accountEntities.map { accountMapper.map(it) } }
-    .stateInLazyList(scope)
+    .stateInLazilyList(scope)
 
   override fun getAccounts(): Flow<List<AccountModel>> {
     return accountsList

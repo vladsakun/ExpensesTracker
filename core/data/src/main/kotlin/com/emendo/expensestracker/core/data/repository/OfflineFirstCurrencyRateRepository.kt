@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
-import com.emendo.expensestracker.core.app.common.ext.stateInLazyList
+import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
@@ -37,7 +37,7 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
     currencyRatesDao
       .getAll()
       .map { it.mapNotNull(::toCurrencyRateModel) }
-      .stateInLazyList(scope)
+      .stateInLazilyList(scope)
 
   override val rates: Flow<List<CurrencyRateModel>>
     get() = stateFlow

@@ -37,17 +37,30 @@ fun <T> Flow<T>.stateInWhileSubscribed(
   return stateIn(scope, SharingStarted.WhileSubscribed(stopTimeoutMillis), initialValue)
 }
 
-fun <T> Flow<T>.stateInLazy(
+fun <T> Flow<T>.stateInLazily(
   scope: CoroutineScope,
   initialValue: T,
 ): StateFlow<T> {
   return stateIn(scope, SharingStarted.Lazily, initialValue)
 }
 
-inline fun <reified T : List<*>> Flow<T>.stateInLazyList(
+fun <T> Flow<T>.stateInEagerly(
+  scope: CoroutineScope,
+  initialValue: T,
+): StateFlow<T> {
+  return stateIn(scope, SharingStarted.Eagerly, initialValue)
+}
+
+inline fun <reified T : List<*>> Flow<T>.stateInLazilyList(
   scope: CoroutineScope,
 ): StateFlow<T> {
-  return stateInLazy(scope, emptyList<T>() as T)
+  return stateInLazily(scope, emptyList<T>() as T)
+}
+
+inline fun <reified T : List<*>> Flow<T>.stateInEagerlyList(
+  scope: CoroutineScope,
+): StateFlow<T> {
+  return stateInEagerly(scope, emptyList<T>() as T)
 }
 
 // Todo discover

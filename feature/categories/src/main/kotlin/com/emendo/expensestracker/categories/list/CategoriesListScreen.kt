@@ -1,9 +1,10 @@
 package com.emendo.expensestracker.categories.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -30,11 +31,11 @@ import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTran
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
-import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
+import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -45,8 +46,6 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import com.emendo.expensestracker.core.app.resources.R as AppR
-
-private const val GRID_CELL_COUNT = 3
 
 @RootNavGraph(start = true)
 @Destination
@@ -149,13 +148,7 @@ fun CategoriesGrid(
   onCategoryClick: (category: CategoryWithTotalTransactions) -> Unit,
   onAddCategoryClick: () -> Unit,
 ) {
-  LazyVerticalGrid(
-    modifier = Modifier.fillMaxSize(),
-    columns = GridCells.Fixed(GRID_CELL_COUNT),
-    verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
-    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
-    contentPadding = PaddingValues(Dimens.margin_large_x),
-  ) {
+  CategoriesLazyVerticalGrid {
     items(
       items = categories,
       key = { it.categoryModel.id },

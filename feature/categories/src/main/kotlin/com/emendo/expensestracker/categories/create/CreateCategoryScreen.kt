@@ -23,23 +23,23 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBo
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.StateFlow
 
 @Destination
 @Composable
 fun CreateCategoryRoute(
   navigator: DestinationsNavigator,
-  @Suppress("UNUSED_PARAMETER") categoryType: CategoryType, // retrieved in VM via SavedStateHandle
+  // retrieved in ViewModel via SavedStateHandle
+  @Suppress("UNUSED_PARAMETER") categoryType: CategoryType,
   viewModel: CreateCategoryViewModel = hiltViewModel(),
 ) {
-  val uiState = viewModel.state.collectAsStateWithLifecycle()
-
   BaseScreenWithModalBottomSheetWithViewModel(
     viewModel = viewModel,
     onNavigateUpClick = navigator::navigateUp,
     bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
   ) {
     CreateCategoryContent(
-      stateProvider = uiState::value,
+      stateFlow = viewModel.state,
       onNavigationClick = navigator::navigateUp,
       onTitleChanged = viewModel::changeTitle,
       onIconSelectClick = viewModel::showIconBottomSheet,
@@ -51,15 +51,15 @@ fun CreateCategoryRoute(
 
 @Composable
 private fun CreateCategoryContent(
-  stateProvider: () -> CreateCategoryScreenData,
+  stateFlow: StateFlow<CreateCategoryScreenData>,
   onNavigationClick: () -> Unit,
   onTitleChanged: (String) -> Unit,
   onIconSelectClick: () -> Unit,
   onColorSelectClick: () -> Unit,
   onCreateCategoryClick: () -> Unit,
 ) {
-  val scrollState = rememberScrollState()
-  val isCreateButtonEnabled = remember { derivedStateOf { stateProvider().isCreateButtonEnabled } }
+  val uiState = stateFlow.collectAsStateWithLifecycle()
+  val isCreateButtonEnabled = remember { derivedStateOf { uiState.value.isCreateButtonEnabled } }
 
   ExpeScaffoldWithTopBar(
     titleResId = R.string.create_category,
@@ -69,24 +69,25 @@ private fun CreateCategoryContent(
       modifier = Modifier
         .fillMaxSize()
         .imePadding()
-        .verticalScroll(scrollState)
+        .verticalScroll(rememberScrollState())
         .padding(paddingValues)
         .padding(Dimens.margin_large_x),
       verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     ) {
       ExpeTextField(
         label = "Title",
-        text = stateProvider().title,
+        text = uiState.value.title,
         onValueChange = onTitleChanged,
       )
+      // Todo recomposes Select rows on each input
       SelectRowWithIcon(
         labelResId = R.string.icon,
-        imageVectorProvider = { stateProvider().icon.imageVector },
+        imageVectorProvider = uiState.value.icon::imageVector,
         onClick = onIconSelectClick,
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { stateProvider().color.darkColor },
+        colorProvider = { uiState.value.color },
         onClick = onColorSelectClick,
       )
       ExpeButton(

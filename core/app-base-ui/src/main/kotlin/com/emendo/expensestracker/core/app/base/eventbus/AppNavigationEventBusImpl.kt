@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.app.base.eventbus
 
+import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import kotlinx.coroutines.channels.Channel
@@ -12,6 +13,8 @@ sealed interface AppNavigationEvent {
     val source: TransactionSource?,
     val target: TransactionTarget?,
   ) : AppNavigationEvent
+
+  data class CreateCategory(val categoryType: CategoryType) : AppNavigationEvent
 }
 
 class AppNavigationEventBusImpl @Inject constructor() : AppNavigationEventBus {

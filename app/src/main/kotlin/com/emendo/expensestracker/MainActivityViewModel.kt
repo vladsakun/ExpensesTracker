@@ -1,6 +1,7 @@
 package com.emendo.expensestracker
 
 import androidx.lifecycle.ViewModel
+import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.base.manager.CreateTransactionRepository
@@ -27,6 +28,10 @@ class MainActivityViewModel @Inject constructor(
           createTransactionRepository.setSource(source)
         }
         CreateTransactionScreenDestination
+      }
+
+      is AppNavigationEvent.CreateCategory -> {
+        CreateCategoryRouteDestination(event.categoryType)
       }
     }
   }

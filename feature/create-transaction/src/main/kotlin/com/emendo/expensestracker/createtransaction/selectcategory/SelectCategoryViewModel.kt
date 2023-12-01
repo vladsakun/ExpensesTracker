@@ -1,6 +1,8 @@
 package com.emendo.expensestracker.createtransaction.selectcategory
 
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
+import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.base.manager.CreateTransactionRepository
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
@@ -8,7 +10,6 @@ import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
-import com.emendo.expensestracker.core.domain.GetCategoriesWithTotalTransactionsUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,14 +21,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectCategoryViewModel @Inject constructor(
-  getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
+  categoryRepository: CategoryRepository,
   private val createTransactionRepository: CreateTransactionRepository,
-  private val categoryRepository: CategoryRepository,
+  private val appNavigationEventBus: AppNavigationEventBus,
 ) : BaseBottomSheetViewModel<BottomSheetType>() {
 
-  private val categoryTypeFromRepository: CategoryType
-    get() = (createTransactionRepository.getTargetSnapshot() as? CategoryModel)?.type
+  private val categoryTypeFromRepository: CategoryType by lazy {
+    (createTransactionRepository.getTargetSnapshot() as? CategoryModel)?.type
       ?: CategoryType.EXPENSE // Todo remove hardcoded
+  }
 
   val selectCategoryUiState: StateFlow<SelectCategoryUiState> =
     categoriesUiState(
@@ -36,13 +38,17 @@ class SelectCategoryViewModel @Inject constructor(
     ).stateInWhileSubscribed(
       scope = viewModelScope,
       initialValue = getDisplayCategoriesState(
-        categories = categoryRepository.getCategoriesSnapshot(),
+        categories = categoryRepository.categoriesSnapshot,
         categoryType = categoryTypeFromRepository,
       ),
     )
 
   fun saveCategory(category: CategoryModel) {
     createTransactionRepository.setTarget(category)
+  }
+
+  fun openCreateCategoryScreen() {
+    appNavigationEventBus.navigate(AppNavigationEvent.CreateCategory(categoryTypeFromRepository))
   }
 }
 

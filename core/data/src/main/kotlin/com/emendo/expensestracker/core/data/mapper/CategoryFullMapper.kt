@@ -14,7 +14,7 @@ class CategoryFullMapper @Inject constructor(
 
   override suspend fun map(from: CategoryFull): CategoryWithTransactions = with(from) {
     CategoryWithTransactions(
-      categoryModel = category.asExternalModel(),
+      categoryModel = asExternalModel(category),
       transactions = transactions.map { toCategoryTransactionModel(it) },
     )
   }

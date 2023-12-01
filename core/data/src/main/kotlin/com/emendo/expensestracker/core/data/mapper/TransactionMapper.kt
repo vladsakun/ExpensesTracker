@@ -18,9 +18,10 @@ class TransactionMapper @Inject constructor(
 ) : Mapper<TransactionFull, TransactionModel> {
 
   override suspend fun map(from: TransactionFull): TransactionModel = with(from) {
-    val target = (targetAccount?.let { accountMapper.map(it) }?.let { TransactionTargetUiModel.Account(it) }
-      ?: targetCategory?.asExternalModel()?.let { TransactionTargetUiModel.Category(it) }
-      ?: throw IllegalStateException("Transaction must have target"))
+    val targetAccount = targetAccount?.let { accountMapper.map(it) }?.let(TransactionTargetUiModel::Account)
+    val targetCategory = targetCategory?.let(::asExternalModel)?.let(TransactionTargetUiModel::Category)
+
+    val target = targetAccount ?: targetCategory ?: throw IllegalStateException("Transaction must have a target")
 
     val type = target.transactionType
     val currencyModel = currencyMapper.map(transactionEntity.currencyCode)

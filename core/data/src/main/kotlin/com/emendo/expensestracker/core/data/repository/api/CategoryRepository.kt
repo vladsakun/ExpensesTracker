@@ -11,7 +11,7 @@ interface CategoryRepository {
   val categories: Flow<List<CategoryModel>>
   val categoriesWithTransactions: Flow<List<CategoryWithTransactions>>
 
-  fun getCategoriesSnapshot(): List<CategoryModel>
+  val categoriesSnapshot: List<CategoryModel>
 
   suspend fun upsertCategory(name: String, icon: IconModel, color: ColorModel, type: CategoryType)
   suspend fun deleteCategory(id: Long)

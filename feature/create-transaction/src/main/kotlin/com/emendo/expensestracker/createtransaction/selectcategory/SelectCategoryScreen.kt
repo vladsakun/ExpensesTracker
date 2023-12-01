@@ -1,8 +1,8 @@
 package com.emendo.expensestracker.createtransaction.selectcategory
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +19,11 @@ import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
-import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
+import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -31,11 +31,9 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import com.emendo.expensestracker.core.app.resources.R as AppR
 
-private const val GRID_CELL_COUNT = 3
-
 @Destination
 @Composable
-fun SelectCategoryScreen(
+internal fun SelectCategoryScreen(
   navigator: DestinationsNavigator,
   viewModel: SelectCategoryViewModel = hiltViewModel(),
 ) {
@@ -43,9 +41,8 @@ fun SelectCategoryScreen(
 
   SelectCategoryContent(
     stateProvider = uiState::value,
-    onCreateCategoryClick = {
-      //      navigator.navigate(CreateCategoryRouteDestination(viewModel.getCategoryType()))
-    },
+    onBackClick = navigator::navigateUp,
+    onCreateCategoryClick = viewModel::openCreateCategoryScreen,
     onCategoryClick = { category ->
       viewModel.saveCategory(category)
       navigator.navigateUp()
@@ -56,10 +53,14 @@ fun SelectCategoryScreen(
 @Composable
 private fun SelectCategoryContent(
   stateProvider: () -> SelectCategoryUiState,
+  onBackClick: () -> Unit,
   onCreateCategoryClick: () -> Unit,
   onCategoryClick: (category: CategoryModel) -> Unit,
 ) {
-  ExpeScaffoldWithTopBar(titleResId = AppR.string.categories) { paddingValues ->
+  ExpeScaffoldWithTopBar(
+    titleResId = AppR.string.categories,
+    onNavigationClick = onBackClick,
+  ) { paddingValues ->
     Box(
       modifier = Modifier
         .fillMaxSize()
@@ -70,27 +71,14 @@ private fun SelectCategoryContent(
         is SelectCategoryUiState.Empty -> Unit
         is SelectCategoryUiState.Loading -> ExpLoadingWheel()
         is SelectCategoryUiState.Error -> Text(text = state.message)
-        is SelectCategoryUiState.DisplayCategoryList -> CategoriesList(
-          uiStateProvider = { state },
-          onCreateCategoryClick = onCreateCategoryClick,
+        is SelectCategoryUiState.DisplayCategoryList -> CategoriesGrid(
+          categories = state.categories,
           onCategoryClick = onCategoryClick,
+          onAddCategoryClick = onCreateCategoryClick,
         )
       }
     }
   }
-}
-
-@Composable
-private fun CategoriesList(
-  uiStateProvider: () -> SelectCategoryUiState.DisplayCategoryList,
-  onCreateCategoryClick: () -> Unit,
-  onCategoryClick: (category: CategoryModel) -> Unit,
-) {
-  CategoriesGrid(
-    categories = uiStateProvider().categories,
-    onCategoryClick = onCategoryClick,
-    onAddCategoryClick = onCreateCategoryClick,
-  )
 }
 
 @Composable
@@ -99,13 +87,7 @@ fun CategoriesGrid(
   onCategoryClick: (category: CategoryModel) -> Unit,
   onAddCategoryClick: () -> Unit,
 ) {
-  LazyVerticalGrid(
-    modifier = Modifier.fillMaxSize(),
-    columns = GridCells.Fixed(GRID_CELL_COUNT),
-    verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
-    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
-    contentPadding = PaddingValues(Dimens.margin_large_x),
-  ) {
+  CategoriesLazyVerticalGrid {
     items(
       items = categories,
       key = { it.id },
@@ -143,6 +125,7 @@ private fun CategoriesListPreview() {
           }.toImmutableList(),
         )
       },
+      onBackClick = {},
       onCreateCategoryClick = {},
       onCategoryClick = {},
     )

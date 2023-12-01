@@ -50,10 +50,10 @@ internal fun CreateAccountRoute(
       stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
       onAccountNameChange = remember { viewModel::setAccountName },
-      onIconRowClick = remember { viewModel::onIconRowClick },
-      onColorRowClick = remember { viewModel::onColorRowClick },
+      onIconRowClick = remember { viewModel::openIconBottomSheet },
+      onColorRowClick = remember { viewModel::openColorBottomSheet },
       onInitialBalanceRowClick = remember { viewModel::onInitialBalanceClick },
-      onCurrencyRowClick = remember { viewModel::onCurrencyRowClick },
+      onCurrencyRowClick = remember { viewModel::openCurrencyBottomSheet },
       onCreateAccountClick = remember { viewModel::createNewAccount },
     )
   }

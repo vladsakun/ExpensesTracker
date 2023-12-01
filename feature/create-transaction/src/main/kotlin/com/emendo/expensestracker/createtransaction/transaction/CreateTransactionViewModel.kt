@@ -42,14 +42,14 @@ class CreateTransactionViewModel @Inject constructor(
   private val appNavigationEventBus: AppNavigationEventBus,
 ) : BaseBottomSheetViewModel<BottomSheetType.Calculator>(), CalculatorKeyboardActions {
 
-  //  private val currencyUiState: MutableStateFlow<CurrencyModel?> = MutableStateFlow(null)
-  //  private val currencyState: StateFlow<CurrencyModel?> = merge(currencyUiState, sourceUiModel.map { it?.currency })
-  //    .distinctUntilChanged()
-  //    .stateIn(
-  //      scope = viewModelScope,
-  //      started = SharingStarted.Eagerly,
-  //      initialValue = null,
-  //    )
+  //    private val currencyUiState: MutableStateFlow<CurrencyModel?> = MutableStateFlow(null)
+  //    private val currencyState: StateFlow<CurrencyModel?> = merge(currencyUiState, sourceUiModel.map { it?.currency })
+  //      .distinctUntilChanged()
+  //      .stateIn(
+  //        scope = viewModelScope,
+  //        started = SharingStarted.Eagerly,
+  //        initialValue = null,
+  //      )
 
   private val _uiState: MutableStateFlow<CreateTransactionUiState> =
     MutableStateFlow(getDefaultCreateTransactionUiState())

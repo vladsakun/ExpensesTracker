@@ -27,9 +27,9 @@ private fun CategoryEntity.toExternalModel(name: TransactionElementName = Transa
   )
 }
 
-fun CategoryEntity.asExternalModel() =
-  if (id == DefaultTransactionTargetIncomeId || id == DefaultTransactionTargetExpenseId) {
-    toExternalModel(TransactionElementName.NameStringRes(R.string.uncategorized))
+fun asExternalModel(category: CategoryEntity) =
+  if (category.id == DefaultTransactionTargetIncomeId || category.id == DefaultTransactionTargetExpenseId) {
+    category.toExternalModel(TransactionElementName.NameStringRes(R.string.uncategorized))
   } else {
-    toExternalModel()
+    category.toExternalModel()
   }

@@ -23,7 +23,7 @@ import com.emendo.expensestracker.core.app.resources.R as AppR
 
 @Destination
 @Composable
-fun SelectAccountScreen(
+internal fun SelectAccountScreen(
   navigator: DestinationsNavigator,
   viewModel: SelectAccountViewModel = hiltViewModel(),
 ) {
@@ -42,6 +42,7 @@ fun SelectAccountScreen(
       when (val state = uiState.value) {
         is SelectAccountUiState.Empty -> uniqueItem("empty") {
           Text(text = "You have zero accounts. Create one 😊")
+          // Todo add a create button
         }
 
         is SelectAccountUiState.Error -> uniqueItem("error") {

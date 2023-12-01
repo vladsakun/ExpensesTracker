@@ -18,7 +18,7 @@ class AccountMapper @Inject constructor(
 
   override suspend fun map(from: AccountEntity): AccountModel = with(from) {
     val currencyModel = currencyMapper.map(currencyCode)
-    return AccountModel(
+    AccountModel(
       id = id,
       name = TransactionElementName.Name(name),
       balance = balance,

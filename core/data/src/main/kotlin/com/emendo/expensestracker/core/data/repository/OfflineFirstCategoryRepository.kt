@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.core.data.repository
 
-import com.emendo.expensestracker.core.app.common.ext.stateInLazyList
+import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
+import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
@@ -33,12 +34,15 @@ class OfflineFirstCategoryRepository @Inject constructor(
   @ApplicationScope private val scope: CoroutineScope,
 ) : CategoryRepository {
 
-  private val categoriesState: StateFlow<List<CategoryModel>> by lazy(LazyThreadSafetyMode.NONE) {
+  private val categoriesState: StateFlow<List<CategoryModel>> =
     categoryDao
       .getAll()
-      .map { categoryEntities -> categoryEntities.map { it.asExternalModel() } }
-      .stateInLazyList(scope)
-  }
+      .map { categories ->
+        categories
+          .filterNot(::isPrepopulatedCategory)
+          .map(::asExternalModel)
+      }
+      .stateInEagerlyList(scope)
 
   private val categoriesWithTransactionState: StateFlow<List<CategoryWithTransactions>> by lazy(LazyThreadSafetyMode.NONE) {
     categoryDao
@@ -48,7 +52,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
           .filterNot(::isEmptyPrepopulatedCategory)
           .map { categoryFullMapper.map(it) }
       }
-      .stateInLazyList(scope)
+      .stateInLazilyList(scope)
   }
 
   override val categories: Flow<List<CategoryModel>>
@@ -57,8 +61,8 @@ class OfflineFirstCategoryRepository @Inject constructor(
   override val categoriesWithTransactions: Flow<List<CategoryWithTransactions>>
     get() = categoriesWithTransactionState
 
-  override fun getCategoriesSnapshot(): List<CategoryModel> =
-    categoriesState.value
+  override val categoriesSnapshot: List<CategoryModel>
+    get() = categoriesState.value
 
   override suspend fun upsertCategory(
     name: String,
@@ -84,9 +88,9 @@ class OfflineFirstCategoryRepository @Inject constructor(
     }
   }
 
-  private fun isEmptyPrepopulatedCategory(category: CategoryFull): Boolean {
-    return (category.category.id == DefaultTransactionTargetExpenseId ||
-      category.category.id == DefaultTransactionTargetIncomeId) &&
-      category.transactions.isEmpty()
-  }
+  private fun isPrepopulatedCategory(category: CategoryEntity): Boolean =
+    category.id == DefaultTransactionTargetExpenseId || category.id == DefaultTransactionTargetIncomeId
+
+  private fun isEmptyPrepopulatedCategory(category: CategoryFull): Boolean =
+    isPrepopulatedCategory(category.category) && category.transactions.isEmpty()
 }

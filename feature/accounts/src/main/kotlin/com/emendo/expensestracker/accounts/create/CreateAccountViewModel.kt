@@ -102,7 +102,7 @@ class CreateAccountViewModel @Inject constructor(
     }
   }
 
-  fun onIconRowClick() {
+  fun openIconBottomSheet() {
     showBottomSheet(
       BottomSheetType.Icon(
         selectedIcon = state.value.icon,
@@ -111,7 +111,7 @@ class CreateAccountViewModel @Inject constructor(
     )
   }
 
-  fun onColorRowClick() {
+  fun openColorBottomSheet() {
     showBottomSheet(
       BottomSheetType.Color(
         selectedColor = state.value.color,
@@ -120,7 +120,7 @@ class CreateAccountViewModel @Inject constructor(
     )
   }
 
-  fun onCurrencyRowClick() {
+  fun openCurrencyBottomSheet() {
     showBottomSheet(
       BottomSheetType.Currency(
         selectedCurrency = state.value.currency,

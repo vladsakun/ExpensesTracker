@@ -14,13 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
 
@@ -100,7 +101,7 @@ fun SelectRowWithText(
 @Composable
 fun SelectRowWithColor(
   @StringRes labelResId: Int,
-  colorProvider: () -> Color,
+  colorProvider: () -> ColorModel,
   onClick: () -> Unit,
 ) {
   SelectRow(
@@ -112,7 +113,7 @@ fun SelectRowWithColor(
           .size(Dimens.icon_size)
           .aspectRatio(1f)
           .clip(shape = CircleShape)
-          .background(color = colorProvider())
+          .background(color = colorProvider().color)
       )
     },
   )
