@@ -16,7 +16,7 @@ class NumericKeyboardCommanderImpl @Inject constructor(
 
   override val calculatorTextState by lazy { MutableStateFlow(INITIAL_CALCULATOR_TEXT) }
   override val equalButtonState by lazy { MutableStateFlow(EqualButtonState.Default) }
-  override val currencyValue: BigDecimal
+  override val currentValue: BigDecimal
     get() = calculatorInput.currentValue
 
   private var doneClick: () -> Boolean = {
@@ -133,5 +133,10 @@ class NumericKeyboardCommanderImpl @Inject constructor(
 
   override fun doMath() {
     calculatorInput.doMath()
+  }
+
+  override fun negate() {
+    calculatorInput.doMath()
+    mathDone(calculatorInput.negate())
   }
 }

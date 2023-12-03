@@ -5,6 +5,9 @@
   <string name="close">Close</string>
   <string name="add">Add</string>
   <string name="create">Create</string>
+  <string name="save">Save</string>
+  <string name="delete">Delete</string>
+  <string name="cancel">Cancel</string>
   <string name="done">Done</string>
   <string name="loading">Loading</string>
   <string name="on_label">On</string>
@@ -14,6 +17,7 @@
 
   <string name="expense">Expense</string>
   <string name="income">Income</string>
+  <string name="transfer">Transfer</string>
   <string name="substract">Subtract</string>
   <string name="multiply">Multiply</string>
   <string name="divide">Divide</string>
@@ -21,10 +25,12 @@
   <string name="equal">Equal</string>
   <string name="currency_with_symbol">Currency\n%s</string>
   <string name="currency">Currency</string>
+  <string name="archive">Archive</string>
   <string name="icon">Icon</string>
   <string name="color">Color</string>
   <string name="balance">Balance</string>
   <string name="accounts">Accounts</string>
+  <string name="select_account">Select account</string>
   <string name="account">Account</string>
   <string name="accounts_loading">Loading accounts</string>
   <string name="account_name">Account name</string>
@@ -49,4 +55,6 @@
   <string name="sync_notification_title">Expenses tracker</string>
   <string name="sync_notification_channel_name">Sync</string>
   <string name="sync_notification_channel_description">Background tasks for Expenses tracker</string>
+
+  <string name="account_detail_dialog_delete_confirm_title">Are you sure that you want to delete the account?</string>
 </resources>

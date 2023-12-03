@@ -5,14 +5,14 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
+import com.emendo.expensestracker.core.app.resources.models.TextValue
 
 @Composable
 @ReadOnlyComposable
-fun TransactionElementName.stringValue(): String =
+fun TextValue.stringValue(): String =
   when (val name = this) {
-    is TransactionElementName.Name -> name.value
-    is TransactionElementName.NameStringRes -> stringResource(id = name.value)
+    is TextValue.Value -> name.value
+    is TextValue.Resource -> stringResource(id = name.resId)
   }
 
 @Composable

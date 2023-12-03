@@ -24,6 +24,8 @@ interface CalculatorInput {
   fun isEmpty(): Boolean
   fun isNotEmpty(): Boolean
   fun clear()
+  fun negate(): String
+  fun refreshValue()
 }
 
 interface KeyboardCallbacks {

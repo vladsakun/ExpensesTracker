@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.accounts.list
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,11 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
-import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
+import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
@@ -42,18 +44,32 @@ fun AccountsScreenRoute(
     }
   }
 
+  val onBackClick: (() -> Unit)? = if (viewModel.isSelectMode) navigator::navigateUp else null
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
   AccountsListScreenContent(
     uiStateProvider = uiState::value,
-    onAddAccountClick = { navigator.navigate(CreateAccountRouteDestination) }
+    onAddAccountClick = { navigator.navigate(CreateAccountRouteDestination) },
+    onAccountClick = { account ->
+      if (viewModel.isSelectMode) {
+        viewModel.selectAccountItem(account)
+        navigator.navigateUp()
+      } else {
+        navigator.navigate(AccountDetailScreenDestination(account.id))
+      }
+    },
+    onBackClick = onBackClick,
+    titleRestId = viewModel.titleResId,
   )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountsListScreenContent(
+  @StringRes titleRestId: Int,
   uiStateProvider: () -> AccountsListUiState,
   onAddAccountClick: () -> Unit,
+  onAccountClick: (AccountModel) -> Unit,
+  onBackClick: (() -> Unit)?,
 ) {
   val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -63,8 +79,9 @@ private fun AccountsListScreenContent(
       .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
     topBar = {
       ExpeTopBar(
-        titleRes = R.string.accounts,
+        titleResId = titleRestId,
         scrollBehavior = topAppBarScrollBehavior,
+        onNavigationBackClick = onBackClick,
       )
     },
     floatingActionButtonPosition = FabPosition.End,
@@ -93,7 +110,7 @@ private fun AccountsListScreenContent(
         is AccountsListUiState.DisplayAccountsList -> {
           items(
             items = state.accountModels,
-            key = { it.id },
+            key = AccountModel::id,
             contentType = { _ -> "account" }
           ) { account ->
             AccountItem(
@@ -101,6 +118,7 @@ private fun AccountsListScreenContent(
               icon = account.icon.imageVector,
               name = account.name.stringValue(),
               balance = account.balanceFormatted,
+              onClick = { onAccountClick(account) },
             )
             ExpeDivider()
           }

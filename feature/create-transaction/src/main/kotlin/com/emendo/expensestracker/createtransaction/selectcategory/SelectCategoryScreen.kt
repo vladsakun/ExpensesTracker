@@ -13,7 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
+import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
@@ -117,9 +117,9 @@ private fun CategoriesListPreview() {
           categories = List(6) { index ->
             CategoryModel(
               id = index.toLong(),
-              name = TransactionElementName.Name("Childcare"),
-              icon = IconModel.CHILDCARE,
-              color = ColorModel.Purple,
+              name = TextValue.Value("Childcare"),
+              icon = IconModel.random,
+              color = ColorModel.random,
               type = CategoryType.EXPENSE,
             )
           }.toImmutableList(),

@@ -32,16 +32,14 @@ class SelectCategoryViewModel @Inject constructor(
   }
 
   val selectCategoryUiState: StateFlow<SelectCategoryUiState> =
-    categoriesUiState(
-      categoryRepository,
-      categoryTypeFromRepository
-    ).stateInWhileSubscribed(
-      scope = viewModelScope,
-      initialValue = getDisplayCategoriesState(
-        categories = categoryRepository.categoriesSnapshot,
-        categoryType = categoryTypeFromRepository,
-      ),
-    )
+    categoriesUiState(categoryRepository, categoryTypeFromRepository)
+      .stateInWhileSubscribed(
+        scope = viewModelScope,
+        initialValue = getDisplayCategoriesState(
+          categories = categoryRepository.categoriesSnapshot,
+          categoryType = categoryTypeFromRepository,
+        ),
+      )
 
   fun saveCategory(category: CategoryModel) {
     createTransactionRepository.setTarget(category)

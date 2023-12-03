@@ -3,7 +3,7 @@ package com.emendo.expensestracker.core.app.base.manager
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
+import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
@@ -34,6 +34,8 @@ class CreateTransactionRepositoryImpl @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = null,
       )
+
+  private var isSelectSourceFlow: Boolean = false
 
   override suspend fun init() {
     transactionSourceMutableState.update {
@@ -72,7 +74,7 @@ class CreateTransactionRepositoryImpl @Inject constructor(
       } else {
         DefaultTransactionTargetIncomeId
       },
-      name = TransactionElementName.NameStringRes(AppR.string.uncategorized),
+      name = TextValue.Resource(AppR.string.uncategorized),
       icon = IconModel.UNKNOWN,
       color = ColorModel.Base,
       type = if (transactionType == TransactionType.EXPENSE) {
@@ -81,6 +83,18 @@ class CreateTransactionRepositoryImpl @Inject constructor(
         CategoryType.INCOME
       },
     )
+
+  override fun isSelectSourceFlow(): Boolean {
+    return isSelectSourceFlow
+  }
+
+  override fun startSelectSourceFlow() {
+    isSelectSourceFlow = true
+  }
+
+  override fun finishSelectSourceFlow() {
+    isSelectSourceFlow = false
+  }
 
   override fun clear() {
     transactionTargetState.update { null }

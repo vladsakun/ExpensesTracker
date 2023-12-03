@@ -54,7 +54,6 @@ fun TextSwitch(
   require(items.isNotEmpty()) { "Items can't be empty" }
   BoxWithConstraints(
     modifier
-      .padding(4.dp)
       .height(40.dp)
       .clip(RoundedCornerShape(cornerRadius))
       .background(backgroundColor)

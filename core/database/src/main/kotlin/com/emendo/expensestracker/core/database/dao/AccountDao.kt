@@ -33,6 +33,9 @@ abstract class AccountDao : BaseDao<AccountEntity>() {
   @Query("UPDATE $TABLE_NAME SET balance = :balance WHERE $PRIMARY_KEY = :id")
   abstract fun updateBalance(id: Long, balance: BigDecimal)
 
+  @Query("DELETE FROM $TABLE_NAME WHERE id = :id")
+  abstract fun deleteById(id: Long)
+
   companion object {
     private const val TABLE_NAME = TABLE_ACCOUNT
     private const val PRIMARY_KEY = ACCOUNT_PRIMARY_KEY

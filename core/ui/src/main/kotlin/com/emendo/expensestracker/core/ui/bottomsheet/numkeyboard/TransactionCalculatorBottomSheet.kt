@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
@@ -24,17 +25,20 @@ data class CalculatorBottomSheetState(
   val currency: String?,
   val equalButtonState: EqualButtonState,
   val decimalSeparator: String,
+  @StringRes val transactionTypeLabelResId: Int,
   val numericKeyboardActions: NumericKeyboardActions,
 ) {
   companion object {
     fun initial(
       decimalSeparator: String,
+      @StringRes transactionTypeLabelResId: Int,
       numericKeyboardActions: NumericKeyboardActions,
     ) = CalculatorBottomSheetState(
       text = CalculatorConstants.INITIAL_CALCULATOR_TEXT,
       currency = null,
       equalButtonState = EqualButtonState.Default,
       decimalSeparator = decimalSeparator,
+      transactionTypeLabelResId = transactionTypeLabelResId,
       numericKeyboardActions = numericKeyboardActions,
     )
   }
@@ -48,17 +52,15 @@ interface CalculatorKeyboardActions {
 
 @Composable
 fun TransactionCalculatorBottomSheet(
-  textStateProvider: () -> String,
-  currencyState: () -> String?,
-  equalButtonState: () -> EqualButtonState,
+  stateProvider: () -> CalculatorBottomSheetState,
   decimalSeparator: String,
   calculatorActions: CalculatorKeyboardActions,
   numericKeyboardActions: NumericKeyboardActions,
   modifier: Modifier = Modifier,
 ) {
   BaseNumericalKeyboardBottomSheet(
-    textProvider = textStateProvider,
-    equalButtonStateProvider = equalButtonState,
+    textProvider = { stateProvider().text },
+    equalButtonStateProvider = { stateProvider().equalButtonState },
     decimalSeparator = decimalSeparator,
     firstAction = { actionModifier ->
       RoundedCornerSmallButton(
@@ -68,7 +70,7 @@ fun TransactionCalculatorBottomSheet(
         contentPadding = PaddingValues(0.dp),
       ) {
         Text(
-          text = "Income",
+          text = stringResource(id = stateProvider().transactionTypeLabelResId),
           modifier = Modifier.align(Alignment.CenterVertically),
           textAlign = TextAlign.Center,
         )
@@ -82,7 +84,7 @@ fun TransactionCalculatorBottomSheet(
         modifier = actionModifier,
         contentPadding = PaddingValues(0.dp),
       ) {
-        currencyState()?.let { currency ->
+        stateProvider().currency?.let { currency ->
           Text(
             text = stringResource(id = R.string.currency_with_symbol, currency),
             modifier = Modifier.align(Alignment.CenterVertically),

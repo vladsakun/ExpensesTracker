@@ -15,6 +15,7 @@ sealed interface AppNavigationEvent {
   ) : AppNavigationEvent
 
   data class CreateCategory(val categoryType: CategoryType) : AppNavigationEvent
+  data object SelectAccount : AppNavigationEvent
 }
 
 class AppNavigationEventBusImpl @Inject constructor() : AppNavigationEventBus {

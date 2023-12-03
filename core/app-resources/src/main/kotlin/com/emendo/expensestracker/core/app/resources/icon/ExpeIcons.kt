@@ -30,4 +30,6 @@ object ExpeIcons {
   val Help = Icons.Outlined.Help
   val AdvancedSettings = Icons.Outlined.BuildCircle
   val HideSource = Icons.Outlined.HideSource
+  val Edit = Icons.Outlined.Edit
+  val DragHandle = Icons.Outlined.DragHandle
 }

@@ -2,6 +2,7 @@
 
 package com.emendo.expensestracker.core.designsystem.component
 
+//noinspection SuspiciousImport
 import android.R
 import androidx.annotation.StringRes
 import androidx.compose.material3.*
@@ -17,10 +18,10 @@ import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpeMediumTopBar(
-  modifier: Modifier = Modifier,
+fun ExpeCenterAlignedTopBar(
   title: @Composable () -> Unit,
-  navigationIcon: @Composable () -> Unit,
+  navigationIcon: @Composable () -> Unit = {},
+  modifier: Modifier = Modifier,
   actions: ImmutableList<MenuAction>? = null,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
@@ -47,18 +48,18 @@ fun ExpeMediumTopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpeTopBar(
-  @StringRes titleRes: Int,
+fun ExpeCenterAlignedTopBar(
+  title: String,
   modifier: Modifier = Modifier,
-  navigationIcon: @Composable () -> Unit,
+  navigationIcon: @Composable () -> Unit = {},
   actions: ImmutableList<MenuAction>? = null,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-  LargeTopAppBar(
+  CenterAlignedTopAppBar(
     title = {
       AutoResizedText(
-        text = stringResource(id = titleRes),
+        text = title,
         maxLines = 1,
         minFontSize = 14.sp,
       )
@@ -81,44 +82,64 @@ fun ExpeTopBar(
   )
 }
 
-/**
- * Top  bar with action, displayed on the right
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpeTopBar(
-  @StringRes titleRes: Int,
-  actions: ImmutableList<MenuAction>,
+  title: String,
   modifier: Modifier = Modifier,
+  navigationIcon: (@Composable () -> Unit)? = null,
+  actions: ImmutableList<MenuAction>? = null,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-  ExpeTopBar(
-    titleRes = titleRes,
-    actions = actions,
+  LargeTopAppBar(
+    title = {
+      AutoResizedText(
+        text = title,
+        maxLines = 1,
+        minFontSize = 14.sp,
+      )
+    },
+    navigationIcon = navigationIcon ?: {},
+    actions = {
+      actions?.forEach { action ->
+        IconButton(
+          onClick = action.onClick,
+          enabled = action.enabled,
+        ) {
+          Icon(
+            imageVector = action.icon,
+            contentDescription = action.text,
+            tint = MaterialTheme.colorScheme.onSurface,
+          )
+        }
+      }
+    },
     colors = colors,
-    modifier = modifier,
-    navigationIcon = {},
+    modifier = modifier.testTag("expeTopBar"),
+    scrollBehavior = scrollBehavior,
   )
 }
 
 /**
- * Top  bar with no actions
+ * Top  bar with back navigation
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpeTopBar(
-  @StringRes titleRes: Int,
+  @StringRes titleResId: Int,
   modifier: Modifier = Modifier,
+  onNavigationBackClick: (() -> Unit)? = null,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
   actions: ImmutableList<MenuAction>? = null,
 ) {
   ExpeTopBar(
-    titleRes = titleRes,
-    colors = colors,
+    title = stringResource(titleResId),
     modifier = modifier,
+    onNavigationBackClick = onNavigationBackClick,
+    colors = colors,
     scrollBehavior = scrollBehavior,
-    navigationIcon = {},
     actions = actions,
   )
 }
@@ -129,19 +150,19 @@ fun ExpeTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpeTopBar(
-  @StringRes titleRes: Int,
-  onNavigationBackClick: () -> Unit,
+  title: String,
   modifier: Modifier = Modifier,
+  onNavigationBackClick: (() -> Unit)? = null,
   colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
   actions: ImmutableList<MenuAction>? = null,
 ) {
   ExpeTopBar(
-    titleRes = titleRes,
+    title = title,
     colors = colors,
     modifier = modifier,
     scrollBehavior = scrollBehavior,
-    navigationIcon = { NavigationBackIcon(onNavigationClick = onNavigationBackClick) },
+    navigationIcon = onNavigationBackClick?.let { { NavigationBackIcon(onNavigationClick = it) } },
     actions = actions,
   )
 }
@@ -168,7 +189,7 @@ fun NavigationBackIcon(
 @Composable
 private fun NiaTopBarPreview() {
   ExpeTopBar(
-    titleRes = R.string.untitled,
+    title = stringResource(id = R.string.untitled),
     actions = persistentListOf(
       MenuAction(
         icon = ExpeIcons.Add,

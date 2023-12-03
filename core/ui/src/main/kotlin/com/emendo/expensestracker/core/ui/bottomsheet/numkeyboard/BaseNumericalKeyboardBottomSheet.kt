@@ -68,7 +68,6 @@ internal fun BaseNumericalKeyboardBottomSheet(
   onDoneClick: () -> Unit,
   onEqualClick: () -> Unit,
   modifier: Modifier = Modifier,
-  headerRows: ImmutableList<@Composable () -> Unit> = persistentListOf(),
 ) {
   Column(
     modifier = modifier
@@ -79,8 +78,6 @@ internal fun BaseNumericalKeyboardBottomSheet(
       .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
     verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
   ) {
-    headerRows.forEach { it() }
-
     ResultText(textProvider)
     val mathOperationModifier = remember {
       Modifier
@@ -193,9 +190,9 @@ internal fun BaseNumericalKeyboardBottomSheet(
 }
 
 @Composable
-private fun ResultText(textProvider: () -> String) {
-  val heightValue =
-    MaterialTheme.typography.headlineLarge.lineHeight.value + 5 // Todo remove hardcoded value. Us sp to dp converted
+internal fun ResultText(textProvider: () -> String) {
+  // Todo remove hardcoded value. Us sp to dp converted
+  val heightValue = MaterialTheme.typography.headlineLarge.lineHeight.value + 5
   val lineHeightDp = with(LocalDensity.current) { heightValue.sp.toDp() }
   AutoSizableText(
     text = textProvider(),

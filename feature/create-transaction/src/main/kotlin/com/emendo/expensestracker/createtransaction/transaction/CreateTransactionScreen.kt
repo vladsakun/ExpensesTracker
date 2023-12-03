@@ -10,9 +10,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,11 +29,9 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
 import com.emendo.expensestracker.core.ui.loader
 import com.emendo.expensestracker.core.ui.stringValue
-import com.emendo.expensestracker.createtransaction.destinations.SelectAccountScreenDestination
 import com.emendo.expensestracker.createtransaction.destinations.SelectCategoryScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -68,7 +64,7 @@ fun CreateTransactionScreen(
       stateProvider = uiState::value,
       onAmountClick = remember { viewModel::showCalculatorBottomSheet },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
-      onAccountClick = remember { { navigator.navigate(SelectAccountScreenDestination) } },
+      onAccountClick = remember { viewModel::openAccountListScreen },
       onCreateTransactionClick = remember { viewModel::saveTransaction },
       onBackPressed = navigator::navigateUp,
       onErrorConsumed = remember { viewModel::consumeFieldError },
@@ -91,20 +87,21 @@ private fun CreateTransactionContent(
   onConsumedNavigateUpEvent: () -> Unit,
   onTransactionTypeChange: (TransactionType) -> Unit,
 ) {
-  val selectedTabState = rememberSaveable { mutableIntStateOf(TransactionType.DEFAULT.ordinal) }
   ExpeScaffold(
     topBar = {
-      ExpeMediumTopBar(
+      ExpeCenterAlignedTopBar(
         title = {
-          val tabs = persistentListOf("Income", "Expense", "Transfer")
-          TextSwitch(
-            selectedIndex = selectedTabState.intValue,
-            items = tabs,
-            onSelectionChange = { tabIndex ->
-              selectedTabState.intValue = tabIndex
-              onTransactionTypeChange(tabIndex.toTransactionType())
-            },
-          )
+          val transactionType = stateProvider().successValue?.screenData?.transactionType
+          if (transactionType != null) {
+            val tabs = persistentListOf("Income", "Expense", "Transfer")
+            TextSwitch(
+              selectedIndex = transactionType.ordinal,
+              items = tabs,
+              onSelectionChange = { tabIndex ->
+                onTransactionTypeChange(tabIndex.toTransactionType())
+              },
+            )
+          }
         },
         navigationIcon = {
           IconButton(onClick = onBackPressed) {
@@ -169,6 +166,7 @@ private fun CreateTransactionContent(
               error = state.screenData.sourceError == triggered,
               onConsumed = { onErrorConsumed(FieldWithError.Source) },
             )
+            Spacer(modifier = Modifier.height(Dimens.margin_large_x))
             ExpeButton(
               textResId = AppR.string.save_transaction,
               onClick = onCreateTransactionClick,
@@ -183,25 +181,19 @@ private fun CreateTransactionContent(
 
 @Composable
 private fun BottomSheetContent(
-  type: BottomSheetType?,
+  type: CreateTransactionBottomSheetType?,
   hideBottomSheet: () -> Unit,
 ) {
   when (type) {
-    is BottomSheetType.Calculator -> {
+    is CalculatorBottomSheet -> {
       val state = type.state.collectAsStateWithLifecycle()
 
       TransactionCalculatorBottomSheet(
-        textStateProvider = { state.value.text },
-        currencyState = { state.value.currency },
-        equalButtonState = { state.value.equalButtonState },
+        stateProvider = state::value,
         decimalSeparator = type.decimalSeparator,
         calculatorActions = type.actions,
         numericKeyboardActions = type.numericKeyboardActions,
       )
-    }
-
-    else -> {
-      Unit
     }
   }
 }

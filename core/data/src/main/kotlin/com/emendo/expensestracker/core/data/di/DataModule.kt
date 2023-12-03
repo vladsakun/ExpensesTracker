@@ -17,7 +17,7 @@ interface DataModule {
 
   @Binds
   @Singleton
-  fun bindsAccountsRepository(accountsRepository: OfflineFirstAccountsRepository): AccountsRepository
+  fun bindsAccountsRepository(accountsRepository: OfflineFirstAccountRepository): AccountRepository
 
   @Binds
   @Singleton

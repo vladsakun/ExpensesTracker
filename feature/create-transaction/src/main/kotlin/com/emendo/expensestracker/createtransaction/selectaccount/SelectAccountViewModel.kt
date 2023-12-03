@@ -8,9 +8,9 @@ import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
+import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.repository.api.AccountsRepository
+import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -28,7 +28,7 @@ val mockAccounts = persistentListOf(
       currencyName = "Dollar",
       currencySymbol = null
     ),
-    name = TransactionElementName.Name("Norma Reid"),
+    name = TextValue.Value("Norma Reid"),
     icon = IconModel.CREDITCARD,
     color = ColorModel.Purple,
     balance = BigDecimal.TEN,
@@ -41,7 +41,7 @@ val mockAccounts = persistentListOf(
       currencyName = "Dollar",
       currencySymbol = null
     ),
-    name = TransactionElementName.Name("Norma Reid"),
+    name = TextValue.Value("Norma Reid"),
     icon = IconModel.CREDITCARD,
     color = ColorModel.Purple,
     balance = BigDecimal.TEN,
@@ -54,7 +54,7 @@ val mockAccounts = persistentListOf(
       currencyName = "Dollar",
       currencySymbol = null
     ),
-    name = TransactionElementName.Name("Norma Reid"),
+    name = TextValue.Value("Norma Reid"),
     icon = IconModel.CREDITCARD,
     color = ColorModel.Purple,
     balance = BigDecimal.TEN,
@@ -64,14 +64,14 @@ val mockAccounts = persistentListOf(
 
 @HiltViewModel
 class SelectAccountViewModel @Inject constructor(
-  accountsRepository: AccountsRepository,
+  accountRepository: AccountRepository,
   private val createTransactionRepository: CreateTransactionRepository,
 ) : ViewModel() {
 
-  val uiState = accountsUiState(accountsRepository)
+  val uiState = accountsUiState(accountRepository)
     .stateInWhileSubscribed(
       scope = viewModelScope,
-      initialValue = getSuccessState(accountsRepository.getAccountsSnapshot()),
+      initialValue = getSuccessState(accountRepository.accountsSnapshot),
     )
 
   fun selectAccount(account: AccountModel) {
@@ -87,8 +87,8 @@ private fun getSuccessState(accountModels: List<AccountModel>): SelectAccountUiS
   return SelectAccountUiState.DisplayAccountsList(accountModels.toImmutableList())
 }
 
-private fun accountsUiState(accountsRepository: AccountsRepository): Flow<SelectAccountUiState> {
-  return accountsRepository.getAccounts().asResult().map { accountsResult ->
+private fun accountsUiState(accountRepository: AccountRepository): Flow<SelectAccountUiState> {
+  return accountRepository.accounts.asResult().map { accountsResult ->
     when (accountsResult) {
       is Result.Success -> getSuccessState(accountsResult.data.toImmutableList())
       is Result.Error -> SelectAccountUiState.Error("Error loading accounts")

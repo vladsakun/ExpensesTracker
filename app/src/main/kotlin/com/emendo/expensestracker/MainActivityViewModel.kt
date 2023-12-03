@@ -1,6 +1,7 @@
 package com.emendo.expensestracker
 
 import androidx.lifecycle.ViewModel
+import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
@@ -32,6 +33,11 @@ class MainActivityViewModel @Inject constructor(
 
       is AppNavigationEvent.CreateCategory -> {
         CreateCategoryRouteDestination(event.categoryType)
+      }
+
+      is AppNavigationEvent.SelectAccount -> {
+        createTransactionRepository.startSelectSourceFlow()
+        AccountsScreenRouteDestination
       }
     }
   }

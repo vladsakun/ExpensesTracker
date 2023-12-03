@@ -1,23 +1,19 @@
 package com.emendo.expensestracker.accounts.create
 
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.app.common.network.Dispatcher
-import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
+import com.emendo.expensestracker.accounts.common.AccountViewModel
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
-import com.emendo.expensestracker.core.data.repository.api.AccountsRepository
+import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.model.data.CurrencyModel
-import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.InitialBalanceKeyboardActions
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,61 +22,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
-  private val accountsRepository: AccountsRepository,
+  currencyCacheManager: CurrencyCacheManager,
+  numericKeyboardCommander: NumericKeyboardCommander,
+  private val amountFormatter: AmountFormatter,
+  private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-  private val currencyCacheManager: CurrencyCacheManager,
-  private val numericKeyboardCommander: NumericKeyboardCommander,
-) : BaseBottomSheetViewModel<BottomSheetType>(), InitialBalanceKeyboardActions {
+) : AccountViewModel(calculatorFormatter, currencyCacheManager, numericKeyboardCommander, amountFormatter) {
 
-  private val _state = MutableStateFlow(
+  private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
       currency = currencyCacheManager.getGeneralCurrencySnapshot()
     )
   )
 
-  val state = _state.asStateFlow()
+  override val state = _state.asStateFlow()
 
   private var createAccountJob: Job? = null
 
   init {
-    numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, valueChanged = ::updateValue)
-
-    //    if (IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET) {
-    //      viewModelScope.launch {
-    //        delay(100)
-    //        showBottomSheet(
-    //          BottomSheetType.InitialBalance(
-    //            text = initialBalanceState.asStateFlow(),
-    //            actions = this@CreateAccountViewModel,
-    //            decimalSeparator = amountFormatter.decimalSeparator.toString(),
-    //            equalButtonState = equalButtonState.asStateFlow(),
-    //            currency = state.value.currency.currencyName,
-    //          )
-    //        )
-    //      }
-    //    }
-  }
-
-  private fun updateValue(formattedValue: String, equalButtonState: EqualButtonState): Boolean {
-    _state.update { it.copy(initialBalance = formattedValue) }
-    return false
-  }
-
-  override fun onChangeSignClick() {
-    // Todo
-  }
-
-  private fun doneClick(): Boolean {
-    hideBottomSheet()
-    return false
-  }
-
-  override fun dismissBottomSheet() {
-    if (bottomSheetState.value.bottomSheetState is BottomSheetType.InitialBalance) {
-      numericKeyboardCommander.onDoneClick()
+    if (IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET) {
+      viewModelScope.launch {
+        delay(100)
+        showBalanceBottomSheet()
+      }
     }
-    super.dismissBottomSheet()
   }
 
   fun createNewAccount() {
@@ -88,11 +53,11 @@ class CreateAccountViewModel @Inject constructor(
       return
     }
 
-    createAccountJob = viewModelScope.launch(ioDispatcher) {
+    createAccountJob = viewModelScope.launch {
       with(state.value) {
-        accountsRepository.createAccount(
-          name = accountName,
-          balance = calculatorFormatter.toBigDecimal(initialBalance),
+        accountRepository.createAccount(
+          name = name,
+          balance = calculatorFormatter.toBigDecimal(amountFormatter.removeCurrency(balance, currency)),
           currency = currency,
           icon = icon,
           color = color,
@@ -102,63 +67,27 @@ class CreateAccountViewModel @Inject constructor(
     }
   }
 
-  fun openIconBottomSheet() {
-    showBottomSheet(
-      BottomSheetType.Icon(
-        selectedIcon = state.value.icon,
-        onSelectIcon = ::setIcon,
-      )
-    )
+  override fun updateBalance(balance: String) {
+    _state.update { it.copy(balance = balance) }
   }
 
-  fun openColorBottomSheet() {
-    showBottomSheet(
-      BottomSheetType.Color(
-        selectedColor = state.value.color,
-        onSelectColor = ::setColor,
-      )
-    )
-  }
-
-  fun openCurrencyBottomSheet() {
-    showBottomSheet(
-      BottomSheetType.Currency(
-        selectedCurrency = state.value.currency,
-        onSelectCurrency = ::setCurrency,
-        currencies = currencyCacheManager.getCurrenciesBlocking().values.toImmutableList(),
-      )
-    )
-  }
-
-  fun setAccountName(accountName: String) {
-    _state.update { it.copy(accountName = accountName) }
-    _state.update { state ->
-      state.copy(isCreateAccountButtonEnabled = state.accountName.isNotBlank())
-    }
-  }
-
-  fun onInitialBalanceClick() {
-    showBottomSheet(
-      BottomSheetType.InitialBalance(
-        text = numericKeyboardCommander.calculatorTextState,
-        actions = this,
-        decimalSeparator = calculatorFormatter.decimalSeparator.toString(),
-        equalButtonState = numericKeyboardCommander.equalButtonState,
-        currency = state.value.currency.currencyName,
-        numericKeyboardActions = numericKeyboardCommander,
-      )
-    )
-  }
-
-  private fun setCurrency(currency: CurrencyModel) {
+  override fun updateCurrency(currency: CurrencyModel) {
     _state.update { it.copy(currency = currency) }
   }
 
-  private fun setIcon(icon: IconModel) {
+  override fun updateIcon(icon: IconModel) {
     _state.update { it.copy(icon = icon) }
   }
 
-  private fun setColor(color: ColorModel) {
+  override fun updateColor(color: ColorModel) {
     _state.update { it.copy(color = color) }
+  }
+
+  override fun updateName(name: String) {
+    _state.update { it.copy(name = name) }
+  }
+
+  override fun updateConfirmEnabled(enabled: Boolean) {
+    _state.update { it.copy(isCreateAccountButtonEnabled = enabled) }
   }
 }

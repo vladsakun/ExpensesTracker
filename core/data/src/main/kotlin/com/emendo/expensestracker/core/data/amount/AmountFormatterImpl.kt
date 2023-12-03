@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 class AmountFormatterImpl @Inject constructor(
   private val localeManager: ExpeLocaleManager,
+  private val calculatorFormatter: CalculatorFormatter,
 ) : AmountFormatter {
 
   private val currentLocale: Locale
@@ -53,5 +54,23 @@ class AmountFormatterImpl @Inject constructor(
     }
 
     return currencyNumberFormatter.format(amount)
+  }
+
+  override fun replaceCurrency(s: String, oldCurrency: CurrencyModel, newCurrencyModel: CurrencyModel): String {
+    val noCurrencyAmount = removeCurrency(s, oldCurrency)
+    return format(calculatorFormatter.toBigDecimal(noCurrencyAmount), newCurrencyModel)
+  }
+
+  //removes currency symbol and possible space between currency and amount
+  override fun removeCurrency(s: String, currency: CurrencyModel): String {
+    var symbol = s
+    //currency sign
+    symbol = symbol.replace(currency.currencySymbolOrCode, "")
+    //possible leading non breaking space
+    symbol = symbol.replace("^\u00A0+".toRegex(), "")
+    //possible trailing non breaking space
+    symbol = symbol.replace("\u00A0+$".toRegex(), "")
+
+    return symbol
   }
 }

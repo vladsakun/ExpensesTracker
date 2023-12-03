@@ -53,9 +53,7 @@ fun ExpeButton(
 ) {
   Button(
     onClick = onClick,
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(vertical = Dimens.margin_large_x),
+    modifier = modifier.fillMaxWidth(),
     shape = RoundedCornerNormalRadiusShape,
     enabled = enabled,
     colors = colors,

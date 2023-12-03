@@ -18,5 +18,9 @@ interface CreateTransactionRepository {
 
   fun getDefaultTarget(transactionType: TransactionType): TransactionTarget
 
+  fun isSelectSourceFlow(): Boolean
+  fun startSelectSourceFlow()
+  fun finishSelectSourceFlow()
+
   fun clear()
 }

@@ -7,9 +7,9 @@ import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
-interface AccountsRepository {
-  fun getAccounts(): Flow<List<AccountModel>>
-  fun getAccountsSnapshot(): List<AccountModel>
+interface AccountRepository {
+  val accounts: Flow<List<AccountModel>>
+  val accountsSnapshot: List<AccountModel>
   fun getLastAccount(): Flow<AccountModel?>
   suspend fun retrieveLastAccount(): AccountModel?
 
@@ -24,5 +24,14 @@ interface AccountsRepository {
     balance: BigDecimal,
   )
 
-  suspend fun deleteAccount(accountModel: AccountModel)
+  suspend fun updateAccount(
+    id: Long,
+    currency: CurrencyModel,
+    name: String,
+    icon: IconModel,
+    color: ColorModel,
+    balance: BigDecimal,
+  )
+
+  suspend fun deleteAccount(id: Long)
 }

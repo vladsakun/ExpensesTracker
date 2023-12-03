@@ -8,15 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
@@ -24,13 +22,12 @@ import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
+import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
-import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
-import com.emendo.expensestracker.core.designsystem.component.ExpePreview
-import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
+import com.emendo.expensestracker.core.designsystem.component.*
+import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
@@ -64,6 +61,7 @@ fun CategoriesListRoute(
   )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun CategoriesListScreenContent(
   stateProvider: () -> CategoriesListUiState,
@@ -71,7 +69,13 @@ private fun CategoriesListScreenContent(
   onCategoryClick: (category: CategoryWithTotalTransactions) -> Unit,
   onPageSelected: (pageIndex: Int) -> Unit,
 ) {
-  ExpeScaffoldWithTopBar(titleResId = AppR.string.categories) { paddingValues ->
+  ExpeScaffold(
+    topBar = {
+      ExpeCenterAlignedTopBar(
+        title = stringResource(id = AppR.string.categories),
+      )
+    },
+  ) { paddingValues ->
     Box(
       modifier = Modifier
         .fillMaxSize()
@@ -82,68 +86,45 @@ private fun CategoriesListScreenContent(
         is CategoriesListUiState.Empty -> Unit
         is CategoriesListUiState.Loading -> ExpLoadingWheel()
         is CategoriesListUiState.Error -> Text(text = state.message)
-        is CategoriesListUiState.DisplayCategoriesList -> CategoriesList(
-          uiStateProvider = { state },
-          onCreateCategoryClick = onCreateCategoryClick,
-          onCategoryClick = onCategoryClick,
-          onPageSelected = onPageSelected,
-        )
-      }
-    }
-  }
-}
+        is CategoriesListUiState.DisplayCategoriesList -> {
+          val pagerState = rememberPagerState(pageCount = { state.categories.size })
+          val coroutineScope = rememberCoroutineScope()
+          val selectedPageIndex = rememberSaveable { mutableIntStateOf(0) }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun CategoriesList(
-  uiStateProvider: () -> CategoriesListUiState.DisplayCategoriesList,
-  onCreateCategoryClick: () -> Unit,
-  onCategoryClick: (category: CategoryWithTotalTransactions) -> Unit,
-  onPageSelected: (pageIndex: Int) -> Unit,
-) {
-  val pagerState = rememberPagerState(pageCount = { uiStateProvider().categories.size })
-  val coroutineScope = rememberCoroutineScope()
-  val selectedPageIndex = rememberSaveable { mutableIntStateOf(0) }
-
-  LaunchedEffect(pagerState) {
-    snapshotFlow { pagerState.currentPage }.collect { page ->
-      onPageSelected(page)
-      selectedPageIndex.intValue = page
-    }
-  }
-
-  Column {
-    TabRow(selectedTabIndex = selectedPageIndex.intValue) {
-      uiStateProvider().tabs.forEachIndexed { index, tabData ->
-        Tab(
-          selected = selectedPageIndex.intValue == index,
-          onClick = {
-            coroutineScope.launch {
-              pagerState.animateScrollToPage(index)
+          LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.currentPage }.collect { page ->
+              onPageSelected(page)
+              selectedPageIndex.intValue = page
             }
-          },
-          text = {
-            Text(
-              text = stringResource(id = tabData.titleResId),
-              maxLines = 2,
-              overflow = TextOverflow.Ellipsis,
-            )
           }
-        )
+
+          Column {
+            TextSwitch(
+              selectedIndex = selectedPageIndex.intValue,
+              items = state.tabs.map { stringResource(id = it.titleResId) }.toImmutableList(),
+              onSelectionChange = { tabIndex ->
+                coroutineScope.launch {
+                  pagerState.animateScrollToPage(tabIndex)
+                }
+              },
+              modifier = Modifier.padding(horizontal = Dimens.margin_large_x),
+            )
+            HorizontalPager(state = pagerState) { page ->
+              CategoriesGrid(
+                categories = state.categories[page]!!,
+                onCategoryClick = onCategoryClick,
+                onAddCategoryClick = onCreateCategoryClick,
+              )
+            }
+          }
+        }
       }
-    }
-    HorizontalPager(state = pagerState) { page ->
-      CategoriesGrid(
-        categories = uiStateProvider().categories[page]!!,
-        onCategoryClick = onCategoryClick,
-        onAddCategoryClick = onCreateCategoryClick,
-      )
     }
   }
 }
 
 @Composable
-fun CategoriesGrid(
+private fun CategoriesGrid(
   categories: ImmutableList<CategoryWithTotalTransactions>,
   onCategoryClick: (category: CategoryWithTotalTransactions) -> Unit,
   onAddCategoryClick: () -> Unit,
@@ -180,7 +161,7 @@ private fun CategoriesListPreview() {
               CategoryWithTotalTransactions(
                 categoryModel = CategoryModel(
                   id = index.toLong(),
-                  name = TransactionElementName.Name("Childcare"),
+                  name = TextValue.Value("Childcare"),
                   icon = IconModel.CHILDCARE,
                   color = ColorModel.Purple,
                   type = CategoryType.EXPENSE,

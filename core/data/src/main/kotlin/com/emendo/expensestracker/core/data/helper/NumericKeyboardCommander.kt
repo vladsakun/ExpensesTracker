@@ -11,7 +11,7 @@ import java.math.BigDecimal
 interface NumericKeyboardCommander : NumericKeyboardActions, KeyboardCallbacks {
   val calculatorTextState: StateFlow<String>
   val equalButtonState: StateFlow<EqualButtonState>
-  val currencyValue: BigDecimal
+  val currentValue: BigDecimal
 
   fun setCallbacks(
     doneClick: () -> Boolean,
@@ -28,4 +28,5 @@ interface NumericKeyboardCommander : NumericKeyboardActions, KeyboardCallbacks {
   fun isNotEmpty(): Boolean
   fun getCalculatorValue(): String
   fun doMath()
+  fun negate()
 }

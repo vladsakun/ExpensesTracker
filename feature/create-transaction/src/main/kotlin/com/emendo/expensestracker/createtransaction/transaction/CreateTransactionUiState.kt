@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.common.ext.updateIfType
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TransactionElementName
+import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.transaction.TransactionElement
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import de.palm.composestateevents.StateEvent
@@ -41,7 +41,7 @@ fun TransactionElement.toTransactionItemModel() =
 data class TransactionItemModel(
   val id: Long,
   val icon: IconModel,
-  val name: TransactionElementName,
+  val name: TextValue,
   val color: ColorModel,
 )
 

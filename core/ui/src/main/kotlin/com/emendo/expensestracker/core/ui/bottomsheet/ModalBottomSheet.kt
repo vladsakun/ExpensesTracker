@@ -6,12 +6,13 @@ import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalFocusManager
 import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetState
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 fun <BottomSheetType> ExpeModalBottomSheet(
   modalBottomSheetState: SheetState,
   bottomSheetState: () -> BaseBottomSheetState<BottomSheetType?>,

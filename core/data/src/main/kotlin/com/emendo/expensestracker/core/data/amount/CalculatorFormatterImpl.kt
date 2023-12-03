@@ -14,7 +14,6 @@ class CalculatorFormatterImpl @Inject constructor(
   companion object {
     private const val MAX_DIGITS_BEFORE_DECIMAL = 11
     private const val MAX_DIGITS_AFTER_DECIMAL = 2
-    private const val NEGATIVE_PREFIX = "\u2212\u00A0"
     private const val SPACE = '\u00A0'
   }
 

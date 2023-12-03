@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.data.model.transaction
 
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
 
 data class TransactionModel(
@@ -13,4 +14,5 @@ data class TransactionModel(
   val type: TransactionType,
   val transferReceivedValue: BigDecimal? = null,
   val transferCurrencyModel: CurrencyModel? = null,
+  val date: Instant,
 )

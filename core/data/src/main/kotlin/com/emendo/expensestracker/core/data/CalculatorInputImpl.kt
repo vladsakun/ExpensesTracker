@@ -123,6 +123,7 @@ class CalculatorInputImpl @Inject constructor(
 
   override fun setNumber1(number: StringBuilder) {
     number1 = number
+    refreshValue()
   }
 
   override fun isEmpty(): Boolean {
@@ -136,6 +137,12 @@ class CalculatorInputImpl @Inject constructor(
     mathOperation = null
     number2 = null
     refreshValue()
+  }
+
+  override fun negate(): String {
+    val number1 = StringBuilder(calculatorFormatter.formatFinal(currentValue.negate()))
+    setNumber1(number1)
+    return number1.toString()
   }
 
   private fun appendNum1(value: String) {
@@ -190,7 +197,7 @@ class CalculatorInputImpl @Inject constructor(
     }
   }
 
-  private fun refreshValue() {
+  override fun refreshValue() {
     doOnValueChange.invoke(formatted, equalButtonState)
   }
 

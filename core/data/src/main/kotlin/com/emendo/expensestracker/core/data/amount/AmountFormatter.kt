@@ -9,5 +9,9 @@ interface AmountFormatter {
    * @return the formatted amount with the currency symbol and decimals.
    */
   fun format(amount: BigDecimal, currency: CurrencyModel): String
+
+  fun replaceCurrency(s: String, oldCurrency: CurrencyModel, newCurrencyModel: CurrencyModel): String
+
+  fun removeCurrency(s: String, currency: CurrencyModel): String
 }
 

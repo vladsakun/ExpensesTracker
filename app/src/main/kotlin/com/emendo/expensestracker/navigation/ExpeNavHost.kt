@@ -7,6 +7,7 @@ import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDesti
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_ACCOUNT
 import com.emendo.expensestracker.ui.ExpeAppState
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.coroutines.delay
 
@@ -29,5 +30,8 @@ fun ExpeNavHost(
     navController = appState.navController,
     navGraph = NavGraphs.root,
     modifier = modifier,
+    dependenciesContainerBuilder = {
+      dependency(appState)
+    }
   )
 }

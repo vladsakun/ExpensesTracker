@@ -36,21 +36,12 @@ fun AccountItem(
       .clickable(onClick = onClick)
       .padding(
         horizontal = Dimens.margin_large_x,
-        vertical = Dimens.margin_small_x
+        vertical = Dimens.margin_small_x,
       ),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)
   ) {
     Icon(
-      //        modifier = Modifier
-      //          .clip(RoundedCornerShape(Dimens.corner_radius_small))
-      //          .background(color = color.copy(alpha = 0.2f))
-      //          .border(
-      //            width = Dimens.border_thickness,
-      //            color = color,
-      //            shape = RoundedCornerShape(Dimens.corner_radius_small)
-      //          )
-      //          .padding(Dimens.margin_small_x),
       tint = color,
       imageVector = icon,
       contentDescription = "",

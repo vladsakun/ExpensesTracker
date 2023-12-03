@@ -19,9 +19,11 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.createtransaction.destinations.CreateTransactionScreenDestination
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.spec.DestinationSpec
+import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import timber.log.Timber
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -44,6 +46,7 @@ fun ExpeApp(
         destinations = appState.topLevelDestination,
         onNavigateToDestination = appState::navigateToTopLevelDestination,
         currentDestination = appState.currentDestination,
+        appState = appState,
       )
     },
   ) { padding ->
@@ -64,33 +67,15 @@ fun ExpeApp(
   }
 }
 
-//@Composable
-//fun ErrorDialog(
-//  commander: AppStateCommander,
-//) {
-//  ExpeAlertDialog(
-//    onAlertDialogDismissRequest = commander::onAlertDialogDismissRequest,
-//    onCloseClick = commander::onNegativeActionClick,
-//    onConfirmClick = commander::onPositiveActionClick,
-//    title = state.error.title,
-//    confirmActionText = state.error.positiveAction.text,
-//    dismissActionText = state.error.negativeAction.text,
-//  ) {
-//    Column(
-//      modifier = Modifier.padding(horizontal = Dimens.margin_large_xxx)
-//    ) {
-//      Text(text = state.error.message)
-//    }
-//  }
-//}
-
 @Composable
 private fun ExpeBottomBar(
   destinations: List<TopLevelDestination>,
   onNavigateToDestination: (TopLevelDestination) -> Unit,
   currentDestination: NavDestination?,
   modifier: Modifier = Modifier,
+  appState: ExpeAppState,
 ) {
+  val isCreateTransactionOnBackStack = appState.navController.isRouteOnBackStack(CreateTransactionScreenDestination)
   ExpeNavigationBar(modifier = modifier) {
     destinations.forEach { item ->
       if (item == TopLevelDestination.CREATE_TRANSACTION) {
@@ -110,7 +95,11 @@ private fun ExpeBottomBar(
         return@forEach
       }
 
-      val selected = currentDestination.isTopLevelDestinationInHierarchy(item)
+      val selected = if (isCreateTransactionOnBackStack) {
+        false
+      } else {
+        currentDestination.isTopLevelDestinationInHierarchy(item)
+      }
       ExpeNavigationBarItem(
         selected = selected,
         onClick = { onNavigateToDestination(item) },
@@ -147,6 +136,9 @@ private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: TopLev
   } ?: false
 }
 
+private fun NavDestination?.containsCreateTransactionScreen() =
+  this?.hierarchy?.any { it.route == TopLevelDestination.CREATE_TRANSACTION.screen.startRoute.route } ?: false
+
 private fun DestinationSpec<*>?.isTopLevelDestination(): Boolean {
   Timber.d(
     "NavDestinationRoute: %s, screenRoute: %s",
@@ -154,7 +146,4 @@ private fun DestinationSpec<*>?.isTopLevelDestination(): Boolean {
     TopLevelDestination.CATEGORIES.screen.startRoute.route
   )
   return TopLevelDestination.entries.any { it.screen.startRoute.route == this?.route }
-  //  return this?.hierarchy?.any {
-  //    it.route?.contains(destination.name, true) ?: false
-  //  } ?: false
 }

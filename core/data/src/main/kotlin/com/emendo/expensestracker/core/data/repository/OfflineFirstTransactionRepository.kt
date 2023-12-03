@@ -57,7 +57,9 @@ class OfflineFirstTransactionRepository @Inject constructor(
 
   override fun getTransactionsFull(): Flow<List<TransactionModel>> =
     transactionDao.getTransactionFull().map { transactionFullList ->
-      transactionFullList.map { transactionMapper.map(it) }
+      transactionFullList
+        .map { transactionMapper.map(it) }
+        .sortedByDescending { it.date }
     }
 
   override fun getLastTransactionFull(): Flow<TransactionModel?> {

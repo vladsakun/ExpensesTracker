@@ -56,7 +56,7 @@ fun ExpeScaffoldWithTopBar(
   ExpeScaffold(
     topBar = {
       ExpeTopBar(
-        titleRes = titleResId,
+        titleResId = titleResId,
         onNavigationBackClick = onNavigationClick,
         scrollBehavior = topAppBarScrollBehavior,
         actions = actions,
@@ -70,7 +70,45 @@ fun ExpeScaffoldWithTopBar(
     floatingActionButtonPosition = floatingActionButtonPosition,
     containerColor = containerColor,
     contentColor = contentColor,
-  ) { content(it) }
+    content = content,
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExpeScaffoldWithTopBar(
+  title: String,
+  onNavigationClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  actions: ImmutableList<MenuAction>? = null,
+  snackbarHost: @Composable () -> Unit = {},
+  floatingActionButton: @Composable () -> Unit = {},
+  floatingActionButtonPosition: FabPosition = FabPosition.End,
+  containerColor: Color = MaterialTheme.colorScheme.background,
+  contentColor: Color = contentColorFor(containerColor),
+  content: @Composable (PaddingValues) -> Unit,
+) {
+  val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+  ExpeScaffold(
+    topBar = {
+      ExpeTopBar(
+        title = title,
+        onNavigationBackClick = onNavigationClick,
+        scrollBehavior = topAppBarScrollBehavior,
+        actions = actions,
+      )
+    },
+    modifier = modifier
+      .fillMaxSize()
+      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+    snackbarHost = snackbarHost,
+    floatingActionButton = floatingActionButton,
+    floatingActionButtonPosition = floatingActionButtonPosition,
+    containerColor = containerColor,
+    contentColor = contentColor,
+    content = content,
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +129,7 @@ fun ExpeScaffoldWithTopBar(
   ExpeScaffold(
     topBar = {
       ExpeTopBar(
-        titleRes = titleResId,
+        titleResId = titleResId,
         scrollBehavior = topAppBarScrollBehavior,
         actions = actions,
       )
@@ -104,5 +142,6 @@ fun ExpeScaffoldWithTopBar(
     floatingActionButtonPosition = floatingActionButtonPosition,
     containerColor = containerColor,
     contentColor = contentColor,
-  ) { content(it) }
+    content = content,
+  )
 }

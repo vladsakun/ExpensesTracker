@@ -8,8 +8,7 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.mapper.AccountMapper
 import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.model.asEntity
-import com.emendo.expensestracker.core.data.repository.api.AccountsRepository
+import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -21,24 +20,22 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import javax.inject.Inject
 
-class OfflineFirstAccountsRepository @Inject constructor(
+class OfflineFirstAccountRepository @Inject constructor(
   private val accountsDao: AccountDao,
   private val accountMapper: AccountMapper,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @ApplicationScope private val scope: CoroutineScope,
-) : AccountsRepository {
+) : AccountRepository {
 
   private val accountsList = accountsDao.getAll()
     .map { accountEntities -> accountEntities.map { accountMapper.map(it) } }
     .stateInLazilyList(scope)
 
-  override fun getAccounts(): Flow<List<AccountModel>> {
-    return accountsList
-  }
+  override val accounts: Flow<List<AccountModel>>
+    get() = accountsList
 
-  override fun getAccountsSnapshot(): List<AccountModel> {
-    return accountsList.value
-  }
+  override val accountsSnapshot: List<AccountModel>
+    get() = accountsList.value
 
   override fun getLastAccount(): Flow<AccountModel?> {
     return accountsDao.getLastAccount().map { entity ->
@@ -82,9 +79,31 @@ class OfflineFirstAccountsRepository @Inject constructor(
     }
   }
 
-  override suspend fun deleteAccount(accountModel: AccountModel) {
+  override suspend fun updateAccount(
+    id: Long,
+    currency: CurrencyModel,
+    name: String,
+    icon: IconModel,
+    color: ColorModel,
+    balance: BigDecimal,
+  ) {
     withContext(ioDispatcher) {
-      accountsDao.delete(accountModel.asEntity())
+      accountsDao.save(
+        AccountEntity(
+          id = id,
+          name = name,
+          balance = balance,
+          currencyCode = currency.currencyCode,
+          iconId = icon.id,
+          colorId = color.id,
+        )
+      )
+    }
+  }
+
+  override suspend fun deleteAccount(id: Long) {
+    withContext(ioDispatcher) {
+      accountsDao.deleteById(id)
     }
   }
 }

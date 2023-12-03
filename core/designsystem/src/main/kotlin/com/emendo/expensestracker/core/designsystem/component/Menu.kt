@@ -6,4 +6,5 @@ data class MenuAction(
   val icon: ImageVector,
   val onClick: () -> Unit,
   val text: String,
+  val enabled: Boolean = true,
 )
