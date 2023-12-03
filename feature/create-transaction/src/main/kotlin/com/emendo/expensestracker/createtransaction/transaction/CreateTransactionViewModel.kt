@@ -70,7 +70,8 @@ class CreateTransactionViewModel @Inject constructor(
     getUsedCurrenciesUseCase().stateInEagerlyList(viewModelScope)
 
   private val selectedCurrencyModel: CurrencyModel
-    get() = usedCurrencies.value[calculatorState.value.getSelectedCurrencyIndex()]
+    get() = usedCurrencies.value.getOrNull(calculatorState.value.getSelectedCurrencyIndex())
+      ?: currencyCacheManager.getGeneralCurrencySnapshot()
 
   private var createTransactionJob: Job? = null
 
