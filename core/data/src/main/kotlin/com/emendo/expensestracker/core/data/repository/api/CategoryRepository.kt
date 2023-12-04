@@ -13,6 +13,7 @@ interface CategoryRepository {
 
   val categoriesSnapshot: List<CategoryModel>
 
-  suspend fun upsertCategory(name: String, icon: IconModel, color: ColorModel, type: CategoryType)
+  suspend fun createCategory(name: String, icon: IconModel, color: ColorModel, type: CategoryType)
+  suspend fun updateCategory(id: Long, name: String, icon: IconModel, color: ColorModel, type: CategoryType)
   suspend fun deleteCategory(id: Long)
 }

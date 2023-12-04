@@ -4,13 +4,13 @@ import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
-import com.emendo.expensestracker.core.app.base.manager.CreateTransactionRepository
+import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.label
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
-import com.emendo.expensestracker.core.domain.GetCategoriesWithTotalTransactionsUseCase
+import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,21 +25,26 @@ import javax.inject.Inject
 class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appNavigationEventBus: AppNavigationEventBus,
-  private val createTransactionRepository: CreateTransactionRepository,
 ) : BaseBottomSheetViewModel<BottomSheetType>() {
 
   val categoriesListUiState: StateFlow<CategoriesListUiState> =
     categoriesUiState(getCategoriesWithTotalTransactionsUseCase)
-      .stateIn(
+      .stateInWhileSubscribed(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
         initialValue = CategoriesListUiState.Empty,
       )
 
+  private val _isEditMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val editModeState: StateFlow<Boolean> = _isEditMode.asStateFlow()
+
+  val isEditMode: Boolean
+    get() = editModeState.value
+  val categoryType: CategoryType
+    get() = selectedPageIndex.toCategoryType()
+
   private var selectedPageIndex = DEFAULT_PAGE_INDEX
 
-  fun showCalculatorBottomSheet(category: CategoryWithTotalTransactions) {
-    createTransactionRepository.setTarget(category.categoryModel)
+  fun openCreateTransactionScreen(category: CategoryWithTotal) {
     appNavigationEventBus.navigate(AppNavigationEvent.CreateTransaction(target = category.categoryModel, source = null))
   }
 
@@ -47,8 +52,8 @@ class CategoriesListViewModel @Inject constructor(
     selectedPageIndex = pageIndex
   }
 
-  fun getCategoryType(): CategoryType {
-    return selectedPageIndex.toCategoryType()
+  fun inverseEditMode() {
+    _isEditMode.update { !it }
   }
 
   companion object {
@@ -97,6 +102,8 @@ private fun categoriesUiState(
 private fun createCategoryPagePair(
   categoryType: CategoryType,
   categoriesList: List<CategoryWithTotalTransactions>,
-): Pair<Int, ImmutableList<CategoryWithTotalTransactions>> {
-  return categoryType.toPageIndex() to categoriesList.filter { it.categoryModel.type == categoryType }.toImmutableList()
-}
+): Pair<Int, ImmutableList<CategoryWithTotal>> =
+  categoryType.toPageIndex() to categoriesList
+    .filter { it.categoryModel.type == categoryType }
+    .map { CategoryWithTotal(it.categoryModel, it.totalFormatted) }
+    .toImmutableList()

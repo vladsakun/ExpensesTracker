@@ -3,7 +3,7 @@ package com.emendo.expensestracker.accounts.detail
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TextValue
+import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import java.math.BigDecimal
@@ -17,7 +17,7 @@ internal class AccountDetailPreviewData : PreviewParameterProvider<AccountDetail
         currencyName = "US dollar",
         currencySymbol = null,
       ),
-      name = TextValue.Value("Bank"),
+      name = textValueOf("Bank"),
       icon = IconModel.EDUCATION,
       color = ColorModel.Blue,
       balance = BigDecimal.valueOf(122345, 2),

@@ -20,7 +20,7 @@ import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.labelResId
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
-import com.emendo.expensestracker.core.domain.GetUsedCurrenciesUseCase
+import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel

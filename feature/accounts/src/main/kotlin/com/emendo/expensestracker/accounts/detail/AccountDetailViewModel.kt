@@ -7,13 +7,13 @@ import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDesti
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TextValue
+import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
-import com.emendo.expensestracker.core.domain.GetAccountSnapshotById
+import com.emendo.expensestracker.core.domain.account.GetAccountSnapshotByIdUseCase
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
@@ -29,18 +29,18 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
-  getAccountSnapshotById: GetAccountSnapshotById,
+  getAccountSnapshotByIdUseCase: GetAccountSnapshotByIdUseCase,
   numericKeyboardCommander: NumericKeyboardCommander,
+  private val currencyMapper: CurrencyMapper,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-  currencyMapper: CurrencyMapper,
-) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter, currencyMapper) {
+) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
   private val accountId: Long = requireNotNull(savedStateHandle[AccountDetailScreenDestination.arguments[0].name])
 
   private val _state: MutableStateFlow<AccountDetailScreenData> = MutableStateFlow(
-    AccountDetailScreenData.getDefaultState(requireNotNull(getAccountSnapshotById(accountId)))
+    AccountDetailScreenData.getDefaultState(requireNotNull(getAccountSnapshotByIdUseCase(accountId)))
   )
   override val state: StateFlow<AccountDetailScreenData> = _state.asStateFlow()
 
@@ -92,11 +92,15 @@ class AccountDetailViewModel @Inject constructor(
 
   fun showConfirmDeleteAccountBottomSheet() {
     showBottomSheet(
-      GeneralBottomSheetData.Builder(Action(TextValue.Resource(R.string.delete), ::deleteAccount))
-        .title(TextValue.Resource(R.string.account_detail_dialog_delete_confirm_title))
-        .negativeAction(Action(TextValue.Resource(R.string.cancel), ::hideBottomSheet))
+      GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteAccount))
+        .title(resourceValueOf(R.string.account_detail_dialog_delete_confirm_title))
+        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
         .create()
     )
+  }
+
+  fun updateCurrencyByCode(code: String) {
+    updateCurrencyByCode(amountFormatter, currencyMapper, code)
   }
 
   private fun deleteAccount() {

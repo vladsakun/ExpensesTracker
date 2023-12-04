@@ -1,11 +1,10 @@
-package com.emendo.expensestracker.core.domain
+package com.emendo.expensestracker.core.domain.category
 
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.manager.CurrencyConverter
 import com.emendo.expensestracker.core.data.model.CurrencyRateModel
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTransactions
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepository
 import com.emendo.expensestracker.core.data.repository.api.UserDataRepository
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -21,17 +20,17 @@ data class CategoryWithTotalTransactionsAndCurrencies(
 )
 
 class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
-  private val categoryRepository: CategoryRepository,
   private val currencyRateRepository: CurrencyRateRepository,
   private val currencyConverter: CurrencyConverter,
   private val amountFormatter: AmountFormatter,
   private val userDataRepository: UserDataRepository,
+  private val getUserCreateCategoriesWithNotEmptyPrepopulatedUseCase: GetUserCreateCategoriesWithNotEmptyPrepopulatedUseCase,
 ) {
 
   operator fun invoke(): Flow<List<CategoryWithTotalTransactions>> {
     val combinedFlow: Flow<CategoryWithTotalTransactionsAndCurrencies> =
       combine(
-        categoryRepository.categoriesWithTransactions,
+        getUserCreateCategoriesWithNotEmptyPrepopulatedUseCase(),
         userDataRepository.generalCurrency,
         currencyRateRepository.rates,
       ) { transactions, currency, rates ->

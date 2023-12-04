@@ -1,27 +1,26 @@
-package com.emendo.expensestracker.categories.create
+package com.emendo.expensestracker.categories.detail
 
 import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
-import com.emendo.expensestracker.core.app.resources.models.textValueOf
-import de.palm.composestateevents.StateEvent
-import de.palm.composestateevents.consumed
+import com.emendo.expensestracker.core.data.model.category.CategoryModel
 
 @Stable
-data class CreateCategoryScreenData(
-  override val title: TextValue.Value,
+data class CategoryDetailScreenData(
+  override val title: TextValue,
   override val icon: IconModel,
   override val color: ColorModel,
   override val confirmButtonEnabled: Boolean = false,
-  val navigateUpEvent: StateEvent = consumed,
 ) : CategoryScreenData {
   companion object {
-    fun getDefault() = CreateCategoryScreenData(
-      title = textValueOf(""),
-      icon = IconModel.random,
-      color = ColorModel.random,
-    )
+    fun getDefault(categoryModel: CategoryModel) = with(categoryModel) {
+      CategoryDetailScreenData(
+        title = name,
+        icon = icon,
+        color = color,
+      )
+    }
   }
 }

@@ -15,7 +15,6 @@ import com.emendo.expensestracker.core.data.model.category.asExternalModel
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.database.dao.CategoryDao
 import com.emendo.expensestracker.core.database.model.CategoryEntity
-import com.emendo.expensestracker.core.database.model.CategoryFull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -37,21 +36,13 @@ class OfflineFirstCategoryRepository @Inject constructor(
   private val categoriesState: StateFlow<List<CategoryModel>> =
     categoryDao
       .getAll()
-      .map { categories ->
-        categories
-          .filterNot(::isPrepopulatedCategory)
-          .map(::asExternalModel)
-      }
+      .map { categories -> categories.map(::asExternalModel) }
       .stateInEagerlyList(scope)
 
   private val categoriesWithTransactionState: StateFlow<List<CategoryWithTransactions>> by lazy(LazyThreadSafetyMode.NONE) {
     categoryDao
       .getCategoriesFull()
-      .map { categoryFulls ->
-        categoryFulls
-          .filterNot(::isEmptyPrepopulatedCategory)
-          .map { categoryFullMapper.map(it) }
-      }
+      .map { categoryFulls -> categoryFulls.map { categoryFullMapper.map(it) } }
       .stateInLazilyList(scope)
   }
 
@@ -64,7 +55,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
   override val categoriesSnapshot: List<CategoryModel>
     get() = categoriesState.value
 
-  override suspend fun upsertCategory(
+  override suspend fun createCategory(
     name: String,
     icon: IconModel,
     color: ColorModel,
@@ -82,15 +73,29 @@ class OfflineFirstCategoryRepository @Inject constructor(
     }
   }
 
+  override suspend fun updateCategory(
+    id: Long,
+    name: String,
+    icon: IconModel,
+    color: ColorModel,
+    type: CategoryType,
+  ) {
+    withContext(ioDispatcher) {
+      categoryDao.save(
+        CategoryEntity(
+          id = id,
+          name = name,
+          iconId = icon.id,
+          colorId = color.id,
+          type = type.id,
+        )
+      )
+    }
+  }
+
   override suspend fun deleteCategory(id: Long) {
     withContext(ioDispatcher) {
       categoryDao.deleteById(id)
     }
   }
-
-  private fun isPrepopulatedCategory(category: CategoryEntity): Boolean =
-    category.id == DefaultTransactionTargetExpenseId || category.id == DefaultTransactionTargetIncomeId
-
-  private fun isEmptyPrepopulatedCategory(category: CategoryFull): Boolean =
-    isPrepopulatedCategory(category.category) && category.transactions.isEmpty()
 }

@@ -3,7 +3,7 @@ package com.emendo.expensestracker.core.app.base.manager
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TextValue
+import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
@@ -11,8 +11,8 @@ import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetIncomeId
-import com.emendo.expensestracker.core.domain.GetLastUsedAccountUseCase
-import com.emendo.expensestracker.core.domain.RetrieveLastUsedAccountUseCase
+import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
+import com.emendo.expensestracker.core.domain.account.RetrieveLastUsedAccountUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -74,7 +74,7 @@ class CreateTransactionRepositoryImpl @Inject constructor(
       } else {
         DefaultTransactionTargetIncomeId
       },
-      name = TextValue.Resource(AppR.string.uncategorized),
+      name = resourceValueOf(AppR.string.uncategorized),
       icon = IconModel.UNKNOWN,
       color = ColorModel.Base,
       type = if (transactionType == TransactionType.EXPENSE) {

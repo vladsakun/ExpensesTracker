@@ -53,10 +53,8 @@ class OfflineFirstAccountRepository @Inject constructor(
     return accountsDao.getById(id).map(accountMapper::map)
   }
 
-  override suspend fun retrieveById(id: Long): AccountModel? {
-    return withContext(ioDispatcher) {
-      accountsDao.retrieveById(id)?.let { accountMapper.map(it) }
-    }
+  override suspend fun retrieveById(id: Long): AccountModel? = withContext(ioDispatcher) {
+    accountsDao.retrieveById(id)?.let { accountMapper.map(it) }
   }
 
   override suspend fun createAccount(

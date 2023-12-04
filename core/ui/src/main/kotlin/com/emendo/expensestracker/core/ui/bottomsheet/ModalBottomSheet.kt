@@ -18,7 +18,7 @@ fun <BottomSheetType> ExpeModalBottomSheet(
   bottomSheetState: () -> BaseBottomSheetState<BottomSheetType?>,
   hideBottomSheet: () -> Unit,
   onDismissRequest: () -> Unit,
-  bottomSheetContent: @Composable (type: BottomSheetType?, hideBottomSheet: () -> Unit) -> Unit,
+  bottomSheetContent: @Composable (type: BottomSheetType, hideBottomSheet: () -> Unit) -> Unit,
 ) {
   val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState().bottomSheetState != null } }
   val focusManager = LocalFocusManager.current
@@ -32,7 +32,7 @@ fun <BottomSheetType> ExpeModalBottomSheet(
       // windowInsets = WindowInsets(0),
       shape = ExpeBottomSheetShape,
       content = {
-        bottomSheetContent(bottomSheetState().bottomSheetState, hideBottomSheet)
+        bottomSheetContent(bottomSheetState().bottomSheetState!!, hideBottomSheet)
       },
     )
   }

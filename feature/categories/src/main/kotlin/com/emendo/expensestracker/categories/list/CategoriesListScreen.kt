@@ -17,18 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.categories.list.model.TabData
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
-import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TextValue
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
-import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
@@ -39,10 +34,8 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import com.emendo.expensestracker.core.app.resources.R as AppR
 
 @RootNavGraph(start = true)
 @Destination
@@ -52,12 +45,23 @@ fun CategoriesListRoute(
   viewModel: CategoriesListViewModel = hiltViewModel(),
 ) {
   val uiState = viewModel.categoriesListUiState.collectAsStateWithLifecycle()
+  val editModeState = viewModel.editModeState.collectAsStateWithLifecycle()
 
   CategoriesListScreenContent(
     stateProvider = uiState::value,
-    onCreateCategoryClick = { navigator.navigate(CreateCategoryRouteDestination(viewModel.getCategoryType())) },
-    onCategoryClick = viewModel::showCalculatorBottomSheet,
-    onPageSelected = viewModel::pageSelected,
+    isEditModeProvider = editModeState::value,
+    onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
+    onCategoryClick = remember {
+      { category: CategoryWithTotal ->
+        if (viewModel.isEditMode) {
+          navigator.navigate(CategoryDetailScreenDestination(category.categoryModel.id))
+        } else {
+          viewModel.openCreateTransactionScreen(category)
+        }
+      }
+    },
+    onPageSelected = remember { viewModel::pageSelected },
+    onEditClick = remember { viewModel::inverseEditMode },
   )
 }
 
@@ -65,14 +69,23 @@ fun CategoriesListRoute(
 @Composable
 private fun CategoriesListScreenContent(
   stateProvider: () -> CategoriesListUiState,
+  isEditModeProvider: () -> Boolean,
   onCreateCategoryClick: () -> Unit,
-  onCategoryClick: (category: CategoryWithTotalTransactions) -> Unit,
+  onCategoryClick: (category: CategoryWithTotal) -> Unit,
   onPageSelected: (pageIndex: Int) -> Unit,
+  onEditClick: () -> Unit,
 ) {
   ExpeScaffold(
     topBar = {
       ExpeCenterAlignedTopBar(
-        title = stringResource(id = AppR.string.categories),
+        title = stringResource(id = R.string.categories),
+        actions = persistentListOf(
+          MenuAction(
+            icon = ExpeIcons.Edit,
+            onClick = onEditClick,
+            contentDescription = stringResource(id = R.string.edit)
+          )
+        )
       )
     },
   ) { paddingValues ->
@@ -112,8 +125,9 @@ private fun CategoriesListScreenContent(
             HorizontalPager(state = pagerState) { page ->
               CategoriesGrid(
                 categories = state.categories[page]!!,
+                isEditMode = isEditModeProvider,
                 onCategoryClick = onCategoryClick,
-                onAddCategoryClick = onCreateCategoryClick,
+                onCreateCategoryClick = onCreateCategoryClick,
               )
             }
           }
@@ -125,9 +139,10 @@ private fun CategoriesListScreenContent(
 
 @Composable
 private fun CategoriesGrid(
-  categories: ImmutableList<CategoryWithTotalTransactions>,
-  onCategoryClick: (category: CategoryWithTotalTransactions) -> Unit,
-  onAddCategoryClick: () -> Unit,
+  categories: ImmutableList<CategoryWithTotal>,
+  isEditMode: () -> Boolean,
+  onCategoryClick: (CategoryWithTotal) -> Unit,
+  onCreateCategoryClick: () -> Unit,
 ) {
   CategoriesLazyVerticalGrid {
     items(
@@ -141,10 +156,11 @@ private fun CategoriesGrid(
         icon = category.categoryModel.icon.imageVector,
         total = category.totalFormatted,
         onClick = { onCategoryClick(category) },
+        isEditMode = isEditMode,
       )
     }
     uniqueItem("addCategory") {
-      AddCategoryItem(onClick = onAddCategoryClick)
+      AddCategoryItem(onClick = onCreateCategoryClick)
     }
   }
 }
@@ -152,36 +168,37 @@ private fun CategoriesGrid(
 @ExpePreview
 @Composable
 private fun CategoriesListPreview() {
-  ExpensesTrackerTheme {
-    CategoriesListScreenContent(
-      stateProvider = {
-        CategoriesListUiState.DisplayCategoriesList(
-          categories = persistentMapOf(
-            0 to List(6) { index ->
-              CategoryWithTotalTransactions(
-                categoryModel = CategoryModel(
-                  id = index.toLong(),
-                  name = TextValue.Value("Childcare"),
-                  icon = IconModel.CHILDCARE,
-                  color = ColorModel.Purple,
-                  type = CategoryType.EXPENSE,
-                ),
-                transactions = emptyList(),
-                totalFormatted = "EUR 187.20",
-              )
-            }.toImmutableList(),
-          ),
-          tabs = persistentListOf(
-            TabData(AppR.string.expense),
-            TabData(AppR.string.income),
-          )
-        )
-      },
-      onCreateCategoryClick = {},
-      onCategoryClick = {},
-      onPageSelected = {},
-    )
-  }
+  //  ExpensesTrackerTheme {
+  //    CategoriesListScreenContent(
+  //      stateProvider = {
+  //        CategoriesListUiState.DisplayCategoriesList(
+  //          categories = persistentMapOf(
+  //            0 to List(6) { index ->
+  //              CategoryWithTotalTransactions(
+  //                categoryModel = CategoryModel(
+  //                  id = index.toLong(),
+  //                  name = TextValue.Value("Childcare"),
+  //                  icon = IconModel.CHILDCARE,
+  //                  color = ColorModel.Purple,
+  //                  type = CategoryType.EXPENSE,
+  //                ),
+  //                transactions = emptyList(),
+  //                totalFormatted = "EUR 187.20",
+  //              )
+  //            }.toImmutableList(),
+  //          ),
+  //          tabs = persistentListOf(
+  //            TabData(R.string.expense),
+  //            TabData(R.string.income),
+  //          )
+  //        )
+  //      },
+  //      onCreateCategoryClick = {},
+  //      onCategoryClick = {},
+  //      onPageSelected = {},
+  //      onEditClick = {},
+  //    )
+  //  }
 }
 
 //

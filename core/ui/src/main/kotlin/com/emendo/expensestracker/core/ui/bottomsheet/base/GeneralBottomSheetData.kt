@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.TextValue
 
 @Stable
-class GeneralBottomSheetData(
+class GeneralBottomSheetData private constructor(
   val title: TextValue?,
   val positiveAction: Action,
   val negativeAction: Action?,
@@ -16,9 +16,9 @@ class GeneralBottomSheetData(
   )
 
   class Builder(val positiveAction: Action) {
-    var title: TextValue? = null
+    internal var title: TextValue? = null
       private set
-    var negativeAction: Action? = null
+    internal var negativeAction: Action? = null
       private set
 
     fun title(title: TextValue) = apply { this.title = title }

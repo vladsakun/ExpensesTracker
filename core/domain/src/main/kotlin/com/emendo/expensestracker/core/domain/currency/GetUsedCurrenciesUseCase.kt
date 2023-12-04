@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.domain
+package com.emendo.expensestracker.core.domain.currency
 
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.data.repository.api.UserDataRepository

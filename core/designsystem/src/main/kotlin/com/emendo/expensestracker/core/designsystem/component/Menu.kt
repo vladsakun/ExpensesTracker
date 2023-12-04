@@ -5,6 +5,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class MenuAction(
   val icon: ImageVector,
   val onClick: () -> Unit,
-  val text: String,
+  val contentDescription: String,
   val enabled: Boolean = true,
 )

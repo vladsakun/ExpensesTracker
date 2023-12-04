@@ -9,7 +9,9 @@ import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDesti
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.accounts.detail.AccountDetailScreen
 import com.emendo.expensestracker.categories.create.CreateCategoryRoute
+import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
+import com.emendo.expensestracker.categories.detail.CategoryDetailScreen
 import com.emendo.expensestracker.core.app.base.shared.color.selectColorResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.currency.selectCurrencyResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.icon.selectIconResultRecipient
@@ -61,6 +63,14 @@ fun ExpeNavHost(
       CreateCategoryRoute(
         navigator = destinationsNavigator,
         categoryType = navArgs.categoryType,
+        colorResultRecipient = selectColorResultRecipient(),
+        iconResultRecipient = selectIconResultRecipient(),
+      )
+    }
+    composable(CategoryDetailScreenDestination) {
+      CategoryDetailScreen(
+        navigator = destinationsNavigator,
+        categoryId = navArgs.categoryId,
         colorResultRecipient = selectColorResultRecipient(),
         iconResultRecipient = selectIconResultRecipient(),
       )

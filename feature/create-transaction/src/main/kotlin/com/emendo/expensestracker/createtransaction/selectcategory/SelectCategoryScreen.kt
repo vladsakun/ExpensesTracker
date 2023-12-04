@@ -13,7 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TextValue
+import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
@@ -90,7 +90,7 @@ fun CategoriesGrid(
   CategoriesLazyVerticalGrid {
     items(
       items = categories,
-      key = { it.id },
+      key = CategoryModel::id,
       contentType = { "category" },
     ) { category ->
       CategoryItem(
@@ -99,6 +99,7 @@ fun CategoriesGrid(
         icon = category.icon.imageVector,
         total = "",
         onClick = { onCategoryClick(category) },
+        isEditMode = { false },
       )
     }
     uniqueItem("addCategory") {
@@ -117,7 +118,7 @@ private fun CategoriesListPreview() {
           categories = List(6) { index ->
             CategoryModel(
               id = index.toLong(),
-              name = TextValue.Value("Childcare"),
+              name = textValueOf("Childcare"),
               icon = IconModel.random,
               color = ColorModel.random,
               type = CategoryType.EXPENSE,

@@ -116,63 +116,61 @@ private fun CreateTransactionContent(
           MenuAction(
             icon = ExpeIcons.Check,
             onClick = {},
-            text = stringResource(id = AppR.string.confirm),
+            contentDescription = stringResource(id = AppR.string.confirm),
           )
         ),
       )
     },
     modifier = Modifier.fillMaxSize(),
   ) { paddingValues ->
-    Column(
+    LazyColumn(
       modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues)
     ) {
-      LazyColumn {
-        when (val state = stateProvider()) {
-          is CreateTransactionUiState.Empty -> Unit
-          is CreateTransactionUiState.Error -> error(state)
-          is CreateTransactionUiState.Loading -> loader()
-          is CreateTransactionUiState.DisplayTransactionData -> uniqueItem("screen") {
-            NavigationEventEffect(
-              event = state.screenData.navigateUp,
-              onConsumed = onConsumedNavigateUpEvent,
-              action = onBackPressed,
-            )
-            Text(
-              text = state.screenData.amount,
-              color = state.screenData.transactionType.amountColor(),
-              style = MaterialTheme.typography.headlineMedium,
-              textAlign = TextAlign.End,
-              modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onAmountClick)
-                .padding(
-                  vertical = Dimens.margin_large_x,
-                  horizontal = marginHorizontal,
-                ),
-            )
-            ExpeDivider()
-            TransactionDestinationRow(
-              transactionItem = state.target,
-              label = stringResource(id = AppR.string.category),
-              onClick = onCategoryClick,
-              error = false,
-            )
-            TransactionDestinationRow(
-              transactionItem = state.source,
-              label = stringResource(id = AppR.string.account),
-              onClick = onAccountClick,
-              error = state.screenData.sourceError == triggered,
-              onConsumed = { onErrorConsumed(FieldWithError.Source) },
-            )
-            Spacer(modifier = Modifier.height(Dimens.margin_large_x))
-            ExpeButton(
-              textResId = AppR.string.save_transaction,
-              onClick = onCreateTransactionClick,
-              modifier = Modifier.padding(horizontal = marginHorizontal),
-            )
-          }
+      when (val state = stateProvider()) {
+        is CreateTransactionUiState.Empty -> Unit
+        is CreateTransactionUiState.Error -> error(state)
+        is CreateTransactionUiState.Loading -> loader()
+        is CreateTransactionUiState.DisplayTransactionData -> uniqueItem("screen") {
+          NavigationEventEffect(
+            event = state.screenData.navigateUp,
+            onConsumed = onConsumedNavigateUpEvent,
+            action = onBackPressed,
+          )
+          Text(
+            text = state.screenData.amount,
+            color = state.screenData.transactionType.amountColor(),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.End,
+            modifier = Modifier
+              .fillMaxWidth()
+              .clickable(onClick = onAmountClick)
+              .padding(
+                vertical = Dimens.margin_large_x,
+                horizontal = marginHorizontal,
+              ),
+          )
+          ExpeDivider()
+          TransactionDestinationRow(
+            transactionItem = state.target,
+            label = stringResource(id = AppR.string.category),
+            onClick = onCategoryClick,
+            error = false,
+          )
+          TransactionDestinationRow(
+            transactionItem = state.source,
+            label = stringResource(id = AppR.string.account),
+            onClick = onAccountClick,
+            error = state.screenData.sourceError == triggered,
+            onConsumed = { onErrorConsumed(FieldWithError.Source) },
+          )
+          Spacer(modifier = Modifier.height(Dimens.margin_large_x))
+          ExpeButton(
+            textResId = AppR.string.save_transaction,
+            onClick = onCreateTransactionClick,
+            modifier = Modifier.padding(horizontal = marginHorizontal),
+          )
         }
       }
     }

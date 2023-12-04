@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.app.base.manager;
 
-import com.emendo.expensestracker.core.domain.GetLastUsedAccountUseCase;
-import com.emendo.expensestracker.core.domain.RetrieveLastUsedAccountUseCase;
+import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase;
+import com.emendo.expensestracker.core.domain.account.RetrieveLastUsedAccountUseCase;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;

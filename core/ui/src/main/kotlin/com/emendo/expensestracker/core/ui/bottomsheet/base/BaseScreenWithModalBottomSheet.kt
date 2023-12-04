@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 fun <BSType> BaseScreenWithModalBottomSheetWithViewModel(
   viewModel: BaseBottomSheetViewModel<BSType>,
   onNavigateUpClick: () -> Unit,
-  bottomSheetContent: @Composable (bottomSheetType: BSType?, hideBottomSheet: () -> Unit) -> Unit,
+  bottomSheetContent: @Composable (bottomSheetType: BSType, hideBottomSheet: () -> Unit) -> Unit,
   content: @Composable () -> Unit,
 ) {
   val bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle()
@@ -45,7 +45,7 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
   onConsumedNavigateUpEvent: () -> Unit,
   onConsumedHideBottomSheetEvent: () -> Unit,
   confirmValueChange: (SheetValue) -> Boolean,
-  bottomSheetContent: @Composable (bottomSheetType: BSType?, hideBottomSheet: () -> Unit) -> Unit,
+  bottomSheetContent: @Composable (bottomSheetType: BSType, hideBottomSheet: () -> Unit) -> Unit,
   content: @Composable () -> Unit,
 ) {
   val coroutineScope = rememberCoroutineScope()

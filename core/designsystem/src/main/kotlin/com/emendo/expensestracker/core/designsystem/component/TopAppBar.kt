@@ -34,7 +34,7 @@ fun ExpeCenterAlignedTopBar(
         IconButton(onClick = action.onClick) {
           Icon(
             imageVector = action.icon,
-            contentDescription = action.text,
+            contentDescription = action.contentDescription,
             tint = MaterialTheme.colorScheme.onSurface,
           )
         }
@@ -70,7 +70,7 @@ fun ExpeCenterAlignedTopBar(
         IconButton(onClick = action.onClick) {
           Icon(
             imageVector = action.icon,
-            contentDescription = action.text,
+            contentDescription = action.contentDescription,
             tint = MaterialTheme.colorScheme.onSurface,
           )
         }
@@ -109,7 +109,7 @@ fun ExpeTopBar(
         ) {
           Icon(
             imageVector = action.icon,
-            contentDescription = action.text,
+            contentDescription = action.contentDescription,
             tint = MaterialTheme.colorScheme.onSurface,
           )
         }
@@ -193,7 +193,7 @@ private fun NiaTopBarPreview() {
     actions = persistentListOf(
       MenuAction(
         icon = ExpeIcons.Add,
-        text = "Action icon",
+        contentDescription = "Action icon",
         onClick = {}
       )
     ),

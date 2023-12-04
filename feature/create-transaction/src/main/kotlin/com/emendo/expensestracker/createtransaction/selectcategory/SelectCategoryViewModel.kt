@@ -10,6 +10,7 @@ import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
+import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SelectCategoryViewModel @Inject constructor(
   categoryRepository: CategoryRepository,
+  getUserCreatedCategoriesUseCase: GetUserCreatedCategoriesUseCase,
   private val createTransactionRepository: CreateTransactionRepository,
   private val appNavigationEventBus: AppNavigationEventBus,
 ) : BaseBottomSheetViewModel<BottomSheetType>() {
@@ -32,7 +34,7 @@ class SelectCategoryViewModel @Inject constructor(
   }
 
   val selectCategoryUiState: StateFlow<SelectCategoryUiState> =
-    categoriesUiState(categoryRepository, categoryTypeFromRepository)
+    categoriesUiState(getUserCreatedCategoriesUseCase, categoryTypeFromRepository)
       .stateInWhileSubscribed(
         scope = viewModelScope,
         initialValue = getDisplayCategoriesState(
@@ -51,10 +53,10 @@ class SelectCategoryViewModel @Inject constructor(
 }
 
 private fun categoriesUiState(
-  categoryRepository: CategoryRepository,
+  getUserCreatedCategoriesUseCase: GetUserCreatedCategoriesUseCase,
   categoryType: CategoryType,
-): Flow<SelectCategoryUiState> {
-  return categoryRepository.categories.asResult().map { categoriesResult ->
+): Flow<SelectCategoryUiState> =
+  getUserCreatedCategoriesUseCase().asResult().map { categoriesResult ->
     when (categoriesResult) {
       is Result.Success -> getDisplayCategoriesState(categoriesResult.data, categoryType)
       is Result.Error -> SelectCategoryUiState.Error("No categories found ${categoriesResult.exception}")
@@ -62,7 +64,6 @@ private fun categoriesUiState(
       is Result.Empty -> SelectCategoryUiState.Empty
     }
   }
-}
 
 private fun getDisplayCategoriesState(
   categories: List<CategoryModel>,

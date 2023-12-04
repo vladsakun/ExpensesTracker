@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,11 +26,11 @@ import javax.inject.Inject
 class CreateAccountViewModel @Inject constructor(
   currencyCacheManager: CurrencyCacheManager,
   numericKeyboardCommander: NumericKeyboardCommander,
-  currencyMapper: CurrencyMapper,
+  private val currencyMapper: CurrencyMapper,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter, currencyMapper) {
+) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
   private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
@@ -37,7 +38,7 @@ class CreateAccountViewModel @Inject constructor(
     )
   )
 
-  override val state = _state.asStateFlow()
+  override val state: StateFlow<CreateAccountScreenData> = _state.asStateFlow()
 
   private var createAccountJob: Job? = null
 
@@ -91,5 +92,9 @@ class CreateAccountViewModel @Inject constructor(
 
   override fun updateConfirmEnabled(enabled: Boolean) {
     _state.update { it.copy(isCreateAccountButtonEnabled = enabled) }
+  }
+
+  fun updateCurrencyByCode(code: String) {
+    updateCurrencyByCode(amountFormatter, currencyMapper, code)
   }
 }

@@ -45,8 +45,7 @@ class ExpeAppState(
 ) {
 
   val currentDestination: NavDestination?
-    @Composable get() = navController
-      .currentBackStackEntryAsState().value?.destination
+    @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
   val currentDestinationSpec: DestinationSpec<*>?
     @Composable get() = navController.currentDestinationAsState().value
