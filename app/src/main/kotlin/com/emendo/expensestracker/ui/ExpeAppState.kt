@@ -14,6 +14,8 @@ import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -59,7 +61,7 @@ class ExpeAppState(
    * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
    * route.
    */
-  val topLevelDestination: List<TopLevelDestination> = TopLevelDestination.entries
+  val topLevelDestination: ImmutableList<TopLevelDestination> = TopLevelDestination.entries.toImmutableList()
 
   /**
    * UI logic for navigating to a top level destination in the app. Top level destinations have

@@ -11,10 +11,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.emendo.expensestracker.core.app.base.shared.SelectColorScreen
+import com.emendo.expensestracker.core.app.base.shared.color.SelectColorScreen
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination.NavArgs
-import com.emendo.expensestracker.core.app.base.shared.navtype.colorModelEnumNavType
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.ramcosta.composedestinations.navargs.primitives.DestinationsIntNavType
 import com.ramcosta.composedestinations.navigation.DependenciesContainerBuilder
 import com.ramcosta.composedestinations.navigation.DestinationDependenciesContainer
 import com.ramcosta.composedestinations.scope.DestinationScope
@@ -29,52 +28,52 @@ import com.ramcosta.composedestinations.spec.Route
 public object SelectColorScreenDestination : AppbaseuiTypedDestination<SelectColorScreenDestination.NavArgs> {
     
     override fun invoke(navArgs: NavArgs): Direction = with(navArgs) {
-        invoke(selectedColor)
+        invoke(selectedColorId)
     }
      
     public operator fun invoke(
-		selectedColor: ColorModel,
+		selectedColorId: Int,
     ): Direction {
         return Direction(
             route = "$baseRoute" + 
-					"/${colorModelEnumNavType.serializeValue(selectedColor)}"
+					"/${DestinationsIntNavType.serializeValue(selectedColorId)}"
         )
     }
     
     @get:RestrictTo(RestrictTo.Scope.SUBCLASSES)
     override val baseRoute: String = "select_color_screen"
 
-    override val route: String = "$baseRoute/{selectedColor}"
+    override val route: String = "$baseRoute/{selectedColorId}"
     
 	override val arguments: List<NamedNavArgument> get() = listOf(
-		navArgument("selectedColor") {
-			type = colorModelEnumNavType
+		navArgument("selectedColorId") {
+			type = DestinationsIntNavType
 		}
 	)
 
     @Composable
     override fun DestinationScope<NavArgs>.Content() {
-		val (selectedColor) = navArgs
+		val (selectedColorId) = navArgs
 		SelectColorScreen(
 			navigator = destinationsNavigator, 
 			resultNavigator = resultBackNavigator(), 
-			selectedColor = selectedColor
+			selectedColorId = selectedColorId
 		)
     }
                     
 	override fun argsFrom(bundle: Bundle?): NavArgs {
 	    return NavArgs(
-			selectedColor = colorModelEnumNavType.safeGet(bundle, "selectedColor") ?: throw RuntimeException("'selectedColor' argument is mandatory, but was not present!"),
+			selectedColorId = DestinationsIntNavType.safeGet(bundle, "selectedColorId") ?: throw RuntimeException("'selectedColorId' argument is mandatory, but was not present!"),
 	    )
 	}
                 
 	override fun argsFrom(savedStateHandle: SavedStateHandle): NavArgs {
 	    return NavArgs(
-			selectedColor = colorModelEnumNavType.get(savedStateHandle, "selectedColor") ?: throw RuntimeException("'selectedColor' argument is mandatory, but was not present!"),
+			selectedColorId = DestinationsIntNavType.get(savedStateHandle, "selectedColorId") ?: throw RuntimeException("'selectedColorId' argument is mandatory, but was not present!"),
 	    )
 	}
 
 	public data class NavArgs(
-		val selectedColor: ColorModel,
+		val selectedColorId: Int,
 	)
 }

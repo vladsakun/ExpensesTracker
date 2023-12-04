@@ -30,6 +30,7 @@
   <string name="icon">Icon</string>
   <string name="color">Color</string>
   <string name="select_color">Select color</string>
+  <string name="select_icon">Select icon</string>
   <string name="balance">Balance</string>
   <string name="accounts">Accounts</string>
   <string name="select_account">Select account</string>

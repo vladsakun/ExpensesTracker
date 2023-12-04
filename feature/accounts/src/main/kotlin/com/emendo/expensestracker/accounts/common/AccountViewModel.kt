@@ -28,8 +28,11 @@ abstract class AccountViewModel(
   abstract fun updateName(name: String)
   abstract fun updateConfirmEnabled(enabled: Boolean)
 
-  val selectedColor: ColorModel
-    get() = state.value.color
+  val selectedColorId: Int
+    get() = state.value.color.id
+
+  val selectedIconId: Int
+    get() = state.value.icon.id
 
   init {
     numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateValue)
@@ -44,25 +47,6 @@ abstract class AccountViewModel(
       numericKeyboardCommander.onDoneClick()
     }
     super.dismissBottomSheet()
-  }
-
-  fun openIconBottomSheet() {
-    showBottomSheet(
-      BottomSheetType.Icon(
-        selectedIcon = state.value.icon,
-        onSelectIcon = ::setIcon,
-      )
-    )
-  }
-
-  fun openCurrencyBottomSheet() {
-    //    showBottomSheet(
-    //      BottomSheetType.Currency(
-    //        selectedCurrency = state.value.currency,
-    //        onSelectCurrency = ::setCurrency,
-    //        currencies = currencyCacheManager.getCurrenciesBlocking().values.toImmutableList(),
-    //      )
-    //    )
   }
 
   fun setAccountName(accountName: String) {
@@ -89,6 +73,10 @@ abstract class AccountViewModel(
 
   fun updateCurrencyByCode(code: String) {
     updateCurrency(currencyMapper.toCurrencyModelBlocking(code))
+  }
+
+  fun updateIconById(id: Int) {
+    updateIcon(IconModel.getById(id))
   }
 
   private fun updateValue(value: String): Boolean {

@@ -57,5 +57,10 @@ enum class TopLevelDestination(
     unselectedIcon = ExpeIcons.Settings,
     iconTextId = R.string.settings,
     titleTextId = R.string.settings,
-  ),
+  );
+
+  companion object {
+    val start: TopLevelDestination
+      get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
+  }
 }

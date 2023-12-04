@@ -34,7 +34,7 @@ enum class ColorModel(
   LimeGreen(23, Color(0xff35ab4f), Color(0xff35ab4f)),
   BrightGreen(24, Color(0xff1ec923), Color(0xff1ec923)),
   Lime(25, Color(0xffabde3d), Color(0xffabde3d)),
-  Olive(26, Color(0xffd1d378), Color(0xffd1d378));
+  Olive(26, Color(0xFFA6A851), Color(0xFFA6A851));
 
   companion object {
     val DEFAULT_COLOR = Base

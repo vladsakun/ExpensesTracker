@@ -12,7 +12,8 @@ public object AppbaseuiNavGraph : NavGraphSpec {
     override val destinationsByRoute: Map<String, DestinationSpec<*>> = listOf(
 		DummyStartDestination,
 		SelectColorScreenDestination,
-		SelectCurrencyScreenDestination
+		SelectCurrencyScreenDestination,
+		SelectIconScreenDestination
     ).associateBy { it.route }
 
 }

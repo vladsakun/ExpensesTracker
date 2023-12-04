@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
+import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
@@ -17,13 +18,11 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeTextField
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.ui.SelectRowWithColor
 import com.emendo.expensestracker.core.ui.SelectRowWithIcon
-import com.emendo.expensestracker.core.ui.bottomsheet.IconsBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
+import com.emendo.expensestracker.core.ui.handleValueResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.OpenResultRecipient
+import de.palm.composestateevents.NavigationEventEffect
 
 @Destination
 @Composable
@@ -32,30 +31,28 @@ fun CreateCategoryRoute(
   // retrieved in ViewModel via SavedStateHandle
   @Suppress("UNUSED_PARAMETER") categoryType: CategoryType,
   colorResultRecipient: OpenResultRecipient<Int>,
+  iconResultRecipient: OpenResultRecipient<Int>,
   viewModel: CreateCategoryViewModel = hiltViewModel(),
 ) {
-  colorResultRecipient.onNavResult { result ->
-    when (result) {
-      is NavResult.Value -> viewModel.updateColor(result.value)
-      else -> Unit
-    }
-  }
+  colorResultRecipient.handleValueResult(viewModel::updateColor)
+  iconResultRecipient.handleValueResult(viewModel::updateIcon)
 
-  BaseScreenWithModalBottomSheetWithViewModel(
-    viewModel = viewModel,
-    onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
-  ) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    CreateCategoryContent(
-      stateProvider = state::value,
-      onNavigationClick = navigator::navigateUp,
-      onTitleChanged = remember { viewModel::changeTitle },
-      onIconSelectClick = remember { viewModel::showIconBottomSheet },
-      onColorSelectClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColor)) } },
-      onCreateCategoryClick = remember { viewModel::createCategory },
-    )
-  }
+  val state = viewModel.state.collectAsStateWithLifecycle()
+
+  NavigationEventEffect(
+    event = state.value.navigateUpEvent,
+    onConsumed = viewModel::consumeNavigateUpEvent,
+    action = navigator::navigateUp,
+  )
+
+  CreateCategoryContent(
+    stateProvider = state::value,
+    onNavigationClick = navigator::navigateUp,
+    onTitleChanged = remember { viewModel::changeTitle },
+    onIconSelectClick = remember { { navigator.navigate(SelectIconScreenDestination(viewModel.selectedIconId)) } },
+    onColorSelectClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColorId)) } },
+    onCreateCategoryClick = remember { viewModel::createCategory },
+  )
 }
 
 @Composable
@@ -99,25 +96,6 @@ private fun CreateCategoryContent(
         textResId = R.string.create,
         onClick = onCreateCategoryClick,
         enabled = stateProvider().isCreateButtonEnabled,
-      )
-    }
-  }
-}
-
-@Composable
-private fun BottomSheetContent(
-  type: BottomSheetType?,
-  hideBottomSheet: () -> Unit,
-) {
-  when (type) {
-    is BottomSheetType.Icon -> {
-      IconsBottomSheet(
-        onIconSelect = {
-          type.onSelectIcon(it)
-          hideBottomSheet()
-        },
-        onCloseClick = hideBottomSheet,
-        selectedIcon = type.selectedIcon,
       )
     }
   }

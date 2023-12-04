@@ -1,18 +1,16 @@
 package com.emendo.expensestracker.categories.create
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.core.app.common.network.Dispatcher
-import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,26 +22,22 @@ import javax.inject.Inject
 class CreateCategoryViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
-  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-) : BaseBottomSheetViewModel<BottomSheetType>() {
+) : ViewModel() {
 
   private val _state = MutableStateFlow(CreateCategoryScreenData.getDefault())
   val state = _state.asStateFlow()
 
-  val selectedColor: ColorModel
-    get() = state.value.color
+  val selectedColorId: Int
+    get() = state.value.color.id
+  val selectedIconId: Int
+    get() = state.value.icon.id
 
   private var createCategoryJob: Job? = null
-
-  private val categoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name] ?: CategoryType.EXPENSE
+  private val categoryType: CategoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name]!!
 
   fun changeTitle(newTitle: String) {
     _state.update { it.copy(title = newTitle) }
     _state.update { it.copy(isCreateButtonEnabled = newTitle.isNotBlank()) }
-  }
-
-  fun showIconBottomSheet() {
-    showBottomSheet(BottomSheetType.Icon(state.value.icon, ::selectIcon))
   }
 
   fun createCategory() {
@@ -51,14 +45,16 @@ class CreateCategoryViewModel @Inject constructor(
       return
     }
 
-    createCategoryJob = viewModelScope.launch(ioDispatcher) {
-      categoryRepository.upsertCategory(
-        name = state.value.title,
-        icon = state.value.icon,
-        color = state.value.color,
-        type = categoryType,
-      )
-      navigateUp()
+    createCategoryJob = viewModelScope.launch {
+      with(state.value) {
+        categoryRepository.upsertCategory(
+          name = title,
+          icon = icon,
+          color = color,
+          type = categoryType,
+        )
+      }
+      _state.update { it.copy(navigateUpEvent = triggered) }
     }
   }
 
@@ -66,11 +62,11 @@ class CreateCategoryViewModel @Inject constructor(
     _state.update { it.copy(color = ColorModel.getById(colorId)) }
   }
 
-  private fun selectIcon(iconModel: IconModel) {
-    _state.update { it.copy(icon = iconModel) }
+  fun updateIcon(iconId: Int) {
+    _state.update { it.copy(icon = IconModel.getById(iconId)) }
   }
 
-  private fun selectColor(colorModel: ColorModel) {
-    _state.update { it.copy(color = colorModel) }
+  fun consumeNavigateUpEvent() {
+    _state.update { it.copy(navigateUpEvent = consumed) }
   }
 }

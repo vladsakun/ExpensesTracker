@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.app.base.shared
+package com.emendo.expensestracker.core.app.base.shared.color
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
@@ -25,6 +26,8 @@ import com.emendo.expensestracker.core.ui.Constants.SELECTED_ITEM_ALPHA_BORDER
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.scope.AnimatedDestinationScope
+import com.ramcosta.composedestinations.scope.resultRecipient
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -33,7 +36,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun SelectColorScreen(
   navigator: DestinationsNavigator,
   resultNavigator: ResultBackNavigator<Int>,
-  selectedColor: ColorModel,
+  selectedColorId: Int,
 ) {
   val colors: ImmutableList<ColorModel> = ColorModel.entries.toImmutableList()
   ExpeScaffoldWithTopBar(
@@ -54,7 +57,7 @@ fun SelectColorScreen(
       ) { color ->
         ColorItem(
           color = color,
-          isSelected = color == selectedColor,
+          isSelected = color.id == selectedColorId,
           onColorSelect = { resultNavigator.navigateBack(color.id) },
         )
       }
@@ -93,3 +96,7 @@ private fun ColorItem(
     )
   }
 }
+
+@Composable
+fun AnimatedDestinationScope<*>.selectColorResultRecipient() =
+  resultRecipient<SelectColorScreenDestination, Int>()

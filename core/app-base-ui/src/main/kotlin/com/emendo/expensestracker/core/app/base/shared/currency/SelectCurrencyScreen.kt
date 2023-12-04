@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
@@ -20,6 +21,8 @@ import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.scope.AnimatedDestinationScope
+import com.ramcosta.composedestinations.scope.resultRecipient
 
 @Destination
 @Composable
@@ -94,3 +97,7 @@ private fun CurrencyItem(
     ExpeDivider()
   }
 }
+
+@Composable
+fun AnimatedDestinationScope<*>.selectCurrencyResultRecipient() =
+  resultRecipient<SelectCurrencyScreenDestination, String>()
