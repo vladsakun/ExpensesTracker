@@ -30,25 +30,20 @@ class CreateCategoryViewModel @Inject constructor(
   private val _state = MutableStateFlow(CreateCategoryScreenData.getDefault())
   val state = _state.asStateFlow()
 
+  val selectedColor: ColorModel
+    get() = state.value.color
+
   private var createCategoryJob: Job? = null
 
   private val categoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name] ?: CategoryType.EXPENSE
 
   fun changeTitle(newTitle: String) {
-    _state.update {
-      it.copy(
-        title = newTitle,
-        isCreateButtonEnabled = newTitle.isNotBlank(),
-      )
-    }
+    _state.update { it.copy(title = newTitle) }
+    _state.update { it.copy(isCreateButtonEnabled = newTitle.isNotBlank()) }
   }
 
   fun showIconBottomSheet() {
     showBottomSheet(BottomSheetType.Icon(state.value.icon, ::selectIcon))
-  }
-
-  fun showColorBottomSheet() {
-    showBottomSheet(BottomSheetType.Color(state.value.color, ::selectColor))
   }
 
   fun createCategory() {
@@ -65,6 +60,10 @@ class CreateCategoryViewModel @Inject constructor(
       )
       navigateUp()
     }
+  }
+
+  fun updateColor(colorId: Int) {
+    _state.update { it.copy(color = ColorModel.getById(colorId)) }
   }
 
   private fun selectIcon(iconModel: IconModel) {

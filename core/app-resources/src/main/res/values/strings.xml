@@ -25,9 +25,11 @@
   <string name="equal">Equal</string>
   <string name="currency_with_symbol">Currency\n%s</string>
   <string name="currency">Currency</string>
+  <string name="select_currency">Select currency</string>
   <string name="archive">Archive</string>
   <string name="icon">Icon</string>
   <string name="color">Color</string>
+  <string name="select_color">Select color</string>
   <string name="balance">Balance</string>
   <string name="accounts">Accounts</string>
   <string name="select_account">Select account</string>

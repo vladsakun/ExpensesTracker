@@ -5,19 +5,18 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
+import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.InitialBalanceKeyboardActions
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class AccountViewModel(
   private val calculatorFormatter: CalculatorFormatter,
-  private val currencyCacheManager: CurrencyCacheManager,
   private val numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
+  private val currencyMapper: CurrencyMapper,
 ) : BaseBottomSheetViewModel<BottomSheetType>(), InitialBalanceKeyboardActions {
 
   abstract val state: StateFlow<AccountScreenData>
@@ -28,6 +27,9 @@ abstract class AccountViewModel(
   abstract fun updateColor(color: ColorModel)
   abstract fun updateName(name: String)
   abstract fun updateConfirmEnabled(enabled: Boolean)
+
+  val selectedColor: ColorModel
+    get() = state.value.color
 
   init {
     numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateValue)
@@ -53,23 +55,14 @@ abstract class AccountViewModel(
     )
   }
 
-  fun openColorBottomSheet() {
-    showBottomSheet(
-      BottomSheetType.Color(
-        selectedColor = state.value.color,
-        onSelectColor = ::setColor,
-      )
-    )
-  }
-
   fun openCurrencyBottomSheet() {
-    showBottomSheet(
-      BottomSheetType.Currency(
-        selectedCurrency = state.value.currency,
-        onSelectCurrency = ::setCurrency,
-        currencies = currencyCacheManager.getCurrenciesBlocking().values.toImmutableList(),
-      )
-    )
+    //    showBottomSheet(
+    //      BottomSheetType.Currency(
+    //        selectedCurrency = state.value.currency,
+    //        onSelectCurrency = ::setCurrency,
+    //        currencies = currencyCacheManager.getCurrenciesBlocking().values.toImmutableList(),
+    //      )
+    //    )
   }
 
   fun setAccountName(accountName: String) {
@@ -88,6 +81,14 @@ abstract class AccountViewModel(
         numericKeyboardActions = numericKeyboardCommander,
       )
     )
+  }
+
+  fun updateColorById(id: Int) {
+    updateColor(ColorModel.getById(id))
+  }
+
+  fun updateCurrencyByCode(code: String) {
+    updateCurrency(currencyMapper.toCurrencyModelBlocking(code))
   }
 
   private fun updateValue(value: String): Boolean {

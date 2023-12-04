@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
@@ -17,13 +17,13 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeTextField
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.ui.SelectRowWithColor
 import com.emendo.expensestracker.core.ui.SelectRowWithIcon
-import com.emendo.expensestracker.core.ui.bottomsheet.ColorsBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.IconsBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.StateFlow
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.OpenResultRecipient
 
 @Destination
 @Composable
@@ -31,36 +31,42 @@ fun CreateCategoryRoute(
   navigator: DestinationsNavigator,
   // retrieved in ViewModel via SavedStateHandle
   @Suppress("UNUSED_PARAMETER") categoryType: CategoryType,
+  colorResultRecipient: OpenResultRecipient<Int>,
   viewModel: CreateCategoryViewModel = hiltViewModel(),
 ) {
+  colorResultRecipient.onNavResult { result ->
+    when (result) {
+      is NavResult.Value -> viewModel.updateColor(result.value)
+      else -> Unit
+    }
+  }
+
   BaseScreenWithModalBottomSheetWithViewModel(
     viewModel = viewModel,
     onNavigateUpClick = navigator::navigateUp,
     bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
   ) {
+    val state = viewModel.state.collectAsStateWithLifecycle()
     CreateCategoryContent(
-      stateFlow = viewModel.state,
+      stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
-      onTitleChanged = viewModel::changeTitle,
-      onIconSelectClick = viewModel::showIconBottomSheet,
-      onColorSelectClick = viewModel::showColorBottomSheet,
-      onCreateCategoryClick = viewModel::createCategory,
+      onTitleChanged = remember { viewModel::changeTitle },
+      onIconSelectClick = remember { viewModel::showIconBottomSheet },
+      onColorSelectClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColor)) } },
+      onCreateCategoryClick = remember { viewModel::createCategory },
     )
   }
 }
 
 @Composable
 private fun CreateCategoryContent(
-  stateFlow: StateFlow<CreateCategoryScreenData>,
+  stateProvider: () -> CreateCategoryScreenData,
   onNavigationClick: () -> Unit,
   onTitleChanged: (String) -> Unit,
   onIconSelectClick: () -> Unit,
   onColorSelectClick: () -> Unit,
   onCreateCategoryClick: () -> Unit,
 ) {
-  val uiState = stateFlow.collectAsStateWithLifecycle()
-  val isCreateButtonEnabled = remember { derivedStateOf { uiState.value.isCreateButtonEnabled } }
-
   ExpeScaffoldWithTopBar(
     titleResId = R.string.create_category,
     onNavigationClick = onNavigationClick,
@@ -76,24 +82,23 @@ private fun CreateCategoryContent(
     ) {
       ExpeTextField(
         label = "Title",
-        text = uiState.value.title,
+        text = stateProvider().title,
         onValueChange = onTitleChanged,
       )
-      // Todo recomposes Select rows on each input
       SelectRowWithIcon(
         labelResId = R.string.icon,
-        imageVectorProvider = uiState.value.icon::imageVector,
+        imageVectorProvider = { stateProvider().icon.imageVector },
         onClick = onIconSelectClick,
       )
       SelectRowWithColor(
         labelResId = R.string.color,
-        colorProvider = { uiState.value.color },
+        colorProvider = { stateProvider().color },
         onClick = onColorSelectClick,
       )
       ExpeButton(
         textResId = R.string.create,
         onClick = onCreateCategoryClick,
-        enabled = isCreateButtonEnabled.value,
+        enabled = stateProvider().isCreateButtonEnabled,
       )
     }
   }
@@ -105,17 +110,6 @@ private fun BottomSheetContent(
   hideBottomSheet: () -> Unit,
 ) {
   when (type) {
-    is BottomSheetType.Color -> {
-      ColorsBottomSheet(
-        selectedColor = type.selectedColor,
-        onColorSelect = {
-          type.onSelectColor(it)
-          hideBottomSheet()
-        },
-        onCloseClick = hideBottomSheet,
-      )
-    }
-
     is BottomSheetType.Icon -> {
       IconsBottomSheet(
         onIconSelect = {

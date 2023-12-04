@@ -9,6 +9,7 @@ import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
+import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,10 +25,11 @@ import javax.inject.Inject
 class CreateAccountViewModel @Inject constructor(
   currencyCacheManager: CurrencyCacheManager,
   numericKeyboardCommander: NumericKeyboardCommander,
+  currencyMapper: CurrencyMapper,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-) : AccountViewModel(calculatorFormatter, currencyCacheManager, numericKeyboardCommander, amountFormatter) {
+) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter, currencyMapper) {
 
   private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(

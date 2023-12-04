@@ -44,7 +44,7 @@ fun IconsBottomSheet(
         ) {
           items(
             items = icons,
-            key = { item: IconModel -> item.id },
+            key = IconModel::id,
             contentType = { _ -> "icons" },
           ) { item ->
             IconItem(

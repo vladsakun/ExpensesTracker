@@ -9,7 +9,7 @@ enum class ColorModel(
   val darkColor: Color,
   val lightColor: Color? = null,
 ) {
-  Base(1, Color(0xFF8B8A8A), Color(0xff333333)),
+  Base(1, Color(0xffd9d9d9), Color(0xff333333)),
   Gray(2, Color(0xff999999), Color(0xff999999)),
   LightGray(3, Color(0xffccc7ab), Color(0xffccc7ab)),
   Tan(4, Color(0xffdeb087), Color(0xffdeb087)),
@@ -38,8 +38,9 @@ enum class ColorModel(
 
   companion object {
     val DEFAULT_COLOR = Base
-    inline val random get() = entries.random()
-    inline val ColorModel.color: Color
+    val random
+      get() = entries.random()
+    val ColorModel.color: Color
       @Composable get() = if (isSystemInDarkTheme()) darkColor else lightColor ?: darkColor
 
     private val values = entries.associateBy { it.id }

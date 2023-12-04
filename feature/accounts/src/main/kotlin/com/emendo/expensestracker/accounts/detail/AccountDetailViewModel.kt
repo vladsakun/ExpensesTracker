@@ -11,7 +11,7 @@ import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
+import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.domain.GetAccountSnapshotById
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -30,12 +30,12 @@ import javax.inject.Inject
 class AccountDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   getAccountSnapshotById: GetAccountSnapshotById,
-  currencyCacheManager: CurrencyCacheManager,
   numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-) : AccountViewModel(calculatorFormatter, currencyCacheManager, numericKeyboardCommander, amountFormatter) {
+  currencyMapper: CurrencyMapper,
+) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter, currencyMapper) {
 
   private val accountId: Long = requireNotNull(savedStateHandle[AccountDetailScreenDestination.arguments[0].name])
 

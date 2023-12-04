@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.accounts.common.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.AccountContent
+import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
@@ -23,12 +24,15 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.OpenResultRecipient
 
 @Destination
 @Composable
-internal fun AccountDetailScreen(
+fun AccountDetailScreen(
   navigator: DestinationsNavigator,
   @Suppress("UNUSED_PARAMETER") accountId: Long,
+  colorResultRecipient: OpenResultRecipient<Int>,
+  currencyResultRecipient: OpenResultRecipient<String>,
   viewModel: AccountDetailViewModel = hiltViewModel(),
 ) {
   BaseScreenWithModalBottomSheetWithViewModel(
@@ -43,7 +47,7 @@ internal fun AccountDetailScreen(
       onNavigationClick = navigator::navigateUp,
       onNameChange = remember { viewModel::setAccountName },
       onIconRowClick = remember { viewModel::openIconBottomSheet },
-      onColorRowClick = remember { viewModel::openColorBottomSheet },
+      onColorRowClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColor)) } },
       onBalanceRowClick = remember { viewModel::showBalanceBottomSheet },
       onCurrencyRowClick = remember { viewModel::openCurrencyBottomSheet },
       onConfirmAccountDetailsClick = remember { viewModel::updateAccount },

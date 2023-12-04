@@ -2,6 +2,7 @@ package com.emendo.expensestracker.navigation
 
 import com.emendo.expensestracker.accounts.AccountsNavGraph
 import com.emendo.expensestracker.categories.CategoriesNavGraph
+import com.emendo.expensestracker.core.app.base.shared.AppbaseuiNavGraph
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.emendo.expensestracker.settings.SettingsNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
@@ -20,6 +21,7 @@ object NavGraphs {
       TransactionsNavGraph,
       SettingsNavGraph,
       CreatetransactionNavGraph,
+      AppbaseuiNavGraph,
     )
   }
 

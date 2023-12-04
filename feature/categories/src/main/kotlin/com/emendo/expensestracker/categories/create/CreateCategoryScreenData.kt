@@ -1,8 +1,10 @@
 package com.emendo.expensestracker.categories.create
 
+import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 
+@Stable
 data class CreateCategoryScreenData(
   val title: String,
   val icon: IconModel,

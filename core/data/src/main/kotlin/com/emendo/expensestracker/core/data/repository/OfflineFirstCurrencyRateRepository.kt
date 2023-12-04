@@ -33,17 +33,22 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
   @ApplicationScope private val scope: CoroutineScope,
 ) : CurrencyRateRepository {
 
-  private val stateFlow: StateFlow<List<CurrencyRateModel>> =
+  private val ratesStateFlow: StateFlow<List<CurrencyRateModel>> =
     currencyRatesDao
       .getAll()
       .map { it.mapNotNull(::toCurrencyRateModel) }
       .stateInLazilyList(scope)
 
+  private val currencies: StateFlow<List<String>> =
+    currencyRatesDao
+      .getCurrencyCodes()
+      .stateInLazilyList(scope)
+
   override val rates: Flow<List<CurrencyRateModel>>
-    get() = stateFlow
+    get() = ratesStateFlow
 
   override val currencyCodes: Flow<List<String>>
-    get() = currencyRatesDao.getCurrencyCodes()
+    get() = currencies
 
   override suspend fun retrieveAllCurrencyCodes(): List<String> = withContext(ioDispatcher) {
     currencyRatesDao.retrieveAllCurrencyCodes()

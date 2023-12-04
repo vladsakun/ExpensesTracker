@@ -75,7 +75,7 @@ private fun TransactionsList(
   LazyColumn(modifier = Modifier.fillMaxSize()) {
     items(
       items = transactions,
-      key = { it.id },
+      key = TransactionModel::id,
       contentType = { "transaction" }
     ) { transaction ->
       TransactionItem(
