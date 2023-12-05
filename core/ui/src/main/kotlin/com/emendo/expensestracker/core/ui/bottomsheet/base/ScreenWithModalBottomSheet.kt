@@ -2,15 +2,15 @@ package com.emendo.expensestracker.core.ui.bottomsheet.base
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.core.model.data.BottomSheetData
-import com.emendo.expensestracker.core.ui.bottomsheet.ExpeModalBottomSheet
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
@@ -104,4 +104,30 @@ private fun Effects(
     onConsumed = onConsumedHideBottomSheetEvent,
     action = hideBottomSheet,
   )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun ExpeModalBottomSheet(
+  modalBottomSheetState: SheetState,
+  bottomSheetState: () -> BottomSheetState,
+  onDismissRequest: () -> Unit,
+  bottomSheetContent: @Composable (ColumnScope.(type: BottomSheetData) -> Unit),
+) {
+  val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState().bottomSheetState != null } }
+  val focusManager = LocalFocusManager.current
+
+  if (shouldOpenBottomSheet.value) {
+    focusManager.clearFocus()
+    ModalBottomSheet(
+      onDismissRequest = onDismissRequest,
+      sheetState = modalBottomSheetState,
+      // Todo uncomment when fixed https://issuetracker.google.com/issues/275849044
+      // windowInsets = WindowInsets(0),
+      shape = ExpeBottomSheetShape,
+      content = {
+        bottomSheetContent(bottomSheetState().bottomSheetState!!)
+      },
+    )
+  }
 }

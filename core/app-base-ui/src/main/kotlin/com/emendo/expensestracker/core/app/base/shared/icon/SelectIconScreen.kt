@@ -15,13 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.emendo.expensestracker.core.app.base.shared.SelectedItemConstants
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.conditional
-import com.emendo.expensestracker.core.ui.Constants
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -44,7 +44,7 @@ fun SelectIconScreen(
     onNavigationClick = navigator::navigateUp,
   ) { paddingValues ->
     LazyVerticalGrid(
-      columns = GridCells.FixedSize(Constants.ITEM_FIXED_SIZE_DP.dp),
+      columns = GridCells.FixedSize(SelectedItemConstants.SELECT_ITEM_FIXED_SIZE_DP.dp),
       horizontalArrangement = Arrangement.SpaceAround,
       modifier = Modifier
         .fillMaxSize()
@@ -71,7 +71,7 @@ private fun IconItem(
   isSelected: Boolean,
   onIconSelect: (icon: IconModel) -> Unit,
 ) {
-  val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Constants.SELECTED_ITEM_ALPHA_BORDER)
+  val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = SelectedItemConstants.SELECTED_ITEM_ALPHA_BORDER)
 
   Surface {
     Box(
@@ -83,7 +83,7 @@ private fun IconItem(
         .clickable { onIconSelect(icon) }
         .conditional(isSelected) {
           border(
-            width = Constants.SELECTED_ICON_BORDER_WIDTH.dp,
+            width = SelectedItemConstants.SELECTED_ITEM_BORDER_WIDTH.dp,
             color = borderColor,
             shape = CircleShape,
           )

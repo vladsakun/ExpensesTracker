@@ -13,6 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.emendo.expensestracker.core.app.base.shared.SelectedItemConstants.SELECTED_ITEM_ALPHA_BORDER
+import com.emendo.expensestracker.core.app.base.shared.SelectedItemConstants.SELECTED_ITEM_BORDER_WIDTH
+import com.emendo.expensestracker.core.app.base.shared.SelectedItemConstants.SELECT_ITEM_FIXED_SIZE_DP
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
@@ -20,9 +23,6 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.conditional
-import com.emendo.expensestracker.core.ui.Constants.ITEM_FIXED_SIZE_DP
-import com.emendo.expensestracker.core.ui.Constants.SELECTED_COLOR_BORDER_WIDTH
-import com.emendo.expensestracker.core.ui.Constants.SELECTED_ITEM_ALPHA_BORDER
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -48,7 +48,7 @@ fun SelectColorScreen(
       modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues),
-      columns = GridCells.FixedSize(ITEM_FIXED_SIZE_DP.dp),
+      columns = GridCells.FixedSize(SELECT_ITEM_FIXED_SIZE_DP.dp),
       horizontalArrangement = Arrangement.SpaceAround,
     ) {
       items(
@@ -81,7 +81,7 @@ private fun ColorItem(
       .clickable(onClick = onColorSelect)
       .conditional(isSelected) {
         val border = border(
-          width = SELECTED_COLOR_BORDER_WIDTH.dp,
+          width = SELECTED_ITEM_BORDER_WIDTH.dp,
           color = colorValue.copy(alpha = SELECTED_ITEM_ALPHA_BORDER),
           shape = CircleShape,
         )

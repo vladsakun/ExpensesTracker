@@ -18,7 +18,7 @@ import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTra
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
-import com.emendo.expensestracker.core.ui.bottomsheet.general.ActionType
+import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetDataImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -34,8 +34,7 @@ class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appNavigationEventBus: AppNavigationEventBus,
   private val categoryRepository: CategoryRepository,
-) : ViewModel(),
-    BottomSheetStateManager by BottomSheetStateManagerDelegate() {
+) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate() {
 
   companion object {
     private val DEFAULT_PAGE_INDEX = CategoryType.EXPENSE.toPageIndex()
@@ -58,7 +57,7 @@ class CategoriesListViewModel @Inject constructor(
 
   private var selectedPageIndex = DEFAULT_PAGE_INDEX
 
-  fun openCreateTransactionScreen(category: CategoryWithTotal) {
+  fun openCreateTransactionScreen(category: CategoryWithTotalTransactions) {
     appNavigationEventBus.navigate(AppNavigationEvent.CreateTransaction(target = category.categoryModel, source = null))
   }
 
@@ -70,20 +69,20 @@ class CategoriesListViewModel @Inject constructor(
     _isEditMode.update { !it }
   }
 
-  fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {
+  fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotalTransactions) {
     showBottomSheet(
       GeneralBottomSheetDataImpl
-        .Builder(Action(resourceValueOf(R.string.delete), { deleteCategory(category) }, ActionType.DANGER))
+        .Builder(DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.categoryModel.id) })
         .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
         .build()
     )
   }
 
-  private fun deleteCategory(category: CategoryWithTotal) {
+  private fun deleteCategory(categoryId: Long) {
     hideBottomSheet()
     viewModelScope.launch {
-      categoryRepository.deleteCategory(category.categoryModel.id)
+      categoryRepository.deleteCategory(categoryId)
     }
   }
 }
@@ -129,8 +128,7 @@ private fun categoriesUiState(
 private fun createCategoryPagePair(
   categoryType: CategoryType,
   categoriesList: List<CategoryWithTotalTransactions>,
-): Pair<Int, ImmutableList<CategoryWithTotal>> =
+): Pair<Int, ImmutableList<CategoryWithTotalTransactions>> =
   categoryType.toPageIndex() to categoriesList
     .filter { it.categoryModel.type == categoryType }
-    .map { CategoryWithTotal(it.categoryModel, it.totalFormatted) }
     .toImmutableList()

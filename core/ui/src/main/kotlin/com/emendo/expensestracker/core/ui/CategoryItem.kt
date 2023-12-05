@@ -31,8 +31,8 @@ fun CategoryItem(
   total: String,
   onClick: () -> Unit,
   isEditMode: () -> Boolean,
-  onDeleteClick: () -> Unit = {},
   modifier: Modifier = Modifier,
+  onDeleteClick: () -> Unit = {},
 ) {
   val infiniteTransition = rememberInfiniteTransition(label = "rotationTransition")
   val transition = infiniteTransition.animateFloat(
@@ -126,67 +126,3 @@ fun AddCategoryItem(
     )
   }
 }
-
-//@Composable
-//fun RoundedRectangleItem(
-//  cellSizeDp: Dp,
-//  icon: ImageVector,
-//  backgroundColor: Color,
-//  modifier: Modifier = Modifier,
-//  onClick: () -> Unit = {},
-//  text: String = "",
-//  isEditMode: Boolean,
-//) {
-//
-//  Column(
-//    modifier = modifier
-//      .width(cellSizeDp)
-//      .wrapContentHeight()
-//      .padding(PADDING_CATEGORY_ITEM_PADDING)
-//      .graphicsLayer {
-//        if (isEditMode) {
-//          rotationZ = rotation
-//        }
-//      },
-//    verticalArrangement = Arrangement.Center,
-//    horizontalAlignment = Alignment.CenterHorizontally
-//  ) {
-//    Box {
-//      if (isEditMode) {
-//        Icon(
-//          imageVector = ExpIcons.Remove,
-//          contentDescription = "remove",
-//          modifier = Modifier
-//            .size(16.dp)
-//            .zIndex(2f)
-//            .background(Color.Gray, CircleShape)
-//            .align(Alignment.TopStart)
-//        )
-//      }
-//      Box(
-//        modifier = Modifier
-//          .fillMaxWidth()
-//          .padding(4.dp)
-//          .aspectRatio(1f)
-//          .clip(RoundedCornerShape(16.dp))
-//          .background(backgroundColor, RectangleShape)
-//          .clickable(onClick = onClick)
-//      ) {
-//        Icon(
-//          imageVector = icon,
-//          contentDescription = "category icon",
-//          modifier = Modifier
-//            .fillMaxSize(0.6f)
-//            .align(Alignment.Center)
-//        )
-//      }
-//    }
-//    Spacer(modifier = Modifier.height(4.dp))
-//    Text(
-//      text = text,
-//      maxLines = 1,
-//      overflow = TextOverflow.Ellipsis,
-//      style = MaterialTheme.typography.labelSmall
-//    )
-//  }
-//}

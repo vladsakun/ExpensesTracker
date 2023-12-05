@@ -20,6 +20,7 @@ fun ColumnScope.ExpeBottomSheet(
   titleLayout: @Composable (modifier: Modifier) -> Unit,
   modifier: Modifier = Modifier,
   onCloseClick: (() -> Unit)? = null,
+  addBottomPadding: Boolean = true,
   content: @Composable ColumnScope.() -> Unit,
 ) {
   Row(
@@ -44,6 +45,9 @@ fun ColumnScope.ExpeBottomSheet(
     }
   }
   content()
+  if (addBottomPadding) {
+    Spacer(modifier = Modifier.height(Dimens.margin_large_x))
+  }
 }
 
 @Composable

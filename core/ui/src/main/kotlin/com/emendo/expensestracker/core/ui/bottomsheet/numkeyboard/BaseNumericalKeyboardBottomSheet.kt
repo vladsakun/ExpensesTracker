@@ -27,32 +27,9 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
 import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardNumber
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-
-const val MATH_OPERATION_WEIGHT = 3f
-const val DIGIT_BUTTON_WEIGHT = 5f
-
-val keyboardRows = persistentListOf<ImmutableList<NumericKeyboardNumber>>(
-  persistentListOf(
-    NumericKeyboardNumber.Seven(),
-    NumericKeyboardNumber.Eight(),
-    NumericKeyboardNumber.Nine(),
-  ),
-  persistentListOf(
-    NumericKeyboardNumber.Four(),
-    NumericKeyboardNumber.Five(),
-    NumericKeyboardNumber.Six(),
-  ),
-  persistentListOf(
-    NumericKeyboardNumber.One(),
-    NumericKeyboardNumber.Two(),
-    NumericKeyboardNumber.Three(),
-  ),
-  persistentListOf(
-    NumericKeyboardNumber.Zero(),
-  ),
-)
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardConstants.DIGIT_BUTTON_WEIGHT
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardConstants.MATH_OPERATION_WEIGHT
+import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardConstants.keyboardRows
 
 @Composable
 internal fun BaseNumericalKeyboardBottomSheet(
@@ -274,6 +251,19 @@ private fun DigitButton(
       modifier = Modifier.align(Alignment.CenterVertically),
     )
   }
+}
+
+@Composable
+private fun CalculatorRow(
+  modifier: Modifier = Modifier,
+  horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+  content: @Composable (RowScope.() -> Unit),
+) {
+  Row(
+    modifier = modifier.height(Dimens.icon_button_size),
+    content = content,
+    horizontalArrangement = horizontalArrangement,
+  )
 }
 
 private fun Modifier.applyKeyboardPadding() = this

@@ -10,7 +10,7 @@ import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
+import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesSnapshotUseCase
 import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectCategoryViewModel @Inject constructor(
-  categoryRepository: CategoryRepository,
   getUserCreatedCategoriesUseCase: GetUserCreatedCategoriesUseCase,
+  getUserCreatedCategoriesSnapshotUseCase: GetUserCreatedCategoriesSnapshotUseCase,
   private val createTransactionRepository: CreateTransactionRepository,
   private val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate() {
@@ -39,7 +39,7 @@ class SelectCategoryViewModel @Inject constructor(
       .stateInWhileSubscribed(
         scope = viewModelScope,
         initialValue = getDisplayCategoriesState(
-          categories = categoryRepository.categoriesSnapshot,
+          categories = getUserCreatedCategoriesSnapshotUseCase(),
           categoryType = categoryTypeFromRepository,
         ),
       )

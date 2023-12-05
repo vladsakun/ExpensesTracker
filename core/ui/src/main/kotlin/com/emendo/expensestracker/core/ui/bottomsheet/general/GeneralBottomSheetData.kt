@@ -57,4 +57,8 @@ data class Action(
   val title: TextValue,
   val action: () -> Unit,
   val type: ActionType? = null,
-)
+) {
+  companion object {
+    fun DangerAction(title: TextValue, action: () -> Unit) = Action(title, action, ActionType.DANGER)
+  }
+}

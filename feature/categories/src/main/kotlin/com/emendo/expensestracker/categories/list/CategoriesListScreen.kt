@@ -22,6 +22,7 @@ import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDes
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
+import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
@@ -64,7 +65,7 @@ fun CategoriesListRoute(
       isEditModeProvider = editModeState::value,
       onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
       onCategoryClick = remember {
-        { category: CategoryWithTotal ->
+        { category: CategoryWithTotalTransactions ->
           if (viewModel.isEditMode) {
             navigator.navigate(CategoryDetailScreenDestination(category.categoryModel.id))
           } else {
@@ -85,10 +86,10 @@ private fun CategoriesListScreenContent(
   stateProvider: () -> CategoriesListUiState,
   isEditModeProvider: () -> Boolean,
   onCreateCategoryClick: () -> Unit,
-  onCategoryClick: (category: CategoryWithTotal) -> Unit,
+  onCategoryClick: (CategoryWithTotalTransactions) -> Unit,
   onPageSelected: (pageIndex: Int) -> Unit,
   onEditClick: () -> Unit,
-  onDeleteCategoryClick: (category: CategoryWithTotal) -> Unit,
+  onDeleteCategoryClick: (CategoryWithTotalTransactions) -> Unit,
 ) {
   ExpeScaffold(
     topBar = {
@@ -155,11 +156,11 @@ private fun CategoriesListScreenContent(
 
 @Composable
 private fun CategoriesGrid(
-  categories: ImmutableList<CategoryWithTotal>,
+  categories: ImmutableList<CategoryWithTotalTransactions>,
   isEditMode: () -> Boolean,
-  onCategoryClick: (CategoryWithTotal) -> Unit,
+  onCategoryClick: (CategoryWithTotalTransactions) -> Unit,
   onCreateCategoryClick: () -> Unit,
-  onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
+  onDeleteCategoryClick: (CategoryWithTotalTransactions) -> Unit,
 ) {
   CategoriesLazyVerticalGrid {
     items(

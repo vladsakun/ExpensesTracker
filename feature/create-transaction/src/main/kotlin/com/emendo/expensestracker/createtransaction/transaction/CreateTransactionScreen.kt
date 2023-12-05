@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_VARIABLE")
+
 package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.animation.animateColorAsState
@@ -164,7 +166,7 @@ private fun CreateTransactionContent(
             label = stringResource(id = AppR.string.account),
             onClick = onAccountClick,
             error = state.screenData.sourceError == triggered,
-            onConsumed = { onErrorConsumed(FieldWithError.Source) },
+            onErrorConsumed = { onErrorConsumed(FieldWithError.Source) },
           )
           Spacer(modifier = Modifier.height(Dimens.margin_large_x))
           ExpeButton(
@@ -202,14 +204,11 @@ private fun TransactionDestinationRow(
   label: String,
   onClick: () -> Unit,
   error: Boolean,
-  onConsumed: () -> Unit = {},
+  onErrorConsumed: () -> Unit = {},
 ) {
-  val errorFinished: (Color) -> Unit = {
-    onConsumed()
-  }
   val backgroundColor = animateColorAsState(
     targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
-    finishedListener = errorFinished,
+    finishedListener = { onErrorConsumed() },
     animationSpec = tween(500),
     label = "error"
   )
