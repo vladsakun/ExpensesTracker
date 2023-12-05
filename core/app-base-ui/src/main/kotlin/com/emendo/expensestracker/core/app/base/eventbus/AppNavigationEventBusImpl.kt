@@ -16,6 +16,9 @@ sealed interface AppNavigationEvent {
 
   data class CreateCategory(val categoryType: CategoryType) : AppNavigationEvent
   data object SelectAccount : AppNavigationEvent
+  data object SelectCurrency : AppNavigationEvent
+  data class SelectColor(val preselectedColorId: Int) : AppNavigationEvent
+  data class SelectIcon(val preselectedIconId: Int) : AppNavigationEvent
 }
 
 class AppNavigationEventBusImpl @Inject constructor() : AppNavigationEventBus {

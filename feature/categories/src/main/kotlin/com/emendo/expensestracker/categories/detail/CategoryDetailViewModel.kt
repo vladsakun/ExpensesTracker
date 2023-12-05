@@ -75,7 +75,7 @@ class CategoryDetailViewModel @Inject constructor(
       GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteCategory))
         .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
-        .create()
+        .build()
     )
   }
 

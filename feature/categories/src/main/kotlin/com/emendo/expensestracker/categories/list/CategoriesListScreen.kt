@@ -27,6 +27,8 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
+import com.emendo.expensestracker.core.ui.bottomsheet.GeneralBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
 import com.ramcosta.composedestinations.annotation.Destination
@@ -47,22 +49,29 @@ fun CategoriesListRoute(
   val uiState = viewModel.categoriesListUiState.collectAsStateWithLifecycle()
   val editModeState = viewModel.editModeState.collectAsStateWithLifecycle()
 
-  CategoriesListScreenContent(
-    stateProvider = uiState::value,
-    isEditModeProvider = editModeState::value,
-    onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
-    onCategoryClick = remember {
-      { category: CategoryWithTotal ->
-        if (viewModel.isEditMode) {
-          navigator.navigate(CategoryDetailScreenDestination(category.categoryModel.id))
-        } else {
-          viewModel.openCreateTransactionScreen(category)
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
+    onNavigateUpClick = navigator::navigateUp,
+    bottomSheetContent = { type, hideBottomSheet -> GeneralBottomSheet(data = type) }
+  ) {
+    CategoriesListScreenContent(
+      stateProvider = uiState::value,
+      isEditModeProvider = editModeState::value,
+      onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
+      onCategoryClick = remember {
+        { category: CategoryWithTotal ->
+          if (viewModel.isEditMode) {
+            navigator.navigate(CategoryDetailScreenDestination(category.categoryModel.id))
+          } else {
+            viewModel.openCreateTransactionScreen(category)
+          }
         }
-      }
-    },
-    onPageSelected = remember { viewModel::pageSelected },
-    onEditClick = remember { viewModel::inverseEditMode },
-  )
+      },
+      onPageSelected = remember { viewModel::pageSelected },
+      onEditClick = remember { viewModel::inverseEditMode },
+      onDeleteCategoryClick = remember { viewModel::showConfirmDeleteCategoryBottomSheet },
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -74,6 +83,7 @@ private fun CategoriesListScreenContent(
   onCategoryClick: (category: CategoryWithTotal) -> Unit,
   onPageSelected: (pageIndex: Int) -> Unit,
   onEditClick: () -> Unit,
+  onDeleteCategoryClick: (category: CategoryWithTotal) -> Unit,
 ) {
   ExpeScaffold(
     topBar = {
@@ -128,6 +138,7 @@ private fun CategoriesListScreenContent(
                 isEditMode = isEditModeProvider,
                 onCategoryClick = onCategoryClick,
                 onCreateCategoryClick = onCreateCategoryClick,
+                onDeleteCategoryClick = onDeleteCategoryClick,
               )
             }
           }
@@ -143,6 +154,7 @@ private fun CategoriesGrid(
   isEditMode: () -> Boolean,
   onCategoryClick: (CategoryWithTotal) -> Unit,
   onCreateCategoryClick: () -> Unit,
+  onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
 ) {
   CategoriesLazyVerticalGrid {
     items(
@@ -157,6 +169,7 @@ private fun CategoriesGrid(
         total = category.totalFormatted,
         onClick = { onCategoryClick(category) },
         isEditMode = isEditMode,
+        onDeleteClick = { onDeleteCategoryClick(category) },
       )
     }
     uniqueItem("addCategory") {

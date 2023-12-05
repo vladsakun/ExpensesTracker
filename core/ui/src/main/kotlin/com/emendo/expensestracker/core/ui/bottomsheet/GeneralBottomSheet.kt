@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import com.emendo.expensestracker.core.designsystem.component.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ActionType.Companion.color
 import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.stringValue
 
@@ -24,6 +25,9 @@ fun GeneralBottomSheet(data: GeneralBottomSheetData) {
     ExpeButton(
       text = data.positiveAction.title.stringValue(),
       onClick = data.positiveAction.action,
+      colors = data.positiveAction.type?.color?.let {
+        ButtonDefaults.buttonColors(containerColor = it)
+      } ?: ButtonDefaults.buttonColors()
     )
     if (data.negativeAction != null) {
       Spacer(modifier = Modifier.height(Dimens.margin_small_x))
@@ -31,6 +35,7 @@ fun GeneralBottomSheet(data: GeneralBottomSheetData) {
         text = data.negativeAction.title.stringValue(),
         onClick = data.negativeAction.action,
         colors = ButtonDefaults.outlinedButtonColors(),
+        textColor = data.negativeAction.type?.color,
       )
     }
   }

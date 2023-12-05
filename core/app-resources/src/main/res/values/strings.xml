@@ -62,5 +62,6 @@
   <string name="sync_notification_channel_description">Background tasks for Expenses tracker</string>
 
   <string name="account_detail_dialog_delete_confirm_title">Are you sure that you want to delete the account?</string>
+  <string name="category_list_dialog_delete_confirm_title">Are you sure that you want to delete the category?</string>
   <string name="category_detail_dialog_delete_confirm_title">Are you sure that you want to delete the category?</string>
 </resources>

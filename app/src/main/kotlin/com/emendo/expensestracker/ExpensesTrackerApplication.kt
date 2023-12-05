@@ -3,6 +3,7 @@ package com.emendo.expensestracker
 import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
+import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.manager.AppInitManager
 import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
 import com.emendo.expensestracker.sync.initializers.Sync

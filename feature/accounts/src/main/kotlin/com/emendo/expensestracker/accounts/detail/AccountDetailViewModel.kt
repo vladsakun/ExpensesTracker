@@ -95,7 +95,7 @@ class AccountDetailViewModel @Inject constructor(
       GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteAccount))
         .title(resourceValueOf(R.string.account_detail_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
-        .create()
+        .build()
     )
   }
 

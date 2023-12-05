@@ -10,7 +10,7 @@ class AccountInputHandling(
   private val calculatorFormatter: CalculatorFormatter,
   private val numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
-  private val stateManager: AccountStateManagement,
+  private val stateManager: AccountStateManager,
   private val currencyMapper: CurrencyMapper,
 ) {
 

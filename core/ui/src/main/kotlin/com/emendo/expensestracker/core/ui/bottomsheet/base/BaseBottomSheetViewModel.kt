@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 // Todo use composition over inheritance
 abstract class BaseBottomSheetViewModel<BSType> : ViewModel() {
 
-  private val _bottomSheetState = MutableStateFlow<BaseBottomSheetState<BSType?>>(BaseBottomSheetState())
+  private val _bottomSheetState = MutableStateFlow<BottomSheetState<BSType?>>(BottomSheetState())
   val bottomSheetState = _bottomSheetState.asStateFlow()
 
   open fun dismissBottomSheet() {

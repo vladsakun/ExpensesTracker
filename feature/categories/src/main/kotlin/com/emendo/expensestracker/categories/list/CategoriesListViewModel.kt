@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.categories.list
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
@@ -7,25 +8,37 @@ import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
+import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.label
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
+import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.base.Action
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ActionType
+import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManagerDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appNavigationEventBus: AppNavigationEventBus,
-) : BaseBottomSheetViewModel<BottomSheetType>() {
+  private val categoryRepository: CategoryRepository,
+) : ViewModel(), BottomSheetStateManager<GeneralBottomSheetData> by BottomSheetStateManagerDelegate() {
+
+  companion object {
+    private val DEFAULT_PAGE_INDEX = CategoryType.EXPENSE.toPageIndex()
+  }
 
   val categoriesListUiState: StateFlow<CategoriesListUiState> =
     categoriesUiState(getCategoriesWithTotalTransactionsUseCase)
@@ -56,8 +69,21 @@ class CategoriesListViewModel @Inject constructor(
     _isEditMode.update { !it }
   }
 
-  companion object {
-    private val DEFAULT_PAGE_INDEX = CategoryType.EXPENSE.toPageIndex()
+  fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {
+    showBottomSheet(
+      GeneralBottomSheetData
+        .Builder(Action(resourceValueOf(R.string.delete), { deleteCategory(category) }, ActionType.DANGER))
+        .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
+        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
+        .build()
+    )
+  }
+
+  private fun deleteCategory(category: CategoryWithTotal) {
+    hideBottomSheet()
+    viewModelScope.launch {
+      categoryRepository.deleteCategory(category.categoryModel.id)
+    }
   }
 }
 

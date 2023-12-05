@@ -11,15 +11,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.accounts.common.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.AccountContent
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -38,8 +35,8 @@ fun CreateAccountRoute(
   currencyResultRecipient.handleValueResult(viewModel::updateCurrencyByCode)
   iconResultRecipient.handleValueResult(viewModel::updateIconById)
 
-  BaseScreenWithModalBottomSheetWithViewModel(
-    viewModel = viewModel,
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
     bottomSheetContent = { type, hideBottomSheet -> AccountBottomSheetContent(type, hideBottomSheet) },
   ) {
@@ -49,10 +46,10 @@ fun CreateAccountRoute(
       stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
       onNameChange = remember { viewModel::setAccountName },
-      onIconRowClick = remember { { navigator.navigate(SelectIconScreenDestination(viewModel.selectedIconId)) } },
-      onColorRowClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColorId)) } },
+      onIconRowClick = remember { viewModel::openSelectIconScreen },
+      onColorRowClick = remember { viewModel::openSelectColorScreen },
       onBalanceRowClick = remember { viewModel::showBalanceBottomSheet },
-      onCurrencyRowClick = remember { { navigator.navigate(SelectCurrencyScreenDestination) } },
+      onCurrencyRowClick = remember { viewModel::openSelectCurrencyScreen },
       onCreateAccountClick = remember { viewModel::createNewAccount },
     )
   }

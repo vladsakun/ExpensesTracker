@@ -1,4 +1,4 @@
-package com.emendo.expensestracker
+package com.emendo.expensestracker.broadcast
 
 import android.content.BroadcastReceiver
 import android.content.Context

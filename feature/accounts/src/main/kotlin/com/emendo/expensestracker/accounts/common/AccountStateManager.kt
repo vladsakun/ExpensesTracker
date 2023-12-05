@@ -7,7 +7,7 @@ import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.flow.StateFlow
 
-interface AccountStateManagement {
+interface AccountStateManager {
   val state: StateFlow<AccountScreenData>
 
   val selectedColorId: Int

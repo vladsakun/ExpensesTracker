@@ -21,9 +21,9 @@ import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.ui.bottomsheet.GeneralBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
 import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -43,8 +43,8 @@ fun AccountDetailScreen(
   currencyResultRecipient.handleValueResult(viewModel::updateCurrencyByCode)
   iconResultRecipient.handleValueResult(viewModel::updateIconById)
 
-  BaseScreenWithModalBottomSheetWithViewModel(
-    viewModel = viewModel,
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
     bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
   ) {

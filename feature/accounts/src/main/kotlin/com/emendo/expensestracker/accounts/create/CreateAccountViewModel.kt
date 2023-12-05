@@ -1,7 +1,10 @@
 package com.emendo.expensestracker.accounts.create
 
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
+import com.emendo.expensestracker.accounts.common.AccountScreenNavigatorDelegate
 import com.emendo.expensestracker.accounts.common.AccountViewModel
+import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -30,7 +33,9 @@ class CreateAccountViewModel @Inject constructor(
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
+  private val appNavigationEventBus: AppNavigationEventBus,
+) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter),
+    AccountScreenNavigator by AccountScreenNavigatorDelegate(appNavigationEventBus) {
 
   private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
@@ -96,5 +101,13 @@ class CreateAccountViewModel @Inject constructor(
 
   fun updateCurrencyByCode(code: String) {
     updateCurrencyByCode(amountFormatter, currencyMapper, code)
+  }
+
+  fun openSelectIconScreen() {
+    openSelectIconScreen(selectedIconId)
+  }
+
+  fun openSelectColorScreen() {
+    openSelectColorScreen(selectedColorId)
   }
 }

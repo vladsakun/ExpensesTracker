@@ -31,6 +31,7 @@ fun CategoryItem(
   total: String,
   onClick: () -> Unit,
   isEditMode: () -> Boolean,
+  onDeleteClick: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
   val infiniteTransition = rememberInfiniteTransition(label = "rotationTransition")
@@ -52,7 +53,7 @@ fun CategoryItem(
         modifier = Modifier
           .size(Dimens.icon_size)
           .zIndex(2f)
-          .clickable { }
+          .clickable(onClick = onDeleteClick)
           .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
           .align(Alignment.TopStart)
       )

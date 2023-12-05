@@ -1,10 +1,12 @@
 package com.emendo.expensestracker.accounts.common
 
+import androidx.lifecycle.ViewModel
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.InitialBalanceKeyboardActions
 
 // Todo use composition over inheritance
@@ -12,7 +14,9 @@ abstract class AccountViewModel(
   private val calculatorFormatter: CalculatorFormatter,
   private val numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
-) : BaseBottomSheetViewModel<BottomSheetType>(), InitialBalanceKeyboardActions, AccountStateManagement {
+) : ViewModel(), BottomSheetStateManager<BottomSheetType> by BottomSheetStateManagerDelegate(),
+    InitialBalanceKeyboardActions,
+    AccountStateManager {
 
   init {
     numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateValue)
@@ -22,11 +26,10 @@ abstract class AccountViewModel(
     numericKeyboardCommander.negate()
   }
 
-  override fun dismissBottomSheet() {
+  override fun onDismissBottomSheet() {
     if (bottomSheetState.value.bottomSheetState is BottomSheetType.Balance) {
       numericKeyboardCommander.onDoneClick()
     }
-    super.dismissBottomSheet()
   }
 
   fun showBalanceBottomSheet() {
