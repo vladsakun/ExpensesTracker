@@ -1,17 +1,17 @@
-package com.emendo.expensestracker.accounts.common
+package com.emendo.expensestracker.accounts.common.design
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
+import com.emendo.expensestracker.core.data.helper.BalanceBottomSheetData
+import com.emendo.expensestracker.core.model.data.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardBottomSheet
 
 @Composable
 internal fun AccountBottomSheetContent(
-  type: BottomSheetType?,
-  hideBottomSheet: () -> Unit,
+  type: BottomSheetData?,
 ) {
   when (type) {
-    is BottomSheetType.Balance -> {
+    is BalanceBottomSheetData -> {
       val text = type.text.collectAsStateWithLifecycle()
       val equalButtonState = type.equalButtonState.collectAsStateWithLifecycle()
 

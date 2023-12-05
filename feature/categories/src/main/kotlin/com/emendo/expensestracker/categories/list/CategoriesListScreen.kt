@@ -27,8 +27,9 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
-import com.emendo.expensestracker.core.ui.bottomsheet.GeneralBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.composition.ScreenWithModalBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
 import com.ramcosta.composedestinations.annotation.Destination
@@ -52,7 +53,11 @@ fun CategoriesListRoute(
   ScreenWithModalBottomSheet(
     stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type, hideBottomSheet -> GeneralBottomSheet(data = type) }
+    bottomSheetContent = { type ->
+      when (type) {
+        is GeneralBottomSheetData -> GeneralBottomSheet(type)
+      }
+    }
   ) {
     CategoriesListScreenContent(
       stateProvider = uiState::value,

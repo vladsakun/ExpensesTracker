@@ -22,6 +22,7 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTo
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.conditional
 import com.emendo.expensestracker.core.ui.Constants
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
@@ -30,7 +31,7 @@ import com.ramcosta.composedestinations.scope.resultRecipient
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-@Destination
+@Destination(style = BottomSheetTransition::class)
 @Composable
 fun SelectIconScreen(
   navigator: DestinationsNavigator,

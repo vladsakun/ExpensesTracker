@@ -1,14 +1,15 @@
 package com.emendo.expensestracker.core.ui.bottomsheet.base
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.core.model.data.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.ExpeModalBottomSheet
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
@@ -16,21 +17,21 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <BSType> BaseScreenWithModalBottomSheetWithViewModel(
-  viewModel: BaseBottomSheetViewModel<BSType>,
+fun ScreenWithModalBottomSheet(
+  stateManager: BottomSheetStateManager,
   onNavigateUpClick: () -> Unit,
-  bottomSheetContent: @Composable (bottomSheetType: BSType, hideBottomSheet: () -> Unit) -> Unit,
+  bottomSheetContent: @Composable ColumnScope.(bottomSheetType: BottomSheetData) -> Unit,
   content: @Composable () -> Unit,
 ) {
-  val bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle()
+  val bottomSheetState = stateManager.bottomSheetState.collectAsStateWithLifecycle()
 
   BaseScreenWithModalBottomSheet(
     bottomSheetState = bottomSheetState::value,
     onNavigationClick = onNavigateUpClick,
-    onBottomSheetDismissRequest = viewModel::dismissBottomSheet,
-    onConsumedNavigateUpEvent = viewModel::consumeNavigateUpEvent,
-    onConsumedHideBottomSheetEvent = viewModel::onConsumedHideBottomSheetEvent,
-    confirmValueChange = viewModel::confirmValueChange,
+    onBottomSheetDismissRequest = stateManager::dismissBottomSheet,
+    onConsumedNavigateUpEvent = stateManager::consumeNavigateUpEvent,
+    onConsumedHideBottomSheetEvent = stateManager::onConsumedHideBottomSheetEvent,
+    confirmValueChange = stateManager::confirmValueChange,
     bottomSheetContent = bottomSheetContent,
     content = content,
   )
@@ -38,14 +39,14 @@ fun <BSType> BaseScreenWithModalBottomSheetWithViewModel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <BSType> BaseScreenWithModalBottomSheet(
-  bottomSheetState: () -> BottomSheetState<BSType?>,
+private fun BaseScreenWithModalBottomSheet(
+  bottomSheetState: () -> BottomSheetState,
   onNavigationClick: () -> Unit,
   onBottomSheetDismissRequest: () -> Unit,
   onConsumedNavigateUpEvent: () -> Unit,
   onConsumedHideBottomSheetEvent: () -> Unit,
   confirmValueChange: (SheetValue) -> Boolean,
-  bottomSheetContent: @Composable (bottomSheetType: BSType, hideBottomSheet: () -> Unit) -> Unit,
+  bottomSheetContent: @Composable ColumnScope.(bottomSheetType: BottomSheetData) -> Unit,
   content: @Composable () -> Unit,
 ) {
   val coroutineScope = rememberCoroutineScope()
@@ -73,8 +74,6 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
     onNavigationClick = onNavigationClick,
     onConsumedHideBottomSheetEvent = onConsumedHideBottomSheetEvent,
     hideBottomSheet = hideBottomSheet,
-    modalBottomSheetState = modalBottomSheetState,
-    onBottomSheetDismissRequest = onBottomSheetDismissRequest,
   )
 
   content()
@@ -82,22 +81,18 @@ private fun <BSType> BaseScreenWithModalBottomSheet(
   ExpeModalBottomSheet(
     modalBottomSheetState = modalBottomSheetState,
     bottomSheetState = bottomSheetState,
-    hideBottomSheet = hideBottomSheet,
-    bottomSheetContent = bottomSheetContent,
     onDismissRequest = onBottomSheetDismissRequest,
+    bottomSheetContent = bottomSheetContent,
   )
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun Effects(
-  bottomSheetStateProvider: () -> BottomSheetState<*>,
+  bottomSheetStateProvider: () -> BottomSheetState,
   onConsumedNavigateUpEvent: () -> Unit,
   onNavigationClick: () -> Unit,
   onConsumedHideBottomSheetEvent: () -> Unit,
   hideBottomSheet: () -> Unit,
-  modalBottomSheetState: SheetState,
-  onBottomSheetDismissRequest: () -> Unit,
 ) {
   NavigationEventEffect(
     event = bottomSheetStateProvider().navigateUpEvent,
@@ -109,10 +104,4 @@ private fun Effects(
     onConsumed = onConsumedHideBottomSheetEvent,
     action = hideBottomSheet,
   )
-  //  LaunchedEffect(Unit) {
-  //    snapshotFlow { modalBottomSheetState.currentValue }
-  //      .collect {
-  //        if (it == SheetValue.Hidden) onBottomSheetDismissRequest()
-  //      }
-  //  }
 }

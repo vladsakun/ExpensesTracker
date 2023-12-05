@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountViewModel
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
+import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -15,8 +16,8 @@ import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.domain.account.GetAccountSnapshotByIdUseCase
 import com.emendo.expensestracker.core.model.data.CurrencyModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.Action
-import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetDataImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountDetailViewModel @Inject constructor(
+  override val appNavigationEventBus: AppNavigationEventBus,
   savedStateHandle: SavedStateHandle,
   getAccountSnapshotByIdUseCase: GetAccountSnapshotByIdUseCase,
   numericKeyboardCommander: NumericKeyboardCommander,
@@ -92,7 +94,7 @@ class AccountDetailViewModel @Inject constructor(
 
   fun showConfirmDeleteAccountBottomSheet() {
     showBottomSheet(
-      GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteAccount))
+      GeneralBottomSheetDataImpl.Builder(Action(resourceValueOf(R.string.delete), ::deleteAccount))
         .title(resourceValueOf(R.string.account_detail_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
         .build()

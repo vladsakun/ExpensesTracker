@@ -1,8 +1,6 @@
 package com.emendo.expensestracker.accounts.create
 
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
-import com.emendo.expensestracker.accounts.common.AccountScreenNavigatorDelegate
 import com.emendo.expensestracker.accounts.common.AccountViewModel
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
@@ -33,9 +31,8 @@ class CreateAccountViewModel @Inject constructor(
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
   private val calculatorFormatter: CalculatorFormatter,
-  private val appNavigationEventBus: AppNavigationEventBus,
-) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter),
-    AccountScreenNavigator by AccountScreenNavigatorDelegate(appNavigationEventBus) {
+  override val appNavigationEventBus: AppNavigationEventBus,
+) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
   private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
     CreateAccountScreenData.getDefaultState(
@@ -52,25 +49,6 @@ class CreateAccountViewModel @Inject constructor(
       viewModelScope.launch {
         delay(100)
         showBalanceBottomSheet()
-      }
-    }
-  }
-
-  fun createNewAccount() {
-    if (createAccountJob != null) {
-      return
-    }
-
-    createAccountJob = viewModelScope.launch {
-      with(state.value) {
-        accountRepository.createAccount(
-          name = name,
-          balance = calculatorFormatter.toBigDecimal(amountFormatter.removeCurrency(balance, currency)),
-          currency = currency,
-          icon = icon,
-          color = color,
-        )
-        navigateUp()
       }
     }
   }
@@ -99,15 +77,26 @@ class CreateAccountViewModel @Inject constructor(
     _state.update { it.copy(isCreateAccountButtonEnabled = enabled) }
   }
 
+  fun createNewAccount() {
+    if (createAccountJob != null) {
+      return
+    }
+
+    createAccountJob = viewModelScope.launch {
+      with(state.value) {
+        accountRepository.createAccount(
+          name = name,
+          balance = calculatorFormatter.toBigDecimal(amountFormatter.removeCurrency(balance, currency)),
+          currency = currency,
+          icon = icon,
+          color = color,
+        )
+        navigateUp()
+      }
+    }
+  }
+
   fun updateCurrencyByCode(code: String) {
     updateCurrencyByCode(amountFormatter, currencyMapper, code)
-  }
-
-  fun openSelectIconScreen() {
-    openSelectIconScreen(selectedIconId)
-  }
-
-  fun openSelectColorScreen() {
-    openSelectColorScreen(selectedColorId)
   }
 }

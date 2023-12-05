@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.categories.detail
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -11,8 +12,10 @@ import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorS
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
-import com.emendo.expensestracker.core.ui.bottomsheet.GeneralBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
+import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -31,10 +34,10 @@ fun CategoryDetailScreen(
   colorResultRecipient.handleValueResult(viewModel::updateColor)
   iconResultRecipient.handleValueResult(viewModel::updateIcon)
 
-  BaseScreenWithModalBottomSheetWithViewModel(
-    viewModel = viewModel,
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type, _ -> GeneralBottomSheet(type) }
+    bottomSheetContent = { BottomSheetContent(it) }
   ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -47,6 +50,13 @@ fun CategoryDetailScreen(
       onConfirmActionClick = remember { viewModel::updateCategory },
       onDeleteActionClick = remember { viewModel::showDeleteCategoryBottomSheet },
     )
+  }
+}
+
+@Composable
+private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
+  when (type) {
+    is GeneralBottomSheetData -> GeneralBottomSheet(type)
   }
 }
 

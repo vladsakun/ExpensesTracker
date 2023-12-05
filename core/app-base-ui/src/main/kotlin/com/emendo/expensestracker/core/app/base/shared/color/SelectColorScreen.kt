@@ -23,6 +23,7 @@ import com.emendo.expensestracker.core.designsystem.utils.conditional
 import com.emendo.expensestracker.core.ui.Constants.ITEM_FIXED_SIZE_DP
 import com.emendo.expensestracker.core.ui.Constants.SELECTED_COLOR_BORDER_WIDTH
 import com.emendo.expensestracker.core.ui.Constants.SELECTED_ITEM_ALPHA_BORDER
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
@@ -31,7 +32,7 @@ import com.ramcosta.composedestinations.scope.resultRecipient
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-@Destination
+@Destination(style = BottomSheetTransition::class)
 @Composable
 fun SelectColorScreen(
   navigator: DestinationsNavigator,

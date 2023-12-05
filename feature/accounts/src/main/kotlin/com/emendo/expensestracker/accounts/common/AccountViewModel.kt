@@ -1,40 +1,44 @@
 package com.emendo.expensestracker.accounts.common
 
 import androidx.lifecycle.ViewModel
+import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
+import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
+import com.emendo.expensestracker.core.data.helper.BalanceBottomSheetData
+import com.emendo.expensestracker.core.data.helper.BalanceBottomSheetDataImpl
 import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManager
-import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManagerDelegate
-import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.InitialBalanceKeyboardActions
+import com.emendo.expensestracker.core.model.data.keyboard.InitialBalanceKeyboardActions
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 
 // Todo use composition over inheritance
 abstract class AccountViewModel(
   private val calculatorFormatter: CalculatorFormatter,
   private val numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
-) : ViewModel(), BottomSheetStateManager<BottomSheetType> by BottomSheetStateManagerDelegate(),
-    InitialBalanceKeyboardActions,
-    AccountStateManager {
+) : ViewModel(),
+    BottomSheetStateManager by BottomSheetStateManagerDelegate(),
+    InitialBalanceKeyboardActions by InitialBalanceKeyboardActionsDelegate(numericKeyboardCommander),
+    AccountStateManager,
+    AccountScreenNavigator {
+
+  override val accountStateManager: AccountStateManager
+    get() = this
 
   init {
     numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateValue)
   }
 
-  override fun onChangeSignClick() {
-    numericKeyboardCommander.negate()
-  }
-
   override fun onDismissBottomSheet() {
-    if (bottomSheetState.value.bottomSheetState is BottomSheetType.Balance) {
+    if (bottomSheetState.value.bottomSheetState is BalanceBottomSheetData) {
       numericKeyboardCommander.onDoneClick()
     }
   }
 
   fun showBalanceBottomSheet() {
     showBottomSheet(
-      BottomSheetType.Balance(
+      BalanceBottomSheetDataImpl(
         text = numericKeyboardCommander.calculatorTextState,
         actions = this,
         decimalSeparator = calculatorFormatter.decimalSeparator.toString(),

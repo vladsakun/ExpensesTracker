@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.createtransaction.selectcategory
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
@@ -11,8 +12,8 @@ import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesUseCase
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +27,7 @@ class SelectCategoryViewModel @Inject constructor(
   getUserCreatedCategoriesUseCase: GetUserCreatedCategoriesUseCase,
   private val createTransactionRepository: CreateTransactionRepository,
   private val appNavigationEventBus: AppNavigationEventBus,
-) : BaseBottomSheetViewModel<BottomSheetType>() {
+) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate() {
 
   private val categoryTypeFromRepository: CategoryType by lazy {
     (createTransactionRepository.getTargetSnapshot() as? CategoryModel)?.type

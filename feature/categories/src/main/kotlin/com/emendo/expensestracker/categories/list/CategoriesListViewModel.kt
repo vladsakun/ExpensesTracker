@@ -15,11 +15,11 @@ import com.emendo.expensestracker.core.data.model.category.CategoryType.Companio
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
-import com.emendo.expensestracker.core.ui.bottomsheet.base.Action
-import com.emendo.expensestracker.core.ui.bottomsheet.base.ActionType
-import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
-import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManager
-import com.emendo.expensestracker.core.ui.bottomsheet.composition.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
+import com.emendo.expensestracker.core.ui.bottomsheet.general.ActionType
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetDataImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -34,7 +34,8 @@ class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appNavigationEventBus: AppNavigationEventBus,
   private val categoryRepository: CategoryRepository,
-) : ViewModel(), BottomSheetStateManager<GeneralBottomSheetData> by BottomSheetStateManagerDelegate() {
+) : ViewModel(),
+    BottomSheetStateManager by BottomSheetStateManagerDelegate() {
 
   companion object {
     private val DEFAULT_PAGE_INDEX = CategoryType.EXPENSE.toPageIndex()
@@ -71,7 +72,7 @@ class CategoriesListViewModel @Inject constructor(
 
   fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {
     showBottomSheet(
-      GeneralBottomSheetData
+      GeneralBottomSheetDataImpl
         .Builder(Action(resourceValueOf(R.string.delete), { deleteCategory(category) }, ActionType.DANGER))
         .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))

@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.accounts.common
+package com.emendo.expensestracker.accounts.common.model
 
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel

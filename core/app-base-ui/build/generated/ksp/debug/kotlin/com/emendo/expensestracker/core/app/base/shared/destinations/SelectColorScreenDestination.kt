@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.app.base.shared.destinations
 
 import android.os.Bundle
 import androidx.annotation.RestrictTo
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NamedNavArgument
@@ -13,6 +14,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.emendo.expensestracker.core.app.base.shared.color.SelectColorScreen
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination.NavArgs
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
 import com.ramcosta.composedestinations.navargs.primitives.DestinationsIntNavType
 import com.ramcosta.composedestinations.navigation.DependenciesContainerBuilder
 import com.ramcosta.composedestinations.navigation.DestinationDependenciesContainer
@@ -25,6 +27,7 @@ import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 import com.ramcosta.composedestinations.spec.Route
 
+@OptIn(ExperimentalAnimationApi::class)
 public object SelectColorScreenDestination : AppbaseuiTypedDestination<SelectColorScreenDestination.NavArgs> {
     
     override fun invoke(navArgs: NavArgs): Direction = with(navArgs) {
@@ -50,6 +53,8 @@ public object SelectColorScreenDestination : AppbaseuiTypedDestination<SelectCol
 			type = DestinationsIntNavType
 		}
 	)
+
+	override val style: DestinationStyle = BottomSheetTransition
 
     @Composable
     override fun DestinationScope<NavArgs>.Content() {

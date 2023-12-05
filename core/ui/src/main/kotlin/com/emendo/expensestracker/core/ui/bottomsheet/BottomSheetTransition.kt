@@ -8,7 +8,7 @@ import androidx.navigation.NavBackStackEntry
 import com.ramcosta.composedestinations.spec.DestinationStyle
 
 object BottomSheetTransition : DestinationStyle.Animated {
-  private const val DURATION_MILLIS = 400
+  private const val DURATION_MILLIS = 300
 
   override fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition(): EnterTransition? {
     return slideIntoContainer(

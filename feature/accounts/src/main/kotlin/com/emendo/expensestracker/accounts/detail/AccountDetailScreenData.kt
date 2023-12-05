@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.accounts.detail
 
-import com.emendo.expensestracker.accounts.common.AccountScreenData
+import com.emendo.expensestracker.accounts.common.model.AccountScreenData
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.model.AccountModel

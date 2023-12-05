@@ -1,5 +1,6 @@
-package com.emendo.expensestracker.core.ui.bottomsheet
+package com.emendo.expensestracker.core.ui.bottomsheet.general
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -9,12 +10,11 @@ import androidx.compose.ui.Modifier
 import com.emendo.expensestracker.core.designsystem.component.ExpeBottomSheet
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.ui.bottomsheet.base.ActionType.Companion.color
-import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.general.ActionType.Companion.color
 import com.emendo.expensestracker.core.ui.stringValue
 
 @Composable
-fun GeneralBottomSheet(data: GeneralBottomSheetData) {
+fun ColumnScope.GeneralBottomSheet(data: GeneralBottomSheetData) {
   ExpeBottomSheet(
     title = data.title?.stringValue(),
     modifier = Modifier
@@ -29,13 +29,13 @@ fun GeneralBottomSheet(data: GeneralBottomSheetData) {
         ButtonDefaults.buttonColors(containerColor = it)
       } ?: ButtonDefaults.buttonColors()
     )
-    if (data.negativeAction != null) {
+    data.negativeAction?.let { negativeAction ->
       Spacer(modifier = Modifier.height(Dimens.margin_small_x))
       ExpeButton(
-        text = data.negativeAction.title.stringValue(),
-        onClick = data.negativeAction.action,
+        text = negativeAction.title.stringValue(),
+        onClick = negativeAction.action,
         colors = ButtonDefaults.outlinedButtonColors(),
-        textColor = data.negativeAction.type?.color,
+        textColor = negativeAction.type?.color,
       )
     }
   }

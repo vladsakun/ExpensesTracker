@@ -2,6 +2,7 @@ package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
@@ -23,7 +24,8 @@ import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseBottomSheetViewModel
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,7 +48,7 @@ class CreateTransactionViewModel @Inject constructor(
   private val transactionRepository: TransactionRepository,
   private val calculatorFormatter: CalculatorFormatter,
   private val appNavigationEventBus: AppNavigationEventBus,
-) : BaseBottomSheetViewModel<CreateTransactionBottomSheetType>(), CalculatorKeyboardActions {
+) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate(), CalculatorKeyboardActions {
 
   private val _uiState: MutableStateFlow<CreateTransactionUiState> =
     MutableStateFlow(getDefaultCreateTransactionUiState())
@@ -140,7 +142,7 @@ class CreateTransactionViewModel @Inject constructor(
 
   fun showCalculatorBottomSheet() {
     showBottomSheet(
-      CalculatorBottomSheet(
+      CalculatorBottomSheetData(
         state = calculatorState,
         actions = this,
         numericKeyboardActions = numericKeyboardCommander,

@@ -1,20 +1,20 @@
-package com.emendo.expensestracker.core.ui.bottomsheet.composition
+package com.emendo.expensestracker.core.ui.bottomsheet.base
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetState
+import com.emendo.expensestracker.core.model.data.BottomSheetData
 import kotlinx.coroutines.flow.StateFlow
 
-interface BottomSheetStateManager<BSType> {
+interface BottomSheetStateManager {
 
-  val bottomSheetState: StateFlow<BottomSheetState<BSType?>>
+  val bottomSheetState: StateFlow<BottomSheetState>
 
   fun onDismissBottomSheet() {}
   fun dismissBottomSheet()
   fun hideBottomSheet()
   fun onConsumedHideBottomSheetEvent()
   fun consumeNavigateUpEvent()
-  fun showBottomSheet(bottomSheet: BSType?)
+  fun showBottomSheet(bottomSheet: BottomSheetData?)
   fun navigateUp()
 
   @OptIn(ExperimentalMaterial3Api::class)

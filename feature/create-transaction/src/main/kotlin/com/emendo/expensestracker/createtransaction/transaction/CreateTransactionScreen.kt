@@ -28,7 +28,8 @@ import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BaseScreenWithModalBottomSheetWithViewModel
+import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
 import com.emendo.expensestracker.core.ui.loader
 import com.emendo.expensestracker.core.ui.stringValue
@@ -55,10 +56,10 @@ fun CreateTransactionScreen(
 ) {
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-  BaseScreenWithModalBottomSheetWithViewModel(
-    viewModel = viewModel,
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) }
+    bottomSheetContent = { type -> BottomSheetContent(type) }
   ) {
     CreateTransactionContent(
       stateProvider = uiState::value,
@@ -179,11 +180,10 @@ private fun CreateTransactionContent(
 
 @Composable
 private fun BottomSheetContent(
-  type: CreateTransactionBottomSheetType?,
-  hideBottomSheet: () -> Unit,
+  type: BottomSheetData?,
 ) {
   when (type) {
-    is CalculatorBottomSheet -> {
+    is CalculatorBottomSheetData -> {
       val state = type.state.collectAsStateWithLifecycle()
 
       TransactionCalculatorBottomSheet(

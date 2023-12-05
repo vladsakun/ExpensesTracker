@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.accounts.detail
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
@@ -10,8 +11,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.accounts.common.AccountBottomSheetContent
-import com.emendo.expensestracker.accounts.common.AccountContent
+import com.emendo.expensestracker.accounts.common.design.AccountBottomSheetContent
+import com.emendo.expensestracker.accounts.common.design.AccountContent
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
@@ -20,10 +21,10 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
-import com.emendo.expensestracker.core.ui.bottomsheet.GeneralBottomSheet
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetType
-import com.emendo.expensestracker.core.ui.bottomsheet.base.GeneralBottomSheetData
-import com.emendo.expensestracker.core.ui.bottomsheet.composition.ScreenWithModalBottomSheet
+import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -46,7 +47,7 @@ fun AccountDetailScreen(
   ScreenWithModalBottomSheet(
     stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type, hideBottomSheet -> BottomSheetContent(type, hideBottomSheet) },
+    bottomSheetContent = { BottomSheetContent(it) },
   ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -101,13 +102,12 @@ private fun AccountDetailContent(
 }
 
 @Composable
-private fun BottomSheetContent(
-  type: BottomSheetType?,
-  hideBottomSheet: () -> Unit,
+private fun ColumnScope.BottomSheetContent(
+  type: BottomSheetData?,
 ) {
   when (type) {
     is GeneralBottomSheetData -> GeneralBottomSheet(type)
-    else -> AccountBottomSheetContent(type = type, hideBottomSheet)
+    else -> AccountBottomSheetContent(type = type)
   }
 }
 
