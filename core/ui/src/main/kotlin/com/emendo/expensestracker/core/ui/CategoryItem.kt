@@ -45,7 +45,7 @@ fun CategoryItem(
     label = "rotation"
   )
 
-  Box {
+  Box(modifier = modifier) {
     if (isEditMode()) {
       Icon(
         imageVector = ExpeIcons.Remove,

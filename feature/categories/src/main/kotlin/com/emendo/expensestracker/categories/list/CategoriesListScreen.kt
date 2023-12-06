@@ -1,21 +1,29 @@
 package com.emendo.expensestracker.categories.list
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
+import com.emendo.expensestracker.categories.list.drag.DraggableItem
+import com.emendo.expensestracker.categories.list.drag.dragContainer
+import com.emendo.expensestracker.categories.list.drag.rememberGridDragDropState
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
@@ -155,6 +163,46 @@ private fun CategoriesListScreenContent(
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun LazyGridTestGoogle() {
+  var list by remember { mutableStateOf(List(50) { it }) }
+
+  val gridState = rememberLazyGridState()
+  val dragDropState = rememberGridDragDropState(gridState) { fromIndex, toIndex ->
+    list = list.toMutableList().apply {
+      add(toIndex, removeAt(fromIndex))
+    }
+  }
+
+  LazyVerticalGrid(
+    columns = GridCells.Fixed(3),
+    modifier = Modifier.dragContainer(dragDropState),
+    state = gridState,
+    contentPadding = PaddingValues(16.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+    horizontalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
+    itemsIndexed(list, key = { _, item -> item }) { index, item ->
+      DraggableItem(dragDropState, index) { isDragging ->
+        val elevation by animateDpAsState(if (isDragging) 4.dp else 1.dp)
+        Card(
+          modifier = Modifier
+            .shadow(elevation)
+        ) {
+          Text(
+            "Item $item",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 40.dp)
+          )
+        }
+      }
+    }
+  }
+}
+
 @Composable
 private fun CategoriesGrid(
   categories: ImmutableList<CategoryWithTotalTransactions>,
@@ -162,6 +210,18 @@ private fun CategoriesGrid(
   onCategoryClick: (CategoryWithTotalTransactions) -> Unit,
   onCreateCategoryClick: () -> Unit,
   onDeleteCategoryClick: (CategoryWithTotalTransactions) -> Unit,
+) {
+  LazyGridTestGoogle()
+  //  CategoriesGridWithData(categories, onCategoryClick, isEditMode, onDeleteCategoryClick, onCreateCategoryClick)
+}
+
+@Composable
+private fun CategoriesGridWithData(
+  categories: ImmutableList<CategoryWithTotalTransactions>,
+  onCategoryClick: (CategoryWithTotalTransactions) -> Unit,
+  isEditMode: () -> Boolean,
+  onDeleteCategoryClick: (CategoryWithTotalTransactions) -> Unit,
+  onCreateCategoryClick: () -> Unit,
 ) {
   CategoriesLazyVerticalGrid {
     items(

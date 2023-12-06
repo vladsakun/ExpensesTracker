@@ -1,4 +1,5 @@
 import com.emendo.expensestracker.ExpeBuildType
+import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
   id("expensestracker.android.application")
@@ -18,15 +19,29 @@ android {
     vectorDrawables.useSupportLibrary = true
   }
 
+  signingConfigs {
+    create("release") {
+      val keystoreProperties = Properties().apply {
+        load(file(rootDir.path + "/keystore.properties").reader())
+      }
+      keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
+      keyPassword = keystoreProperties.getProperty("KEY_PASSWORD")
+      storeFile = file(keystoreProperties.getProperty("STORE_FILE"))
+      storePassword = keystoreProperties.getProperty("STORE_PASSWORD")
+    }
+  }
+
   buildTypes {
     debug {
       applicationIdSuffix = ExpeBuildType.DEBUG.applicationIdSuffix
       isDebuggable = true
     }
     val release by getting {
+      applicationIdSuffix = ExpeBuildType.RELEASE.applicationIdSuffix
       isMinifyEnabled = true
       isShrinkResources = true
       isDebuggable = false
+      signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
