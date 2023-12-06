@@ -12,7 +12,7 @@ import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorS
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
-import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData

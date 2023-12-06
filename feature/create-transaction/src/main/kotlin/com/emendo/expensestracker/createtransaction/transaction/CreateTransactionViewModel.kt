@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
+import com.emendo.expensestracker.core.app.base.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.app.base.manager.CreateTransactionRepository
 import com.emendo.expensestracker.core.app.common.ext.enableReloadWhenSubscribed
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
@@ -14,7 +15,6 @@ import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.di.DecimalSeparator
-import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget

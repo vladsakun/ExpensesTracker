@@ -35,11 +35,10 @@ val CreateTransactionUiState.successValue: CreateTransactionUiState.DisplayTrans
   get() = (this as? CreateTransactionUiState.DisplayTransactionData)
 
 fun TransactionElement.toTransactionItemModel() =
-  TransactionItemModel(id, icon, name, color)
+  TransactionItemModel(icon, name, color)
 
 @Stable
 data class TransactionItemModel(
-  val id: Long,
   val icon: IconModel,
   val name: TextValue,
   val color: ColorModel,

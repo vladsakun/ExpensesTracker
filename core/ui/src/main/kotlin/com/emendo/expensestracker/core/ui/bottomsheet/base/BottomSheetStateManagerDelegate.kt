@@ -2,7 +2,7 @@ package com.emendo.expensestracker.core.ui.bottomsheet.base
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
-import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow

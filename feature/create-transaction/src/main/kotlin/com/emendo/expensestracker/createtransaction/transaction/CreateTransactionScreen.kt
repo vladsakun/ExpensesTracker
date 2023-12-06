@@ -30,7 +30,7 @@ import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
-import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
 import com.emendo.expensestracker.core.ui.loader
@@ -181,9 +181,7 @@ private fun CreateTransactionContent(
 }
 
 @Composable
-private fun BottomSheetContent(
-  type: BottomSheetData?,
-) {
+private fun BottomSheetContent(type: BottomSheetData) {
   when (type) {
     is CalculatorBottomSheetData -> {
       val state = type.state.collectAsStateWithLifecycle()

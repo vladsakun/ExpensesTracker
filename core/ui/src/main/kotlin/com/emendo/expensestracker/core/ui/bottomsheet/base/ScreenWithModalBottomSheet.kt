@@ -10,7 +10,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
-import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch

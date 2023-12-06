@@ -1,10 +1,7 @@
 package com.emendo.expensestracker.categories.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -28,6 +25,7 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
@@ -54,11 +52,7 @@ fun CategoriesListRoute(
   ScreenWithModalBottomSheet(
     stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type ->
-      when (type) {
-        is GeneralBottomSheetData -> GeneralBottomSheet(type)
-      }
-    }
+    bottomSheetContent = { BottomSheetContent(it) }
   ) {
     CategoriesListScreenContent(
       stateProvider = uiState::value,
@@ -77,6 +71,13 @@ fun CategoriesListRoute(
       onEditClick = remember { viewModel::inverseEditMode },
       onDeleteCategoryClick = remember { viewModel::showConfirmDeleteCategoryBottomSheet },
     )
+  }
+}
+
+@Composable
+private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
+  when (type) {
+    is GeneralBottomSheetData -> GeneralBottomSheet(type)
   }
 }
 

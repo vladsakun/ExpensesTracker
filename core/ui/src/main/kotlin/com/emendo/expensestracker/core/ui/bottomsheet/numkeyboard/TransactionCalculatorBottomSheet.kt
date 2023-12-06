@@ -17,7 +17,7 @@ import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.model.data.keyboard.CalculatorConstants
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
-import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardActions
+import com.emendo.expensestracker.core.ui.bottomsheet.NumericKeyboardActions
 
 @Stable
 data class CalculatorBottomSheetState(

@@ -21,7 +21,7 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
-import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData

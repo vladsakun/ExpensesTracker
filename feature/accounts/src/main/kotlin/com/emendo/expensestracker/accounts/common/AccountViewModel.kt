@@ -3,12 +3,11 @@ package com.emendo.expensestracker.accounts.common
 import androidx.lifecycle.ViewModel
 import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
+import com.emendo.expensestracker.core.app.base.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
-import com.emendo.expensestracker.core.data.helper.BalanceBottomSheetData
-import com.emendo.expensestracker.core.data.helper.BalanceBottomSheetDataImpl
-import com.emendo.expensestracker.core.data.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.model.data.keyboard.InitialBalanceKeyboardActions
+import com.emendo.expensestracker.core.ui.bottomsheet.BalanceBottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceKeyboardActions
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 
@@ -38,7 +37,7 @@ abstract class AccountViewModel(
 
   fun showBalanceBottomSheet() {
     showBottomSheet(
-      BalanceBottomSheetDataImpl(
+      BalanceBottomSheetData(
         text = numericKeyboardCommander.calculatorTextState,
         actions = this,
         decimalSeparator = calculatorFormatter.decimalSeparator.toString(),

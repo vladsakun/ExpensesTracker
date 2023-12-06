@@ -1,10 +1,10 @@
-package com.emendo.expensestracker.core.data.helper
+package com.emendo.expensestracker.core.app.base.helper
 
 import com.emendo.expensestracker.core.data.KeyboardCallbacks
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
-import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardActions
 import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardNumber
+import com.emendo.expensestracker.core.ui.bottomsheet.NumericKeyboardActions
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 

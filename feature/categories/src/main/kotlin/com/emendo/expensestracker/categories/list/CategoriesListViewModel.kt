@@ -19,7 +19,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManag
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
-import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetDataImpl
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -71,7 +71,7 @@ class CategoriesListViewModel @Inject constructor(
 
   fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotalTransactions) {
     showBottomSheet(
-      GeneralBottomSheetDataImpl
+      GeneralBottomSheetData
         .Builder(DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.categoryModel.id) })
         .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))

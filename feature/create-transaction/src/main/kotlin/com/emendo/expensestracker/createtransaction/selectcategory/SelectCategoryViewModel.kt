@@ -70,6 +70,8 @@ private fun getDisplayCategoriesState(
   categories: List<CategoryModel>,
   categoryType: CategoryType,
 ): SelectCategoryUiState.DisplayCategoryList {
-  val categoriesByType = categories.filter { it.type == categoryType }
-  return SelectCategoryUiState.DisplayCategoryList(categoriesByType.toImmutableList())
+  val categoriesByType = categories
+    .filter { it.type == categoryType }
+    .toImmutableList()
+  return SelectCategoryUiState.DisplayCategoryList(categoriesByType)
 }

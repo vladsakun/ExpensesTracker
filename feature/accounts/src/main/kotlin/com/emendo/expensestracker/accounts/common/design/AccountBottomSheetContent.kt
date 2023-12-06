@@ -2,8 +2,8 @@ package com.emendo.expensestracker.accounts.common.design
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.core.data.helper.BalanceBottomSheetData
-import com.emendo.expensestracker.core.model.data.BottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BalanceBottomSheetData
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboardBottomSheet
 
 @Composable

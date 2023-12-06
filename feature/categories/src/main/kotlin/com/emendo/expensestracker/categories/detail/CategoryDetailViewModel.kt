@@ -12,7 +12,7 @@ import com.emendo.expensestracker.core.domain.category.GetCategorySnapshotByIdUs
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
-import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetDataImpl
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,7 +74,7 @@ class CategoryDetailViewModel @Inject constructor(
 
   fun showDeleteCategoryBottomSheet() {
     showBottomSheet(
-      GeneralBottomSheetDataImpl.Builder(Action(resourceValueOf(R.string.delete), ::deleteCategory))
+      GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteCategory))
         .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
         .build()
