@@ -6,29 +6,33 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 
 @Composable
 fun AutoSizableText(
   text: String,
   minFontSize: TextUnit,
-  textAlign: TextAlign,
   modifier: Modifier = Modifier,
-  textStyle: TextStyle = TextStyle.Default,
+  textAlign: TextAlign? = null,
+  style: TextStyle = TextStyle.Default,
   maxLines: Int = Int.MAX_VALUE,
   scaleFactor: Float = 0.9f,
+  color: Color = Color.Unspecified,
+  overflow: TextOverflow = TextOverflow.Clip,
 ) {
   BoxWithConstraints(modifier = modifier) {
-    var nFontSize = textStyle.fontSize
+    var nFontSize = style.fontSize
     val calculateParagraph = @Composable {
       Paragraph(
         text = text,
-        style = textStyle.copy(fontSize = nFontSize),
+        style = style.copy(fontSize = nFontSize),
         density = LocalDensity.current,
         fontFamilyResolver = LocalFontFamilyResolver.current,
         constraints = constraints.copy(minWidth = 0, minHeight = 0),
@@ -51,9 +55,11 @@ fun AutoSizableText(
       modifier = Modifier
         .fillMaxWidth()
         .align(Alignment.BottomCenter),
-      style = textStyle.copy(fontSize = nFontSize),
+      style = style.copy(fontSize = nFontSize),
       maxLines = maxLines,
       textAlign = textAlign,
+      color = color,
+      overflow = overflow,
     )
   }
 }

@@ -179,7 +179,7 @@ internal fun ResultText(textProvider: () -> String) {
       .fillMaxWidth()
       .padding(horizontal = Dimens.margin_small_xx)
       .height(lineHeightDp),
-    textStyle = MaterialTheme.typography.headlineLarge,
+    style = MaterialTheme.typography.headlineLarge,
     maxLines = 1,
   )
 }

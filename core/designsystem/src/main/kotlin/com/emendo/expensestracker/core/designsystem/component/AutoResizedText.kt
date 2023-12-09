@@ -12,7 +12,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isUnspecified
-import timber.log.Timber
 
 @Composable
 fun AutoResizedText(
@@ -23,10 +22,11 @@ fun AutoResizedText(
   maxLines: Int = Int.MAX_VALUE,
   style: TextStyle = LocalTextStyle.current,
   color: Color = style.color,
-  overflow: TextOverflow = TextOverflow.Clip,
+  onMaxDecreasedOverflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
   var resizedTextStyle by remember { mutableStateOf(style) }
   var shouldDraw by remember { mutableStateOf(false) }
+  var overflowState by remember { mutableStateOf(TextOverflow.Clip) }
 
   val defaultFontSize = MaterialTheme.typography.bodyMedium.fontSize
 
@@ -41,17 +41,16 @@ fun AutoResizedText(
     textAlign = textAlign,
     maxLines = maxLines,
     softWrap = false,
-    overflow = overflow,
+    overflow = overflowState,
     style = resizedTextStyle,
     onTextLayout = { result ->
       if (result.didOverflowWidth) {
         if (style.fontSize.isUnspecified) {
-          resizedTextStyle = resizedTextStyle.copy(
-            fontSize = defaultFontSize
-          )
+          resizedTextStyle = resizedTextStyle.copy(fontSize = defaultFontSize)
         }
         val decreasedFontSize = resizedTextStyle.fontSize * 0.95
         if (decreasedFontSize <= minFontSize) {
+          overflowState = onMaxDecreasedOverflow
           return@Text
         }
 

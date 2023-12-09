@@ -5,9 +5,12 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 fun Modifier.conditional(condition: Boolean, modifier: Modifier.() -> Modifier): Modifier =
@@ -28,3 +31,15 @@ inline val screenWidthDp: Dp
   @Composable get() {
     return LocalConfiguration.current.screenWidthDp.dp
   }
+
+@Composable
+@ReadOnlyComposable
+fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
+
+@Composable
+@ReadOnlyComposable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+
+@Composable
+@ReadOnlyComposable
+fun TextUnit.toDp(): Dp = with(LocalDensity.current) { this@toDp.toDp() }

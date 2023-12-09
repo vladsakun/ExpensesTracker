@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,6 +27,7 @@ import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.AddCategoryItem
@@ -231,38 +233,21 @@ private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
 
 @ExpePreview
 @Composable
-private fun CategoriesListPreview() {
-  //  ExpensesTrackerTheme {
-  //    CategoriesListScreenContent(
-  //      stateProvider = {
-  //        CategoriesListUiState.DisplayCategoriesList(
-  //          categories = persistentMapOf(
-  //            0 to List(6) { index ->
-  //              CategoryWithTotal(
-  //                category = category(
-  //                  id = index.toLong(),
-  //                  name = TextValue.Value("Childcare"),
-  //                  icon = IconModel.CHILDCARE,
-  //                  color = ColorModel.Purple,
-  //                  type = CategoryType.EXPENSE,
-  //                ),
-  //                transactions = emptyList(),
-  //                totalFormatted = "EUR 187.20",
-  //              )
-  //            }.toImmutableList(),
-  //          ),
-  //          tabs = persistentListOf(
-  //            TabData(R.string.expense),
-  //            TabData(R.string.income),
-  //          )
-  //        )
-  //      },
-  //      onCreateCategoryClick = {},
-  //      onCategoryClick = {},
-  //      onPageSelected = {},
-  //      onEditClick = {},
-  //    )
-  //  }
+private fun CategoriesListPreview(
+  @PreviewParameter(CategoriesListPreviewData::class) previewData: CategoriesListUiState,
+) {
+  ExpensesTrackerTheme {
+    CategoriesListScreenContent(
+      stateProvider = { previewData },
+      onCreateCategoryClick = {},
+      onCategoryClick = {},
+      onPageSelected = {},
+      onEditClick = {},
+      isEditModeProvider = { false },
+      onDeleteCategoryClick = {},
+      onMove = {},
+    )
+  }
 }
 
 //

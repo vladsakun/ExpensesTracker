@@ -18,12 +18,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
+import com.emendo.expensestracker.core.designsystem.component.AutoResizedText
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
+import com.emendo.expensestracker.core.designsystem.utils.toDp
+
+private val ItemPadding
+  get() = Dimens.margin_large_x
 
 @Composable
 fun CategoryItem(
@@ -65,7 +70,7 @@ fun CategoryItem(
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(14.dp)
+        .padding(ItemPadding)
         .graphicsLayer {
           if (isEditMode()) {
             rotationZ = transition.value
@@ -85,19 +90,22 @@ fun CategoryItem(
         contentDescription = "$name category icon",
         tint = Color.White, // Todo remove hardcoded color
       )
+      val textStyle = MaterialTheme.typography.labelSmall
       Text(
         text = name,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.labelSmall,
+        style = textStyle,
         color = Color.White,
       )
-      Text(
+      val fontSizeWithSpacing = (textStyle.fontSize.value + 5).sp
+      AutoResizedText(
         text = total,
+        minFontSize = 8.sp,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.labelSmall,
+        style = textStyle,
         color = Color.White,
+        modifier = Modifier.height(fontSizeWithSpacing.toDp())
       )
     }
   }
@@ -125,11 +133,12 @@ fun AddCategoryItem(
       contentDescription = "icon",
       modifier = modifier
         .fillMaxSize()
-        .padding(14.dp)
+        .padding(ItemPadding)
         .clip(RoundedCornerNormalRadiusShape)
         .clickable(onClick = onClick)
         .background(color = MaterialTheme.colorScheme.primaryContainer)
-        .padding(Dimens.margin_large_x),
+        .padding(Dimens.margin_large_x)
+        .padding(Dimens.margin_small_x),
     )
   }
 }
