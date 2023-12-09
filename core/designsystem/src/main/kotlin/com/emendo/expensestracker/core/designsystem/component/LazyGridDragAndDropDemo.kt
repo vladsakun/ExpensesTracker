@@ -260,19 +260,20 @@ fun LazyGridItemScope.DraggableItem(
   dragDropState: GridDragDropState,
   index: Int,
   modifier: Modifier = Modifier,
+  zIndex: Float = 1f,
   content: @Composable (isDragging: Boolean) -> Unit,
 ) {
   val dragging = index == dragDropState.draggingItemIndex
   val draggingModifier = if (dragging) {
     Modifier
-      .zIndex(1f)
+      .zIndex(zIndex)
       .graphicsLayer {
         translationX = dragDropState.draggingItemOffset.x
         translationY = dragDropState.draggingItemOffset.y
       }
   } else if (index == dragDropState.previousIndexOfDraggedItem) {
     Modifier
-      .zIndex(1f)
+      .zIndex(zIndex)
       .graphicsLayer {
         translationX = dragDropState.previousItemOffset.value.x
         translationY = dragDropState.previousItemOffset.value.y

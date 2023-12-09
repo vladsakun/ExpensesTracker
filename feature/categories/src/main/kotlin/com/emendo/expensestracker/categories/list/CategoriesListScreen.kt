@@ -188,7 +188,9 @@ private fun CategoriesGrid(
   }
 
   CategoriesLazyVerticalGrid(
-    modifier = Modifier.dragContainer(dragDropState, isEditModeProvider),
+    modifier = Modifier
+      .fillMaxSize()
+      .dragContainer(dragDropState, isEditModeProvider),
     state = gridState,
   ) {
     itemsIndexed(

@@ -87,7 +87,9 @@ fun CategoriesGrid(
   onCategoryClick: (category: CategoryModel) -> Unit,
   onAddCategoryClick: () -> Unit,
 ) {
-  CategoriesLazyVerticalGrid {
+  CategoriesLazyVerticalGrid(
+    modifier = Modifier.fillMaxSize()
+  ) {
     items(
       items = categories,
       key = CategoryModel::id,

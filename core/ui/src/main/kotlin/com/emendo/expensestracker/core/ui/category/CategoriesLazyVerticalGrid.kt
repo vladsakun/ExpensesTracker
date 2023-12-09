@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.ui.category
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,7 +13,7 @@ fun CategoriesLazyVerticalGrid(
   content: LazyGridScope.() -> Unit,
 ) {
   LazyVerticalGrid(
-    modifier = modifier.fillMaxSize(),
+    modifier = modifier,
     columns = GridCells.Fixed(GRID_CELL_COUNT),
     state = state,
     content = content,
