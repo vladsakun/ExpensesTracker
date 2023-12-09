@@ -31,6 +31,7 @@ interface AccountRepository {
     icon: IconModel,
     color: ColorModel,
     balance: BigDecimal,
+    ordinalIndex: Int? = null,
   )
 
   suspend fun deleteAccount(id: Long)

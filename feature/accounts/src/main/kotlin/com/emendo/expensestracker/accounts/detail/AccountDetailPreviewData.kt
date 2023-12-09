@@ -22,6 +22,7 @@ internal class AccountDetailPreviewData : PreviewParameterProvider<AccountDetail
       color = ColorModel.Blue,
       balance = BigDecimal.valueOf(122345, 2),
       balanceFormatted = "$1223.45",
+      ordinalIndex = 0,
     ),
   )
   override val values: Sequence<AccountDetailScreenData> = sequenceOf(data)

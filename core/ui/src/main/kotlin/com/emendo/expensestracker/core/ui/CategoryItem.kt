@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
@@ -45,22 +47,25 @@ fun CategoryItem(
     label = "rotation"
   )
 
-  Box(modifier = modifier) {
+  Box {
     if (isEditMode()) {
-      Icon(
-        imageVector = ExpeIcons.Remove,
-        contentDescription = "remove",
-        modifier = Modifier
-          .size(Dimens.icon_size)
-          .zIndex(2f)
-          .clickable(onClick = onDeleteClick)
-          .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
-          .align(Alignment.TopStart)
-      )
+      IconButton(
+        modifier = Modifier.zIndex(2f),
+        onClick = onDeleteClick
+      ) {
+        Icon(
+          imageVector = ExpeIcons.Remove,
+          contentDescription = "remove",
+          modifier = Modifier
+            .size(Dimens.icon_size)
+            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+        )
+      }
     }
     Column(
-      modifier = modifier
+      modifier = Modifier
         .fillMaxSize()
+        .padding(14.dp)
         .graphicsLayer {
           if (isEditMode()) {
             rotationZ = transition.value
@@ -68,6 +73,7 @@ fun CategoryItem(
           }
         }
         .clip(RoundedCornerNormalRadiusShape)
+        .then(modifier)
         .background(color)
         .clickable(onClick = onClick)
         .padding(Dimens.margin_small_x),
@@ -119,6 +125,7 @@ fun AddCategoryItem(
       contentDescription = "icon",
       modifier = modifier
         .fillMaxSize()
+        .padding(14.dp)
         .clip(RoundedCornerNormalRadiusShape)
         .clickable(onClick = onClick)
         .background(color = MaterialTheme.colorScheme.primaryContainer)

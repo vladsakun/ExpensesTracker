@@ -19,8 +19,8 @@ object DatabaseModule {
     @ApplicationContext context: Context,
   ): ExpDatabase = Room
     .databaseBuilder(context, ExpDatabase::class.java, "expe-database.db")
-    //   Uncomment when want to create an asset file to prepopulate the dm
-    //   .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+    // Uncomment to create an asset file to prepopulate the dm
+    // .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
     .createFromAsset("database/expe-database.db")
     .build()
 }

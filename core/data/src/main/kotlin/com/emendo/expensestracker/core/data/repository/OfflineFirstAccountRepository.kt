@@ -10,7 +10,9 @@ import com.emendo.expensestracker.core.data.mapper.AccountMapper
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.database.dao.AccountDao
+import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
 import com.emendo.expensestracker.core.database.model.AccountEntity
+import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -72,6 +74,7 @@ class OfflineFirstAccountRepository @Inject constructor(
           currencyCode = currency.currencyCode,
           iconId = icon.id,
           colorId = color.id,
+          ordinalIndex = accountsList.value.size,
         )
       )
     }
@@ -84,16 +87,28 @@ class OfflineFirstAccountRepository @Inject constructor(
     icon: IconModel,
     color: ColorModel,
     balance: BigDecimal,
+    ordinalIndex: Int?,
   ) {
     withContext(ioDispatcher) {
-      accountsDao.save(
-        AccountEntity(
+      if (ordinalIndex == null) {
+        accountsDao.updateAccountDetail(
+          AccountDetailUpdate(
+            id = id,
+            name = name,
+            balance = balance,
+            currencyCode = currency.currencyCode,
+            iconId = icon.id,
+            colorId = color.id,
+          )
+        )
+
+        return@withContext
+      }
+
+      accountsDao.updateOrdinalIndex(
+        AccountOrdinalIndexUpdate(
           id = id,
-          name = name,
-          balance = balance,
-          currencyCode = currency.currencyCode,
-          iconId = icon.id,
-          colorId = color.id,
+          ordinalIndex = ordinalIndex,
         )
       )
     }

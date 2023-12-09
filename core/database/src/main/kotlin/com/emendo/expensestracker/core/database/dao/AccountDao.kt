@@ -2,8 +2,11 @@ package com.emendo.expensestracker.core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Update
 import com.emendo.expensestracker.core.database.common.BaseDao
+import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
 import com.emendo.expensestracker.core.database.model.AccountEntity
+import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
 import com.emendo.expensestracker.core.database.util.ACCOUNT_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_ACCOUNT
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +38,12 @@ abstract class AccountDao : BaseDao<AccountEntity>() {
 
   @Query("DELETE FROM $TABLE_NAME WHERE id = :id")
   abstract fun deleteById(id: Long)
+
+  @Update(entity = AccountEntity::class)
+  abstract suspend fun updateAccountDetail(accountDetailUpdate: AccountDetailUpdate)
+
+  @Update(entity = AccountEntity::class)
+  abstract suspend fun updateOrdinalIndex(accountOrdinalIndexUpdate: AccountOrdinalIndexUpdate)
 
   companion object {
     private const val TABLE_NAME = TABLE_ACCOUNT

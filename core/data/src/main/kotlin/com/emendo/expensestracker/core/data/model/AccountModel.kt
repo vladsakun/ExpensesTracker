@@ -14,6 +14,7 @@ data class AccountModel(
   override val name: TextValue.Value,
   override val icon: IconModel,
   override val color: ColorModel,
+  override val ordinalIndex: Int,
   val balance: BigDecimal,
   val balanceFormatted: String = "",
 ) : TransactionSource, TransactionTarget

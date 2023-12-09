@@ -122,6 +122,7 @@ private fun CategoriesListPreview() {
               icon = IconModel.random,
               color = ColorModel.random,
               type = CategoryType.EXPENSE,
+              ordinalIndex = index,
             )
           }.toImmutableList(),
         )

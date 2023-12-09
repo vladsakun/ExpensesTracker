@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.ui.category
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.*
@@ -19,8 +18,8 @@ fun CategoriesLazyVerticalGrid(
   LazyVerticalGrid(
     modifier = modifier.fillMaxSize(),
     columns = GridCells.Fixed(GRID_CELL_COUNT),
-    verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
-    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+    //    verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+    //    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     contentPadding = PaddingValues(Dimens.margin_large_x),
     state = state,
     content = content,

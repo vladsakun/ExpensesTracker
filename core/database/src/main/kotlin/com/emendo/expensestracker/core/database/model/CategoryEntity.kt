@@ -12,4 +12,5 @@ data class CategoryEntity(
   val iconId: Int,
   val colorId: Int,
   val type: Int,
+  val ordinalIndex: Int,
 )

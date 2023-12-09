@@ -1,6 +1,7 @@
-package com.emendo.expensestracker.sync
+package com.emendo.expensestracker.sync.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.tracing.traceAsync
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequest
@@ -13,8 +14,6 @@ import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepositor
 import com.emendo.expensestracker.core.datastore.ChangeListVersions
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
 import com.emendo.expensestracker.sync.initializers.SyncConstraints
-import com.emendo.expensestracker.sync.workers.DelegatingWorker
-import com.emendo.expensestracker.sync.workers.delegatedData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,6 +24,7 @@ import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
+@HiltWorker
 class SyncCurrencyRatesWorker @AssistedInject constructor(
   @Assisted private val appContext: Context,
   @Assisted workerParams: WorkerParameters,

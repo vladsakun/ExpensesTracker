@@ -10,6 +10,7 @@ sealed interface TransactionElement {
   val icon: IconModel
   val name: TextValue
   val color: ColorModel
+  val ordinalIndex: Int
 }
 
 interface TransactionSource : TransactionElement {

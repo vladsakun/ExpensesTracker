@@ -26,6 +26,7 @@ class AccountMapper @Inject constructor(
       currency = currencyModel,
       icon = IconModel.getById(iconId),
       color = ColorModel.getById(colorId),
+      ordinalIndex = ordinalIndex,
     )
   }
 }

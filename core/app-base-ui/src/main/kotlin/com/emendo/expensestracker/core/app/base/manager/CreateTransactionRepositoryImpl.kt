@@ -11,6 +11,7 @@ import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetIncomeId
+import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetOrdinalIndex
 import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
 import com.emendo.expensestracker.core.domain.account.RetrieveLastUsedAccountUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -82,6 +83,7 @@ class CreateTransactionRepositoryImpl @Inject constructor(
       } else {
         CategoryType.INCOME
       },
+      ordinalIndex = DefaultTransactionTargetOrdinalIndex,
     )
 
   override fun isSelectSourceFlow(): Boolean {

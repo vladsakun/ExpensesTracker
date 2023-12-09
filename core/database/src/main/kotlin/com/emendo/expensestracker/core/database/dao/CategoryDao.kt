@@ -3,9 +3,12 @@ package com.emendo.expensestracker.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.emendo.expensestracker.core.database.common.BaseDao
+import com.emendo.expensestracker.core.database.model.CategoryDetailUpdate
 import com.emendo.expensestracker.core.database.model.CategoryEntity
 import com.emendo.expensestracker.core.database.model.CategoryFull
+import com.emendo.expensestracker.core.database.model.CategoryOrdinalIndexUpdate
 import com.emendo.expensestracker.core.database.util.CATEGORY_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_CATEGORY
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +34,13 @@ abstract class CategoryDao : BaseDao<CategoryEntity>() {
   abstract fun getCategoriesFullByType(categoryType: Int): Flow<List<CategoryFull>>
 
   @Query("DELETE FROM $TABLE_NAME WHERE id = :id")
-  abstract fun deleteById(id: Long)
+  abstract suspend fun deleteById(id: Long)
+
+  @Update(entity = CategoryEntity::class)
+  abstract suspend fun updateCategoryDetail(update: CategoryDetailUpdate)
+
+  @Update(entity = CategoryEntity::class)
+  abstract suspend fun updateOrdinalIndex(update: CategoryOrdinalIndexUpdate)
 
   companion object {
     private const val TABLE_NAME = TABLE_CATEGORY

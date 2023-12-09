@@ -1,20 +1,4 @@
-package com.emendo.expensestracker.categories.list.drag
-
-/*
- * Copyright 2021 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.emendo.expensestracker.core.designsystem.component
 
 // https://issuetracker.google.com/issues/181282427
 
@@ -91,14 +75,17 @@ fun LazyGridDragAndDropDemo() {
 @Composable
 fun rememberGridDragDropState(
   gridState: LazyGridState,
+  key: Any? = null,
+  ignoreItem: (key: Any) -> Boolean = { false },
   onMove: (Int, Int) -> Unit,
 ): GridDragDropState {
   val scope = rememberCoroutineScope()
-  val state = remember(gridState) {
+  val state = remember(gridState, key) {
     GridDragDropState(
       state = gridState,
       onMove = onMove,
-      scope = scope
+      scope = scope,
+      ignoreItem = ignoreItem,
     )
   }
   LaunchedEffect(state) {
@@ -113,6 +100,7 @@ fun rememberGridDragDropState(
 class GridDragDropState internal constructor(
   private val state: LazyGridState,
   private val scope: CoroutineScope,
+  private val ignoreItem: (key: Any) -> Boolean,
   private val onMove: (Int, Int) -> Unit,
 ) {
   var draggingItemIndex by mutableStateOf<Int?>(null)
@@ -129,7 +117,12 @@ class GridDragDropState internal constructor(
 
   private val draggingItemLayoutInfo: LazyGridItemInfo?
     get() = state.layoutInfo.visibleItemsInfo
-      .firstOrNull { it.index == draggingItemIndex }
+      .firstOrNull {
+        if (ignoreItem(it.key)) {
+          return@firstOrNull false
+        }
+        it.index == draggingItemIndex
+      }
 
   internal var previousIndexOfDraggedItem by mutableStateOf<Int?>(null)
     private set
@@ -177,6 +170,9 @@ class GridDragDropState internal constructor(
     val middleOffset = startOffset + (endOffset - startOffset) / 2f
 
     val targetItem = state.layoutInfo.visibleItemsInfo.find { item ->
+      if (ignoreItem(item.key)) {
+        return@find false
+      }
       middleOffset.x.toInt() in item.offset.x..item.offsetEnd.x &&
         middleOffset.y.toInt() in item.offset.y..item.offsetEnd.y &&
         draggingItem.index != item.index
@@ -227,16 +223,33 @@ private operator fun Offset.plus(size: Size): Offset {
   return Offset(x + size.width, y + size.height)
 }
 
-fun Modifier.dragContainer(dragDropState: GridDragDropState): Modifier {
+fun Modifier.dragContainer(
+  dragDropState: GridDragDropState,
+  enabled: () -> Boolean = { true },
+): Modifier {
   return pointerInput(dragDropState) {
     detectDragGesturesAfterLongPress(
       onDrag = { change, offset ->
+        if (!enabled()) return@detectDragGesturesAfterLongPress
+
         change.consume()
         dragDropState.onDrag(offset = offset)
       },
-      onDragStart = { offset -> dragDropState.onDragStart(offset) },
-      onDragEnd = { dragDropState.onDragInterrupted() },
-      onDragCancel = { dragDropState.onDragInterrupted() }
+      onDragStart = { offset ->
+        if (!enabled()) return@detectDragGesturesAfterLongPress
+
+        dragDropState.onDragStart(offset)
+      },
+      onDragEnd = {
+        if (!enabled()) return@detectDragGesturesAfterLongPress
+
+        dragDropState.onDragInterrupted()
+      },
+      onDragCancel = {
+        if (!enabled()) return@detectDragGesturesAfterLongPress
+
+        dragDropState.onDragInterrupted()
+      }
     )
   }
 }

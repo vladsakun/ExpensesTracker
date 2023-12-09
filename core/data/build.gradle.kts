@@ -1,6 +1,7 @@
 plugins {
   id("expensestracker.android.library")
   id("expensestracker.android.hilt")
+  id("kotlinx-serialization")
 }
 
 android {
