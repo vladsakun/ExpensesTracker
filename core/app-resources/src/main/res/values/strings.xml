@@ -7,6 +7,7 @@
   <string name="create">Create</string>
   <string name="save">Save</string>
   <string name="delete">Delete</string>
+  <string name="duplicate">Duplicate</string>
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
   <string name="loading">Loading</string>
@@ -64,4 +65,7 @@
   <string name="account_detail_dialog_delete_confirm_title">Are you sure that you want to delete the account?</string>
   <string name="category_list_dialog_delete_confirm_title">Are you sure that you want to delete the category?</string>
   <string name="category_detail_dialog_delete_confirm_title">Are you sure that you want to delete the category?</string>
+  <string name="transaction_detail_dialog_delete_confirm_title">Are you sure that you want to delete the transaction?</string>
+
+  <string name="create_transaction_note_placeholder">Note</string>
 </resources>

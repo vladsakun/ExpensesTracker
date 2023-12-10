@@ -29,4 +29,5 @@ interface NumericKeyboardCommander : NumericKeyboardActions, KeyboardCallbacks {
   fun getCalculatorValue(): String
   fun doMath()
   fun negate()
+  fun setInitialValue(initialValue: String)
 }

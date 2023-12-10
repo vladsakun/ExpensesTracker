@@ -14,6 +14,7 @@ import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetI
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetOrdinalIndex
 import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
 import com.emendo.expensestracker.core.domain.account.RetrieveLastUsedAccountUseCase
+import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class CreateTransactionRepositoryImpl @Inject constructor(
       )
 
   private var isSelectSourceFlow: Boolean = false
+  private var payload: CreateTransactionEventPayload? = null
 
   override suspend fun init() {
     transactionSourceMutableState.update {
@@ -98,7 +100,18 @@ class CreateTransactionRepositoryImpl @Inject constructor(
     isSelectSourceFlow = false
   }
 
-  override fun clear() {
-    transactionTargetState.update { null }
+  override fun getTransactionPayload(): CreateTransactionEventPayload? =
+    payload
+
+  override fun setTransactionPayload(newPayload: CreateTransactionEventPayload) {
+    payload = newPayload
+  }
+
+  override fun clear(shouldClearSource: Boolean) {
+    if (shouldClearSource) {
+      transactionTargetState.update { null }
+    }
+    isSelectSourceFlow = false
+    payload = null
   }
 }

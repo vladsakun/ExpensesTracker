@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.data.amount
 
 import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
+import com.emendo.expensestracker.core.data.isFloatingPointNumber
 import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
 import java.math.BigDecimal
 import java.util.Locale
@@ -52,6 +53,20 @@ class CalculatorFormatterImpl @Inject constructor(
     }
 
     if (amount.scale() != 0) {
+      numberFormatter.minimumFractionDigits = amount.scale().coerceAtLeast(2)
+    } else {
+      numberFormatter.minimumFractionDigits = 0
+    }
+
+    return numberFormatter.format(amount)
+  }
+
+  override fun formatFinalWithPrecision(amount: BigDecimal?): String {
+    if (amount == null) {
+      return ""
+    }
+
+    if (amount.isFloatingPointNumber) {
       numberFormatter.minimumFractionDigits = amount.scale().coerceAtLeast(2)
     } else {
       numberFormatter.minimumFractionDigits = 0

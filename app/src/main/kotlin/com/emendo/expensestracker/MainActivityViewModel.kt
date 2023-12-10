@@ -9,7 +9,7 @@ import com.emendo.expensestracker.core.app.base.manager.CreateTransactionReposit
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
-import com.emendo.expensestracker.createtransaction.destinations.CreateTransactionScreenDestination
+import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -23,22 +23,22 @@ class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
   // Todo rethink huge when
-  val navigationEvent: Flow<Direction> = appNavigationEventBus.eventFlow.map { event ->
+  val navigationEvent: Flow<Pair<Boolean, Direction>> = appNavigationEventBus.eventFlow.map { event ->
     when (event) {
       is CreateTransaction -> {
         event.handleEventData(createTransactionRepository)
-        CreateTransactionScreenDestination
+        event.shouldNavigateUp to CreatetransactionNavGraph
       }
 
       is SelectAccount -> {
         createTransactionRepository.startSelectSourceFlow()
-        AccountsScreenRouteDestination
+        false to AccountsScreenRouteDestination
       }
 
-      is CreateCategory -> CreateCategoryRouteDestination(event.categoryType)
-      is SelectColor -> SelectColorScreenDestination(event.preselectedColorId)
-      is SelectCurrency -> SelectCurrencyScreenDestination
-      is SelectIcon -> SelectIconScreenDestination(event.preselectedIconId)
+      is CreateCategory -> false to CreateCategoryRouteDestination(event.categoryType)
+      is SelectColor -> false to SelectColorScreenDestination(event.preselectedColorId)
+      is SelectCurrency -> false to SelectCurrencyScreenDestination
+      is SelectIcon -> false to SelectIconScreenDestination(event.preselectedIconId)
     }
   }
 }
@@ -48,4 +48,5 @@ private fun CreateTransaction.handleEventData(
 ) {
   target?.let(createTransactionRepository::setTarget)
   source?.let(createTransactionRepository::setSource)
+  payload?.let(createTransactionRepository::setTransactionPayload)
 }

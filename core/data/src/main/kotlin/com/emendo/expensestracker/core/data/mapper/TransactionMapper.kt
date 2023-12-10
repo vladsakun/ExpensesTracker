@@ -38,6 +38,7 @@ class TransactionMapper @Inject constructor(
       transferReceivedValue = transactionEntity.transferReceivedValue,
       transferCurrencyModel = transactionEntity.transferReceivedCurrencyCode?.run { currencyMapper.map(this) },
       date = transactionEntity.date,
+      note = transactionEntity.note,
     )
   }
 }

@@ -6,3 +6,7 @@ plugins {
 android {
   namespace = "com.emendo.expensestracker.features.create.transaction"
 }
+
+dependencies {
+  implementation(libs.kotlinx.datetime)
+}

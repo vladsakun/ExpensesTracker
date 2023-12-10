@@ -139,4 +139,8 @@ class NumericKeyboardCommanderImpl @Inject constructor(
     calculatorInput.doMath()
     mathDone(calculatorInput.negate())
   }
+
+  override fun setInitialValue(initialValue: String) {
+    calculatorInput.setNumber1(StringBuilder(initialValue))
+  }
 }

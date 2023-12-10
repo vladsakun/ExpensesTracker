@@ -63,6 +63,10 @@ class OfflineFirstCategoryRepository @Inject constructor(
   override val categoriesSnapshot: List<CategoryModel>
     get() = categoriesState.value
 
+  init {
+    createDefaultCategories()
+  }
+
   override suspend fun createCategory(
     name: String,
     icon: IconModel,

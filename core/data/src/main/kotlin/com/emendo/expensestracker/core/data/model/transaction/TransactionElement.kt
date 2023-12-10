@@ -19,5 +19,4 @@ interface TransactionSource : TransactionElement {
 
 interface TransactionTarget : TransactionElement {
   val currency: CurrencyModel?
-    get() = null
 }

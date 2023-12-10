@@ -65,5 +65,6 @@ private fun CreateCategoryContent(
     onColorSelectClick = onColorSelectClick,
     onConfirmActionClick = onConfirmActionClick,
     confirmButtonText = stringResource(id = R.string.create),
+    shouldFocusTitleInputOnLaunch = true,
   )
 }

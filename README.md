@@ -3,8 +3,7 @@ Engineering To-Do:
 1) Support foldable devices
 2) Export data via GDrive
 3) Baseline profiles
-4) Google pay sync
-5) Dynamic colors
+4) Dynamic colors
 
 Features:
 

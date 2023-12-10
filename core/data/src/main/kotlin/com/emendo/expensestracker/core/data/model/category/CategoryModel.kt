@@ -7,6 +7,7 @@ import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetE
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetName
 import com.emendo.expensestracker.core.database.model.CategoryEntity
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 
 data class CategoryModel(
   override val id: Long = 0,
@@ -15,6 +16,7 @@ data class CategoryModel(
   override val color: ColorModel,
   override val ordinalIndex: Int,
   val type: CategoryType,
+  override val currency: CurrencyModel? = null,
 ) : TransactionTarget
 
 private fun CategoryEntity.asExternalModel(value: TextValue = textValueOf(this.name)): CategoryModel =

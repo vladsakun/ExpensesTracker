@@ -6,12 +6,9 @@ import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 
-sealed interface TransactionTargetUiModel {
-  val id: Long
-  val name: TextValue
-  val icon: IconModel
-  val color: ColorModel
+sealed interface TransactionTargetUiModel : TransactionTarget {
   val transactionType: TransactionType
 
   class Account(account: AccountModel) : TransactionTargetUiModel {
@@ -20,6 +17,8 @@ sealed interface TransactionTargetUiModel {
     override val icon: IconModel = account.icon
     override val color: ColorModel = account.color
     override val transactionType: TransactionType = TransactionType.TRANSFER
+    override val ordinalIndex: Int = account.ordinalIndex
+    override val currency: CurrencyModel = account.currency
   }
 
   class Category(category: CategoryModel) : TransactionTargetUiModel {
@@ -28,6 +27,8 @@ sealed interface TransactionTargetUiModel {
     override val icon: IconModel = category.icon
     override val color: ColorModel = category.color
     override val transactionType: TransactionType = getTransactionType(category)
+    override val ordinalIndex: Int = category.ordinalIndex
+    override val currency: CurrencyModel? = null
     val type: CategoryType = category.type
 
     private fun getTransactionType(category: CategoryModel) =

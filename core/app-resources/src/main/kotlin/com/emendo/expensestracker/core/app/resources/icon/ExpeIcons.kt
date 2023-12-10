@@ -32,4 +32,8 @@ object ExpeIcons {
   val HideSource = Icons.Outlined.HideSource
   val Edit = Icons.Outlined.Edit
   val DragHandle = Icons.Outlined.DragHandle
+  val Delete = Icons.Outlined.Delete
+  val Schedule = Icons.Outlined.Schedule
+  val FileCopy = Icons.Outlined.FileCopy
+  val SettingsSuggest = Icons.Outlined.SettingsSuggest
 }

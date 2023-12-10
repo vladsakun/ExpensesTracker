@@ -2,6 +2,8 @@ package com.emendo.expensestracker.categories.list
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -22,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_TRANSACTION
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
@@ -78,7 +81,9 @@ fun CategoriesListRoute(
       onPageSelected = remember { viewModel::pageSelected },
       onEditClick = remember { viewModel::inverseEditMode },
       onDeleteCategoryClick = remember { viewModel::showConfirmDeleteCategoryBottomSheet },
-      onMove = remember { viewModel::onMove }
+      onMove = remember { viewModel::onMove },
+      enableEditMode = remember { viewModel::enableEditMode },
+      disableEditMode = remember { viewModel::disableEditMode }
     )
   }
 }
@@ -94,6 +99,8 @@ private fun CategoriesListScreenContent(
   onEditClick: () -> Unit,
   onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
   onMove: (List<CategoryWithTotal>) -> Unit,
+  enableEditMode: () -> Unit,
+  disableEditMode: () -> Unit,
 ) {
   ExpeScaffold(
     topBar = {
@@ -150,6 +157,8 @@ private fun CategoriesListScreenContent(
                 onCreateCategoryClick = onCreateCategoryClick,
                 onDeleteCategoryClick = onDeleteCategoryClick,
                 onMove = onMove,
+                onLongClick = enableEditMode,
+                onClick = disableEditMode,
               )
             }
           }
@@ -168,7 +177,15 @@ private fun CategoriesGrid(
   onCreateCategoryClick: () -> Unit,
   onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
   onMove: (List<CategoryWithTotal>) -> Unit,
+  onLongClick: () -> Unit,
+  onClick: () -> Unit,
 ) {
+
+  LaunchedEffect(categories) {
+    if (IS_DEBUG_CREATE_TRANSACTION && categories.dataList.isNotEmpty()) {
+      onCategoryClick(categories.dataList.first())
+    }
+  }
   val mutableList = remember(categories) {
     mutableStateListOf<CategoryWithTotal>().apply {
       addAll(categories.dataList.toList())
@@ -190,7 +207,13 @@ private fun CategoriesGrid(
   CategoriesLazyVerticalGrid(
     modifier = Modifier
       .fillMaxSize()
-      .dragContainer(dragDropState, isEditModeProvider),
+      .dragContainer(dragDropState, isEditModeProvider)
+      .combinedClickable(
+        onLongClick = onLongClick,
+        onClick = onClick,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+      ),
     state = gridState,
   ) {
     itemsIndexed(
@@ -208,7 +231,7 @@ private fun CategoriesGrid(
           onClick = { onCategoryClick(category) },
           isEditMode = isEditModeProvider,
           onDeleteClick = { onDeleteCategoryClick(category) },
-          modifier = Modifier.shadow(elevation, RoundedCornerNormalRadiusShape)
+          modifier = Modifier.shadow(elevation, RoundedCornerNormalRadiusShape),
         )
       }
     }
@@ -248,6 +271,8 @@ private fun CategoriesListPreview(
       isEditModeProvider = { false },
       onDeleteCategoryClick = {},
       onMove = {},
+      enableEditMode = {},
+      disableEditMode = {},
     )
   }
 }

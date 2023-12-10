@@ -14,7 +14,7 @@ import com.emendo.expensestracker.accounts.common.model.AccountScreenData
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
-import com.emendo.expensestracker.core.designsystem.component.ExpeTextField
+import com.emendo.expensestracker.core.designsystem.component.ExpeTextFieldWithRoundedBackground
 import com.emendo.expensestracker.core.designsystem.component.MenuAction
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.ui.SelectRow
@@ -55,8 +55,8 @@ internal fun AccountContent(
         .padding(Dimens.margin_large_x),
       verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     ) {
-      ExpeTextField(
-        label = stringResource(id = R.string.account_name),
+      ExpeTextFieldWithRoundedBackground(
+        placeholder = stringResource(id = R.string.account_name),
         text = stateProvider().name,
         onValueChange = onNameChange,
       )

@@ -12,7 +12,8 @@ data class TransactionModel(
   val formattedValue: String,
   val value: BigDecimal,
   val type: TransactionType,
+  val date: Instant,
+  val note: String?,
   val transferReceivedValue: BigDecimal? = null,
   val transferCurrencyModel: CurrencyModel? = null,
-  val date: Instant,
 )

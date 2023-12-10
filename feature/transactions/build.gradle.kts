@@ -5,4 +5,6 @@ plugins {
 
 dependencies {
   implementation(libs.androidx.activity.compose)
+  implementation(libs.paging.compose)
+  implementation(libs.kotlinx.datetime)
 }

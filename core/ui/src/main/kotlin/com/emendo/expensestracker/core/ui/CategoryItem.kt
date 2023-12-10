@@ -28,7 +28,7 @@ import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRad
 import com.emendo.expensestracker.core.designsystem.utils.toDp
 
 private val ItemPadding
-  get() = Dimens.margin_large_x
+  get() = Dimens.margin_small_x
 
 @Composable
 fun CategoryItem(
@@ -37,9 +37,9 @@ fun CategoryItem(
   icon: ImageVector,
   total: String,
   onClick: () -> Unit,
+  onDeleteClick: () -> Unit,
   isEditMode: () -> Boolean,
   modifier: Modifier = Modifier,
-  onDeleteClick: () -> Unit = {},
 ) {
   val infiniteTransition = rememberInfiniteTransition(label = "rotationTransition")
   val transition = infiniteTransition.animateFloat(
@@ -55,7 +55,13 @@ fun CategoryItem(
   Box {
     if (isEditMode()) {
       IconButton(
-        modifier = Modifier.zIndex(2f),
+        modifier = Modifier
+          .zIndex(2f)
+          .graphicsLayer {
+            val translation = -20f
+            translationX = translation
+            translationY = translation
+          },
         onClick = onDeleteClick
       ) {
         Icon(
@@ -126,7 +132,8 @@ fun AddCategoryItem(
       total = "$100",
       onClick = { },
       isEditMode = { false },
-      modifier = Modifier.alpha(0f)
+      onDeleteClick = {},
+      modifier = Modifier.alpha(0f),
     )
     Icon(
       imageVector = ExpeIcons.Add,

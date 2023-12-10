@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -29,6 +30,14 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   abstract fun getLastTransaction(): Flow<TransactionFull?>
 
   @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE $PRIMARY_KEY = :id")
+  abstract suspend fun retrieveTransactionById(id: Long): TransactionFull?
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME")
+  abstract fun transactionsPagingSource(): PagingSource<Int, TransactionFull>
+
+  @Transaction
   @Query("SELECT * FROM $TABLE_NAME ORDER BY id LIMIT 1")
   abstract suspend fun retrieveLastTransaction(): TransactionFull?
 
@@ -37,6 +46,9 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
 
   @Upsert
   abstract fun upsert(transaction: TransactionEntity)
+
+  @Query("DELETE FROM $TABLE_NAME WHERE $PRIMARY_KEY = :id")
+  abstract suspend fun deleteById(id: Long)
 
   companion object {
     private const val TABLE_NAME = "`$TABLE_TRANSACTION`"

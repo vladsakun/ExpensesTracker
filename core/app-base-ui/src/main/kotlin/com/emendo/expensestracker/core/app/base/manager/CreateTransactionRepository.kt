@@ -3,6 +3,7 @@ package com.emendo.expensestracker.core.app.base.manager
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
+import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import kotlinx.coroutines.flow.Flow
 
 interface CreateTransactionRepository {
@@ -22,5 +23,8 @@ interface CreateTransactionRepository {
   fun startSelectSourceFlow()
   fun finishSelectSourceFlow()
 
-  fun clear()
+  fun getTransactionPayload(): CreateTransactionEventPayload?
+  fun setTransactionPayload(payload: CreateTransactionEventPayload)
+
+  fun clear(shouldClearSource: Boolean)
 }

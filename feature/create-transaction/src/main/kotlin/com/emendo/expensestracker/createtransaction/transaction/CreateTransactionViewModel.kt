@@ -12,6 +12,8 @@ import com.emendo.expensestracker.core.app.common.ext.enableReloadWhenSubscribed
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
+import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.di.DecimalSeparator
@@ -26,6 +28,8 @@ import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -82,7 +86,9 @@ class CreateTransactionViewModel @Inject constructor(
       doneClick = ::doneClick,
       onMathDone = ::updateAmountText
     )
-    showCalculatorBottomSheet()
+    if (createTransactionRepository.getTransactionPayload() == null) {
+      showCalculatorBottomSheet()
+    }
   }
 
   @ExperimentalMaterial3Api
@@ -135,11 +141,6 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  override fun onCleared() {
-    super.onCleared()
-    createTransactionRepository.clear()
-  }
-
   fun showCalculatorBottomSheet() {
     showBottomSheet(
       CalculatorBottomSheetData(
@@ -157,6 +158,13 @@ class CreateTransactionViewModel @Inject constructor(
     if (source == null) {
       _uiState.updateScreenData { screenData ->
         screenData.copy(sourceError = triggered)
+      }
+      return
+    }
+
+    if (numericKeyboardCommander.currentValue == BigDecimal.ZERO) {
+      _uiState.updateScreenData { screenData ->
+        screenData.copy(amountError = triggered)
       }
       return
     }
@@ -195,6 +203,7 @@ class CreateTransactionViewModel @Inject constructor(
         source = source,
         target = target,
         amount = numericKeyboardCommander.currentValue,
+        note = uiState.value.successValue?.note,
       )
 
       numericKeyboardCommander.clear()
@@ -215,11 +224,14 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
-  private fun updateAmountText(amount: String): Boolean {
+  private fun updateAmountText(amount: String): Boolean =
+    updateAmountText(calculatorFormatter.toBigDecimal(amount))
+
+  private fun updateAmountText(amount: BigDecimal): Boolean {
     _uiState.updateScreenData { screenData ->
       screenData.copy(
         amount = amountFormatter.format(
-          amount = calculatorFormatter.toBigDecimal(amount),
+          amount = amount,
           currency = selectedCurrencyModel,
         )
       )
@@ -264,22 +276,29 @@ class CreateTransactionViewModel @Inject constructor(
         }
       }
 
-  private fun getDefaultCreateTransactionUiState(): CreateTransactionUiState.DisplayTransactionData =
-    CreateTransactionUiState.DisplayTransactionData(
-      screenData = getDefaultScreenData(),
+  private fun getDefaultCreateTransactionUiState(): CreateTransactionUiState.DisplayTransactionData {
+    val payload = createTransactionRepository.getTransactionPayload()
+    payload?.transactionValue?.let { transactionValue ->
+      numericKeyboardCommander.setInitialValue(calculatorFormatter.formatFinalWithPrecision(transactionValue))
+    }
+
+    return CreateTransactionUiState.DisplayTransactionData(
+      screenData = CreateTransactionScreenData.default(
+        amount = payload?.transactionValueFormatted ?: getZeroFormattedAmount(),
+      ),
       target = createTransactionRepository.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
       source = createTransactionRepository.getSourceSnapshot()?.toTransactionItemModel(),
+      note = payload?.note,
     )
+  }
+
+  private fun getZeroFormattedAmount(): String =
+    amountFormatter.format(BigDecimal.ZERO, currencyCacheManager.getGeneralCurrencySnapshot())
 
   private fun TransactionTarget?.orDefault(transactionType: TransactionType): TransactionItemModel {
     val target = this ?: getTargetDefaultValue(transactionType)
     return target.toTransactionItemModel()
   }
-
-  private fun getDefaultScreenData() = CreateTransactionScreenData(
-    amount = amountFormatter.format(BigDecimal.ZERO, currencyCacheManager.getGeneralCurrencySnapshot()),
-    transactionType = TransactionType.DEFAULT,
-  )
 
   private fun getTargetDefaultValue(transactionType: TransactionType) =
     if (transactionType == TransactionType.TRANSFER) TODO("Get last account from transfer")
@@ -288,7 +307,7 @@ class CreateTransactionViewModel @Inject constructor(
   private fun getInitialCalculatorState() =
     CalculatorBottomSheetState.initial(
       decimalSeparator = decimalSeparator,
-      transactionTypeLabelResId = getDefaultScreenData().transactionType.labelResId,
+      transactionTypeLabelResId = TransactionType.DEFAULT.labelResId,
       numericKeyboardActions = numericKeyboardCommander,
     )
 
@@ -303,4 +322,46 @@ class CreateTransactionViewModel @Inject constructor(
 
   private fun CalculatorBottomSheetState.getSelectedCurrencyIndex(): Int =
     usedCurrencies.value.indexOfFirst { it.currencySymbolOrCode == currency }
+
+  fun updateNoteText(newNote: String) {
+    _uiState.updateIfSuccess { it.copy(note = newNote) }
+  }
+
+  fun showConfirmDeleteTransactionBottomSheet() {
+    showBottomSheet(
+      GeneralBottomSheetData
+        .Builder(Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction))
+        .title(resourceValueOf(R.string.transaction_detail_dialog_delete_confirm_title))
+        .negativeAction(resourceValueOf(R.string.cancel), ::hideBottomSheet)
+        .build()
+    )
+  }
+
+  private var shouldClearSource: Boolean = true
+
+  fun duplicateTransaction() {
+    val payload = createTransactionRepository.getTransactionPayload() ?: return
+    shouldClearSource = false
+    appNavigationEventBus.navigate(
+      AppNavigationEvent.CreateTransaction(
+        source = createTransactionRepository.getSourceSnapshot(),
+        target = createTransactionRepository.getTargetSnapshot(),
+        payload = payload.copy(transactionId = null),
+        shouldNavigateUp = true,
+      )
+    )
+  }
+
+  private fun deleteTransaction() {
+    val id = createTransactionRepository.getTransactionPayload()?.transactionId ?: return
+    viewModelScope.launch {
+      transactionRepository.deleteTransaction(id)
+    }
+    navigateUp()
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    createTransactionRepository.clear(shouldClearSource)
+  }
 }

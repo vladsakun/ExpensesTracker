@@ -102,6 +102,7 @@ fun CategoriesGrid(
         total = "",
         onClick = { onCategoryClick(category) },
         isEditMode = { false },
+        onDeleteClick = {},
       )
     }
     uniqueItem("addCategory") {

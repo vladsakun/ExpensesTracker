@@ -80,6 +80,7 @@ dependencies {
   implementation(libs.androidx.hilt.navigation.compose)
   implementation(libs.androidx.window.manager)
   implementation(libs.compose.destinations)
+  implementation(libs.kotlinx.datetime)
 
   ksp(libs.compose.destinations.ksp)
 }

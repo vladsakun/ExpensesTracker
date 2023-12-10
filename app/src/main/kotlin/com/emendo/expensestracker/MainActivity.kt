@@ -12,6 +12,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.rememberNavController
+import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
 import com.ramcosta.composedestinations.navigation.navigate
@@ -36,8 +37,12 @@ class MainActivity : ComponentActivity() {
       val navController = rememberNavController()
 
       LaunchedEffect(viewModel.navigationEvent) {
-        viewModel.navigationEvent.collect { direction ->
-          navController.navigate(direction)
+        viewModel.navigationEvent.collectWhenStarted(this@MainActivity) { direction ->
+          val navDirection = direction.second
+          if (direction.first) {
+            navController.navigateUp()
+          }
+          navController.navigate(navDirection)
         }
       }
 

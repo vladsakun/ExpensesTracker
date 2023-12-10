@@ -26,6 +26,13 @@ class GeneralBottomSheetData private constructor(
 
     fun title(title: TextValue) = apply { this.title = title }
     fun negativeAction(negativeAction: Action) = apply { this.negativeAction = negativeAction }
+    fun negativeAction(
+      title: TextValue,
+      action: () -> Unit,
+      type: ActionType? = null,
+    ) = apply {
+      this.negativeAction = Action(title, action, type)
+    }
 
     fun build() = GeneralBottomSheetData(this)
   }

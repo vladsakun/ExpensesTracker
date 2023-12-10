@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
 
@@ -67,7 +68,7 @@ fun ExpeButton(
     Text(
       text = text,
       modifier = Modifier.padding(Dimens.margin_small_x),
-      style = MaterialTheme.typography.bodyLarge,
+      style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
       color = textColor ?: Color.Unspecified,
     )
   }

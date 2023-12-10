@@ -84,7 +84,13 @@ class CategoriesListViewModel @Inject constructor(
   private var categoriesOrderedList: List<CategoryWithTotal>? = null
 
   fun openCreateTransactionScreen(category: CategoryWithTotal) {
-    appNavigationEventBus.navigate(AppNavigationEvent.CreateTransaction(target = category.category, source = null))
+    appNavigationEventBus.navigate(
+      AppNavigationEvent.CreateTransaction(
+        source = null,
+        target = category.category,
+        shouldNavigateUp = true
+      )
+    )
   }
 
   fun pageSelected(pageIndex: Int) {
@@ -100,6 +106,14 @@ class CategoriesListViewModel @Inject constructor(
       }
       !isEditMode
     }
+  }
+
+  fun enableEditMode() {
+    _editMode.update { true }
+  }
+
+  fun disableEditMode() {
+    _editMode.update { false }
   }
 
   fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {

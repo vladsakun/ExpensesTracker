@@ -13,23 +13,28 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 sealed interface CreateTransactionUiState {
   data object Loading : CreateTransactionUiState
-  data class Error(val message: String) : CreateTransactionUiState
-  data object Empty : CreateTransactionUiState
   data class DisplayTransactionData(
     val screenData: CreateTransactionScreenData,
     val target: TransactionItemModel,
     val source: TransactionItemModel?,
+    val note: String? = null,
   ) : CreateTransactionUiState
 }
 
 @Stable
 data class CreateTransactionScreenData(
   val amount: String,
-  val transactionType: TransactionType,
+  val deleteEnabled: Boolean = false,
+  val duplicateEnabled: Boolean = false,
+  val transactionType: TransactionType = TransactionType.DEFAULT,
   val amountError: StateEvent = consumed,
   val sourceError: StateEvent = consumed,
   val navigateUp: StateEvent = consumed,
-)
+) {
+  companion object {
+    fun default(amount: String) = CreateTransactionScreenData(amount = amount)
+  }
+}
 
 val CreateTransactionUiState.successValue: CreateTransactionUiState.DisplayTransactionData?
   get() = (this as? CreateTransactionUiState.DisplayTransactionData)

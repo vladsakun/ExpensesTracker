@@ -77,39 +77,11 @@ class SettingsViewModel @Inject constructor(
     viewModelScope.launch(ioDispatcher) {
       when (settingsItemModel.id) {
         GENERAL_CURRENCY_ID -> {
-          //          if(empty()){
-          //
+          //          if (userDataRepository.getGeneralCurrencyCode() == "USD") {
+          //            userDataRepository.setGeneralCurrencyCode("EUR")
+          //          } else {
+          //            userDataRepository.setGeneralCurrencyCode("USD")
           //          }
-          //          try{
-          //            getCurrenciesList()
-          //          }catch (exception: IOException){
-          //            errorHandlingManager.showDialog(
-          //              title, description, action,
-          //            )
-          //          }
-          //
-          //          viewModelScope.launch {
-          //
-          //          }
-          //
-          //          //errorHandlingManager.
-          //          expoRunCatching {
-          //            showLoader()
-          //            callBE()
-          //            showSuccess()
-          //          }
-          //            .onFailure {}
-          //            .onUnhandledException { showScreenErrorState() }
-          //
-          //          Result.success(2)
-          //            .onFailure {  }
-          //            .onSuccess {  }
-
-          if (userDataRepository.getGeneralCurrencyCode() == "USD") {
-            userDataRepository.setGeneralCurrencyCode("EUR")
-          } else {
-            userDataRepository.setGeneralCurrencyCode("USD")
-          }
         }
       }
     }
