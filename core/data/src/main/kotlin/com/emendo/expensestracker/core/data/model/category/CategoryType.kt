@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.data.model.category
 
 import androidx.annotation.StringRes
 import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 
 enum class CategoryType(val id: Int) {
   EXPENSE(0),
@@ -20,6 +21,12 @@ enum class CategoryType(val id: Int) {
       when (this) {
         EXPENSE -> 0
         INCOME -> 1
+      }
+
+    fun CategoryType.toTransactionType(): TransactionType =
+      when (this) {
+        EXPENSE -> TransactionType.EXPENSE
+        INCOME -> TransactionType.INCOME
       }
 
     fun Int.toCategoryType(): CategoryType =

@@ -24,15 +24,21 @@ sealed interface CreateTransactionUiState {
 @Stable
 data class CreateTransactionScreenData(
   val amount: String,
+  val transactionType: TransactionType,
   val deleteEnabled: Boolean = false,
   val duplicateEnabled: Boolean = false,
-  val transactionType: TransactionType = TransactionType.DEFAULT,
   val amountError: StateEvent = consumed,
   val sourceError: StateEvent = consumed,
   val navigateUp: StateEvent = consumed,
 ) {
   companion object {
-    fun default(amount: String) = CreateTransactionScreenData(amount = amount)
+    fun default(
+      amount: String,
+      transactionType: TransactionType,
+    ) = CreateTransactionScreenData(
+      amount = amount,
+      transactionType = transactionType,
+    )
   }
 }
 

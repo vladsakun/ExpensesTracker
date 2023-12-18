@@ -12,6 +12,7 @@ val ExpeBottomSheetShape = RoundedCornerShape(
 )
 
 val RoundedCornerNormalRadiusShape = RoundedCornerShape(Dimens.corner_radius_normal)
+val RoundedCornerSmallRadiusShape = RoundedCornerShape(Dimens.corner_radius_small)
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun hideKeyboard(

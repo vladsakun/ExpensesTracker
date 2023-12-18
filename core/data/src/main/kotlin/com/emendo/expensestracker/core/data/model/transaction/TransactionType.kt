@@ -12,6 +12,8 @@ enum class TransactionType {
     val DEFAULT = EXPENSE
 
     fun Int.toTransactionType(): TransactionType = entries[this]
+    val TransactionType.id
+      get() = this.ordinal
 
     val TransactionType.labelResId: Int
       @StringRes get() = when (this) {

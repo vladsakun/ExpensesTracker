@@ -11,6 +11,7 @@ import com.emendo.expensestracker.core.database.model.TransactionFull
 import com.emendo.expensestracker.core.database.util.TABLE_TRANSACTION
 import com.emendo.expensestracker.core.database.util.TRANSACTION_PRIMARY_KEY
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 @Dao
 abstract class TransactionDao : BaseDao<TransactionEntity>() {
@@ -26,7 +27,7 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   abstract fun getTransactionFull(): Flow<List<TransactionFull>>
 
   @Transaction
-  @Query("SELECT * FROM $TABLE_NAME ORDER BY id LIMIT 1")
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY date DESC LIMIT 1")
   abstract fun getLastTransaction(): Flow<TransactionFull?>
 
   @Transaction
@@ -34,12 +35,16 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   abstract suspend fun retrieveTransactionById(id: Long): TransactionFull?
 
   @Transaction
-  @Query("SELECT * FROM $TABLE_NAME")
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY date DESC")
   abstract fun transactionsPagingSource(): PagingSource<Int, TransactionFull>
 
   @Transaction
-  @Query("SELECT * FROM $TABLE_NAME ORDER BY id LIMIT 1")
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY date DESC LIMIT 1")
   abstract suspend fun retrieveLastTransaction(): TransactionFull?
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE date BETWEEN :from AND :to")
+  abstract suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionFull>
 
   @Query("DELETE FROM $TABLE_NAME")
   abstract override suspend fun deleteAll()

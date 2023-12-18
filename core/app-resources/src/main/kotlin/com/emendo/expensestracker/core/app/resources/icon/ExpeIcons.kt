@@ -36,4 +36,5 @@ object ExpeIcons {
   val Schedule = Icons.Outlined.Schedule
   val FileCopy = Icons.Outlined.FileCopy
   val SettingsSuggest = Icons.Outlined.SettingsSuggest
+  val SubdirectoryArrowRight = Icons.Outlined.SubdirectoryArrowRight
 }

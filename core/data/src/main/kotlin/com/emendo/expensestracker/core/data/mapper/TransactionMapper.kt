@@ -26,7 +26,7 @@ class TransactionMapper @Inject constructor(
     val type = target.transactionType
     val currencyModel = currencyMapper.map(transactionEntity.currencyCode)
     val formattedValue = amountFormatter.format(transactionEntity.value, currencyModel)
-    val formattedTransactionValue = if (type == TransactionType.INCOME) "+ $formattedValue" else formattedValue
+    val formattedTransactionValue = if (type == TransactionType.INCOME) "+$formattedValue" else formattedValue
 
     return TransactionModel(
       id = transactionEntity.id,

@@ -4,8 +4,10 @@ import androidx.paging.PagingData
 import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
+import com.emendo.expensestracker.core.data.model.transaction.TransactionValueWithType
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
 
 interface TransactionRepository {
@@ -16,6 +18,7 @@ interface TransactionRepository {
 
   suspend fun retrieveLastTransactionFull(): TransactionModel?
   suspend fun retrieveTransaction(id: Long): TransactionModel?
+  suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType>
 
   suspend fun createTransaction(
     source: TransactionSource,

@@ -10,9 +10,8 @@ import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
-import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
-import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
+import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.toTransactionType
+import com.emendo.expensestracker.core.data.model.transaction.*
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
@@ -23,8 +22,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlinx.datetime.*
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -47,17 +45,18 @@ class OfflineFirstTransactionRepository @Inject constructor(
 
   override val transactionsFull: Flow<List<TransactionModel>>
     get() = transactionsFullState
-
   override val lastTransactionFull: Flow<TransactionModel?>
     get() = transactionDao
       .getLastTransaction()
-      .map { transactionFull ->
-        transactionFull?.let { transactionMapper.map(it) }
+      .map { transaction ->
+        transaction?.let { transactionMapper.map(it) }
       }
 
   override fun getTransactionsPager(): Flow<PagingData<TransactionModel>> =
     Pager(
-      config = PagingConfig(pageSize = PAGE_SIZE),
+      config = PagingConfig(
+        pageSize = PAGE_SIZE,
+      ),
       pagingSourceFactory = { transactionDao.transactionsPagingSource() }
     )
       .flow
@@ -101,6 +100,23 @@ class OfflineFirstTransactionRepository @Inject constructor(
     }
   }
 
+  override suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType> =
+    transactionDao.retrieveTransactionsInPeriod(from, to).map { transaction ->
+      val type: TransactionType = when {
+        transaction.targetAccount != null -> {
+          TransactionType.TRANSFER
+        }
+
+        transaction.targetCategory != null -> {
+          val categoryType = CategoryType.getById(transaction.targetCategory!!.type)
+          categoryType.toTransactionType()
+        }
+
+        else -> throw IllegalStateException("Can't get transaction type for $transaction")
+      }
+      TransactionValueWithType(type, transaction.transactionEntity.value)
+    }
+
   private suspend fun createExpenseTransaction(
     source: AccountModel,
     target: CategoryModel,
@@ -111,18 +127,20 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newBalance = source.balance - amount
-        accountDao.updateBalance(source.id, newBalance)
-        transactionDao.save(
-          TransactionEntity(
-            sourceAccountId = source.id,
-            targetCategoryId = target.id,
-            value = amount,
-            currencyCode = currencyModel.currencyCode,
-            date = date,
-            note = note,
+        repeat(200) { index ->
+          val newBalance = source.balance - amount
+          accountDao.updateBalance(source.id, newBalance)
+          transactionDao.save(
+            TransactionEntity(
+              sourceAccountId = source.id,
+              targetCategoryId = target.id,
+              value = amount.negate() + (index * 10.0).toBigDecimal(),
+              currencyCode = currencyModel.currencyCode,
+              date = date.minus(DateTimePeriod(days = index % 5), TimeZone.currentSystemDefault()),
+              note = note,
+            )
           )
-        )
+        }
       }
     }
   }

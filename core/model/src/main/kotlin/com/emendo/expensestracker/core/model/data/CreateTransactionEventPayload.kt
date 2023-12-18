@@ -9,4 +9,5 @@ data class CreateTransactionEventPayload(
   val transactionValue: BigDecimal,
   val note: String?,
   val date: Instant,
+  val transactionType: Int,
 )

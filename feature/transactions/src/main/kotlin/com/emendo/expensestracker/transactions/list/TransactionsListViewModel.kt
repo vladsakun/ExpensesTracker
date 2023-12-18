@@ -2,37 +2,126 @@ package com.emendo.expensestracker.transactions.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
+import com.emendo.expensestracker.core.data.amount.AmountFormatter
+import com.emendo.expensestracker.core.data.manager.ExpeTimeZoneManager
+import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
 import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.id
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
+import com.emendo.expensestracker.core.domain.transaction.GetTransactionsSumUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.*
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
 class TransactionsListViewModel @Inject constructor(
-  transactionRepository: TransactionRepository,
+  private val transactionRepository: TransactionRepository,
+  timeZoneManager: ExpeTimeZoneManager,
   private val appNavigationEventBus: AppNavigationEventBus,
+  private val amountFormatter: AmountFormatter,
+  private val currencyCacheManager: CurrencyCacheManager,
+  private val getTransactionsSumUseCase: GetTransactionsSumUseCase,
 ) : ViewModel() {
 
-  val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository, viewModelScope)
+  private val repos: Flow<PagingData<UiModel.TransactionItem>> = transactionRepository
+    .getTransactionsPager()
+    .cachedIn(viewModelScope)
+    .map { pagingData ->
+      pagingData.map { UiModel.TransactionItem(it) }
+    }
+
+  val list: Flow<PagingData<UiModel>> =
+    combine(timeZoneManager.timeZoneState, repos) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem> ->
+      transformPagingData(pagingData, zoneId)
+    }
+
+  private fun transformPagingData(
+    pagingData: PagingData<UiModel.TransactionItem>,
+    zoneId: ZoneId,
+  ): PagingData<UiModel> {
+    return pagingData.insertSeparators { before: UiModel.TransactionItem?, after: UiModel.TransactionItem? ->
+      if (after == null) {
+        // we're at the end of the list
+        return@insertSeparators null
+      }
+
+      if (before == null) {
+        // we're at the beginning of the list
+        return@insertSeparators SeparatorItem(zoneId, after)
+      }
+
+      // check between 2 items
+      if (isSameGroup(before, after, zoneId)) {
+        // no separator
+        null
+      } else {
+        SeparatorItem(zoneId, after)
+      }
+    }
+  }
+
+  private suspend fun SeparatorItem(
+    zoneId: ZoneId,
+    after: UiModel.TransactionItem,
+  ): UiModel.SeparatorItem {
+    val timeZone = TimeZone.of(zoneId.id)
+    val from = after.transaction.date.toLocalDateTime(timeZone).date.atStartOfDayIn(timeZone)
+    val to = from.plus(DateTimePeriod(days = 1), timeZone)
+
+    val transactions = transactionRepository.retrieveTransactionsInPeriod(from, to)
+    val total = getTransactionsSumUseCase(transactions)
+    return UiModel.SeparatorItem(
+      instant = after.transaction.date,
+      sum = amountFormatter.format(total, currencyCacheManager.getGeneralCurrencySnapshot()),
+    )
+  }
+
+  val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository, list)
     .stateInWhileSubscribed(
       scope = viewModelScope,
-      initialValue = TransactionScreenUiState.DisplayTransactionsList(
-        transactionRepository
-          .getTransactionsPager()
-          .cachedIn(viewModelScope)
-      ),
+      initialValue = TransactionScreenUiState.DisplayTransactionsList(list),
     )
+
+  sealed class UiModel {
+    data class TransactionItem(val transaction: TransactionModel) : UiModel()
+    data class SeparatorItem(val instant: Instant, val sum: String?) : UiModel()
+  }
+
+  private fun isSameGroup(before: UiModel.TransactionItem, after: UiModel.TransactionItem, zoneId: ZoneId): Boolean {
+    val beforeDate = before.transaction.date
+    val afterDate = after.transaction.date
+
+    return isSameGroup(beforeDate, afterDate, zoneId)
+  }
+
+  private fun isSameGroup(before: Instant, after: Instant, zoneId: ZoneId): Boolean =
+    before.year(zoneId) == after.year(zoneId) &&
+      before.dayOfYear(zoneId) == after.dayOfYear(zoneId) &&
+      before.month(zoneId) == after.month(zoneId)
+
+  private fun Instant.year(zoneId: ZoneId) =
+    this.toLocalDateTime(TimeZone.of(zoneId.id)).year
+
+  private fun Instant.dayOfYear(zoneId: ZoneId) =
+    this.toLocalDateTime(TimeZone.of(zoneId.id)).dayOfYear
+
+  private fun Instant.month(zoneId: ZoneId) =
+    this.toLocalDateTime(TimeZone.of(zoneId.id)).month
 
   fun openTransactionDetails(transactionModel: TransactionModel) {
     appNavigationEventBus.navigate(
@@ -45,6 +134,7 @@ class TransactionsListViewModel @Inject constructor(
           note = transactionModel.note,
           date = transactionModel.date,
           transactionValue = transactionModel.value,
+          transactionType = transactionModel.type.id,
         ),
       )
     )
@@ -53,18 +143,13 @@ class TransactionsListViewModel @Inject constructor(
 
 private fun transactionUiState(
   transactionRepository: TransactionRepository,
-  cacheScope: CoroutineScope,
+  pagingList: Flow<PagingData<TransactionsListViewModel.UiModel>>,
 ): Flow<TransactionScreenUiState> {
   return transactionRepository.getTransactionsPager().asResult().map {
     when (it) {
       is Result.Loading -> TransactionScreenUiState.Loading
       is Result.Error -> TransactionScreenUiState.Error("Error loading transactions")
-      is Result.Success -> TransactionScreenUiState.DisplayTransactionsList(
-        transactionRepository
-          .getTransactionsPager()
-          .cachedIn(cacheScope)
-      )
-
+      is Result.Success -> TransactionScreenUiState.DisplayTransactionsList(pagingList)
       is Result.Empty -> TransactionScreenUiState.Empty
     }
   }

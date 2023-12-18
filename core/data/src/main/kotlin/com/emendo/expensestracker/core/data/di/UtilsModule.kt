@@ -6,6 +6,8 @@ import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatterImpl
 import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
 import com.emendo.expensestracker.core.data.manager.ExpeLocaleManagerImpl
+import com.emendo.expensestracker.core.data.manager.ExpeTimeZoneManager
+import com.emendo.expensestracker.core.data.manager.ExpeTimeZoneManagerImpl
 import com.emendo.expensestracker.core.data.repository.*
 import dagger.Binds
 import dagger.Module
@@ -29,6 +31,10 @@ interface UtilsModule {
   @Binds
   @Singleton
   fun bindsLocaleManager(localeManagerImpl: ExpeLocaleManagerImpl): ExpeLocaleManager
+
+  @Binds
+  @Singleton
+  fun bindsTimeZoneManager(timeZoneManagerImpl: ExpeTimeZoneManagerImpl): ExpeTimeZoneManager
 
   companion object {
 

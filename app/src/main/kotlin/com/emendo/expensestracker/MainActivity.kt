@@ -12,6 +12,8 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.rememberNavController
+import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
+import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
 import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
@@ -23,6 +25,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
   val viewModel: MainActivityViewModel by viewModels()
+
+  private val localeBroadcastReceiver by lazy { LocaleBroadcastReceiver(viewModel::updateLocale) }
+  private val timeZoneBroadcastReceiver by lazy { TimeZoneBroadcastReceiver(viewModel::updateTimeZone) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -37,12 +42,11 @@ class MainActivity : ComponentActivity() {
       val navController = rememberNavController()
 
       LaunchedEffect(viewModel.navigationEvent) {
-        viewModel.navigationEvent.collectWhenStarted(this@MainActivity) { direction ->
-          val navDirection = direction.second
-          if (direction.first) {
+        viewModel.navigationEvent.collectWhenStarted(this@MainActivity) { event ->
+          if (event.navigateUp) {
             navController.navigateUp()
           }
-          navController.navigate(navDirection)
+          navController.navigate(event.direction)
         }
       }
 
@@ -68,6 +72,18 @@ class MainActivity : ComponentActivity() {
         )
       }
     }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    localeBroadcastReceiver.register(this)
+    timeZoneBroadcastReceiver.register(this)
+  }
+
+  override fun onStop() {
+    super.onStop()
+    localeBroadcastReceiver.unregister(this)
+    timeZoneBroadcastReceiver.unregister(this)
   }
 }
 

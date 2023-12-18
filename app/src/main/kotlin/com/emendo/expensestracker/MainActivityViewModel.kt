@@ -9,6 +9,8 @@ import com.emendo.expensestracker.core.app.base.manager.CreateTransactionReposit
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
+import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
+import com.emendo.expensestracker.core.data.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,28 +22,46 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject constructor(
   appNavigationEventBus: AppNavigationEventBus,
   private val createTransactionRepository: CreateTransactionRepository,
+  private val localeManager: ExpeLocaleManager,
+  private val timeZoneManager: ExpeTimeZoneManager,
 ) : ViewModel() {
 
   // Todo rethink huge when
-  val navigationEvent: Flow<Pair<Boolean, Direction>> = appNavigationEventBus.eventFlow.map { event ->
+  val navigationEvent: Flow<NavigationEvent> = appNavigationEventBus.eventFlow.map { event ->
     when (event) {
       is CreateTransaction -> {
         event.handleEventData(createTransactionRepository)
-        event.shouldNavigateUp to CreatetransactionNavGraph
+        CreatetransactionNavGraph.asNavigationEvent(event.shouldNavigateUp)
       }
 
       is SelectAccount -> {
         createTransactionRepository.startSelectSourceFlow()
-        false to AccountsScreenRouteDestination
+        AccountsScreenRouteDestination.asNavigationEvent()
       }
 
-      is CreateCategory -> false to CreateCategoryRouteDestination(event.categoryType)
-      is SelectColor -> false to SelectColorScreenDestination(event.preselectedColorId)
-      is SelectCurrency -> false to SelectCurrencyScreenDestination
-      is SelectIcon -> false to SelectIconScreenDestination(event.preselectedIconId)
+      is CreateCategory -> CreateCategoryRouteDestination(event.categoryType).asNavigationEvent()
+      is SelectColor -> SelectColorScreenDestination(event.preselectedColorId).asNavigationEvent()
+      is SelectCurrency -> SelectCurrencyScreenDestination.asNavigationEvent()
+      is SelectIcon -> SelectIconScreenDestination(event.preselectedIconId).asNavigationEvent()
     }
   }
+
+  fun updateLocale() {
+    localeManager.onLocaleChange()
+  }
+
+  fun updateTimeZone() {
+    timeZoneManager.onZoneChange()
+  }
 }
+
+data class NavigationEvent(
+  val direction: Direction,
+  val navigateUp: Boolean = false,
+)
+
+fun Direction.asNavigationEvent(navigateUp: Boolean = false) =
+  NavigationEvent(direction = this, navigateUp = navigateUp)
 
 private fun CreateTransaction.handleEventData(
   createTransactionRepository: CreateTransactionRepository,

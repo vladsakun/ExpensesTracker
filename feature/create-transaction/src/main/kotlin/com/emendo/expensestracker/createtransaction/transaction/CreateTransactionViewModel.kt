@@ -21,7 +21,9 @@ import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
+import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.DEFAULT
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.labelResId
+import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.toTransactionType
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -80,6 +82,7 @@ class CreateTransactionViewModel @Inject constructor(
       ?: currencyCacheManager.getGeneralCurrencySnapshot()
 
   private var createTransactionJob: Job? = null
+  private var shouldClearSource: Boolean = true
 
   init {
     numericKeyboardCommander.setCallbacks(
@@ -285,6 +288,7 @@ class CreateTransactionViewModel @Inject constructor(
     return CreateTransactionUiState.DisplayTransactionData(
       screenData = CreateTransactionScreenData.default(
         amount = payload?.transactionValueFormatted ?: getZeroFormattedAmount(),
+        transactionType = payload?.transactionType?.toTransactionType() ?: DEFAULT
       ),
       target = createTransactionRepository.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
       source = createTransactionRepository.getSourceSnapshot()?.toTransactionItemModel(),
@@ -336,8 +340,6 @@ class CreateTransactionViewModel @Inject constructor(
         .build()
     )
   }
-
-  private var shouldClearSource: Boolean = true
 
   fun duplicateTransaction() {
     val payload = createTransactionRepository.getTransactionPayload() ?: return
