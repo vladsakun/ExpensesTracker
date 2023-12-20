@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
+import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
@@ -33,22 +34,29 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
   @ApplicationScope private val scope: CoroutineScope,
 ) : CurrencyRateRepository {
 
-  private val ratesStateFlow: StateFlow<List<CurrencyRateModel>> =
+  private val ratesStateFlow: StateFlow<Map<String, CurrencyRateModel>> =
     currencyRatesDao
       .getAll()
-      .map { it.mapNotNull(::toCurrencyRateModel) }
-      .stateInLazilyList(scope)
+      .map { currencyRates ->
+        currencyRates
+          .mapNotNull(::toCurrencyRateModel)
+          .associateBy { it.currencyCode }
+      }
+      .stateInLazily(scope, emptyMap())
 
   private val currencies: StateFlow<List<String>> =
     currencyRatesDao
       .getCurrencyCodes()
       .stateInLazilyList(scope)
 
-  override val rates: Flow<List<CurrencyRateModel>>
+  override val rates: Flow<Map<String, CurrencyRateModel>>
     get() = ratesStateFlow
 
   override val currencyCodes: Flow<List<String>>
     get() = currencies
+
+  override fun getRatesSnapshot(): Map<String, CurrencyRateModel> =
+    ratesStateFlow.value
 
   override suspend fun retrieveAllCurrencyCodes(): List<String> = withContext(ioDispatcher) {
     currencyRatesDao.retrieveAllCurrencyCodes()

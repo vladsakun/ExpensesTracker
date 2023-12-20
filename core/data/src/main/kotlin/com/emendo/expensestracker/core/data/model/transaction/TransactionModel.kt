@@ -8,7 +8,7 @@ import java.math.BigDecimal
 data class TransactionModel(
   val id: Long,
   val source: AccountModel,
-  val target: TransactionTargetUiModel,
+  val target: TransactionTarget,
   val formattedValue: String,
   val value: BigDecimal,
   val type: TransactionType,

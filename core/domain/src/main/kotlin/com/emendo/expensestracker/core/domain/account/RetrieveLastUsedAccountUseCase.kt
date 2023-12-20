@@ -10,7 +10,7 @@ class RetrieveLastUsedAccountUseCase @Inject constructor(
   private val accountRepository: AccountRepository,
 ) {
   suspend operator fun invoke(): AccountModel? {
-    val lastTransaction = transactionRepository.retrieveLastTransactionFull()
+    val lastTransaction = transactionRepository.retrieveLastTransaction()
       ?: return accountRepository.retrieveLastAccount()
 
     val sourceId = lastTransaction.source.id

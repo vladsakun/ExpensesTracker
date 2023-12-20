@@ -1,9 +1,11 @@
 package com.emendo.expensestracker.core.app.base.manager
 
+import com.emendo.expensestracker.core.app.common.ext.stateInEagerly
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
+import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
@@ -31,19 +33,19 @@ class CreateTransactionRepositoryImpl @Inject constructor(
   private val transactionSourceMutableState: MutableStateFlow<TransactionSource?> by lazy { MutableStateFlow(null) }
   private val transactionSourceState: StateFlow<TransactionSource?> =
     merge(transactionSourceMutableState, getLastUsedAccountUseCase())
-      .stateIn(
+      .stateInEagerly(
         scope = scope,
-        started = SharingStarted.Eagerly,
         initialValue = null,
       )
 
   private var isSelectSourceFlow: Boolean = false
+  private var isSelectTransferTargetFlow: Boolean = false
   private var payload: CreateTransactionEventPayload? = null
 
   override suspend fun init() {
-    transactionSourceMutableState.update {
-      retrieveLastUsedAccountUseCase()
-    }
+    //    transactionSourceMutableState.update {
+    //      retrieveLastUsedAccountUseCase()
+    //    }
   }
 
   override fun getTarget(): Flow<TransactionTarget?> {
@@ -54,12 +56,21 @@ class CreateTransactionRepositoryImpl @Inject constructor(
     return transactionTargetState.value
   }
 
-  override fun setTarget(target: TransactionTarget) {
+  override fun setTarget(target: TransactionTarget?) {
     transactionTargetState.update { target }
   }
 
-  override fun setSource(source: TransactionSource) {
+  override fun setSource(source: TransactionSource?) {
     transactionSourceMutableState.update { source }
+  }
+
+  override fun selectAccount(account: AccountModel) {
+    if (isSelectSourceFlow()) {
+      setSource(account)
+      return
+    }
+
+    setTarget(account)
   }
 
   override fun getSource(): Flow<TransactionSource?> {
@@ -88,16 +99,20 @@ class CreateTransactionRepositoryImpl @Inject constructor(
       ordinalIndex = DefaultTransactionTargetOrdinalIndex,
     )
 
-  override fun isSelectSourceFlow(): Boolean {
-    return isSelectSourceFlow
+  override fun isSelectMode(): Boolean =
+    isSelectSourceFlow() || isSelectTransferTargetFlow()
+
+  override fun finishSelectMode() {
+    finishSelectSourceFlow()
+    finishSelectTransferTargetFlow()
   }
 
   override fun startSelectSourceFlow() {
     isSelectSourceFlow = true
   }
 
-  override fun finishSelectSourceFlow() {
-    isSelectSourceFlow = false
+  override fun startSelectTransferTargetFlow() {
+    isSelectTransferTargetFlow = true
   }
 
   override fun getTransactionPayload(): CreateTransactionEventPayload? =
@@ -107,11 +122,27 @@ class CreateTransactionRepositoryImpl @Inject constructor(
     payload = newPayload
   }
 
-  override fun clear(shouldClearSource: Boolean) {
-    if (shouldClearSource) {
+  private fun isSelectSourceFlow(): Boolean =
+    isSelectSourceFlow
+
+  private fun finishSelectSourceFlow() {
+    isSelectSourceFlow = false
+  }
+
+  private fun isSelectTransferTargetFlow(): Boolean {
+    return isSelectTransferTargetFlow
+  }
+
+  private fun finishSelectTransferTargetFlow() {
+    isSelectTransferTargetFlow = false
+  }
+
+  override fun clear(shouldClearTarget: Boolean) {
+    if (shouldClearTarget) {
       transactionTargetState.update { null }
     }
-    isSelectSourceFlow = false
+    finishSelectSourceFlow()
+    finishSelectTransferTargetFlow()
     payload = null
   }
 }

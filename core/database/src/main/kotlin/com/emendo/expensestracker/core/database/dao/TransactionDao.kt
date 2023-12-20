@@ -46,6 +46,10 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   @Query("SELECT * FROM $TABLE_NAME WHERE date BETWEEN :from AND :to")
   abstract suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionFull>
 
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE sourceAccountId = :sourceAccountId AND targetAccountId != NULL ORDER BY date DESC LIMIT 1")
+  abstract suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionFull?
+
   @Query("DELETE FROM $TABLE_NAME")
   abstract override suspend fun deleteAll()
 

@@ -15,9 +15,13 @@ sealed interface CreateTransactionUiState {
   data object Loading : CreateTransactionUiState
   data class DisplayTransactionData(
     val screenData: CreateTransactionScreenData,
-    val target: TransactionItemModel,
+    val target: TransactionItemModel?,
     val source: TransactionItemModel?,
     val note: String? = null,
+    val transferReceivedAmount: String? = null,
+    val isCustomTransferAmount: Boolean = false,
+    val sourceAmountFocused: Boolean = false,
+    val transferTargetAmountFocused: Boolean = false,
   ) : CreateTransactionUiState
 }
 

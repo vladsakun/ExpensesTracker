@@ -16,7 +16,7 @@ import javax.inject.Inject
 data class CategoryWithTotalTransactionsAndCurrencies(
   val categoryWithTransactions: List<CategoryWithTransactions>,
   val generalCurrency: CurrencyModel,
-  val currencyRates: List<CurrencyRateModel>,
+  val currencyRates: Map<String, CurrencyRateModel>,
 )
 
 class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(

@@ -12,11 +12,11 @@ import java.math.BigDecimal
 
 interface TransactionRepository {
 
-  val transactionsFull: Flow<List<TransactionModel>>
   val lastTransactionFull: Flow<TransactionModel?>
-  fun getTransactionsPager(): Flow<PagingData<TransactionModel>>
+  val transactionsPagingFlow: Flow<PagingData<TransactionModel>>
 
-  suspend fun retrieveLastTransactionFull(): TransactionModel?
+  suspend fun retrieveLastTransaction(): TransactionModel?
+  suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel?
   suspend fun retrieveTransaction(id: Long): TransactionModel?
   suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType>
 

@@ -1,11 +1,9 @@
 package com.emendo.expensestracker.core.data.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.paging.*
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
+import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
@@ -19,10 +17,12 @@ import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -34,17 +34,9 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+  @ApplicationScope private val scope: CoroutineScope,
 ) : TransactionRepository {
 
-  private val transactionsFullState = transactionDao.getTransactionFull()
-    .map { transactionFullList ->
-      transactionFullList
-        .map { transactionMapper.map(it) }
-        .sortedByDescending { it.date }
-    }
-
-  override val transactionsFull: Flow<List<TransactionModel>>
-    get() = transactionsFullState
   override val lastTransactionFull: Flow<TransactionModel?>
     get() = transactionDao
       .getLastTransaction()
@@ -52,15 +44,15 @@ class OfflineFirstTransactionRepository @Inject constructor(
         transaction?.let { transactionMapper.map(it) }
       }
 
-  override fun getTransactionsPager(): Flow<PagingData<TransactionModel>> =
+  override val transactionsPagingFlow: Flow<PagingData<TransactionModel>> by lazy {
     Pager(
-      config = PagingConfig(
-        pageSize = PAGE_SIZE,
-      ),
+      config = PagingConfig(pageSize = PAGE_SIZE),
       pagingSourceFactory = { transactionDao.transactionsPagingSource() }
     )
       .flow
       .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
+      .cachedIn(scope)
+  }
 
   override suspend fun createTransaction(
     source: TransactionSource,
@@ -81,14 +73,19 @@ class OfflineFirstTransactionRepository @Inject constructor(
         }
 
         source is AccountModel && target is AccountModel -> createTransferTransaction(source, target, amount, note)
-        else -> throw IllegalArgumentException("Unsupported transaction type")
+        else -> throw IllegalArgumentException("Unsupported transaction type with source: $source, target: $target")
       }
     }
   }
 
-  override suspend fun retrieveLastTransactionFull(): TransactionModel? = withContext(ioDispatcher) {
+  override suspend fun retrieveLastTransaction(): TransactionModel? = withContext(ioDispatcher) {
     transactionDao.retrieveLastTransaction()?.let { transactionMapper.map(it) }
   }
+
+  override suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel? =
+    withContext(ioDispatcher) {
+      transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }
+    }
 
   override suspend fun retrieveTransaction(id: Long): TransactionModel? = withContext(ioDispatcher) {
     transactionDao.retrieveTransactionById(id)?.let { transactionMapper.map(it) }
@@ -127,20 +124,18 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        repeat(200) { index ->
-          val newBalance = source.balance - amount
-          accountDao.updateBalance(source.id, newBalance)
-          transactionDao.save(
-            TransactionEntity(
-              sourceAccountId = source.id,
-              targetCategoryId = target.id,
-              value = amount.negate() + (index * 10.0).toBigDecimal(),
-              currencyCode = currencyModel.currencyCode,
-              date = date.minus(DateTimePeriod(days = index % 5), TimeZone.currentSystemDefault()),
-              note = note,
-            )
+        val newBalance = source.balance - amount
+        accountDao.updateBalance(source.id, newBalance)
+        transactionDao.save(
+          TransactionEntity(
+            sourceAccountId = source.id,
+            targetCategoryId = target.id,
+            value = amount.negate(),
+            currencyCode = currencyModel.currencyCode,
+            date = date,
+            note = note,
           )
-        }
+        )
       }
     }
   }

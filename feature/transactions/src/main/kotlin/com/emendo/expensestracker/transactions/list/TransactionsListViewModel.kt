@@ -8,7 +8,7 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
-import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
+import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
@@ -37,18 +37,14 @@ class TransactionsListViewModel @Inject constructor(
   private val currencyCacheManager: CurrencyCacheManager,
   private val getTransactionsSumUseCase: GetTransactionsSumUseCase,
 ) : ViewModel() {
-
   private val repos: Flow<PagingData<UiModel.TransactionItem>> = transactionRepository
-    .getTransactionsPager()
-    .cachedIn(viewModelScope)
-    .map { pagingData ->
-      pagingData.map { UiModel.TransactionItem(it) }
-    }
+    .transactionsPagingFlow
+    .map { it.map(UiModel::TransactionItem) }
 
   val list: Flow<PagingData<UiModel>> =
     combine(timeZoneManager.timeZoneState, repos) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem> ->
       transformPagingData(pagingData, zoneId)
-    }
+    }.cachedIn(viewModelScope)
 
   private fun transformPagingData(
     pagingData: PagingData<UiModel.TransactionItem>,
@@ -92,7 +88,7 @@ class TransactionsListViewModel @Inject constructor(
   }
 
   val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository, list)
-    .stateInWhileSubscribed(
+    .stateInLazily(
       scope = viewModelScope,
       initialValue = TransactionScreenUiState.DisplayTransactionsList(list),
     )
@@ -145,7 +141,7 @@ private fun transactionUiState(
   transactionRepository: TransactionRepository,
   pagingList: Flow<PagingData<TransactionsListViewModel.UiModel>>,
 ): Flow<TransactionScreenUiState> {
-  return transactionRepository.getTransactionsPager().asResult().map {
+  return transactionRepository.transactionsPagingFlow.asResult().map {
     when (it) {
       is Result.Loading -> TransactionScreenUiState.Loading
       is Result.Error -> TransactionScreenUiState.Error("Error loading transactions")

@@ -18,7 +18,7 @@ sealed interface AppNavigationEvent {
   ) : AppNavigationEvent
 
   data class CreateCategory(val categoryType: CategoryType) : AppNavigationEvent
-  data object SelectAccount : AppNavigationEvent
+  data class SelectAccount(val isTransferTargetSelect: Boolean = false) : AppNavigationEvent
   data object SelectCurrency : AppNavigationEvent
   data class SelectColor(val preselectedColorId: Int) : AppNavigationEvent
   data class SelectIcon(val preselectedIconId: Int) : AppNavigationEvent

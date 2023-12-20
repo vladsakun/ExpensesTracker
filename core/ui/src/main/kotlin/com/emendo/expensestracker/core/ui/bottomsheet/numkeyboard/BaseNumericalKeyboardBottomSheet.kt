@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.designsystem.component.AutoSizableText
+import com.emendo.expensestracker.core.designsystem.component.AutoSizableTextField
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
@@ -168,12 +168,12 @@ internal fun BaseNumericalKeyboardBottomSheet(
 
 @Composable
 internal fun ResultText(textProvider: () -> String) {
-  // Todo remove hardcoded value. Us sp to dp converted
+  // Todo remove hardcoded value. Use sp to dp converted
   val heightValue = MaterialTheme.typography.headlineLarge.lineHeight.value + 5
   val lineHeightDp = with(LocalDensity.current) { heightValue.sp.toDp() }
-  AutoSizableText(
+  AutoSizableTextField(
     text = textProvider(),
-    minFontSize = 14.sp,
+    minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
     textAlign = TextAlign.End,
     modifier = Modifier
       .fillMaxWidth()
@@ -181,6 +181,7 @@ internal fun ResultText(textProvider: () -> String) {
       .height(lineHeightDp),
     style = MaterialTheme.typography.headlineLarge,
     maxLines = 1,
+    focused = true,
   )
 }
 

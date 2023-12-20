@@ -46,6 +46,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val ADD_CATEGORY_KEY = "addCategory"
@@ -183,6 +184,7 @@ private fun CategoriesGrid(
 
   LaunchedEffect(categories) {
     if (IS_DEBUG_CREATE_TRANSACTION && categories.dataList.isNotEmpty()) {
+      delay(200)
       onCategoryClick(categories.dataList.first())
     }
   }

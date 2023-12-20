@@ -35,7 +35,7 @@ class MainActivityViewModel @Inject constructor(
       }
 
       is SelectAccount -> {
-        createTransactionRepository.startSelectSourceFlow()
+        event.handleEventData(createTransactionRepository)
         AccountsScreenRouteDestination.asNavigationEvent()
       }
 
@@ -69,4 +69,12 @@ private fun CreateTransaction.handleEventData(
   target?.let(createTransactionRepository::setTarget)
   source?.let(createTransactionRepository::setSource)
   payload?.let(createTransactionRepository::setTransactionPayload)
+}
+
+private fun SelectAccount.handleEventData(createTransactionRepository: CreateTransactionRepository) {
+  if (isTransferTargetSelect) {
+    createTransactionRepository.startSelectTransferTargetFlow()
+  } else {
+    createTransactionRepository.startSelectSourceFlow()
+  }
 }

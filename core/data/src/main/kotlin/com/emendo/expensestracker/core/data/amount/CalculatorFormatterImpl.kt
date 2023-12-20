@@ -87,9 +87,10 @@ class CalculatorFormatterImpl @Inject constructor(
     }
 
     val precision = fromTrimmed.substringAfterLast(decimalSeparator, "").length
-    val value = fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toLong()
+    val value =
+      fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toBigInteger()
 
-    return BigDecimal(value.toBigInteger(), precision)
+    return BigDecimal(value, precision)
   }
 
   private fun formatBigDecimal(amount: BigDecimal?): String {

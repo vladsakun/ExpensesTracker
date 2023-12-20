@@ -30,16 +30,16 @@ class AccountsListViewModel @Inject constructor(
     )
 
   val isSelectMode: Boolean
-    get() = createTransactionRepository.isSelectSourceFlow()
+    get() = createTransactionRepository.isSelectMode()
   val titleResId: Int
     @StringRes get() = if (isSelectMode) R.string.select_account else R.string.accounts
 
   fun selectAccountItem(account: AccountModel) {
-    createTransactionRepository.setSource(account)
+    createTransactionRepository.selectAccount(account)
   }
 
   override fun onCleared() {
-    createTransactionRepository.finishSelectSourceFlow()
+    createTransactionRepository.finishSelectMode()
   }
 }
 

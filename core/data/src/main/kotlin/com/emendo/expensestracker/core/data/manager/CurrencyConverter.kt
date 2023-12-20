@@ -4,10 +4,10 @@ import com.emendo.expensestracker.core.data.model.CurrencyRateModel
 import java.math.BigDecimal
 
 interface CurrencyConverter {
-  suspend fun convert(
+  fun convert(
     value: BigDecimal,
     fromCurrencyCode: String,
     toCurrencyCode: String,
-    currencyRates: List<CurrencyRateModel>,
+    currencyRates: Map<String, CurrencyRateModel>,
   ): BigDecimal
 }

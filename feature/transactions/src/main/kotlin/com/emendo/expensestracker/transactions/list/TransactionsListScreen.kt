@@ -25,8 +25,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
+import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
-import com.emendo.expensestracker.core.data.model.transaction.TransactionTargetUiModel
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
@@ -91,7 +91,7 @@ private fun TransactionsList(
   val transactions: LazyPagingItems<TransactionsListViewModel.UiModel> = transactionsFlow.collectAsLazyPagingItems()
 
   Box(modifier = Modifier.fillMaxSize()) {
-    LazyColumn {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
       items(count = transactions.itemCount) { movie ->
         when (val uiModel = transactions[movie]) {
           is TransactionsListViewModel.UiModel.TransactionItem -> {
@@ -161,7 +161,7 @@ private fun TransactionItem(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val isTransfer = transaction.target is TransactionTargetUiModel.Account
+  val isTransfer = transaction.target is AccountModel
 
   Row(
     modifier = modifier
@@ -235,7 +235,6 @@ private fun TransactionItem(
           contentDescription = null,
         )
       }
-
 
       transaction.note?.let { note ->
         Text(
