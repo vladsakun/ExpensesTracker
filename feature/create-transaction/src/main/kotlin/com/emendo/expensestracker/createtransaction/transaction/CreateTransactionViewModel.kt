@@ -126,7 +126,7 @@ class CreateTransactionViewModel @Inject constructor(
   override fun confirmValueChange(sheetValue: SheetValue): Boolean {
     numericKeyboardCommander.doMath()
     if (sheetValue == SheetValue.Hidden) {
-      _uiState.updateIfSuccess { state ->
+      _uiState.update { state ->
         state.copy(
           sourceAmountFocused = false,
           transferTargetAmountFocused = false,
@@ -137,7 +137,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   fun changeTransactionType(type: TransactionType) {
-    _uiState.updateIfSuccess { state ->
+    _uiState.update { state ->
       state.copy(
         screenData = state.screenData.copy(transactionType = type),
         sourceAmountFocused = false,
@@ -162,7 +162,7 @@ class CreateTransactionViewModel @Inject constructor(
         val convertedValue = getConvertedTargetTransferValue(target, source, numericKeyboardCommander.currentValue)
         val toCurrency = target.currency
 
-        _uiState.updateIfSuccess { state ->
+        _uiState.update { state ->
           state.copy(transferReceivedAmount = amountFormatter.format(convertedValue, toCurrency))
         }
       }
@@ -187,7 +187,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   override fun changeTransactionType() {
-    val transactionType = uiState.value.successValue?.screenData?.transactionType ?: return
+    val transactionType = uiState.value.screenData.transactionType
 
     if (transactionType == TransactionType.EXPENSE) {
       changeTransactionType(TransactionType.INCOME)
@@ -218,7 +218,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   fun showCalculatorBottomSheet(sourceTrigger: Boolean = true) {
-    _uiState.updateIfSuccess { state ->
+    _uiState.update { state ->
       if (sourceTrigger) {
         state.copy(
           sourceAmountFocused = true,
@@ -232,9 +232,9 @@ class CreateTransactionViewModel @Inject constructor(
       }
     }
     val amount = if (sourceTrigger) {
-      _uiState.value.successValue?.screenData?.amount
+      uiState.value.screenData.amount
     } else {
-      _uiState.value.successValue?.transferReceivedAmount
+      uiState.value.transferReceivedAmount
     }
 
     if (amount != null) {
@@ -277,7 +277,7 @@ class CreateTransactionViewModel @Inject constructor(
       return
     }
 
-    val transactionType = checkNotNull(uiState.value.successValue).screenData.transactionType
+    val transactionType = checkNotNull(uiState.value).screenData.transactionType
     val target = createTransactionRepository.getTargetSnapshot() ?: getTargetDefaultValue(transactionType)
     createTransaction(source, target)
   }
@@ -311,7 +311,7 @@ class CreateTransactionViewModel @Inject constructor(
         source = source,
         target = target,
         amount = numericKeyboardCommander.currentValue,
-        note = uiState.value.successValue?.note,
+        note = uiState.value.note,
       )
 
       numericKeyboardCommander.clear()
@@ -336,14 +336,14 @@ class CreateTransactionViewModel @Inject constructor(
     updateAmountText(calculatorFormatter.toBigDecimal(amount))
 
   private fun updateAmountText(amount: BigDecimal): Boolean {
-    _uiState.updateIfSuccess { state ->
+    _uiState.update { state ->
       val formattedAmount = amountFormatter.format(
         amount = amount,
         currency = selectedCurrencyModel,
       )
       if (state.screenData.transactionType == TransactionType.TRANSFER) {
         if (state.transferTargetAmountFocused) {
-          return@updateIfSuccess state.copy(
+          return@update state.copy(
             transferReceivedAmount = formattedAmount,
             isCustomTransferAmount = true,
           )
@@ -351,8 +351,8 @@ class CreateTransactionViewModel @Inject constructor(
 
         if (!state.isCustomTransferAmount) {
           val target: AccountModel =
-            (createTransactionRepository.getTargetSnapshot() as? AccountModel) ?: return@updateIfSuccess state
-          val source = createTransactionRepository.getSourceSnapshot() ?: return@updateIfSuccess state
+            (createTransactionRepository.getTargetSnapshot() as? AccountModel) ?: return@update state
+          val source = createTransactionRepository.getSourceSnapshot() ?: return@update state
           val toCurrency = target.currency
 
           val fromCurrency = source.currency
@@ -367,7 +367,7 @@ class CreateTransactionViewModel @Inject constructor(
           }
 
           val transferReceivedAmount = amountFormatter.format(convertedValue, toCurrency)
-          return@updateIfSuccess state.copy(
+          return@update state.copy(
             screenData = state.screenData.copy(amount = formattedAmount),
             transferReceivedAmount = transferReceivedAmount,
           )
@@ -384,29 +384,24 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
-  // Todo total mess 💩
   private fun combineCreateTransactionUiState(
     uiState: CreateTransactionUiState,
     target: TransactionTarget?,
     source: TransactionSource?,
   ): CreateTransactionUiState {
-    if (uiState is CreateTransactionUiState.DisplayTransactionData) {
-      return uiState.copy(
-        target = target.orDefault(uiState.screenData.transactionType),
-        source = source?.toTransactionItemModel(),
-      )
-    }
-
-    return uiState
+    return uiState.copy(
+      target = target.orDefault(uiState.screenData.transactionType),
+      source = source?.toTransactionItemModel()
+    )
   }
 
-  private fun getDefaultCreateTransactionUiState(): CreateTransactionUiState.DisplayTransactionData {
+  private fun getDefaultCreateTransactionUiState(): CreateTransactionUiState {
     val payload = createTransactionRepository.getTransactionPayload()
     payload?.transactionAmount?.let { transactionValue ->
       numericKeyboardCommander.setInitialValue(calculatorFormatter.formatFinalWithPrecision(transactionValue.value))
     }
 
-    return CreateTransactionUiState.DisplayTransactionData(
+    return CreateTransactionUiState(
       screenData = CreateTransactionScreenData.default(
         amount = payload?.transactionAmount ?: getZeroFormattedAmount(),
         transactionType = if (IS_DEBUG_TRANSFER_TRANSACTION) TransactionType.TRANSFER else payload?.transactionType?.toTransactionType()
@@ -443,7 +438,7 @@ class CreateTransactionViewModel @Inject constructor(
     usedCurrencies.value.indexOfFirst { it.currencySymbolOrCode == currency }
 
   fun updateNoteText(newNote: String) {
-    _uiState.updateIfSuccess { it.copy(note = newNote) }
+    _uiState.update { it.copy(note = newNote) }
   }
 
   fun showConfirmDeleteTransactionBottomSheet() {

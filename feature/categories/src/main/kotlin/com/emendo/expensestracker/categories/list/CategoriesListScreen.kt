@@ -150,7 +150,10 @@ private fun CategoriesListScreenContent(
               },
               modifier = Modifier.padding(horizontal = Dimens.margin_large_x),
             )
-            HorizontalPager(state = pagerState) { page ->
+            HorizontalPager(
+              state = pagerState,
+              contentPadding = PaddingValues(top = Dimens.margin_large_x),
+            ) { page ->
               CategoriesGrid(
                 categories = state.categories[page]!!,
                 isEditModeProvider = isEditModeProvider,
@@ -181,7 +184,6 @@ private fun CategoriesGrid(
   onLongClick: () -> Unit,
   onClick: () -> Unit,
 ) {
-
   LaunchedEffect(categories) {
     if (IS_DEBUG_CREATE_TRANSACTION && categories.dataList.isNotEmpty()) {
       delay(200)

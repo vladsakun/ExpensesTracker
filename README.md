@@ -38,3 +38,4 @@ Features:
 29) Export data to excel or other formats
 30) Pin code for app (biometrics)
 31) Transactions period like 1Money instead of MoneyFlow
+32) Last transactions block on Overview

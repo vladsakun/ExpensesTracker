@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.runtime.Stable
-import com.emendo.expensestracker.core.app.common.ext.updateIfType
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
@@ -11,20 +10,18 @@ import com.emendo.expensestracker.core.model.data.Amount
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
-sealed interface CreateTransactionUiState {
-  data object Loading : CreateTransactionUiState
-  data class DisplayTransactionData(
-    val screenData: CreateTransactionScreenData,
-    val target: TransactionItemModel?,
-    val source: TransactionItemModel?,
-    val note: String? = null,
-    val transferReceivedAmount: Amount? = null,
-    val isCustomTransferAmount: Boolean = false,
-    val sourceAmountFocused: Boolean = false,
-    val transferTargetAmountFocused: Boolean = false,
-  ) : CreateTransactionUiState
-}
+data class CreateTransactionUiState(
+  val screenData: CreateTransactionScreenData,
+  val target: TransactionItemModel?,
+  val source: TransactionItemModel?,
+  val note: String? = null,
+  val transferReceivedAmount: Amount? = null,
+  val isCustomTransferAmount: Boolean = false,
+  val sourceAmountFocused: Boolean = false,
+  val transferTargetAmountFocused: Boolean = false,
+)
 
 @Stable
 data class CreateTransactionScreenData(
@@ -47,10 +44,7 @@ data class CreateTransactionScreenData(
   }
 }
 
-val CreateTransactionUiState.successValue: CreateTransactionUiState.DisplayTransactionData?
-  get() = (this as? CreateTransactionUiState.DisplayTransactionData)
-
-fun TransactionElement.toTransactionItemModel() =
+internal fun TransactionElement.toTransactionItemModel() =
   TransactionItemModel(icon, name, color)
 
 @Stable
@@ -60,18 +54,10 @@ data class TransactionItemModel(
   val color: ColorModel,
 )
 
-internal fun MutableStateFlow<CreateTransactionUiState>.updateIfSuccess(
-  function: (CreateTransactionUiState.DisplayTransactionData) -> CreateTransactionUiState.DisplayTransactionData,
-) {
-  updateIfType<CreateTransactionUiState.DisplayTransactionData, CreateTransactionUiState> { state ->
-    function(state)
-  }
-}
-
 internal fun MutableStateFlow<CreateTransactionUiState>.updateScreenData(
   function: (CreateTransactionScreenData) -> CreateTransactionScreenData,
 ) {
-  updateIfSuccess { state ->
+  update { state ->
     state.copy(screenData = function(state.screenData))
   }
 }

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
@@ -28,6 +29,7 @@ fun ExpeButton(
   border: BorderStroke? = null,
   contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  textStyle: TextStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
 ) {
   ExpeButton(
     text = stringResource(id = textResId),
@@ -39,6 +41,7 @@ fun ExpeButton(
     border = border,
     contentPadding = contentPadding,
     interactionSource = interactionSource,
+    textStyle = textStyle,
   )
 }
 
@@ -54,6 +57,7 @@ fun ExpeButton(
   contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   textColor: Color? = null,
+  textStyle: TextStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
 ) {
   Button(
     onClick = onClick,
@@ -69,7 +73,7 @@ fun ExpeButton(
     Text(
       text = text,
       modifier = Modifier.padding(Dimens.margin_small_x),
-      style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+      style = textStyle,
       color = textColor ?: Color.Unspecified,
     )
   }
