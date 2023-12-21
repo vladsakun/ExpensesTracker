@@ -229,7 +229,7 @@ private fun CategoriesGrid(
           name = category.category.name.stringValue(),
           color = category.category.color.color,
           icon = category.category.icon.imageVector,
-          total = category.totalFormatted,
+          total = category.totalAmount.formattedValue,
           onClick = { onCategoryClick(category) },
           isEditMode = isEditModeProvider,
           onDeleteClick = { onDeleteCategoryClick(category) },

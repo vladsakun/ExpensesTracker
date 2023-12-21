@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,7 +35,6 @@ import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.PlaceholderTextStyle
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
-import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomScreenTransition
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
@@ -53,7 +53,9 @@ import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 
-val marginHorizontal = Dimens.margin_large_x
+private val marginVertical = Dimens.margin_large_x
+private val marginHorizontal = Dimens.margin_large_x
+private const val ERROR_ANIMATION_DURATION_MILLIS = 500
 
 @RootNavGraph(start = true)
 @Destination(
@@ -92,22 +94,23 @@ fun CreateTransactionScreen(
 
 // Todo extract to a separate file
 @Composable
-fun Chevron(modifier: Modifier = Modifier) {
+fun Chevron(height: Dp, modifier: Modifier = Modifier) {
   val color = DividerDefaults.color
-  Spacer(modifier = modifier
-    .height(90.dp)
-    .drawWithCache {
-      val path = androidx.compose.ui.graphics.Path()
-      path.lineTo(size.width, size.height / 2f)
-      path.lineTo(0f, size.height)
-      onDrawBehind {
-        drawPath(
-          path = path,
-          color = color,
-          style = Stroke(width = Dimens.divider_thickness.toPx(), cap = StrokeCap.Round),
-        )
+  Spacer(
+    modifier = modifier
+      .height(height)
+      .drawWithCache {
+        val path = androidx.compose.ui.graphics.Path()
+        path.lineTo(size.width, size.height / 2f)
+        path.lineTo(0f, size.height)
+        onDrawBehind {
+          drawPath(
+            path = path,
+            color = color,
+            style = Stroke(width = Dimens.divider_thickness.toPx(), cap = StrokeCap.Round),
+          )
+        }
       }
-    }
   )
 }
 
@@ -180,12 +183,12 @@ private fun CreateTransactionContent(
                   .defaultMinSize(minHeight = 80.dp)
                   .padding(horizontal = marginHorizontal),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+                horizontalArrangement = Arrangement.spacedBy(marginVertical),
               ) {
                 Column(
                   modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = Dimens.margin_large_x)
+                    .padding(vertical = marginVertical)
                     .defaultMinSize(minHeight = 80.dp),
                   verticalArrangement = Arrangement.Center,
                 ) {
@@ -198,17 +201,17 @@ private fun CreateTransactionContent(
                   } else {
                     TransferAccount(onAccountClick, source)
                     TransferAmount(
-                      text = state.screenData.amount,
+                      text = state.screenData.amount.formattedValue,
                       focused = state.sourceAmountFocused,
                       onClick = onSourceAmountClick,
                     )
                   }
                 }
-                Chevron(modifier = Modifier.width(12.dp))
+                Chevron(height = 90.dp, modifier = Modifier.width(12.dp))
                 Column(
                   modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = Dimens.margin_large_x)
+                    .padding(vertical = marginVertical)
                     .defaultMinSize(minHeight = 80.dp),
                   verticalArrangement = Arrangement.Center,
                 ) {
@@ -222,7 +225,7 @@ private fun CreateTransactionContent(
                     TransferAccount(onTransferTargetAccountClick, target)
                     state.transferReceivedAmount?.let { amount ->
                       TransferAmount(
-                        text = amount,
+                        text = amount.formattedValue,
                         focused = state.transferTargetAmountFocused,
                         textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
                         onClick = onTargetAmountClick,
@@ -234,7 +237,7 @@ private fun CreateTransactionContent(
             } else {
               Amount(
                 onClick = onSourceAmountClick,
-                text = state.screenData.amount,
+                text = state.screenData.amount.formattedValue,
                 transactionType = state.screenData.transactionType,
                 error = state.screenData.amountError == triggered,
                 onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },
@@ -243,47 +246,40 @@ private fun CreateTransactionContent(
             }
             ExpeDivider()
             if (state.screenData.transactionType != TransactionType.TRANSFER) {
-              TransactionDestinationRow(
+              TransactionElementRow(
                 transactionItem = state.target,
                 label = stringResource(id = R.string.category),
                 onClick = onCategoryClick,
-                error = false,
               )
-              TransactionDestinationRow(
+              TransactionElementRow(
                 transactionItem = state.source,
                 label = stringResource(id = R.string.account),
                 onClick = onAccountClick,
                 error = state.screenData.sourceError == triggered,
-                onErrorConsumed = { onErrorConsumed(FieldWithError.Source) },
+                onErrorConsumed = remember { { onErrorConsumed(FieldWithError.Source) } },
               )
               ExpeDivider()
             }
-            CreateTransactionRow {
-              ExpeTextField(
-                placeholder = stringResource(id = R.string.create_transaction_note_placeholder),
-                text = state.note,
-                onValueChange = onNoteValueChange,
-                modifier = Modifier.fillMaxWidth(),
-              )
-            }
-            ExpeDivider()
-            Spacer(
-              modifier = Modifier
-                .height(Dimens.margin_large_x)
+            ExpeTextField(
+              text = state.note,
+              onValueChange = onNoteValueChange,
+              modifier = Modifier.fillMaxWidth(),
+              placeholder = stringResource(id = R.string.create_transaction_note_placeholder),
+              paddingValues = PaddingValues(horizontal = marginHorizontal, vertical = marginVertical),
             )
+            ExpeDivider()
+            VerticalSpacer(marginVertical)
             ExpeButton(
               textResId = R.string.save_transaction,
               onClick = onCreateTransactionClick,
               modifier = Modifier
                 .padding(horizontal = marginHorizontal)
             )
-            VerticalSpacer(
-              height = Dimens.margin_large_x,
-            )
+            VerticalSpacer(marginVertical)
             Column {
               CreateTransactionRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+                horizontalArrangement = Arrangement.spacedBy(marginVertical),
               ) {
                 AdditionalAction(
                   titleResId = R.string.delete,
@@ -312,17 +308,16 @@ private fun TransferAmount(
   modifier: Modifier = Modifier,
   textColor: Color = MaterialTheme.typography.headlineMedium.color,
 ) {
-  Surface {
-    AutoSizableTextField(
-      text = text,
-      focused = focused,
-      modifier = modifier.clickable(onClick = onClick),
-      minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
-      style = MaterialTheme.typography.headlineMedium,
-      color = textColor,
-      textAlign = TextAlign.End,
-    )
-  }
+  AutoSizableTextField(
+    text = text,
+    focused = focused,
+    modifier = modifier.clickable(onClick = onClick),
+    minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
+    style = MaterialTheme.typography.headlineMedium,
+    color = textColor,
+    textAlign = TextAlign.End,
+    maxLines = 1,
+  )
 }
 
 @Composable
@@ -358,18 +353,15 @@ private fun RowScope.AdditionalAction(
   onClick: () -> Unit,
   enabled: Boolean = true,
 ) {
-  Button(
+  ExpeButtonWithIcon(
+    titleResId = titleResId,
+    icon = icon,
     onClick = onClick,
-    modifier = Modifier.Companion
+    enabled = enabled,
+    modifier = Modifier
       .weight(1f)
       .heightIn(min = Dimens.icon_button_size),
-    shape = RoundedCornerNormalRadiusShape,
-    enabled = enabled,
-  ) {
-    Icon(imageVector = icon, contentDescription = stringResource(id = titleResId))
-    HorizontalSpacer(Dimens.margin_small_x)
-    Text(text = stringResource(id = titleResId), style = MaterialTheme.typography.labelLarge)
-  }
+  )
 }
 
 @Composable
@@ -385,7 +377,7 @@ private fun Amount(
   val backgroundColor = animateColorAsState(
     targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
     finishedListener = { onErrorConsumed() },
-    animationSpec = tween(500),
+    animationSpec = tween(ERROR_ANIMATION_DURATION_MILLIS),
     label = "error"
   )
   AutoSizableTextField(
@@ -395,12 +387,13 @@ private fun Amount(
     style = MaterialTheme.typography.headlineMedium,
     textAlign = TextAlign.End,
     focused = focused,
+    maxLines = 1,
     modifier = modifier
       .fillMaxWidth()
       .drawBehind { drawRect(backgroundColor.value) }
       .clickable(onClick = onClick)
       .padding(
-        vertical = Dimens.margin_large_x,
+        vertical = marginVertical,
         horizontal = marginHorizontal,
       ),
   )
@@ -426,18 +419,18 @@ private fun ColumnScope.BottomSheetContent(sheetData: BottomSheetData) {
 }
 
 @Composable
-private fun TransactionDestinationRow(
+private fun TransactionElementRow(
   transactionItem: TransactionItemModel?,
   label: String,
   onClick: () -> Unit,
-  error: Boolean,
+  error: Boolean = false,
   modifier: Modifier = Modifier,
   onErrorConsumed: () -> Unit = {},
 ) {
   val backgroundColor = animateColorAsState(
     targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
     finishedListener = { onErrorConsumed() },
-    animationSpec = tween(500),
+    animationSpec = tween(ERROR_ANIMATION_DURATION_MILLIS),
     label = "error"
   )
   CreateTransactionRow(
@@ -452,7 +445,7 @@ private fun TransactionDestinationRow(
     Spacer(modifier = Modifier.width(Dimens.margin_small_x))
     Spacer(modifier = Modifier.weight(1f))
     transactionItem?.let { model ->
-      TransactionItem(
+      TransactionElement(
         icon = model.icon.imageVector,
         title = model.name.stringValue(),
         tint = model.color.color,
@@ -463,14 +456,14 @@ private fun TransactionDestinationRow(
 }
 
 @Composable
-private fun TransactionItem(
+private fun TransactionElement(
   icon: ImageVector,
   title: String,
   tint: Color,
 ) {
   Icon(
     imageVector = icon,
-    contentDescription = "Transaction item icon",
+    contentDescription = null,
     tint = tint,
   )
   Spacer(modifier = Modifier.width(Dimens.margin_small_xx))
@@ -491,7 +484,7 @@ private fun CreateTransactionRow(
   Row(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = horizontalArrangement,
-    modifier = modifier.padding(vertical = Dimens.margin_large_x, horizontal = marginHorizontal),
+    modifier = modifier.padding(vertical = marginVertical, horizontal = marginHorizontal),
     content = content,
   )
 }

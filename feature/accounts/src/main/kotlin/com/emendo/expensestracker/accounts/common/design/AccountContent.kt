@@ -76,7 +76,7 @@ internal fun AccountContent(
         labelModifier = { Modifier.weight(1f) },
         endLayout = {
           Text(
-            text = stateProvider().balance,
+            text = stateProvider().balance.formattedValue,
             style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

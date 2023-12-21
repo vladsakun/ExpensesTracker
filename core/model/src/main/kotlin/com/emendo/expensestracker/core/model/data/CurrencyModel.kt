@@ -14,5 +14,11 @@ data class CurrencyModel(
       currencyName = "",
       currencySymbol = null,
     )
+
+    val USD = CurrencyModel(
+      currencyCode = "USD",
+      currencyName = "US dollar",
+      currencySymbol = "$",
+    )
   }
 }

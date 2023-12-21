@@ -5,8 +5,8 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.data.model.AccountModel
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
-import java.math.BigDecimal
 
 internal class AccountDetailPreviewData : PreviewParameterProvider<AccountDetailScreenData> {
   val data = AccountDetailScreenData.getDefaultState(
@@ -20,8 +20,7 @@ internal class AccountDetailPreviewData : PreviewParameterProvider<AccountDetail
       name = textValueOf("Bank"),
       icon = IconModel.EDUCATION,
       color = ColorModel.Blue,
-      balance = BigDecimal.valueOf(122345, 2),
-      balanceFormatted = "$1223.45",
+      balance = Amount.Mock,
       ordinalIndex = 0,
     ),
   )

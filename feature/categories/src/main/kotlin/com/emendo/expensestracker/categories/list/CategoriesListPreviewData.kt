@@ -8,9 +8,12 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.data.model.category.CategoryType
+import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
+import java.math.BigDecimal
 import kotlin.math.pow
 
 class CategoriesListPreviewData : PreviewParameterProvider<CategoriesListUiState> {
@@ -27,7 +30,11 @@ class CategoriesListPreviewData : PreviewParameterProvider<CategoriesListUiState
               type = CategoryType.EXPENSE,
               ordinalIndex = index,
             ),
-            totalFormatted = "EUR 187${10.0.pow(index)}.20",
+            totalAmount = Amount(
+              formattedValue = "$187${10.0.pow(index)}.20",
+              currency = CurrencyModel.USD,
+              value = BigDecimal.valueOf(187),
+            ),
           )
         }.toImmutableList(),
       )

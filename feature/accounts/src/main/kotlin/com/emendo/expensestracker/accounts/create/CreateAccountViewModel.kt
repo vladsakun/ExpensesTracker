@@ -12,6 +12,7 @@ import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
 import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,10 +37,16 @@ class CreateAccountViewModel @Inject constructor(
 ) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
   private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
-    CreateAccountScreenData.getDefaultState(
-      currency = currencyCacheManager.getGeneralCurrencySnapshot()
-    )
+    getDefaultCreateAccountScreenData(currencyCacheManager)
   )
+
+  private fun getDefaultCreateAccountScreenData(currencyCacheManager: CurrencyCacheManager): CreateAccountScreenData {
+    val currency = currencyCacheManager.getGeneralCurrencySnapshot()
+    return CreateAccountScreenData.getDefaultState(
+      currency = currency,
+      balance = amountFormatter.format(BigDecimal.ZERO, currency),
+    )
+  }
 
   override val state: StateFlow<CreateAccountScreenData> = _state.asStateFlow()
 
@@ -53,7 +61,7 @@ class CreateAccountViewModel @Inject constructor(
     }
   }
 
-  override fun updateBalance(balance: String) {
+  override fun updateBalance(balance: Amount) {
     _state.update { it.copy(balance = balance) }
   }
 
@@ -86,7 +94,7 @@ class CreateAccountViewModel @Inject constructor(
       with(state.value) {
         accountRepository.createAccount(
           name = name,
-          balance = calculatorFormatter.toBigDecimal(amountFormatter.removeCurrency(balance, currency)),
+          balance = balance.value,
           currency = currency,
           icon = icon,
           color = color,

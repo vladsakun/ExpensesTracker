@@ -54,7 +54,7 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
 
         CategoryWithTotalTransactions(
           categoryModel = categoryWithTransactions.categoryModel,
-          totalFormatted = amountFormatter.format(
+          totalAmount = amountFormatter.format(
             amount = totalSum,
             currency = generalCurrency,
           )

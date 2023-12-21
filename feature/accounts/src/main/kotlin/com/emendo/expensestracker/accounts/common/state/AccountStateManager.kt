@@ -5,6 +5,7 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.flow.StateFlow
 
@@ -17,7 +18,7 @@ interface AccountStateManager {
   val selectedIconId: Int
     get() = state.value.icon.id
 
-  fun updateBalance(balance: String)
+  fun updateBalance(balance: Amount)
   fun updateCurrency(currency: CurrencyModel)
   fun updateName(name: String)
   fun updateConfirmEnabled(enabled: Boolean)
@@ -43,11 +44,8 @@ interface AccountStateManager {
   }
 
   fun setCurrency(amountFormatter: AmountFormatter, currency: CurrencyModel) {
-    val balance = getReplacedCurrencyBalance(amountFormatter, currency)
+    val balance = amountFormatter.replaceCurrency(state.value.balance, currency)
     updateBalance(balance)
     updateCurrency(currency)
   }
-
-  private fun getReplacedCurrencyBalance(amountFormatter: AmountFormatter, currency: CurrencyModel): String =
-    amountFormatter.replaceCurrency(state.value.balance, state.value.currency, currency)
 }

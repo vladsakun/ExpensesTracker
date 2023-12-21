@@ -83,7 +83,7 @@ class TransactionsListViewModel @Inject constructor(
     val total = getTransactionsSumUseCase(transactions)
     return UiModel.SeparatorItem(
       instant = after.transaction.date,
-      sum = amountFormatter.format(total, currencyCacheManager.getGeneralCurrencySnapshot()),
+      sum = amountFormatter.format(total, currencyCacheManager.getGeneralCurrencySnapshot()).formattedValue,
     )
   }
 
@@ -126,11 +126,11 @@ class TransactionsListViewModel @Inject constructor(
         target = transactionModel.target,
         payload = CreateTransactionEventPayload(
           transactionId = transactionModel.id,
-          transactionValueFormatted = transactionModel.formattedValue,
           note = transactionModel.note,
           date = transactionModel.date,
-          transactionValue = transactionModel.value,
+          transactionAmount = transactionModel.amount,
           transactionType = transactionModel.type.id,
+          transferReceivedAmount = transactionModel.transferReceivedAmount,
         ),
       )
     )

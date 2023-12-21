@@ -15,6 +15,7 @@ import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.domain.account.GetAccountSnapshotByIdUseCase
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
@@ -48,7 +49,7 @@ class AccountDetailViewModel @Inject constructor(
 
   private var editAccountJob: Job? = null
 
-  override fun updateBalance(balance: String) {
+  override fun updateBalance(balance: Amount) {
     _state.update { it.copy(balance = balance) }
   }
 
@@ -82,7 +83,7 @@ class AccountDetailViewModel @Inject constructor(
         accountRepository.updateAccount(
           id = accountId,
           name = name,
-          balance = calculatorFormatter.toBigDecimal(amountFormatter.removeCurrency(balance, currency)),
+          balance = balance.value,
           currency = currency,
           icon = icon,
           color = color,

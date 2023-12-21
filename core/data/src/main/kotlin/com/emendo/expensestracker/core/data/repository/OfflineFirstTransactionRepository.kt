@@ -124,7 +124,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newBalance = source.balance - amount
+        val newBalance = source.balance.value - amount
         accountDao.updateBalance(source.id, newBalance)
         transactionDao.save(
           TransactionEntity(
@@ -150,7 +150,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newBalance = source.balance + amount
+        val newBalance = source.balance.value + amount
         accountDao.updateBalance(source.id, newBalance)
         transactionDao.save(
           TransactionEntity(
@@ -178,8 +178,8 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newSourceBalance = source.balance - amount
-        val newTargetBalance = target.balance + amount
+        val newSourceBalance = source.balance.value - amount
+        val newTargetBalance = target.balance.value + amount
 
         accountDao.updateBalance(source.id, newSourceBalance)
         accountDao.updateBalance(target.id, newTargetBalance)

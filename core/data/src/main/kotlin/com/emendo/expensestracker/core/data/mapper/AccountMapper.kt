@@ -21,8 +21,7 @@ class AccountMapper @Inject constructor(
     AccountModel(
       id = id,
       name = textValueOf(name),
-      balance = balance,
-      balanceFormatted = amountFormatter.format(balance, currencyModel),
+      balance = amountFormatter.format(balance, currencyModel),
       currency = currencyModel,
       icon = IconModel.getById(iconId),
       color = ColorModel.getById(colorId),

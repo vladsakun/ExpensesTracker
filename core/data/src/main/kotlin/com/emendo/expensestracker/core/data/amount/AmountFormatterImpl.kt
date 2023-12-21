@@ -4,6 +4,7 @@ import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
 import com.emendo.expensestracker.core.data.isFloatingPointNumber
 import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import java.math.BigDecimal
 import java.util.Locale
@@ -38,7 +39,7 @@ class AmountFormatterImpl @Inject constructor(
    * @param amount
    * @return the formatted amount value using the rules of number format of default Locale
    */
-  override fun format(amount: BigDecimal, currency: CurrencyModel): String {
+  override fun format(amount: BigDecimal, currency: CurrencyModel): Amount {
     currencyNumberFormatter.apply {
       if (amount.isFloatingPointNumber) {
         maximumFractionDigits = 2
@@ -53,24 +54,14 @@ class AmountFormatterImpl @Inject constructor(
       }
     }
 
-    return currencyNumberFormatter.format(amount)
+    return Amount(
+      formattedValue = currencyNumberFormatter.format(amount),
+      currency = currency,
+      value = amount,
+    )
   }
 
-  override fun replaceCurrency(s: String, oldCurrency: CurrencyModel, newCurrencyModel: CurrencyModel): String {
-    val noCurrencyAmount = removeCurrency(s, oldCurrency)
-    return format(calculatorFormatter.toBigDecimal(noCurrencyAmount), newCurrencyModel)
-  }
-
-  //removes currency symbol and possible space between currency and amount
-  override fun removeCurrency(s: String, currency: CurrencyModel): String {
-    var symbol = s
-    //currency sign
-    symbol = symbol.replace(currency.currencySymbolOrCode, "")
-    //possible leading non breaking space
-    symbol = symbol.replace("^\u00A0+".toRegex(), "")
-    //possible trailing non breaking space
-    symbol = symbol.replace("\u00A0+$".toRegex(), "")
-
-    return symbol
+  override fun replaceCurrency(amount: Amount, newCurrencyModel: CurrencyModel): Amount {
+    return format(amount.value, newCurrencyModel)
   }
 }

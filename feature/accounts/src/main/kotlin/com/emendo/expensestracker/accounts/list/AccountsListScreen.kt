@@ -117,7 +117,7 @@ private fun AccountsListScreenContent(
               color = account.color.color,
               icon = account.icon.imageVector,
               name = account.name.stringValue(),
-              balance = account.balanceFormatted,
+              balance = account.balance.formattedValue,
               onClick = { onAccountClick(account) },
             )
             ExpeDivider()

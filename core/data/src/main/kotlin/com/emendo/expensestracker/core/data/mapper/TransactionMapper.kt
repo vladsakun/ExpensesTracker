@@ -31,18 +31,25 @@ class TransactionMapper @Inject constructor(
       else -> TransactionType.DEFAULT
     }
     val currencyModel = currencyMapper.map(transactionEntity.currencyCode)
-    val formattedValue = amountFormatter.format(transactionEntity.value, currencyModel)
-    val formattedTransactionValue = if (type == TransactionType.INCOME) "+$formattedValue" else formattedValue
+    val transferReceivedCurrencyModel = transactionEntity.transferReceivedCurrencyCode?.let { currencyMapper.map(it) }
+    val amount = amountFormatter.format(transactionEntity.value, currencyModel)
+    val formattedTransactionValue =
+      if (type == TransactionType.INCOME) "+${amount.formattedValue}" else amount.formattedValue
 
+    val transferReceivedValue = transactionEntity.transferReceivedValue
+    val transferReceivedAmount =
+      if (transferReceivedValue != null && transferReceivedCurrencyModel != null) {
+        amountFormatter.format(transferReceivedValue, transferReceivedCurrencyModel)
+      } else null
+
+    // Todo refactor
     return TransactionModel(
       id = transactionEntity.id,
       source = accountMapper.map(sourceAccount),
       target = target,
-      formattedValue = formattedTransactionValue,
-      value = transactionEntity.value,
+      amount = amount,
       type = type,
-      transferReceivedValue = transactionEntity.transferReceivedValue,
-      transferCurrencyModel = transactionEntity.transferReceivedCurrencyCode?.run { currencyMapper.map(this) },
+      transferReceivedAmount = transferReceivedAmount,
       date = transactionEntity.date,
       note = transactionEntity.note,
     )

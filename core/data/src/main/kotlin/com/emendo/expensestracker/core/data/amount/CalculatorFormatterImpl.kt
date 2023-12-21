@@ -75,6 +75,20 @@ class CalculatorFormatterImpl @Inject constructor(
     return numberFormatter.format(amount)
   }
 
+  override fun formatFinalWithMax2Precision(amount: BigDecimal?): String {
+    if (amount == null) {
+      return ""
+    }
+
+    if (amount.isFloatingPointNumber) {
+      numberFormatter.minimumFractionDigits = 2
+    } else {
+      numberFormatter.minimumFractionDigits = 0
+    }
+
+    return numberFormatter.format(amount)
+  }
+
   override fun format(amount: String): String {
     return formatBigDecimal(toBigDecimal(amount))
   }

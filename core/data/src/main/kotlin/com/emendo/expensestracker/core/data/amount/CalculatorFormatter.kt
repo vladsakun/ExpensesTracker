@@ -42,6 +42,12 @@ interface CalculatorFormatter {
    */
   fun formatFinalWithPrecision(amount: BigDecimal?): String
 
+  /**
+   * @param amount
+   * @return the formatted amount with decimals and without the currency symbol.
+   */
+  fun formatFinalWithMax2Precision(amount: BigDecimal?): String
+
   fun toBigDecimal(from: String): BigDecimal
 }
 

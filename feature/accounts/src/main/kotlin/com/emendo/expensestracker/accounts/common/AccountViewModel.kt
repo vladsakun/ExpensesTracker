@@ -26,7 +26,7 @@ abstract class AccountViewModel(
     get() = this
 
   init {
-    numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateValue)
+    numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateBalanceValue)
   }
 
   override fun onDismissBottomSheet() {
@@ -48,7 +48,7 @@ abstract class AccountViewModel(
     )
   }
 
-  private fun updateValue(value: String): Boolean {
+  private fun updateBalanceValue(value: String): Boolean {
     val formattedValue = amountFormatter.format(calculatorFormatter.toBigDecimal(value), state.value.currency)
     updateBalance(formattedValue)
     return false

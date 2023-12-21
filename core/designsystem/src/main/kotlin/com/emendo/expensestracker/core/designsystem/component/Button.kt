@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
@@ -71,5 +72,35 @@ fun ExpeButton(
       style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
       color = textColor ?: Color.Unspecified,
     )
+  }
+}
+
+@Composable
+fun ExpeButtonWithIcon(
+  @StringRes titleResId: Int,
+  icon: ImageVector,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  colors: ButtonColors = ButtonDefaults.buttonColors(),
+  elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+  border: BorderStroke? = null,
+  contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+  Button(
+    onClick = onClick,
+    modifier = modifier,
+    shape = RoundedCornerNormalRadiusShape,
+    enabled = enabled,
+    colors = colors,
+    elevation = elevation,
+    border = border,
+    contentPadding = contentPadding,
+    interactionSource = interactionSource,
+  ) {
+    Icon(imageVector = icon, contentDescription = stringResource(id = titleResId))
+    HorizontalSpacer(Dimens.margin_small_x)
+    Text(text = stringResource(id = titleResId), style = MaterialTheme.typography.labelLarge)
   }
 }

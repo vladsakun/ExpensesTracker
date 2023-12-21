@@ -214,14 +214,14 @@ private fun TransactionItem(
         }
         Spacer(modifier = Modifier.width(Dimens.margin_small_x))
         Text(
-          text = transaction.formattedValue,
+          text = transaction.amount.formattedValue,
           style = MaterialTheme.typography.bodyLarge,
           modifier = Modifier.align(Alignment.CenterVertically),
           color = transaction.textColor()
         )
         if (isTransfer) {
           Text(
-            text = transaction.transferReceivedValue.toString(),
+            text = transaction.transferReceivedAmount.toString(),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.align(Alignment.CenterVertically),
           )

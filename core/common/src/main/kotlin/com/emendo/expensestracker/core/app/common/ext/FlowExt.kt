@@ -66,7 +66,6 @@ inline fun <reified T : List<*>> Flow<T>.stateInEagerlyList(
 // Todo discover
 /**
  * This resulting [Flow] has following properties:
- * - when it is being collected, and something calls [reload] or [reloadIfFailed], BE will get called appropriately
  * - when there's more than one these Flows, reload trigger will be handled only once
  * - when there's no such Flow being collected, BE will be called later when there's a collector again
  */

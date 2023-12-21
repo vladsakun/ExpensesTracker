@@ -7,6 +7,7 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.transaction.TransactionElement
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
+import com.emendo.expensestracker.core.model.data.Amount
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,7 @@ sealed interface CreateTransactionUiState {
     val target: TransactionItemModel?,
     val source: TransactionItemModel?,
     val note: String? = null,
-    val transferReceivedAmount: String? = null,
+    val transferReceivedAmount: Amount? = null,
     val isCustomTransferAmount: Boolean = false,
     val sourceAmountFocused: Boolean = false,
     val transferTargetAmountFocused: Boolean = false,
@@ -27,7 +28,7 @@ sealed interface CreateTransactionUiState {
 
 @Stable
 data class CreateTransactionScreenData(
-  val amount: String,
+  val amount: Amount,
   val transactionType: TransactionType,
   val deleteEnabled: Boolean = false,
   val duplicateEnabled: Boolean = false,
@@ -37,7 +38,7 @@ data class CreateTransactionScreenData(
 ) {
   companion object {
     fun default(
-      amount: String,
+      amount: Amount,
       transactionType: TransactionType,
     ) = CreateTransactionScreenData(
       amount = amount,

@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.domain.currency
 
 import com.emendo.expensestracker.core.data.manager.CurrencyConverter
 import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepository
+import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -15,10 +16,14 @@ class ConvertCurrencyUseCase @Inject constructor(
     fromCurrencyCode: String,
     toCurrencyCode: String,
   ): BigDecimal =
-    currencyConverter.convert(
-      value = value,
-      fromCurrencyCode = fromCurrencyCode,
-      toCurrencyCode = toCurrencyCode,
-      currencyRates = currencyRateRepository.getRatesSnapshot(),
-    )
+    try {
+      currencyConverter.convert(
+        value = value,
+        fromCurrencyCode = fromCurrencyCode,
+        toCurrencyCode = toCurrencyCode,
+        currencyRates = currencyRateRepository.getRatesSnapshot(),
+      )
+    } catch (e: CurrencyRateNotFoundException) {
+      value
+    }
 }

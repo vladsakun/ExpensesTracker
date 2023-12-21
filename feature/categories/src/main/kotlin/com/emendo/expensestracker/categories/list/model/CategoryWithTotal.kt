@@ -6,11 +6,12 @@ import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 
 data class CategoryWithTotal(
   val category: Category,
-  val totalFormatted: String,
+  val totalAmount: Amount,
 ) {
   data class Category(
     override val id: Long,
@@ -47,7 +48,7 @@ data class CategoryWithTotal(
 
 fun toCategoryWithTotal(category: CategoryWithTotalTransactions) =
   CategoryWithTotal(
-    totalFormatted = category.totalFormatted,
+    totalAmount = category.totalAmount,
     category = category.asCategory()
   )
 
