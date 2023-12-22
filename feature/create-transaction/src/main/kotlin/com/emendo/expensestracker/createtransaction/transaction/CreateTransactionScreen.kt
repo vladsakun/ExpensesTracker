@@ -6,13 +6,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,10 +43,12 @@ import com.emendo.expensestracker.createtransaction.destinations.SelectCategoryS
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.launch
 
 private val marginVertical = Dimens.margin_large_x
 private val marginHorizontal = Dimens.margin_large_x
@@ -62,14 +63,17 @@ fun CreateTransactionScreen(
   viewModel: CreateTransactionViewModel = hiltViewModel(),
 ) {
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+  val bottomSheetState: State<CreateTransactionBottomSheetState> =
+    viewModel.bottomSheetState.collectAsStateWithLifecycle()
 
   ScreenWithModalBottomSheet(
     stateManager = viewModel,
     onNavigateUpClick = navigator::navigateUp,
-    bottomSheetContent = { type -> BottomSheetContent(type) }
+    bottomSheetContent = { type -> BottomSheetContent(type) },
   ) {
     CreateTransactionContent(
       stateProvider = uiState::value,
+      bottomSheetStateProvider = bottomSheetState::value,
       onSourceAmountClick = remember { { viewModel.showCalculatorBottomSheet() } },
       onTargetAmountClick = remember { { viewModel.showCalculatorBottomSheet(sourceTrigger = false) } },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
@@ -79,6 +83,8 @@ fun CreateTransactionScreen(
       onBackPressed = remember { { navigator.navigateUp() } },
       onErrorConsumed = remember { viewModel::consumeFieldError },
       onConsumedNavigateUpEvent = remember { viewModel::consumeCloseEvent },
+      onConsumedShowCalculatorBottomSheetEvent = remember { viewModel::consumeShowCalculatorBottomSheet },
+      onConsumedHideCalculatorBottomSheetEvent = remember { viewModel::consumeHideCalculatorBottomSheet },
       onTransactionTypeChange = remember { viewModel::changeTransactionType },
       onNoteValueChange = remember { viewModel::updateNoteText },
       onDeleteClick = remember { viewModel::showConfirmDeleteTransactionBottomSheet },
@@ -91,6 +97,7 @@ fun CreateTransactionScreen(
 @Composable
 private fun CreateTransactionContent(
   stateProvider: () -> CreateTransactionUiState,
+  bottomSheetStateProvider: () -> CreateTransactionBottomSheetState,
   onSourceAmountClick: () -> Unit,
   onTargetAmountClick: () -> Unit,
   onCategoryClick: () -> Unit,
@@ -100,12 +107,45 @@ private fun CreateTransactionContent(
   onBackPressed: () -> Unit,
   onErrorConsumed: (field: FieldWithError) -> Unit,
   onConsumedNavigateUpEvent: () -> Unit,
+  onConsumedShowCalculatorBottomSheetEvent: () -> Unit,
+  onConsumedHideCalculatorBottomSheetEvent: () -> Unit,
   onTransactionTypeChange: (TransactionType) -> Unit,
   onNoteValueChange: (String) -> Unit,
   onDeleteClick: () -> Unit,
   onDuplicateClick: () -> Unit,
 ) {
-  ExpeScaffold(
+  val scope = rememberCoroutineScope()
+  val scaffoldState = rememberBottomSheetScaffoldState()
+
+  EventEffect(
+    event = bottomSheetStateProvider().hide,
+    onConsumed = onConsumedHideCalculatorBottomSheetEvent,
+    action = {
+      scope.launch {
+        scaffoldState.bottomSheetState.partialExpand()
+      }
+    },
+  )
+
+  EventEffect(
+    event = bottomSheetStateProvider().show,
+    onConsumed = onConsumedShowCalculatorBottomSheetEvent,
+    action = {
+      scope.launch {
+        scaffoldState.bottomSheetState.expand()
+      }
+    },
+  )
+  BottomSheetScaffold(
+    scaffoldState = scaffoldState,
+    sheetContent = {
+      val state = bottomSheetStateProvider().data
+      if (state != null) {
+        BottomSheetContent(sheetData = state)
+      }
+    },
+    // Workaround for issue https://issuetracker.google.com/issues/265444789
+    sheetPeekHeight = 0.dp,
     topBar = {
       ExpeCenterAlignedTopBar(
         title = {
@@ -130,11 +170,14 @@ private fun CreateTransactionContent(
         ),
       )
     },
-    modifier = Modifier.fillMaxSize(),
+    modifier = Modifier
+      .consumeWindowInsets(WindowInsets(0, 0, 0, 0))
+      .fillMaxSize(),
   ) { paddingValues ->
     Column(
       modifier = Modifier
         .fillMaxSize()
+        .verticalScroll(rememberScrollState())
         .padding(paddingValues)
     ) {
       val state = stateProvider()
@@ -172,7 +215,6 @@ private fun CreateTransactionContent(
                   focused = state.transferTargetAmountFocused,
                   textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
                   onClick = onTargetAmountClick,
-                  modifier = Modifier.alpha(1f),
                 )
               }
             }
@@ -242,6 +284,7 @@ private fun SaveButton(onClick: () -> Unit) {
   )
 }
 
+// Todo hide calculator bottom sheet on note focus
 @Composable
 private fun NoteTextField(
   text: String?,
@@ -504,6 +547,7 @@ private fun CreateTransactionScreenPreview(
   ExpensesTrackerTheme {
     CreateTransactionContent(
       stateProvider = { state },
+      bottomSheetStateProvider = { TODO() },
       onSourceAmountClick = {},
       onTargetAmountClick = {},
       onCategoryClick = {},
@@ -513,6 +557,8 @@ private fun CreateTransactionScreenPreview(
       onBackPressed = {},
       onErrorConsumed = { _ -> },
       onConsumedNavigateUpEvent = {},
+      onConsumedHideCalculatorBottomSheetEvent = {},
+      onConsumedShowCalculatorBottomSheetEvent = {},
       onTransactionTypeChange = { _ -> },
       onNoteValueChange = { _ -> },
       onDeleteClick = {},

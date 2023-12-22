@@ -7,16 +7,16 @@ import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import kotlinx.coroutines.flow.StateFlow
 
 @Stable
-interface BottomSheetStateManager {
+interface ModalBottomSheetStateManager {
 
-  val bottomSheetState: StateFlow<BottomSheetState>
+  val modalBottomSheetState: StateFlow<BottomSheetState>
 
-  fun onDismissBottomSheet() {}
-  fun dismissBottomSheet()
-  fun hideBottomSheet()
-  fun onConsumedHideBottomSheetEvent()
+  fun onDismissModalBottomSheet() {}
+  fun dismissModalBottomSheet()
+  fun hideModalBottomSheet()
+  fun onConsumedHideModalBottomSheetEvent()
   fun consumeNavigateUpEvent()
-  fun showBottomSheet(bottomSheet: BottomSheetData?)
+  fun showModalBottomSheet(bottomSheet: BottomSheetData?)
   fun navigateUp()
 
   @OptIn(ExperimentalMaterial3Api::class)

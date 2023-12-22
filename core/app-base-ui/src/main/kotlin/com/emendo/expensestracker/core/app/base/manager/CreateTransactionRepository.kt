@@ -8,8 +8,6 @@ import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import kotlinx.coroutines.flow.Flow
 
 interface CreateTransactionRepository {
-  suspend fun init()
-
   fun getTarget(): Flow<TransactionTarget?>
   fun getTargetSnapshot(): TransactionTarget?
   fun setTarget(target: TransactionTarget?)

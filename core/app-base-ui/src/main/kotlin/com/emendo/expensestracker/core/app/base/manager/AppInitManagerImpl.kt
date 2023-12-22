@@ -12,7 +12,6 @@ class AppInitManagerImpl @Inject constructor(
 
   override suspend fun init() {
     initCurrency()
-    createTransactionRepository.init()
   }
 
   private suspend fun initCurrency() {

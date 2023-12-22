@@ -7,6 +7,7 @@ import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.data.model.transaction.TransactionElement
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,17 +33,13 @@ data class CreateTransactionScreenData(
   val amountError: StateEvent = consumed,
   val sourceError: StateEvent = consumed,
   val navigateUp: StateEvent = consumed,
-) {
-  companion object {
-    fun default(
-      amount: Amount,
-      transactionType: TransactionType,
-    ) = CreateTransactionScreenData(
-      amount = amount,
-      transactionType = transactionType,
-    )
-  }
-}
+)
+
+data class CreateTransactionBottomSheetState(
+  val data: BottomSheetData? = null,
+  val show: StateEvent = consumed,
+  val hide: StateEvent = consumed,
+)
 
 internal fun TransactionElement.toTransactionItemModel() =
   TransactionItemModel(icon, name, color)

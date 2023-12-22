@@ -24,8 +24,8 @@ import com.emendo.expensestracker.core.data.model.category.toCategoryWithOrdinal
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
@@ -46,7 +46,7 @@ class CategoriesListViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
-) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate() {
+) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
   /**
    * Stores the latest version from db.
@@ -117,11 +117,11 @@ class CategoriesListViewModel @Inject constructor(
   }
 
   fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {
-    showBottomSheet(
+    showModalBottomSheet(
       GeneralBottomSheetData
         .Builder(DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.category.id) })
         .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
-        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
+        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()
     )
   }
@@ -131,7 +131,7 @@ class CategoriesListViewModel @Inject constructor(
   }
 
   private fun deleteCategory(categoryId: Long) {
-    hideBottomSheet()
+    hideModalBottomSheet()
     viewModelScope.launch(ioDispatcher) {
       handleDragEvents(categoriesOrderedList)
       categoryRepository.deleteCategory(categoryId)

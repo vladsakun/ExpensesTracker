@@ -9,8 +9,8 @@ import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.*
 import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.domain.category.GetCategorySnapshotByIdUseCase
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,7 @@ class CategoryDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
   private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
-) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate(), CategoryDelegate {
+) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(), CategoryDelegate {
 
   private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
   private val category by lazy { getCategorySnapshotByIdUseCase(categoryId) }
@@ -73,10 +73,10 @@ class CategoryDetailViewModel @Inject constructor(
   }
 
   fun showDeleteCategoryBottomSheet() {
-    showBottomSheet(
+    showModalBottomSheet(
       GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteCategory))
         .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
-        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideBottomSheet))
+        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()
     )
   }

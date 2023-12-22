@@ -22,7 +22,6 @@ import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
-import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.DEFAULT
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.labelResId
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.toTransactionType
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
@@ -30,15 +29,17 @@ import com.emendo.expensestracker.core.domain.account.GetLastTransferAccountOrRa
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
@@ -60,17 +61,14 @@ class CreateTransactionViewModel @Inject constructor(
   private val appNavigationEventBus: AppNavigationEventBus,
   private val getLastTransferAccountOrRandomUseCase: GetLastTransferAccountOrRandomUseCase,
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
-) : ViewModel(), BottomSheetStateManager by BottomSheetStateManagerDelegate(), CalculatorKeyboardActions {
+) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(), CalculatorKeyboardActions {
 
   private val _uiState: MutableStateFlow<CreateTransactionUiState> =
     MutableStateFlow(getDefaultCreateTransactionUiState())
-
-  private val source: Flow<TransactionSource?> by lazy(LazyThreadSafetyMode.NONE) { createTransactionRepository.getSource() }
-
-  val uiState: StateFlow<CreateTransactionUiState> = combine(
+  internal val uiState: StateFlow<CreateTransactionUiState> = combine(
     _uiState,
     createTransactionRepository.getTarget(),
-    source,
+    createTransactionRepository.getSource(),
     transform = ::combineCreateTransactionUiState,
   )
     .stateInWhileSubscribed(viewModelScope, getDefaultCreateTransactionUiState())
@@ -82,16 +80,26 @@ class CreateTransactionViewModel @Inject constructor(
     MutableStateFlow(createTransactionRepository.getSourceSnapshot()?.currency)
   private val sourceCurrency: Flow<CurrencyModel?> = createTransactionRepository
     .getSource()
-    .map { it?.currency }
+    .map { source ->
+      val amount = uiState.value.screenData.amount
+      if (shouldKeepUserSelectedCurrency(amount)) {
+        amount.currency
+      } else {
+        source?.currency
+      }
+    }
     .distinctUntilChanged()
 
-  private val superCurrencyState: Flow<CurrencyModel?> = merge(_calculatorCurrencyState, sourceCurrency)
+  private fun shouldKeepUserSelectedCurrency(amount: Amount) =
+    amount.value == DEFAULT_AMOUNT_VALUE && !hasSelectedCustomCurrency
+
+  private val currencyState: Flow<CurrencyModel?> = merge(_calculatorCurrencyState, sourceCurrency)
 
   private val calculatorState: StateFlow<CalculatorBottomSheetState> = combine(
     _calculatorBottomSheetState,
     numericKeyboardCommander.calculatorTextState,
     numericKeyboardCommander.equalButtonState,
-    superCurrencyState
+    currencyState
   ) { state, text, equalButtonState, currency ->
     state.copy(
       text = text,
@@ -105,21 +113,30 @@ class CreateTransactionViewModel @Inject constructor(
     getUsedCurrenciesUseCase()
       .stateInEagerlyList(viewModelScope)
 
+  private val _bottomSheetState: MutableStateFlow<CreateTransactionBottomSheetState> by lazy {
+    MutableStateFlow(
+      CreateTransactionBottomSheetState(
+        data = getCalculatorBottomSheetData(),
+        show = isBottomSheetVisibleOnInit(),
+      )
+    )
+  }
+
+  internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState.asStateFlow() }
+
   private val selectedCurrencyModel: CurrencyModel
     get() = usedCurrencies.value.getOrNull(calculatorState.value.getSelectedCurrencyIndex())
       ?: currencyCacheManager.getGeneralCurrencySnapshot()
 
   private var createTransactionJob: Job? = null
   private var shouldClearTarget: Boolean = true
+  private var hasSelectedCustomCurrency = false
 
   init {
     numericKeyboardCommander.setCallbacks(
       doneClick = ::doneClick,
       onMathDone = ::updateAmountText
     )
-    if (createTransactionRepository.getTransactionPayload() == null) {
-      // Todo uncomment     showCalculatorBottomSheet()
-    }
   }
 
   @ExperimentalMaterial3Api
@@ -204,6 +221,7 @@ class CreateTransactionViewModel @Inject constructor(
       return
     }
 
+    hasSelectedCustomCurrency = true
     val selectedCurrencyIndex = calculatorState.value.getSelectedCurrencyIndex()
     val nextCurrency = currencies.getNextItem(selectedCurrencyIndex)
     _uiState.updateScreenData { screenData ->
@@ -245,23 +263,20 @@ class CreateTransactionViewModel @Inject constructor(
       }
       numericKeyboardCommander.setInitialValue(initialValue)
     }
-    showBottomSheet(
-      CalculatorBottomSheetData(
-        state = calculatorState,
-        actions = this,
-        numericKeyboardActions = numericKeyboardCommander,
-        decimalSeparator = decimalSeparator,
-      )
-    )
+    _bottomSheetState.update {
+      it.copy(show = triggered)
+    }
   }
+
+  private fun getCalculatorBottomSheetData() = CalculatorBottomSheetData(
+    state = calculatorState,
+    actions = this,
+    numericKeyboardActions = numericKeyboardCommander,
+    decimalSeparator = decimalSeparator,
+  )
 
   fun saveTransaction() {
     val source = createTransactionRepository.getSourceSnapshot()
-
-    _uiState.updateScreenData { screenData ->
-      screenData.copy(sourceError = triggered)
-    }
-    return
 
     if (source == null) {
       _uiState.updateScreenData { screenData ->
@@ -270,7 +285,7 @@ class CreateTransactionViewModel @Inject constructor(
       return
     }
 
-    if (numericKeyboardCommander.currentValue == BigDecimal.ZERO) {
+    if (numericKeyboardCommander.currentValue == DEFAULT_AMOUNT_VALUE) {
       _uiState.updateScreenData { screenData ->
         screenData.copy(amountError = triggered)
       }
@@ -315,7 +330,7 @@ class CreateTransactionViewModel @Inject constructor(
       )
 
       numericKeyboardCommander.clear()
-      hideBottomSheet()
+      hideCalculatorBottomSheet()
     }.apply {
       invokeOnCompletion {
         // Todo add loading state
@@ -327,8 +342,14 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
+  private fun hideCalculatorBottomSheet() {
+    _bottomSheetState.update { state ->
+      state.copy(hide = triggered)
+    }
+  }
+
   private fun doneClick(): Boolean {
-    hideBottomSheet()
+    hideCalculatorBottomSheet()
     return false
   }
 
@@ -350,27 +371,7 @@ class CreateTransactionViewModel @Inject constructor(
         }
 
         if (!state.isCustomTransferAmount) {
-          val target: AccountModel =
-            (createTransactionRepository.getTargetSnapshot() as? AccountModel) ?: return@update state
-          val source = createTransactionRepository.getSourceSnapshot() ?: return@update state
-          val toCurrency = target.currency
-
-          val fromCurrency = source.currency
-          val convertedValue = try {
-            convertCurrencyUseCase.invoke(
-              value = amount,
-              fromCurrencyCode = fromCurrency.currencyCode,
-              toCurrencyCode = toCurrency.currencyCode,
-            )
-          } catch (e: CurrencyRateNotFoundException) {
-            amount
-          }
-
-          val transferReceivedAmount = amountFormatter.format(convertedValue, toCurrency)
-          return@update state.copy(
-            screenData = state.screenData.copy(amount = formattedAmount),
-            transferReceivedAmount = transferReceivedAmount,
-          )
+          return@update handleCustomTransferAmount(state, amount, formattedAmount)
         }
       }
 
@@ -384,14 +385,44 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
+  private fun handleCustomTransferAmount(
+    state: CreateTransactionUiState,
+    amount: BigDecimal,
+    formattedAmount: Amount,
+  ): CreateTransactionUiState {
+    val target: AccountModel =
+      (createTransactionRepository.getTargetSnapshot() as? AccountModel) ?: return state
+    val source = createTransactionRepository.getSourceSnapshot() ?: return state
+    val toCurrency = target.currency
+
+    val fromCurrency = source.currency
+    val convertedValue = try {
+      convertCurrencyUseCase.invoke(
+        value = amount,
+        fromCurrencyCode = fromCurrency.currencyCode,
+        toCurrencyCode = toCurrency.currencyCode,
+      )
+    } catch (e: CurrencyRateNotFoundException) {
+      amount
+    }
+
+    val transferReceivedAmount = amountFormatter.format(convertedValue, toCurrency)
+    return state.copy(
+      screenData = state.screenData.copy(amount = formattedAmount),
+      transferReceivedAmount = transferReceivedAmount,
+    )
+  }
+
   private fun combineCreateTransactionUiState(
     uiState: CreateTransactionUiState,
     target: TransactionTarget?,
     source: TransactionSource?,
   ): CreateTransactionUiState {
+    val screenData = uiState.screenData
+
     return uiState.copy(
-      target = target.orDefault(uiState.screenData.transactionType),
-      source = source?.toTransactionItemModel()
+      target = target.orDefault(screenData.transactionType),
+      source = source?.toTransactionItemModel(),
     )
   }
 
@@ -401,23 +432,21 @@ class CreateTransactionViewModel @Inject constructor(
       numericKeyboardCommander.setInitialValue(calculatorFormatter.formatFinalWithPrecision(transactionValue.value))
     }
 
+    val source = createTransactionRepository.getSourceSnapshot()
     return CreateTransactionUiState(
-      screenData = CreateTransactionScreenData.default(
-        amount = payload?.transactionAmount ?: getZeroFormattedAmount(),
-        transactionType = if (IS_DEBUG_TRANSFER_TRANSACTION) TransactionType.TRANSFER else payload?.transactionType?.toTransactionType()
-          ?: DEFAULT
+      screenData = CreateTransactionScreenData(
+        amount = payload?.transactionAmount ?: getDefaultAmount(source?.currency),
+        transactionType = getTransactionType(payload)
       ),
       target = createTransactionRepository.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
-      source = createTransactionRepository.getSourceSnapshot()?.toTransactionItemModel(),
+      source = source?.toTransactionItemModel(),
       note = payload?.note,
+      sourceAmountFocused = true,
     )
   }
 
-  private fun getZeroFormattedAmount(): Amount =
-    amountFormatter.format(
-      BigDecimal.ZERO,
-      currencyCacheManager.getGeneralCurrencySnapshot()
-    ) // Todo check currency. maybe source
+  private fun getDefaultAmount(currencyModel: CurrencyModel?): Amount =
+    amountFormatter.format(DEFAULT_AMOUNT_VALUE, currencyModel ?: currencyCacheManager.getGeneralCurrencySnapshot())
 
   private fun TransactionTarget?.orDefault(transactionType: TransactionType): TransactionItemModel {
     val target = this ?: getTargetDefaultValue(transactionType)
@@ -442,11 +471,11 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   fun showConfirmDeleteTransactionBottomSheet() {
-    showBottomSheet(
+    showModalBottomSheet(
       GeneralBottomSheetData
         .Builder(Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction))
         .title(resourceValueOf(R.string.transaction_detail_dialog_delete_confirm_title))
-        .negativeAction(resourceValueOf(R.string.cancel), ::hideBottomSheet)
+        .negativeAction(resourceValueOf(R.string.cancel), ::hideModalBottomSheet)
         .build()
     )
   }
@@ -462,6 +491,18 @@ class CreateTransactionViewModel @Inject constructor(
         shouldNavigateUp = true,
       )
     )
+  }
+
+  fun consumeShowCalculatorBottomSheet() {
+    _bottomSheetState.update {
+      it.copy(show = consumed)
+    }
+  }
+
+  fun consumeHideCalculatorBottomSheet() {
+    _bottomSheetState.update {
+      it.copy(hide = consumed)
+    }
   }
 
   private fun deleteTransaction() {
@@ -482,4 +523,19 @@ class CreateTransactionViewModel @Inject constructor(
       AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
     )
   }
+
+  private fun isBottomSheetVisibleOnInit(): StateEvent =
+    if (createTransactionRepository.getTransactionPayload() == null) triggered else consumed
+
+  companion object {
+    private val DEFAULT_AMOUNT_VALUE = BigDecimal.ZERO
+  }
+}
+
+private fun getTransactionType(payload: CreateTransactionEventPayload?): TransactionType {
+  if (IS_DEBUG_TRANSFER_TRANSACTION) {
+    return TransactionType.TRANSFER
+  }
+
+  return payload?.transactionType?.toTransactionType() ?: TransactionType.DEFAULT
 }

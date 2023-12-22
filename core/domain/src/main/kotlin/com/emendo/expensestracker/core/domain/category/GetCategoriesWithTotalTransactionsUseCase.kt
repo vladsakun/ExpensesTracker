@@ -42,6 +42,10 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
       }
 
     return combinedFlow.transform { (transactions, generalCurrency, rates) ->
+      if (rates.isEmpty()) {
+        return@transform
+      }
+
       val remappedTransactions: List<CategoryWithTotalTransactions> = transactions.map { categoryWithTransactions ->
         val totalSum = categoryWithTransactions.transactions.map {
           currencyConverter.convert(

@@ -15,7 +15,6 @@ import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetE
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetOrdinalIndex
 import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
-import com.emendo.expensestracker.core.domain.account.RetrieveLastUsedAccountUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -24,10 +23,8 @@ import com.emendo.expensestracker.core.app.resources.R as AppR
 
 class CreateTransactionRepositoryImpl @Inject constructor(
   getLastUsedAccountUseCase: GetLastUsedAccountUseCase,
-  private val retrieveLastUsedAccountUseCase: RetrieveLastUsedAccountUseCase,
   @ApplicationScope private val scope: CoroutineScope,
 ) : CreateTransactionRepository {
-  // Todo need to be smart on switching between transfer and expense transaction type
   private val transactionTargetState: MutableStateFlow<TransactionTarget?> by lazy { MutableStateFlow(null) }
 
   private val transactionSourceMutableState: MutableStateFlow<TransactionSource?> by lazy { MutableStateFlow(null) }
@@ -41,12 +38,6 @@ class CreateTransactionRepositoryImpl @Inject constructor(
   private var isSelectSourceFlow: Boolean = false
   private var isSelectTransferTargetFlow: Boolean = false
   private var payload: CreateTransactionEventPayload? = null
-
-  override suspend fun init() {
-    //    transactionSourceMutableState.update {
-    //      retrieveLastUsedAccountUseCase()
-    //    }
-  }
 
   override fun getTarget(): Flow<TransactionTarget?> {
     return transactionTargetState

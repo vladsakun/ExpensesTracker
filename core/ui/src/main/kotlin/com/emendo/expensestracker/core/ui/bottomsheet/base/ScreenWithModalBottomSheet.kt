@@ -18,19 +18,19 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenWithModalBottomSheet(
-  stateManager: BottomSheetStateManager,
+  stateManager: ModalBottomSheetStateManager,
   onNavigateUpClick: () -> Unit,
   bottomSheetContent: @Composable ColumnScope.(bottomSheetType: BottomSheetData) -> Unit,
   content: @Composable () -> Unit,
 ) {
-  val bottomSheetState = stateManager.bottomSheetState.collectAsStateWithLifecycle()
+  val bottomSheetState = stateManager.modalBottomSheetState.collectAsStateWithLifecycle()
 
   BaseScreenWithModalBottomSheet(
     bottomSheetState = bottomSheetState::value,
     onNavigationClick = onNavigateUpClick,
-    onBottomSheetDismissRequest = stateManager::dismissBottomSheet,
+    onBottomSheetDismissRequest = stateManager::dismissModalBottomSheet,
     onConsumedNavigateUpEvent = stateManager::consumeNavigateUpEvent,
-    onConsumedHideBottomSheetEvent = stateManager::onConsumedHideBottomSheetEvent,
+    onConsumedHideBottomSheetEvent = stateManager::onConsumedHideModalBottomSheetEvent,
     confirmValueChange = stateManager::confirmValueChange,
     bottomSheetContent = bottomSheetContent,
     content = content,
@@ -114,7 +114,7 @@ private fun ExpeModalBottomSheet(
   onDismissRequest: () -> Unit,
   bottomSheetContent: @Composable (ColumnScope.(type: BottomSheetData) -> Unit),
 ) {
-  val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState().bottomSheetState != null } }
+  val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState().bottomSheetData != null } }
   val focusManager = LocalFocusManager.current
 
   if (shouldOpenBottomSheet.value) {
@@ -126,7 +126,7 @@ private fun ExpeModalBottomSheet(
       // windowInsets = WindowInsets(0),
       shape = ExpeBottomSheetShape,
       content = {
-        bottomSheetContent(bottomSheetState().bottomSheetState!!)
+        bottomSheetContent(bottomSheetState().bottomSheetData!!)
       },
     )
   }

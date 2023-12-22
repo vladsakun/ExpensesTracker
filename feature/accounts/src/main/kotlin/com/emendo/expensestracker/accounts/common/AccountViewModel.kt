@@ -8,8 +8,8 @@ import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.ui.bottomsheet.BalanceBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceKeyboardActions
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManager
-import com.emendo.expensestracker.core.ui.bottomsheet.base.BottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 
 // Todo use composition over inheritance
 abstract class AccountViewModel(
@@ -17,7 +17,7 @@ abstract class AccountViewModel(
   private val numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
 ) : ViewModel(),
-    BottomSheetStateManager by BottomSheetStateManagerDelegate(),
+    ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
     InitialBalanceKeyboardActions by InitialBalanceKeyboardActionsDelegate(numericKeyboardCommander),
     AccountStateManager,
     AccountScreenNavigator {
@@ -29,14 +29,14 @@ abstract class AccountViewModel(
     numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateBalanceValue)
   }
 
-  override fun onDismissBottomSheet() {
-    if (bottomSheetState.value.bottomSheetState is BalanceBottomSheetData) {
+  override fun onDismissModalBottomSheet() {
+    if (modalBottomSheetState.value.bottomSheetData is BalanceBottomSheetData) {
       numericKeyboardCommander.onDoneClick()
     }
   }
 
   fun showBalanceBottomSheet() {
-    showBottomSheet(
+    showModalBottomSheet(
       BalanceBottomSheetData(
         text = numericKeyboardCommander.calculatorTextState,
         actions = this,
@@ -55,7 +55,7 @@ abstract class AccountViewModel(
   }
 
   private fun doneClick(): Boolean {
-    hideBottomSheet()
+    hideModalBottomSheet()
     return false
   }
 }

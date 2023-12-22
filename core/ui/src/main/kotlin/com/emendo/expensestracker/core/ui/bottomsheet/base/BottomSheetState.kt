@@ -7,7 +7,7 @@ import de.palm.composestateevents.consumed
 
 @Stable
 data class BottomSheetState(
-  val bottomSheetState: BottomSheetData? = null,
+  val bottomSheetData: BottomSheetData? = null,
   val hideBottomSheetEvent: StateEvent = consumed,
   val navigateUpEvent: StateEvent = consumed,
 )
