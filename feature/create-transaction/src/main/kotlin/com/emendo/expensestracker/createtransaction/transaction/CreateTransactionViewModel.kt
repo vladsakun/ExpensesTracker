@@ -136,8 +136,8 @@ class CreateTransactionViewModel @Inject constructor(
     numericKeyboardCommander.setCallbacks(
       doneClick = ::doneClick,
       onMathDone = ::updateAmountText,
-      valueChanged = { text, _ ->
-        // Todo on value changed update amount text
+      valueChanged = { _, _ ->
+        updateAmountText(numericKeyboardCommander.getMathResult())
         false
       }
     )

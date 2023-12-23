@@ -121,6 +121,18 @@ class CalculatorInputImpl @Inject constructor(
     return true
   }
 
+  override fun getMathResult(): BigDecimal {
+    val decimal1 = calculatorFormatter.toBigDecimal(number1.toString())
+
+    if (!canDoMath()) {
+      return decimal1
+    }
+
+    val decimal2 = calculatorFormatter.toBigDecimal(checkNotNull(number2).toString())
+
+    return checkNotNull(mathOperation).doMath(decimal1, decimal2)
+  }
+
   override fun setNumber1(number: StringBuilder) {
     number1 = number
     refreshValue()

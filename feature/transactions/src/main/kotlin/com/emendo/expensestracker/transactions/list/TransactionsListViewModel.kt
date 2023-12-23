@@ -17,6 +17,7 @@ import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
 import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.id
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
+import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.transaction.GetTransactionsSumUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,7 @@ class TransactionsListViewModel @Inject constructor(
   private val amountFormatter: AmountFormatter,
   private val currencyCacheManager: CurrencyCacheManager,
   private val getTransactionsSumUseCase: GetTransactionsSumUseCase,
+  private val convertCurrencyUseCase: ConvertCurrencyUseCase,
 ) : ViewModel() {
   private val repos: Flow<PagingData<UiModel.TransactionItem>> = transactionRepository
     .transactionsPagingFlow
@@ -78,12 +80,25 @@ class TransactionsListViewModel @Inject constructor(
     val timeZone = TimeZone.of(zoneId.id)
     val from = after.transaction.date.toLocalDateTime(timeZone).date.atStartOfDayIn(timeZone)
     val to = from.plus(DateTimePeriod(days = 1), timeZone)
+    val generalCurrency = currencyCacheManager.getGeneralCurrencySnapshot()
 
     val transactions = transactionRepository.retrieveTransactionsInPeriod(from, to)
-    val total = getTransactionsSumUseCase(transactions)
+    val transactionWithConvertedValues = transactions.map { transaction ->
+      if (transaction.currency == generalCurrency) {
+        return@map transaction
+      }
+
+      val convertedValue = convertCurrencyUseCase.invoke(
+        value = transaction.value,
+        fromCurrencyCode = transaction.currency.currencyCode,
+        toCurrencyCode = generalCurrency.currencyCode,
+      )
+      transaction.copy(value = convertedValue)
+    }
+    val total = getTransactionsSumUseCase(transactionWithConvertedValues)
     return UiModel.SeparatorItem(
       instant = after.transaction.date,
-      sum = amountFormatter.format(total, currencyCacheManager.getGeneralCurrencySnapshot()).formattedValue,
+      sum = amountFormatter.format(total, generalCurrency).formattedValue,
     )
   }
 

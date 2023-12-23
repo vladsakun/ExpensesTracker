@@ -143,4 +143,7 @@ class NumericKeyboardCommanderImpl @Inject constructor(
   override fun setInitialValue(initialValue: String) {
     calculatorInput.setNumber1(StringBuilder(initialValue))
   }
+
+  override fun getMathResult(): BigDecimal =
+    calculatorInput.getMathResult()
 }

@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.core.data.manager
 
 import com.emendo.expensestracker.core.data.applyDefaultDecimalStyle
+import com.emendo.expensestracker.core.data.divideWithScale
 import com.emendo.expensestracker.core.data.model.CurrencyRateModel
 import com.emendo.expensestracker.core.model.data.CurrencyModels
 import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
@@ -21,14 +22,14 @@ class CurrencyConverterImpl @Inject constructor() : CurrencyConverter {
 
     val toRate = currencyRates[toCurrencyCode]?.rate ?: throw CurrencyRateNotFoundException()
     if (fromCurrencyCode == CurrencyModels.CURRENCY_RATES_BASE) {
-      return value * toRate
+      return (value * toRate).applyDefaultDecimalStyle()
     }
 
     val fromRate = currencyRates[fromCurrencyCode]?.rate ?: throw CurrencyRateNotFoundException()
     if (toCurrencyCode == CurrencyModels.CURRENCY_RATES_BASE) {
-      return value / fromRate
+      return value.divideWithScale(fromRate)
     }
 
-    return (value / fromRate * toRate).applyDefaultDecimalStyle()
+    return value.divideWithScale(fromRate).multiply(toRate).applyDefaultDecimalStyle()
   }
 }

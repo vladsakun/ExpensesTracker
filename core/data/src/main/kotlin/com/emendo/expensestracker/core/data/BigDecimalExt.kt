@@ -7,5 +7,12 @@ fun BigDecimal.applyDefaultDecimalStyle() = apply {
   setScale(2, RoundingMode.HALF_EVEN)
 }
 
-inline val BigDecimal.isFloatingPointNumber: Boolean
+fun BigDecimal.divideWithScale(
+  divisor: BigDecimal,
+  scale: Int = 2,
+  roundingMode: RoundingMode = RoundingMode.HALF_EVEN,
+): BigDecimal =
+  divide(divisor, scale, roundingMode)
+
+val BigDecimal.isFloatingPointNumber: Boolean
   get() = remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0

@@ -30,4 +30,5 @@ interface NumericKeyboardCommander : NumericKeyboardActions, KeyboardCallbacks {
   fun doMath()
   fun negate()
   fun setInitialValue(initialValue: String)
+  fun getMathResult(): BigDecimal
 }

@@ -20,6 +20,7 @@ interface CalculatorInput {
     shouldCleanMathOperationIfCantDoMath: Boolean = false,
   ): Boolean
 
+  fun getMathResult(): BigDecimal
   fun setNumber1(number: StringBuilder)
   fun isEmpty(): Boolean
   fun isNotEmpty(): Boolean

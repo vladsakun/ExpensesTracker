@@ -4,6 +4,7 @@ import androidx.paging.*
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
+import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
@@ -28,11 +29,13 @@ import javax.inject.Inject
 
 private const val PAGE_SIZE = 50
 
+// Todo refactor constructor. Too much mappers
 class OfflineFirstTransactionRepository @Inject constructor(
   private val accountDao: AccountDao,
   private val transactionDao: TransactionDao,
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
+  private val currencyMapper: CurrencyMapper,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @ApplicationScope private val scope: CoroutineScope,
 ) : TransactionRepository {
@@ -111,7 +114,11 @@ class OfflineFirstTransactionRepository @Inject constructor(
 
         else -> throw IllegalStateException("Can't get transaction type for $transaction")
       }
-      TransactionValueWithType(type, transaction.transactionEntity.value)
+      TransactionValueWithType(
+        type = type,
+        value = transaction.transactionEntity.value,
+        currency = currencyMapper.map(transaction.transactionEntity.currencyCode),
+      )
     }
 
   private suspend fun createExpenseTransaction(
