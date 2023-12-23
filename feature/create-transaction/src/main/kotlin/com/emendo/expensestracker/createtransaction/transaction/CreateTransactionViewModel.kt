@@ -74,22 +74,15 @@ class CreateTransactionViewModel @Inject constructor(
 
   private val _calculatorCurrencyState: MutableStateFlow<CurrencyModel?> =
     MutableStateFlow(createTransactionRepository.getSourceSnapshot()?.currency)
-  private val sourceCurrency: Flow<CurrencyModel?> = createTransactionRepository
-    .getSource()
-    .map { source ->
-      val amount = uiState.value.amount
-      if (shouldKeepUserSelectedCurrency(amount)) {
-        amount.currency
-      } else {
-        source?.currency
-      }
-    }
-    .distinctUntilChanged()
-
-  private fun shouldKeepUserSelectedCurrency(amount: Amount) =
-    amount.value == DEFAULT_AMOUNT_VALUE && !hasSelectedCustomCurrency
+  private val sourceCurrency: Flow<CurrencyModel?> =
+    sourceCurrencyFlow(createTransactionRepository, ::shouldKeepUserSelectedCurrency)
 
   private val currencyState: Flow<CurrencyModel?> = merge(_calculatorCurrencyState, sourceCurrency)
+    .onEach { currency ->
+      if (currency != null) {
+        updateAmountCurrency(currency)
+      }
+    }
 
   private val calculatorState: StateFlow<CalculatorBottomSheetState> = combine(
     _calculatorBottomSheetState,
@@ -220,16 +213,33 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
     hasSelectedCustomCurrency = true
-    val nextCurrency = getNextCurrency(currencies)
+    val newCurrency = getNextCurrency(currencies)
+    _calculatorCurrencyState.update { newCurrency }
+  }
+
+  private fun updateAmountCurrency(newCurrency: CurrencyModel) {
     _uiState.update { state ->
+      if (state.transferTargetAmountFocused) {
+        val transferReceivedAmount = state.transferReceivedAmount
+        if (transferReceivedAmount != null) {
+          return@update state.copy(
+            transferReceivedAmount = amountFormatter.replaceCurrency(
+              amount = state.transferReceivedAmount,
+              newCurrencyModel = newCurrency,
+            )
+          )
+        } else {
+          return@update state
+        }
+      }
+
       state.copy(
         amount = amountFormatter.replaceCurrency(
           amount = state.amount,
-          newCurrencyModel = nextCurrency,
+          newCurrencyModel = newCurrency,
         )
       )
     }
-    _calculatorCurrencyState.update { nextCurrency }
   }
 
   private fun getNextCurrency(currencies: List<CurrencyModel>): CurrencyModel {
@@ -543,7 +553,26 @@ class CreateTransactionViewModel @Inject constructor(
   private fun isBottomSheetVisibleOnInit(): StateEvent =
     if (createTransactionRepository.getTransactionPayload() == null) triggered else consumed
 
+  private fun shouldKeepUserSelectedCurrency(): Boolean {
+    if (uiState.value.amount.value == DEFAULT_AMOUNT_VALUE) {
+      return false
+    }
+    return hasSelectedCustomCurrency
+  }
+
   companion object {
     private val DEFAULT_AMOUNT_VALUE = BigDecimal.ZERO
   }
 }
+
+private fun sourceCurrencyFlow(
+  createTransactionRepository: CreateTransactionRepository,
+  shouldKeepUserSelectedCurrency: () -> Boolean,
+): Flow<CurrencyModel?> = createTransactionRepository
+  .getSource()
+  .transform { source ->
+    if (!shouldKeepUserSelectedCurrency()) {
+      emit(source?.currency)
+    }
+  }
+  .distinctUntilChanged()
