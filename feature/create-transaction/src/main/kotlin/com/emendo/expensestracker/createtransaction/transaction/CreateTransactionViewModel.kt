@@ -104,7 +104,7 @@ class CreateTransactionViewModel @Inject constructor(
     MutableStateFlow(
       CreateTransactionBottomSheetState(
         data = getCalculatorBottomSheetData(),
-        show = isBottomSheetVisibleOnInit(),
+        show = createTransactionRepository.isBottomSheetVisibleOnInit(),
       )
     )
   }
@@ -120,8 +120,9 @@ class CreateTransactionViewModel @Inject constructor(
     numericKeyboardCommander.setCallbacks(
       doneClick = ::doneClick,
       onMathDone = ::updateAmountText,
-      valueChanged = { _, _ ->
+      valueChanged = { text, _ ->
         updateAmountText(numericKeyboardCommander.getMathResult())
+        updateCalculatorEditableHint(text)
         false
       }
     )
@@ -155,49 +156,38 @@ class CreateTransactionViewModel @Inject constructor(
     }
     numericKeyboardCommander.doMath()
 
-    if (type == TransactionType.TRANSFER) {
-      viewModelScope.launch {
-        val target = getLastTransferAccountOrRandomUseCase(createTransactionRepository.getSourceSnapshot()?.id)
-        createTransactionRepository.setTarget(target)
-
-        if (target == null) {
-          return@launch
-        }
-
-        val source = createTransactionRepository.getSourceSnapshot() ?: return@launch
-        val transferReceivedAmount = getConvertedFormattedValue(
-          value = uiState.value.amount.value,
-          fromCurrency = source.currency,
-          toCurrency = target.currency,
-        )
-
-        _uiState.update { state ->
-          state.copy(transferReceivedAmount = transferReceivedAmount)
-        }
-      }
+    if (type != TransactionType.TRANSFER) {
+      createTransactionRepository.setTarget(createTransactionRepository.getDefaultTarget(type))
       return
     }
 
-    createTransactionRepository.setTarget(createTransactionRepository.getDefaultTarget(type))
+    viewModelScope.launch {
+      val target = getLastTransferAccountOrRandomUseCase(createTransactionRepository.getSourceSnapshot()?.id)
+      createTransactionRepository.setTarget(target)
+
+      if (target == null) {
+        return@launch
+      }
+
+      val source = createTransactionRepository.getSourceSnapshot() ?: return@launch
+      val transferReceivedAmount = getConvertedFormattedValue(
+        value = uiState.value.amount.value,
+        fromCurrency = source.currency,
+        toCurrency = target.currency,
+      )
+
+      _uiState.update { state ->
+        state.copy(transferReceivedAmount = transferReceivedAmount)
+      }
+    }
   }
 
-  private fun getConvertedFormattedValue(
-    value: BigDecimal,
-    fromCurrency: CurrencyModel,
-    toCurrency: CurrencyModel,
-  ): Amount {
-    val convertedValue = convertCurrencyUseCase(
-      value = value,
-      fromCurrencyCode = fromCurrency.currencyCode,
-      toCurrencyCode = toCurrency.currencyCode,
-    )
-    return amountFormatter.format(convertedValue, toCurrency)
+  fun updateNoteText(newNote: String) {
+    _uiState.update { it.copy(note = newNote) }
   }
 
   override fun changeTransactionType() {
-    val transactionType = uiState.value.screenData.transactionType
-
-    if (transactionType == TransactionType.EXPENSE) {
+    if (uiState.value.screenData.transactionType == TransactionType.EXPENSE) {
       changeTransactionType(TransactionType.INCOME)
       return
     }
@@ -242,12 +232,8 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  private fun getNextCurrency(currencies: List<CurrencyModel>): CurrencyModel {
-    val selectedCurrencyIndex = calculatorState.value.getSelectedCurrencyIndex()
-    return currencies.getNextItem(selectedCurrencyIndex)
-  }
-
   fun showCalculatorBottomSheet(sourceTrigger: Boolean = true) {
+    numericKeyboardCommander.doMath()
     _uiState.update { state ->
       if (sourceTrigger) {
         state.copy(
@@ -270,14 +256,9 @@ class CreateTransactionViewModel @Inject constructor(
     if (amount != null) {
       val initialValue = calculatorFormatter.formatFinalWithMax2Precision(amount.value)
       _calculatorCurrencyState.update { amount.currency }
-      //      _calculatorBottomSheetState.update { state ->
-      //        state.copy(text = initialValue)
-      //      }
       numericKeyboardCommander.setInitialValue(initialValue)
     }
-    _bottomSheetState.update {
-      it.copy(show = triggered)
-    }
+    _bottomSheetState.update { it.copy(show = triggered) }
   }
 
   private fun getCalculatorBottomSheetData(): CalculatorBottomSheetData =
@@ -310,35 +291,21 @@ class CreateTransactionViewModel @Inject constructor(
     createTransaction(source, target)
   }
 
-  fun consumeFieldError(field: FieldWithError) {
-    _uiState.updateScreenData { state ->
-      when (field) {
-        is FieldWithError.Amount -> state.copy(amountError = consumed)
-        is FieldWithError.Source -> state.copy(sourceError = consumed)
-      }
-    }
-  }
-
-  fun consumeCloseEvent() {
-    _uiState.updateScreenData { state ->
-      state.copy(navigateUp = triggered)
-    }
-  }
-
   fun openAccountListScreen() {
     appNavigationEventBus.navigate(AppNavigationEvent.SelectAccount())
   }
 
-  private fun createTransaction(source: TransactionSource, target: TransactionTarget): Boolean {
+  private fun createTransaction(source: TransactionSource, target: TransactionTarget) {
     if (createTransactionJob != null) {
-      return false
+      return
     }
 
     createTransactionJob = viewModelScope.launch {
       transactionRepository.createTransaction(
         source = source,
         target = target,
-        amount = numericKeyboardCommander.currentValue,
+        amount = uiState.value.amount,
+        transferReceivedAmount = uiState.value.transferReceivedAmount,
         note = uiState.value.note,
       )
 
@@ -351,8 +318,16 @@ class CreateTransactionViewModel @Inject constructor(
         navigateUp()
       }
     }
+  }
 
-    return false
+  private fun updateCalculatorEditableHint(text: String) {
+    _uiState.update { state ->
+      if (state.transferTargetAmountFocused) {
+        state.copy(transferReceivedCalculatorHint = text)
+      } else {
+        state.copy(amountCalculatorHint = text)
+      }
+    }
   }
 
   fun hideCalculatorBottomSheet() {
@@ -374,22 +349,18 @@ class CreateTransactionViewModel @Inject constructor(
 
   private fun updateAmountText(amount: BigDecimal): Boolean {
     _uiState.update { state ->
-      val screenData = state.screenData
-      val currency: CurrencyModel = getSelectedCurrency(state)
+      val selectedCurrency = getSelectedCurrency(state)
+      val formattedAmount = amountFormatter.format(amount, selectedCurrency)
 
-      val formattedAmount = amountFormatter.format(amount, currency)
-
-      if (screenData.transactionType != TransactionType.TRANSFER) {
-        return@update state.copy(
-          amount = formattedAmount
-        )
+      if (state.screenData.transactionType != TransactionType.TRANSFER) {
+        return@update state.copy(amount = formattedAmount)
       }
 
       // Transfer Target amount to be changed
       if (state.transferTargetAmountFocused) {
         return@update state.copy(
           transferReceivedAmount = formattedAmount,
-          isCustomTransferAmount = true,
+          isCustomTransferAmount = state.newCustomTransferAmountValue(formattedAmount),
         )
       }
 
@@ -401,6 +372,66 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
     return false
+  }
+
+  fun selectTransferTargetAccount() {
+    appNavigationEventBus.navigate(
+      AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
+    )
+  }
+
+  fun duplicateTransaction() {
+    val payload = createTransactionRepository.getTransactionPayload() ?: return
+    shouldClearTarget = false
+    appNavigationEventBus.navigate(
+      AppNavigationEvent.CreateTransaction(
+        source = createTransactionRepository.getSourceSnapshot(),
+        target = createTransactionRepository.getTargetSnapshot(),
+        payload = payload.copy(transactionId = null),
+        shouldNavigateUp = true,
+      )
+    )
+  }
+
+  fun showConfirmDeleteTransactionBottomSheet() {
+    showModalBottomSheet(
+      GeneralBottomSheetData
+        .Builder(Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction))
+        .title(resourceValueOf(R.string.transaction_detail_dialog_delete_confirm_title))
+        .negativeAction(resourceValueOf(R.string.cancel), ::hideModalBottomSheet)
+        .build()
+    )
+  }
+
+  private fun deleteTransaction() {
+    val id = createTransactionRepository.getTransactionPayload()?.transactionId ?: return
+    viewModelScope.launch {
+      transactionRepository.deleteTransaction(id)
+    }
+    navigateUp()
+  }
+
+  fun consumeFieldError(field: FieldWithError) {
+    _uiState.updateScreenData { state ->
+      when (field) {
+        is FieldWithError.Amount -> state.copy(amountError = consumed)
+        is FieldWithError.Source -> state.copy(sourceError = consumed)
+      }
+    }
+  }
+
+  fun consumeCloseEvent() {
+    _uiState.updateScreenData { state ->
+      state.copy(navigateUp = triggered)
+    }
+  }
+
+  fun consumeShowCalculatorBottomSheet() {
+    _bottomSheetState.update { it.copy(show = consumed) }
+  }
+
+  fun consumeHideCalculatorBottomSheet() {
+    _bottomSheetState.update { it.copy(hide = consumed) }
   }
 
   /**
@@ -484,7 +515,6 @@ class CreateTransactionViewModel @Inject constructor(
 
   private fun getInitialCalculatorState(): CalculatorBottomSheetState =
     CalculatorBottomSheetState.initial(
-      decimalSeparator = decimalSeparator,
       transactionTypeLabelResId = TransactionType.DEFAULT.labelResId,
       numericKeyboardActions = numericKeyboardCommander,
     )
@@ -492,66 +522,33 @@ class CreateTransactionViewModel @Inject constructor(
   private fun CalculatorBottomSheetState.getSelectedCurrencyIndex(): Int =
     usedCurrencies.value.indexOfFirst { it.currencySymbolOrCode == currency }
 
-  fun updateNoteText(newNote: String) {
-    _uiState.update { it.copy(note = newNote) }
-  }
-
-  fun showConfirmDeleteTransactionBottomSheet() {
-    showModalBottomSheet(
-      GeneralBottomSheetData
-        .Builder(Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction))
-        .title(resourceValueOf(R.string.transaction_detail_dialog_delete_confirm_title))
-        .negativeAction(resourceValueOf(R.string.cancel), ::hideModalBottomSheet)
-        .build()
+  private fun getConvertedFormattedValue(
+    value: BigDecimal,
+    fromCurrency: CurrencyModel,
+    toCurrency: CurrencyModel,
+  ): Amount {
+    val convertedValue = convertCurrencyUseCase(
+      value = value,
+      fromCurrencyCode = fromCurrency.currencyCode,
+      toCurrencyCode = toCurrency.currencyCode,
     )
+    return amountFormatter.format(convertedValue, toCurrency)
   }
 
-  fun duplicateTransaction() {
-    val payload = createTransactionRepository.getTransactionPayload() ?: return
-    shouldClearTarget = false
-    appNavigationEventBus.navigate(
-      AppNavigationEvent.CreateTransaction(
-        source = createTransactionRepository.getSourceSnapshot(),
-        target = createTransactionRepository.getTargetSnapshot(),
-        payload = payload.copy(transactionId = null),
-        shouldNavigateUp = true,
-      )
-    )
-  }
-
-  fun consumeShowCalculatorBottomSheet() {
-    _bottomSheetState.update {
-      it.copy(show = consumed)
+  /**
+   * Checks if the user really changed Amount. Prevents state change on just focusing transfer target amount
+   */
+  private fun CreateTransactionUiState.newCustomTransferAmountValue(amount: Amount): Boolean =
+    if (isCustomTransferAmount) {
+      true
+    } else {
+      transferReceivedAmount != amount
     }
-  }
-
-  fun consumeHideCalculatorBottomSheet() {
-    _bottomSheetState.update {
-      it.copy(hide = consumed)
-    }
-  }
-
-  private fun deleteTransaction() {
-    val id = createTransactionRepository.getTransactionPayload()?.transactionId ?: return
-    viewModelScope.launch {
-      transactionRepository.deleteTransaction(id)
-    }
-    navigateUp()
-  }
 
   override fun onCleared() {
     super.onCleared()
     createTransactionRepository.clear(shouldClearTarget)
   }
-
-  fun selectTransferTargetAccount() {
-    appNavigationEventBus.navigate(
-      AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
-    )
-  }
-
-  private fun isBottomSheetVisibleOnInit(): StateEvent =
-    if (createTransactionRepository.getTransactionPayload() == null) triggered else consumed
 
   private fun shouldKeepUserSelectedCurrency(): Boolean {
     if (uiState.value.amount.value == DEFAULT_AMOUNT_VALUE) {
@@ -560,10 +557,18 @@ class CreateTransactionViewModel @Inject constructor(
     return hasSelectedCustomCurrency
   }
 
+  private fun getNextCurrency(currencies: List<CurrencyModel>): CurrencyModel {
+    val selectedCurrencyIndex = calculatorState.value.getSelectedCurrencyIndex()
+    return currencies.getNextItem(selectedCurrencyIndex)
+  }
+
   companion object {
     private val DEFAULT_AMOUNT_VALUE = BigDecimal.ZERO
   }
 }
+
+private fun CreateTransactionRepository.isBottomSheetVisibleOnInit(): StateEvent =
+  if (getTransactionPayload() == null) triggered else consumed
 
 private fun sourceCurrencyFlow(
   createTransactionRepository: CreateTransactionRepository,

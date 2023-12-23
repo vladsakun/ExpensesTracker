@@ -23,6 +23,8 @@ data class CreateTransactionUiState(
   val isCustomTransferAmount: Boolean = false,
   val sourceAmountFocused: Boolean = false,
   val transferTargetAmountFocused: Boolean = false,
+  val amountCalculatorHint: String = "",
+  val transferReceivedCalculatorHint: String = "",
 )
 
 @Stable

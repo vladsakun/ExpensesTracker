@@ -208,7 +208,7 @@ private fun CreateTransactionContent(
               Column(modifier = Modifier.clickable(onClick = onSourceAmountClick)) {
                 TransferAmount(text = state.amount.formattedValue)
                 EditableAmount(
-                  textProvider = calculatorTextStateProvider(),
+                  text = state.amountCalculatorHint,
                   focused = state.sourceAmountFocused,
                 )
               }
@@ -228,7 +228,7 @@ private fun CreateTransactionContent(
                     textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
                   )
                   EditableAmount(
-                    textProvider = "test",
+                    text = state.transferReceivedCalculatorHint,
                     focused = state.transferTargetAmountFocused,
                   )
                 }
@@ -251,7 +251,7 @@ private fun CreateTransactionContent(
             onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },
           )
           EditableAmount(
-            textProvider = calculatorTextStateProvider(),
+            text = calculatorTextStateProvider(),
             focused = state.sourceAmountFocused,
             modifier = Modifier
               .fillMaxWidth()
@@ -309,12 +309,12 @@ private fun CreateTransactionContent(
 
 @Composable
 private fun EditableAmount(
-  textProvider: String,
+  text: String,
   focused: Boolean,
   modifier: Modifier = Modifier,
 ) {
   AutoSizableTextField(
-    text = textProvider,
+    text = text,
     minFontSize = MaterialTheme.typography.labelSmall.fontSize,
     textAlign = TextAlign.End,
     style = MaterialTheme.typography.labelSmall,
@@ -490,7 +490,6 @@ private fun Amount(
 
 @Composable
 private fun ColumnScope.BottomSheetContent(sheetData: BottomSheetData) {
-  // Todo rethink ModalBottomSheet. It would be nice to switch transaction type (to Transfer) without closing the keyboard
   when (sheetData) {
     is CalculatorBottomSheetData -> {
       val state = sheetData.state.collectAsStateWithLifecycle()

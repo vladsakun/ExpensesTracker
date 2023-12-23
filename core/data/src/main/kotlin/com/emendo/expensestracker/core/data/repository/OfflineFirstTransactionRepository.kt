@@ -16,7 +16,7 @@ import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.Amount
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import java.math.BigDecimal
 import javax.inject.Inject
 
 private const val PAGE_SIZE = 50
@@ -60,10 +59,8 @@ class OfflineFirstTransactionRepository @Inject constructor(
   override suspend fun createTransaction(
     source: TransactionSource,
     target: TransactionTarget,
-    amount: BigDecimal,
-    sourceCurrency: CurrencyModel?,
-    targetCurrency: CurrencyModel?,
-    transferAmount: BigDecimal?,
+    amount: Amount,
+    transferReceivedAmount: Amount?,
     note: String?,
   ) {
     withContext(ioDispatcher) {
@@ -75,7 +72,14 @@ class OfflineFirstTransactionRepository @Inject constructor(
           }
         }
 
-        source is AccountModel && target is AccountModel -> createTransferTransaction(source, target, amount, note)
+        source is AccountModel && target is AccountModel -> createTransferTransaction(
+          source = source,
+          target = target,
+          amount = amount,
+          note = note,
+          transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount should not be null in Transfer transaction" },
+        )
+
         else -> throw IllegalArgumentException("Unsupported transaction type with source: $source, target: $target")
       }
     }
@@ -124,21 +128,20 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private suspend fun createExpenseTransaction(
     source: AccountModel,
     target: CategoryModel,
-    amount: BigDecimal,
+    amount: Amount,
     note: String?,
-    currencyModel: CurrencyModel = source.currency,
     date: Instant = Clock.System.now(),
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newBalance = source.balance.value - amount
+        val newBalance = source.balance.value - amount.value
         accountDao.updateBalance(source.id, newBalance)
         transactionDao.save(
           TransactionEntity(
             sourceAccountId = source.id,
             targetCategoryId = target.id,
-            value = amount.negate(),
-            currencyCode = currencyModel.currencyCode,
+            value = amount.value.negate(),
+            currencyCode = amount.currency.currencyCode,
             date = date,
             note = note,
           )
@@ -150,21 +153,20 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private suspend fun createIncomeTransaction(
     source: AccountModel,
     target: CategoryModel,
-    amount: BigDecimal,
+    amount: Amount,
     note: String?,
-    currency: CurrencyModel = source.currency,
     date: Instant = Clock.System.now(),
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newBalance = source.balance.value + amount
+        val newBalance = source.balance.value + amount.value
         accountDao.updateBalance(source.id, newBalance)
         transactionDao.save(
           TransactionEntity(
             sourceAccountId = source.id,
             targetCategoryId = target.id,
-            value = amount,
-            currencyCode = currency.currencyCode,
+            value = amount.value,
+            currencyCode = amount.currency.currencyCode,
             date = date,
             note = note,
           )
@@ -176,17 +178,15 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private suspend fun createTransferTransaction(
     source: AccountModel,
     target: AccountModel,
-    amount: BigDecimal,
+    amount: Amount,
     note: String?,
-    currency: CurrencyModel = source.currency,
+    transferReceivedAmount: Amount,
     date: Instant = Clock.System.now(),
-    transferReceivedCurrency: CurrencyModel = target.currency,
-    transferReceivedAmount: BigDecimal = amount,
   ) {
     withContext(ioDispatcher) {
       databaseUtils.expeWithTransaction {
-        val newSourceBalance = source.balance.value - amount
-        val newTargetBalance = target.balance.value + amount
+        val newSourceBalance = source.balance.value - amount.value
+        val newTargetBalance = target.balance.value + transferReceivedAmount.value
 
         accountDao.updateBalance(source.id, newSourceBalance)
         accountDao.updateBalance(target.id, newTargetBalance)
@@ -194,12 +194,12 @@ class OfflineFirstTransactionRepository @Inject constructor(
           TransactionEntity(
             sourceAccountId = source.id,
             targetAccountId = target.id,
-            value = amount,
-            currencyCode = currency.currencyCode,
+            value = amount.value,
+            currencyCode = amount.currency.currencyCode,
             date = date,
             note = note,
-            transferReceivedCurrencyCode = transferReceivedCurrency.currencyCode,
-            transferReceivedValue = transferReceivedAmount,
+            transferReceivedCurrencyCode = transferReceivedAmount.currency.currencyCode,
+            transferReceivedValue = transferReceivedAmount.value,
           )
         )
       }

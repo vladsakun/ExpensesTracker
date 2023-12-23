@@ -5,10 +5,9 @@ import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
 import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionValueWithType
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.Amount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
-import java.math.BigDecimal
 
 interface TransactionRepository {
 
@@ -23,10 +22,8 @@ interface TransactionRepository {
   suspend fun createTransaction(
     source: TransactionSource,
     target: TransactionTarget,
-    amount: BigDecimal,
-    sourceCurrency: CurrencyModel? = source.currency,
-    targetCurrency: CurrencyModel? = target.currency,
-    transferAmount: BigDecimal? = null,
+    amount: Amount,
+    transferReceivedAmount: Amount? = null,
     note: String? = null,
   )
 

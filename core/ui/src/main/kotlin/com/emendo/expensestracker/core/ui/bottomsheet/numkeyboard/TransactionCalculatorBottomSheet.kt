@@ -22,19 +22,16 @@ import com.emendo.expensestracker.core.ui.bottomsheet.NumericKeyboardActions
 data class CalculatorBottomSheetState(
   val currency: String?,
   val equalButtonState: EqualButtonState,
-  val decimalSeparator: String,
   @StringRes val transactionTypeLabelResId: Int,
   val numericKeyboardActions: NumericKeyboardActions,
 ) {
   companion object {
     fun initial(
-      decimalSeparator: String,
       @StringRes transactionTypeLabelResId: Int,
       numericKeyboardActions: NumericKeyboardActions,
     ) = CalculatorBottomSheetState(
       currency = null,
       equalButtonState = EqualButtonState.Default,
-      decimalSeparator = decimalSeparator,
       transactionTypeLabelResId = transactionTypeLabelResId,
       numericKeyboardActions = numericKeyboardActions,
     )

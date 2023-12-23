@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -14,7 +13,6 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -171,16 +169,24 @@ private fun TransactionItem(
       .padding(vertical = Dimens.margin_small_x),
     horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
   ) {
-    Icon(
-      imageVector = transaction.target.icon.imageVector,
-      contentDescription = "icon",
-      modifier = Modifier
-        .size(Dimens.icon_size_large)
-        .clip(CircleShape)
-        .aspectRatio(1f)
-        .background(color = transaction.target.color.color)
-        .padding(Dimens.margin_small_x),
-    )
+    Column(
+      horizontalAlignment = Alignment.End,
+      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
+    ) {
+      Icon(
+        imageVector = transaction.target.icon.imageVector,
+        contentDescription = "icon",
+        modifier = Modifier.size(Dimens.icon_size),
+        tint = transaction.target.color.color,
+      )
+      if (isTransfer) {
+        Icon(
+          imageVector = ExpeIcons.SubdirectoryArrowRight,
+          modifier = Modifier.size(Dimens.icon_size_small),
+          contentDescription = null,
+        )
+      }
+    }
     Column(
       modifier = Modifier.weight(1f),
       verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
@@ -188,6 +194,7 @@ private fun TransactionItem(
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
       ) {
         Column(
           modifier = Modifier.weight(1f),
@@ -213,27 +220,21 @@ private fun TransactionItem(
           }
         }
         Spacer(modifier = Modifier.width(Dimens.margin_small_x))
-        Text(
-          text = transaction.amount.formattedValue,
-          style = MaterialTheme.typography.bodyLarge,
-          modifier = Modifier.align(Alignment.CenterVertically),
-          color = transaction.textColor()
-        )
-        if (isTransfer) {
+        Column {
           Text(
-            text = transaction.transferReceivedAmount.toString(),
+            text = transaction.amount.formattedValue,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.align(Alignment.CenterVertically),
+            color = transaction.textColor()
           )
+          if (isTransfer) {
+            transaction.transferReceivedAmount?.formattedValue?.let { amount ->
+              Text(
+                text = amount,
+                style = MaterialTheme.typography.bodyLarge,
+              )
+            }
+          }
         }
-      }
-
-      if (isTransfer) {
-        Icon(
-          imageVector = ExpeIcons.SubdirectoryArrowRight,
-          modifier = Modifier.size(Dimens.icon_size_small),
-          contentDescription = null,
-        )
       }
 
       transaction.note?.let { note ->
