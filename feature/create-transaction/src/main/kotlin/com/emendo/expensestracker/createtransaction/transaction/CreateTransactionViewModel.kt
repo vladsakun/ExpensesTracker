@@ -11,7 +11,6 @@ import com.emendo.expensestracker.core.app.base.manager.CreateTransactionReposit
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
-import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_TRANSFER_TRANSACTION
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
@@ -23,15 +22,12 @@ import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
 import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.labelResId
-import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.toTransactionType
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
 import com.emendo.expensestracker.core.domain.account.GetLastTransferAccountOrRandomUseCase
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.core.model.data.CurrencyModel
-import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
@@ -121,12 +117,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState.asStateFlow() }
-
   internal val calculatorText: StateFlow<String> = numericKeyboardCommander.calculatorTextState
-
-  private val selectedCurrencyModel: CurrencyModel
-    get() = usedCurrencies.value.getOrNull(calculatorState.value.getSelectedCurrencyIndex())
-      ?: currencyCacheManager.getGeneralCurrencySnapshot()
 
   private var createTransactionJob: Job? = null
   private var shouldClearTarget: Boolean = true
@@ -161,7 +152,7 @@ class CreateTransactionViewModel @Inject constructor(
     _uiState.update { state ->
       state.copy(
         screenData = state.screenData.copy(transactionType = type),
-        sourceAmountFocused = false,
+        sourceAmountFocused = true,
         transferTargetAmountFocused = false,
         isCustomTransferAmount = false,
       )
@@ -181,11 +172,14 @@ class CreateTransactionViewModel @Inject constructor(
         }
 
         val source = createTransactionRepository.getSourceSnapshot() ?: return@launch
-        val convertedValue = getConvertedTargetTransferValue(target, source, numericKeyboardCommander.currentValue)
-        val toCurrency = target.currency
+        val transferReceivedAmount = getConvertedFormattedValue(
+          value = uiState.value.screenData.amount.value,
+          fromCurrency = source.currency,
+          toCurrency = target.currency,
+        )
 
         _uiState.update { state ->
-          state.copy(transferReceivedAmount = amountFormatter.format(convertedValue, toCurrency))
+          state.copy(transferReceivedAmount = transferReceivedAmount)
         }
       }
       return
@@ -194,18 +188,17 @@ class CreateTransactionViewModel @Inject constructor(
     createTransactionRepository.setTarget(createTransactionRepository.getDefaultTarget(type))
   }
 
-  private fun getConvertedTargetTransferValue(
-    target: AccountModel,
-    source: TransactionSource,
+  private fun getConvertedFormattedValue(
     value: BigDecimal,
-  ): BigDecimal {
-    val toCurrency = target.currency
-    val fromCurrency = source.currency
-    return convertCurrencyUseCase.invoke(
+    fromCurrency: CurrencyModel,
+    toCurrency: CurrencyModel,
+  ): Amount {
+    val convertedValue = convertCurrencyUseCase(
       value = value,
       fromCurrencyCode = fromCurrency.currencyCode,
       toCurrencyCode = toCurrency.currencyCode,
     )
+    return amountFormatter.format(convertedValue, toCurrency)
   }
 
   override fun changeTransactionType() {
@@ -227,8 +220,7 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
     hasSelectedCustomCurrency = true
-    val selectedCurrencyIndex = calculatorState.value.getSelectedCurrencyIndex()
-    val nextCurrency = currencies.getNextItem(selectedCurrencyIndex)
+    val nextCurrency = getNextCurrency(currencies)
     _uiState.updateScreenData { screenData ->
       screenData.copy(
         amount = amountFormatter.replaceCurrency(
@@ -238,6 +230,11 @@ class CreateTransactionViewModel @Inject constructor(
       )
     }
     _calculatorCurrencyState.update { nextCurrency }
+  }
+
+  private fun getNextCurrency(currencies: List<CurrencyModel>): CurrencyModel {
+    val selectedCurrencyIndex = calculatorState.value.getSelectedCurrencyIndex()
+    return currencies.getNextItem(selectedCurrencyIndex)
   }
 
   fun showCalculatorBottomSheet(sourceTrigger: Boolean = true) {
@@ -367,58 +364,70 @@ class CreateTransactionViewModel @Inject constructor(
 
   private fun updateAmountText(amount: BigDecimal): Boolean {
     _uiState.update { state ->
-      val formattedAmount = amountFormatter.format(
-        amount = amount,
-        currency = selectedCurrencyModel,
-      )
-      if (state.screenData.transactionType == TransactionType.TRANSFER) {
-        if (state.transferTargetAmountFocused) {
-          return@update state.copy(
-            transferReceivedAmount = formattedAmount,
-            isCustomTransferAmount = true,
-          )
-        }
+      val screenData = state.screenData
+      val currency: CurrencyModel = getSelectedCurrency(state)
 
-        if (!state.isCustomTransferAmount) {
-          return@update handleCustomTransferAmount(state, amount, formattedAmount)
-        }
+      val formattedAmount = amountFormatter.format(amount, currency)
+
+      if (screenData.transactionType != TransactionType.TRANSFER) {
+        return@update state.copy(
+          screenData = screenData.copy(amount = formattedAmount)
+        )
       }
 
-      state.copy(
-        screenData = state.screenData.copy(
-          amount = formattedAmount
+      // Transfer Target amount to be changed
+      if (state.transferTargetAmountFocused) {
+        return@update state.copy(
+          transferReceivedAmount = formattedAmount,
+          isCustomTransferAmount = true,
         )
+      }
+
+      // Transfer Source amount to be changed
+      return@update state.copy(
+        screenData = screenData.copy(amount = formattedAmount),
+        transferReceivedAmount = getTransferReceivedAmount(state, amount),
       )
     }
 
     return false
   }
 
-  private fun handleCustomTransferAmount(
+  /**
+   * Converts [sourceAmount] if the user didn't put any custom value into Transfer target amount
+   *
+   * @param state - screen ui state
+   * @param sourceAmount - source amount [Amount]
+   * @return if user put any custom value into Transfer target amount - Transfer target amount, otherwise - converted [sourceAmount]
+   */
+  private fun getTransferReceivedAmount(
     state: CreateTransactionUiState,
-    amount: BigDecimal,
-    formattedAmount: Amount,
-  ): CreateTransactionUiState {
-    val target: AccountModel =
-      (createTransactionRepository.getTargetSnapshot() as? AccountModel) ?: return state
-    val source = createTransactionRepository.getSourceSnapshot() ?: return state
-    val toCurrency = target.currency
+    sourceAmount: BigDecimal,
+  ): Amount? =
+    if (state.isCustomTransferAmount) state.transferReceivedAmount else getConvertedTransferAmount(sourceAmount)
 
-    val fromCurrency = source.currency
-    val convertedValue = try {
-      convertCurrencyUseCase.invoke(
-        value = amount,
-        fromCurrencyCode = fromCurrency.currencyCode,
-        toCurrencyCode = toCurrency.currencyCode,
-      )
-    } catch (e: CurrencyRateNotFoundException) {
-      amount
+  private fun getSelectedCurrency(state: CreateTransactionUiState): CurrencyModel {
+    val screenData = state.screenData
+    val currency: CurrencyModel = if (screenData.transactionType == TransactionType.TRANSFER) {
+      when {
+        state.sourceAmountFocused -> screenData.amount.currency
+        state.transferTargetAmountFocused -> checkNotNull(state.transferReceivedAmount?.currency) { "Transfer target amount must not be focused with null Amount" }
+        else -> throw IllegalStateException("There's no focused Amount input. We can't get the currency")
+      }
+    } else {
+      screenData.amount.currency
     }
+    return currency
+  }
 
-    val transferReceivedAmount = amountFormatter.format(convertedValue, toCurrency)
-    return state.copy(
-      screenData = state.screenData.copy(amount = formattedAmount),
-      transferReceivedAmount = transferReceivedAmount,
+  private fun getConvertedTransferAmount(amount: BigDecimal): Amount? {
+    val target: AccountModel = createTransactionRepository.getTargetSnapshot() as? AccountModel ?: return null
+    val source = createTransactionRepository.getSourceSnapshot() ?: return null
+
+    return getConvertedFormattedValue(
+      value = amount,
+      fromCurrency = source.currency,
+      toCurrency = target.currency,
     )
   }
 
@@ -539,12 +548,4 @@ class CreateTransactionViewModel @Inject constructor(
   companion object {
     private val DEFAULT_AMOUNT_VALUE = BigDecimal.ZERO
   }
-}
-
-private fun getTransactionType(payload: CreateTransactionEventPayload?): TransactionType {
-  if (IS_DEBUG_TRANSFER_TRANSACTION) {
-    return TransactionType.TRANSFER
-  }
-
-  return payload?.transactionType?.toTransactionType() ?: TransactionType.DEFAULT
 }
