@@ -194,7 +194,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
           TransactionEntity(
             sourceAccountId = source.id,
             targetAccountId = target.id,
-            value = amount.value,
+            value = amount.value.negate(),
             currencyCode = amount.currency.currencyCode,
             date = date,
             note = note,

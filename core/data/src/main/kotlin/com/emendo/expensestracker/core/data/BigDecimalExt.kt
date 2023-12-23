@@ -16,3 +16,6 @@ fun BigDecimal.divideWithScale(
 
 val BigDecimal.isFloatingPointNumber: Boolean
   get() = remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0
+
+val BigDecimal.isPositive: Boolean
+  get() = this >= BigDecimal.ZERO

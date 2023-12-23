@@ -14,7 +14,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.emendo.expensestracker.core.app.base.shared.color.SelectColorScreen
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination.NavArgs
-import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomScreenTransition
 import com.ramcosta.composedestinations.navargs.primitives.DestinationsIntNavType
 import com.ramcosta.composedestinations.navigation.DependenciesContainerBuilder
 import com.ramcosta.composedestinations.navigation.DestinationDependenciesContainer
@@ -54,7 +54,7 @@ public object SelectColorScreenDestination : AppbaseuiTypedDestination<SelectCol
 		}
 	)
 
-	override val style: DestinationStyle = BottomSheetTransition
+	override val style: DestinationStyle = BottomScreenTransition
 
     @Composable
     override fun DestinationScope<NavArgs>.Content() {

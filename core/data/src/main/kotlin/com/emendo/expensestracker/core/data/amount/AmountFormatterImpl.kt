@@ -12,7 +12,6 @@ import javax.inject.Inject
 
 class AmountFormatterImpl @Inject constructor(
   private val localeManager: ExpeLocaleManager,
-  private val calculatorFormatter: CalculatorFormatter,
 ) : AmountFormatter {
 
   private val currentLocale: Locale

@@ -11,7 +11,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.emendo.expensestracker.core.app.base.shared.currency.SelectCurrencyScreen
-import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetTransition
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomScreenTransition
 import com.ramcosta.composedestinations.navigation.DependenciesContainerBuilder
 import com.ramcosta.composedestinations.navigation.DestinationDependenciesContainer
 import com.ramcosta.composedestinations.scope.DestinationScope
@@ -33,7 +33,7 @@ public object SelectCurrencyScreenDestination : AppbaseuiDirectionDestination {
 
     override val route: String = baseRoute
     
-	override val style: DestinationStyle = BottomSheetTransition
+	override val style: DestinationStyle = BottomScreenTransition
 
     @Composable
     override fun DestinationScope<Unit>.Content() {

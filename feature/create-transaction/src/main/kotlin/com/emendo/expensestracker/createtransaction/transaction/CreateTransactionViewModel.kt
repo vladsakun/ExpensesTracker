@@ -498,7 +498,8 @@ class CreateTransactionViewModel @Inject constructor(
       target = createTransactionRepository.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
       source = source?.toTransactionItemModel(),
       note = payload?.note,
-      sourceAmountFocused = true,
+      sourceAmountFocused = payload == null,
+      transferReceivedAmount = payload?.transferReceivedAmount,
     )
   }
 

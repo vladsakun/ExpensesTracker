@@ -98,9 +98,8 @@ private fun ExpeBottomBar(
         return@forEach
       }
 
-      val selected = item == routesOnBackStack.firstOrNull()
       ExpeNavigationBarItem(
-        selected = selected,
+        selected = item.isSelected(routesOnBackStack),
         onClick = { appState.navigateToTopLevelDestination(item) },
         icon = {
           Icon(
@@ -128,3 +127,10 @@ private fun ExpeBottomBar(
     }
   }
 }
+
+private fun TopLevelDestination.isSelected(routesOnBackStack: MutableList<TopLevelDestination>): Boolean =
+  if (routesOnBackStack.contains(TopLevelDestination.CREATE_TRANSACTION)) {
+    false
+  } else {
+    this == routesOnBackStack.firstOrNull()
+  }
