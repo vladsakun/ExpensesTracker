@@ -110,7 +110,6 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState.asStateFlow() }
-  internal val calculatorText: StateFlow<String> = numericKeyboardCommander.calculatorTextState
 
   private var createTransactionJob: Job? = null
   private var shouldClearTarget: Boolean = true

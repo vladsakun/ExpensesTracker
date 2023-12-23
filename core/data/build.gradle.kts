@@ -9,8 +9,8 @@ android {
 }
 
 dependencies {
-  // Todo maybe convert to implementation. Get rid of compose in data module
-  api(project(":core:app-resources"))
+  // Todo Get rid of compose in data module
+  implementation(project(":core:app-resources"))
   implementation(project(":core:common"))
   implementation(project(":core:database"))
   implementation(project(":core:datastore"))

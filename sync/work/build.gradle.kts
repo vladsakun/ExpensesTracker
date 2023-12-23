@@ -11,10 +11,12 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:app-resources"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:datastore"))
     implementation(project(":core:model"))
+
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.tracing.ktx)
     implementation(libs.androidx.work.ktx)

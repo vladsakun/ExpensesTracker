@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -65,9 +68,7 @@ fun CreateTransactionScreen(
   viewModel: CreateTransactionViewModel = hiltViewModel(),
 ) {
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-  val bottomSheetState: State<CreateTransactionBottomSheetState> =
-    viewModel.bottomSheetState.collectAsStateWithLifecycle()
-  val calculatorTextState: State<String> = viewModel.calculatorText.collectAsStateWithLifecycle()
+  val bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle()
 
   ScreenWithModalBottomSheet(
     stateManager = viewModel,
@@ -77,7 +78,6 @@ fun CreateTransactionScreen(
     CreateTransactionContent(
       stateProvider = uiState::value,
       bottomSheetStateProvider = bottomSheetState::value,
-      calculatorTextStateProvider = calculatorTextState::value,
       onSourceAmountClick = remember { { viewModel.showCalculatorBottomSheet() } },
       onTargetAmountClick = remember { { viewModel.showCalculatorBottomSheet(sourceTrigger = false) } },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
@@ -103,7 +103,6 @@ fun CreateTransactionScreen(
 private fun CreateTransactionContent(
   stateProvider: () -> CreateTransactionUiState,
   bottomSheetStateProvider: () -> CreateTransactionBottomSheetState,
-  calculatorTextStateProvider: () -> String,
   onSourceAmountClick: () -> Unit,
   onTargetAmountClick: () -> Unit,
   onCategoryClick: () -> Unit,
@@ -251,7 +250,7 @@ private fun CreateTransactionContent(
             onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },
           )
           EditableAmount(
-            text = calculatorTextStateProvider(),
+            text = state.amountCalculatorHint,
             focused = state.sourceAmountFocused,
             modifier = Modifier
               .fillMaxWidth()
@@ -596,7 +595,6 @@ private fun CreateTransactionScreenPreview(
     CreateTransactionContent(
       stateProvider = { state },
       bottomSheetStateProvider = { TODO() },
-      calculatorTextStateProvider = { TODO() },
       onSourceAmountClick = {},
       onTargetAmountClick = {},
       onCategoryClick = {},
@@ -612,7 +610,6 @@ private fun CreateTransactionScreenPreview(
       onNoteValueChange = { _ -> },
       onDeleteClick = {},
       onDuplicateClick = {},
-      hideCalculatorBottomSheet = {},
-    )
+    ) {}
   }
 }

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-// Todo add favourite currencies
 class GetUsedCurrenciesUseCase @Inject constructor(
   private val accountRepository: AccountRepository,
   private val userDataRepository: UserDataRepository,
@@ -18,8 +17,12 @@ class GetUsedCurrenciesUseCase @Inject constructor(
     val accountCurrenciesFlow = accountRepository.getAccounts().map { accounts ->
       accounts.map { it.currency }
     }
-    return combine(userDataRepository.generalCurrency, accountCurrenciesFlow) { generalCurrency, accountCurrencies ->
-      (accountCurrencies + generalCurrency).distinct()
+    return combine(
+      userDataRepository.generalCurrency,
+      userDataRepository.favouriteCurrencies,
+      accountCurrenciesFlow
+    ) { generalCurrency, favouriteCurrencies, accountCurrencies ->
+      (accountCurrencies + favouriteCurrencies + generalCurrency).distinct()
     }
   }
 }
