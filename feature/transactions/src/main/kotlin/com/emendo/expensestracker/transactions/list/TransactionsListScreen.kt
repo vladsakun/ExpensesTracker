@@ -29,6 +29,7 @@ import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
+import com.emendo.expensestracker.core.designsystem.component.HorizontalSpacer
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerSmallRadiusShape
@@ -161,94 +162,76 @@ private fun TransactionItem(
 ) {
   val isTransfer = transaction.target is AccountModel
 
-  Row(
+  Column(
     modifier = modifier
       .fillMaxWidth()
       .clickable(onClick = onClick)
       .padding(horizontal = Dimens.margin_large_x)
       .padding(vertical = Dimens.margin_small_x),
-    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+    verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
   ) {
-    Column(
-      horizontalAlignment = Alignment.End,
-      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
-    ) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)) {
       Icon(
         imageVector = transaction.target.icon.imageVector,
         contentDescription = "icon",
         modifier = Modifier.size(Dimens.icon_size),
         tint = transaction.target.color.color,
       )
+      Text(
+        text = transaction.target.name.stringValue(),
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.weight(1f),
+      )
+      Text(
+        text = transaction.amount.formattedValue,
+        style = MaterialTheme.typography.bodyLarge,
+        color = transaction.textColor()
+      )
+    }
+    Row(verticalAlignment = Alignment.CenterVertically) {
       if (isTransfer) {
+        HorizontalSpacer(width = Dimens.icon_size)
         Icon(
           imageVector = ExpeIcons.SubdirectoryArrowRight,
           modifier = Modifier.size(Dimens.icon_size_small),
           contentDescription = null,
         )
+      } else {
+        HorizontalSpacer(width = Dimens.icon_size)
+      }
+      HorizontalSpacer(width = Dimens.margin_small_xx)
+      Icon(
+        imageVector = transaction.source.icon.imageVector,
+        contentDescription = null,
+        modifier = Modifier.size(Dimens.icon_size_small)
+      )
+      HorizontalSpacer(width = Dimens.margin_small_xx)
+      Text(
+        text = transaction.source.name.stringValue(),
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.weight(1f),
+      )
+      HorizontalSpacer(width = Dimens.margin_small_xx)
+      if (isTransfer) {
+        transaction.transferReceivedAmount?.formattedValue?.let { amount ->
+          Text(
+            text = amount,
+            style = MaterialTheme.typography.bodyLarge,
+          )
+        }
       }
     }
-    Column(
-      modifier = Modifier.weight(1f),
-      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
-    ) {
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Column(
-          modifier = Modifier.weight(1f),
-          verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
-        ) {
-          Text(
-            text = transaction.target.name.stringValue(),
-            style = MaterialTheme.typography.bodyLarge,
-          )
-          Row(
-            horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
-            verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Icon(
-              imageVector = transaction.source.icon.imageVector,
-              contentDescription = "source_icon",
-              modifier = Modifier.size(Dimens.icon_size_small)
-            )
-            Text(
-              text = transaction.source.name.stringValue(),
-              style = MaterialTheme.typography.bodyLarge,
-            )
-          }
-        }
-        Spacer(modifier = Modifier.width(Dimens.margin_small_x))
-        Column {
-          Text(
-            text = transaction.amount.formattedValue,
-            style = MaterialTheme.typography.bodyLarge,
-            color = transaction.textColor()
-          )
-          if (isTransfer) {
-            transaction.transferReceivedAmount?.formattedValue?.let { amount ->
-              Text(
-                text = amount,
-                style = MaterialTheme.typography.bodyLarge,
-              )
-            }
-          }
-        }
-      }
-
-      transaction.note?.let { note ->
-        Text(
-          text = note,
-          style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
-          modifier = Modifier.padding(bottom = Dimens.margin_small_x),
-        )
-      }
+    transaction.note?.let { note ->
+      Text(
+        text = note,
+        style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
+        modifier = Modifier.padding(bottom = Dimens.margin_small_x),
+      )
     }
   }
   ExpeDivider(
     modifier = Modifier
-      .padding(start = Dimens.margin_large_x + Dimens.icon_size_large + Dimens.margin_small_x * 2)
+      .padding(start = Dimens.margin_large_x + Dimens.icon_size + Dimens.margin_small_xx)
   )
 }
 
