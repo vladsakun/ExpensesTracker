@@ -97,12 +97,10 @@ class CreateTransactionViewModel @Inject constructor(
 
   private val calculatorState: StateFlow<CalculatorBottomSheetState> = combine(
     _calculatorBottomSheetState,
-    numericKeyboardCommander.calculatorTextState,
     numericKeyboardCommander.equalButtonState,
     currencyState
-  ) { state, text, equalButtonState, currency ->
+  ) { state, equalButtonState, currency ->
     state.copy(
-      text = text,
       equalButtonState = equalButtonState,
       currency = currency?.currencySymbolOrCode,
     )
@@ -124,6 +122,8 @@ class CreateTransactionViewModel @Inject constructor(
 
   internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState.asStateFlow() }
 
+  internal val calculatorText: StateFlow<String> = numericKeyboardCommander.calculatorTextState
+
   private val selectedCurrencyModel: CurrencyModel
     get() = usedCurrencies.value.getOrNull(calculatorState.value.getSelectedCurrencyIndex())
       ?: currencyCacheManager.getGeneralCurrencySnapshot()
@@ -135,7 +135,11 @@ class CreateTransactionViewModel @Inject constructor(
   init {
     numericKeyboardCommander.setCallbacks(
       doneClick = ::doneClick,
-      onMathDone = ::updateAmountText
+      onMathDone = ::updateAmountText,
+      valueChanged = { text, _ ->
+        // Todo on value changed update amount text
+        false
+      }
     )
   }
 
@@ -165,6 +169,7 @@ class CreateTransactionViewModel @Inject constructor(
     _calculatorBottomSheetState.update { calculatorState ->
       calculatorState.copy(transactionTypeLabelResId = type.labelResId)
     }
+    numericKeyboardCommander.doMath()
 
     if (type == TransactionType.TRANSFER) {
       viewModelScope.launch {
@@ -258,9 +263,9 @@ class CreateTransactionViewModel @Inject constructor(
     if (amount != null) {
       val initialValue = calculatorFormatter.formatFinalWithMax2Precision(amount.value)
       _calculatorCurrencyState.update { amount.currency }
-      _calculatorBottomSheetState.update { state ->
-        state.copy(text = initialValue)
-      }
+      //      _calculatorBottomSheetState.update { state ->
+      //        state.copy(text = initialValue)
+      //      }
       numericKeyboardCommander.setInitialValue(initialValue)
     }
     _bottomSheetState.update {
@@ -268,12 +273,13 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  private fun getCalculatorBottomSheetData() = CalculatorBottomSheetData(
-    state = calculatorState,
-    actions = this,
-    numericKeyboardActions = numericKeyboardCommander,
-    decimalSeparator = decimalSeparator,
-  )
+  private fun getCalculatorBottomSheetData(): CalculatorBottomSheetData =
+    CalculatorBottomSheetData(
+      state = calculatorState,
+      actions = this,
+      numericKeyboardActions = numericKeyboardCommander,
+      decimalSeparator = decimalSeparator,
+    )
 
   fun saveTransaction() {
     val source = createTransactionRepository.getSourceSnapshot()
@@ -342,9 +348,12 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
-  private fun hideCalculatorBottomSheet() {
-    _bottomSheetState.update { state ->
-      state.copy(hide = triggered)
+  fun hideCalculatorBottomSheet() {
+    _bottomSheetState.update { sheetState ->
+      sheetState.copy(hide = triggered)
+    }
+    _uiState.update { state ->
+      state.copy(sourceAmountFocused = false)
     }
   }
 
@@ -456,7 +465,7 @@ class CreateTransactionViewModel @Inject constructor(
   private fun getTargetDefaultValue(transactionType: TransactionType): TransactionTarget =
     createTransactionRepository.getDefaultTarget(transactionType)
 
-  private fun getInitialCalculatorState() =
+  private fun getInitialCalculatorState(): CalculatorBottomSheetState =
     CalculatorBottomSheetState.initial(
       decimalSeparator = decimalSeparator,
       transactionTypeLabelResId = TransactionType.DEFAULT.labelResId,

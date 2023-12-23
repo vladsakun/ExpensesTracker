@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
+import com.emendo.expensestracker.categories.list.model.toCategoryModel
 import com.emendo.expensestracker.categories.list.model.toCategoryWithTotal
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
@@ -87,7 +88,7 @@ class CategoriesListViewModel @Inject constructor(
     appNavigationEventBus.navigate(
       AppNavigationEvent.CreateTransaction(
         source = null,
-        target = category.category,
+        target = category.category.toCategoryModel(),
         shouldNavigateUp = true
       )
     )

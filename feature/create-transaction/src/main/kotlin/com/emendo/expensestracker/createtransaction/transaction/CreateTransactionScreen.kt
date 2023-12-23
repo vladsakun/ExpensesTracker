@@ -13,8 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,7 +55,7 @@ import kotlinx.coroutines.launch
 private val marginVertical = Dimens.margin_large_x
 private val marginHorizontal = Dimens.margin_large_x
 private const val ERROR_ANIMATION_DURATION_MILLIS = 500
-private const val TRANSFER_BLOCK_MIN_HEIGHT = 80
+private const val TRANSFER_BLOCK_MIN_HEIGHT = 100
 
 @RootNavGraph(start = true)
 @Destination(style = BottomScreenTransition::class)
@@ -65,6 +67,7 @@ fun CreateTransactionScreen(
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
   val bottomSheetState: State<CreateTransactionBottomSheetState> =
     viewModel.bottomSheetState.collectAsStateWithLifecycle()
+  val calculatorTextState: State<String> = viewModel.calculatorText.collectAsStateWithLifecycle()
 
   ScreenWithModalBottomSheet(
     stateManager = viewModel,
@@ -74,6 +77,7 @@ fun CreateTransactionScreen(
     CreateTransactionContent(
       stateProvider = uiState::value,
       bottomSheetStateProvider = bottomSheetState::value,
+      calculatorTextStateProvider = calculatorTextState::value,
       onSourceAmountClick = remember { { viewModel.showCalculatorBottomSheet() } },
       onTargetAmountClick = remember { { viewModel.showCalculatorBottomSheet(sourceTrigger = false) } },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
@@ -89,6 +93,7 @@ fun CreateTransactionScreen(
       onNoteValueChange = remember { viewModel::updateNoteText },
       onDeleteClick = remember { viewModel::showConfirmDeleteTransactionBottomSheet },
       onDuplicateClick = remember { viewModel::duplicateTransaction },
+      hideCalculatorBottomSheet = remember { viewModel::hideCalculatorBottomSheet },
     )
   }
 }
@@ -98,6 +103,7 @@ fun CreateTransactionScreen(
 private fun CreateTransactionContent(
   stateProvider: () -> CreateTransactionUiState,
   bottomSheetStateProvider: () -> CreateTransactionBottomSheetState,
+  calculatorTextStateProvider: () -> String,
   onSourceAmountClick: () -> Unit,
   onTargetAmountClick: () -> Unit,
   onCategoryClick: () -> Unit,
@@ -113,9 +119,11 @@ private fun CreateTransactionContent(
   onNoteValueChange: (String) -> Unit,
   onDeleteClick: () -> Unit,
   onDuplicateClick: () -> Unit,
+  hideCalculatorBottomSheet: () -> Unit,
 ) {
   val scope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState()
+  val focusManager = LocalFocusManager.current
 
   EventEffect(
     event = bottomSheetStateProvider().hide,
@@ -149,11 +157,10 @@ private fun CreateTransactionContent(
     topBar = {
       ExpeCenterAlignedTopBar(
         title = {
-          val transactionType = stateProvider().screenData.transactionType
           val tabsResId = persistentListOf(R.string.income, R.string.expense, R.string.transfer)
           // Todo improve transaction type switch animation
           TextSwitch(
-            selectedIndex = transactionType.ordinal,
+            selectedIndex = stateProvider().screenData.transactionType.ordinal,
             items = tabsResId.map { stringResource(id = it) }.toPersistentList(),
             onSelectionChange = { tabIndex ->
               onTransactionTypeChange(tabIndex.toTransactionType())
@@ -197,8 +204,12 @@ private fun CreateTransactionContent(
               TransferAccount(onAccountClick, source)
               TransferAmount(
                 text = state.screenData.amount.formattedValue,
-                focused = state.sourceAmountFocused,
                 onClick = onSourceAmountClick,
+              )
+              EditableAmount(
+                textProvider = calculatorTextStateProvider,
+                focused = state.sourceAmountFocused,
+                modifier = Modifier.fillMaxWidth(),
               )
             }
           }
@@ -212,23 +223,36 @@ private fun CreateTransactionContent(
               state.transferReceivedAmount?.let { amount ->
                 TransferAmount(
                   text = amount.formattedValue,
-                  focused = state.transferTargetAmountFocused,
                   textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
                   onClick = onTargetAmountClick,
                 )
+                //                EditableAmount(calculatorTextStateProvider = , focused =state.transferTargetAmountFocused )
               }
             }
           }
         }
       } else {
-        Amount(
-          onClick = onSourceAmountClick,
-          text = state.screenData.amount.formattedValue,
-          transactionType = state.screenData.transactionType,
-          error = state.screenData.amountError == triggered,
-          onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },
-          focused = state.sourceAmountFocused,
-        )
+        Column(
+          modifier = Modifier
+            .clickable {
+              onSourceAmountClick()
+              focusManager.clearFocus(force = true)
+            },
+        ) {
+          Amount(
+            text = state.screenData.amount.formattedValue,
+            transactionType = state.screenData.transactionType,
+            error = state.screenData.amountError == triggered,
+            onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },
+          )
+          EditableAmount(
+            textProvider = calculatorTextStateProvider,
+            focused = state.sourceAmountFocused,
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = marginHorizontal, vertical = Dimens.margin_small_xx),
+          )
+        }
       }
       ExpeDivider()
       if (state.screenData.transactionType != TransactionType.TRANSFER) {
@@ -249,6 +273,9 @@ private fun CreateTransactionContent(
       NoteTextField(
         text = state.note,
         onNoteValueChange = onNoteValueChange,
+        onFocused = {
+          hideCalculatorBottomSheet()
+        },
       )
       ExpeDivider()
       VerticalSpacer(marginVertical)
@@ -276,6 +303,23 @@ private fun CreateTransactionContent(
 }
 
 @Composable
+private fun EditableAmount(
+  textProvider: () -> String,
+  focused: Boolean,
+  modifier: Modifier = Modifier,
+) {
+  AutoSizableTextField(
+    text = textProvider(),
+    minFontSize = MaterialTheme.typography.labelSmall.fontSize,
+    textAlign = TextAlign.End,
+    style = MaterialTheme.typography.labelSmall,
+    maxLines = 1,
+    focused = focused,
+    modifier = modifier,
+  )
+}
+
+@Composable
 private fun SaveButton(onClick: () -> Unit) {
   ExpeButton(
     textResId = R.string.save_transaction,
@@ -289,11 +333,18 @@ private fun SaveButton(onClick: () -> Unit) {
 private fun NoteTextField(
   text: String?,
   onNoteValueChange: (String) -> Unit,
+  onFocused: () -> Unit,
 ) {
   ExpeTextField(
     text = text,
     onValueChange = onNoteValueChange,
-    modifier = Modifier.fillMaxWidth(),
+    modifier = Modifier
+      .fillMaxWidth()
+      .onFocusChanged { focusState ->
+        if (focusState.isFocused) {
+          onFocused()
+        }
+      },
     placeholder = stringResource(id = R.string.create_transaction_note_placeholder),
     paddingValues = PaddingValues(horizontal = marginHorizontal, vertical = marginVertical),
   )
@@ -343,14 +394,12 @@ private fun Chevron() {
 @Composable
 private fun TransferAmount(
   text: String,
-  focused: Boolean,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   textColor: Color = MaterialTheme.typography.headlineMedium.color,
 ) {
-  AutoSizableTextField(
+  AutoSizableText(
     text = text,
-    focused = focused,
     modifier = modifier.clickable(onClick = onClick),
     minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
     style = MaterialTheme.typography.headlineMedium,
@@ -382,7 +431,10 @@ private fun TransferAccount(
       imageVector = account.icon.imageVector,
       contentDescription = null,
     )
-    Text(text = account.name.stringValue(), style = MaterialTheme.typography.bodyLarge)
+    Text(
+      text = account.name.stringValue(),
+      style = MaterialTheme.typography.bodyLarge,
+    )
   }
 }
 
@@ -409,9 +461,7 @@ private fun Amount(
   text: String,
   transactionType: TransactionType,
   error: Boolean,
-  onClick: () -> Unit,
   onErrorConsumed: () -> Unit,
-  focused: Boolean,
   modifier: Modifier = Modifier,
 ) {
   val backgroundColor = animateColorAsState(
@@ -420,22 +470,17 @@ private fun Amount(
     animationSpec = tween(ERROR_ANIMATION_DURATION_MILLIS),
     label = "error"
   )
-  AutoSizableTextField(
+  AutoSizableText(
     text = text,
     minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
     color = transactionType.amountColor(),
     style = MaterialTheme.typography.headlineMedium,
     textAlign = TextAlign.End,
-    focused = focused,
     maxLines = 1,
     modifier = modifier
       .fillMaxWidth()
       .drawBehind { drawRect(backgroundColor.value) }
-      .clickable(onClick = onClick)
-      .padding(
-        vertical = marginVertical,
-        horizontal = marginHorizontal,
-      ),
+      .padding(horizontal = marginHorizontal),
   )
 }
 
@@ -548,6 +593,7 @@ private fun CreateTransactionScreenPreview(
     CreateTransactionContent(
       stateProvider = { state },
       bottomSheetStateProvider = { TODO() },
+      calculatorTextStateProvider = { TODO() },
       onSourceAmountClick = {},
       onTargetAmountClick = {},
       onCategoryClick = {},
@@ -557,12 +603,13 @@ private fun CreateTransactionScreenPreview(
       onBackPressed = {},
       onErrorConsumed = { _ -> },
       onConsumedNavigateUpEvent = {},
-      onConsumedHideCalculatorBottomSheetEvent = {},
       onConsumedShowCalculatorBottomSheetEvent = {},
+      onConsumedHideCalculatorBottomSheetEvent = {},
       onTransactionTypeChange = { _ -> },
       onNoteValueChange = { _ -> },
       onDeleteClick = {},
       onDuplicateClick = {},
+      hideCalculatorBottomSheet = {},
     )
   }
 }

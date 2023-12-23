@@ -33,7 +33,6 @@ import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.NumericKeyboar
 
 @Composable
 internal fun BaseNumericalKeyboardBottomSheet(
-  textProvider: () -> String,
   equalButtonStateProvider: () -> EqualButtonState,
   decimalSeparator: String,
   firstAction: @Composable (Modifier) -> Unit,
@@ -55,7 +54,6 @@ internal fun BaseNumericalKeyboardBottomSheet(
       .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
     verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
   ) {
-    ResultText(textProvider)
     val mathOperationModifier = remember {
       Modifier
         .weight(MATH_OPERATION_WEIGHT)
@@ -167,7 +165,7 @@ internal fun BaseNumericalKeyboardBottomSheet(
 }
 
 @Composable
-internal fun ResultText(textProvider: () -> String) {
+fun ResultText(textProvider: () -> String) {
   // Todo remove hardcoded value. Use sp to dp converted
   val heightValue = MaterialTheme.typography.headlineLarge.lineHeight.value + 5
   val lineHeightDp = with(LocalDensity.current) { heightValue.sp.toDp() }

@@ -16,12 +16,11 @@ internal fun AccountBottomSheetContent(
       val equalButtonState = type.equalButtonState.collectAsStateWithLifecycle()
 
       NumericKeyboardBottomSheet(
-        textProvider = text::value,
-        actions = type.actions,
-        equalButtonStateProvider = equalButtonState::value,
-        decimalSeparator = type.decimalSeparator,
         currency = type.currency,
+        equalButtonStateProvider = equalButtonState::value,
+        actions = type.actions,
         numericKeyboardActions = type.numericKeyboardActions,
+        decimalSeparator = type.decimalSeparator,
       )
     }
   }

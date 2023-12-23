@@ -3,9 +3,9 @@ package com.emendo.expensestracker.categories.list.model
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
+import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
-import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 
@@ -14,14 +14,14 @@ data class CategoryWithTotal(
   val totalAmount: Amount,
 ) {
   data class Category(
-    override val id: Long,
-    override val name: TextValue,
-    override val icon: IconModel,
-    override val color: ColorModel,
-    override val ordinalIndex: Int,
+    val id: Long,
+    val name: TextValue,
+    val icon: IconModel,
+    val color: ColorModel,
+    val ordinalIndex: Int,
     val type: CategoryType,
-    override val currency: CurrencyModel? = null,
-  ) : TransactionTarget {
+    val currency: CurrencyModel? = null,
+  ) {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true
       if (javaClass != other?.javaClass) return false
@@ -46,13 +46,24 @@ data class CategoryWithTotal(
   }
 }
 
-fun toCategoryWithTotal(category: CategoryWithTotalTransactions) =
+fun CategoryWithTotal.Category.toCategoryModel(): CategoryModel =
+  CategoryModel(
+    id = id,
+    name = name,
+    icon = icon,
+    color = color,
+    ordinalIndex = ordinalIndex,
+    type = type,
+    currency = currency,
+  )
+
+fun toCategoryWithTotal(category: CategoryWithTotalTransactions): CategoryWithTotal =
   CategoryWithTotal(
     totalAmount = category.totalAmount,
     category = category.asCategory()
   )
 
-private fun CategoryWithTotalTransactions.asCategory() = with(categoryModel) {
+private fun CategoryWithTotalTransactions.asCategory(): CategoryWithTotal.Category = with(categoryModel) {
   CategoryWithTotal.Category(
     id = id,
     name = name,

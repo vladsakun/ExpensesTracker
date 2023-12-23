@@ -19,7 +19,6 @@ import com.emendo.expensestracker.core.ui.bottomsheet.NumericKeyboardActions
 
 @Composable
 fun NumericKeyboardBottomSheet(
-  textProvider: () -> String,
   currency: String,
   equalButtonStateProvider: () -> EqualButtonState,
   actions: InitialBalanceKeyboardActions,
@@ -27,7 +26,7 @@ fun NumericKeyboardBottomSheet(
   decimalSeparator: String,
 ) {
   BaseNumericalKeyboardBottomSheet(
-    textProvider = textProvider,
+    // Todo fix
     equalButtonStateProvider = equalButtonStateProvider,
     decimalSeparator = decimalSeparator,
     firstAction = { modifier ->
