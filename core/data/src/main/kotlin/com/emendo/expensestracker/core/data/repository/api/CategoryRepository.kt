@@ -8,10 +8,9 @@ import com.emendo.expensestracker.core.data.model.category.CategoryWithTransacti
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {
-  val categories: Flow<List<CategoryModel>>
-  val categoriesWithTransactions: Flow<List<CategoryWithTransactions>>
-
-  val categoriesSnapshot: List<CategoryModel>
+  fun getCategories(): Flow<List<CategoryModel>>
+  fun getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>>
+  fun getCategoriesSnapshot(): List<CategoryModel>
 
   suspend fun createCategory(
     name: String,
@@ -28,10 +27,6 @@ interface CategoryRepository {
     type: CategoryType,
   )
 
-  suspend fun updateOrdinalIndex(
-    id: Long,
-    ordinalIndex: Int,
-  )
-
+  suspend fun updateOrdinalIndex(id: Long, ordinalIndex: Int)
   suspend fun deleteCategory(id: Long)
 }

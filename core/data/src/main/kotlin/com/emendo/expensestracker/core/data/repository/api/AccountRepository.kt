@@ -8,13 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
 interface AccountRepository {
-  val accounts: Flow<List<AccountModel>>
-  val accountsSnapshot: List<AccountModel>
+  fun getAccounts(): Flow<List<AccountModel>>
+  fun getAccountsSnapshot(): List<AccountModel>
   fun getLastAccount(): Flow<AccountModel?>
-  suspend fun retrieveLastAccount(): AccountModel?
 
   fun getById(id: Long): Flow<AccountModel>
-  suspend fun retrieveById(id: Long): AccountModel?
 
   suspend fun createAccount(
     currency: CurrencyModel,
@@ -31,7 +29,11 @@ interface AccountRepository {
     icon: IconModel,
     color: ColorModel,
     balance: BigDecimal,
-    ordinalIndex: Int? = null,
+  )
+
+  suspend fun updateOrdinalIndex(
+    id: Long,
+    ordinalIndex: Int,
   )
 
   suspend fun deleteAccount(id: Long)

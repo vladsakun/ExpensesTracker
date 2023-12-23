@@ -8,5 +8,5 @@ class GetCategorySnapshotByIdUseCase @Inject constructor(
   private val categoryRepository: CategoryRepository,
 ) {
   operator fun invoke(categoryId: Long): CategoryModel =
-    categoryRepository.categoriesSnapshot.first { it.id == categoryId }
+    categoryRepository.getCategoriesSnapshot().first { it.id == categoryId }
 }

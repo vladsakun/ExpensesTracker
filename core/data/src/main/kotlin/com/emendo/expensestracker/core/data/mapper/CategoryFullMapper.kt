@@ -6,11 +6,10 @@ import com.emendo.expensestracker.core.data.model.category.CategoryWithTransacti
 import com.emendo.expensestracker.core.data.model.category.asExternalModel
 import com.emendo.expensestracker.core.database.model.CategoryFull
 import com.emendo.expensestracker.core.database.model.TransactionEntity
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import javax.inject.Inject
 
-class CategoryFullMapper @Inject constructor(
-  private val currencyMapper: CurrencyMapper,
-) : Mapper<CategoryFull, CategoryWithTransactions> {
+class CategoryFullMapper @Inject constructor() : Mapper<CategoryFull, CategoryWithTransactions> {
 
   override suspend fun map(from: CategoryFull): CategoryWithTransactions = with(from) {
     CategoryWithTransactions(
@@ -19,10 +18,10 @@ class CategoryFullMapper @Inject constructor(
     )
   }
 
-  private suspend fun toCategoryTransactionModel(entity: TransactionEntity) =
+  private fun toCategoryTransactionModel(entity: TransactionEntity) =
     CategoryTransactionModel(
       id = entity.id,
       value = entity.value,
-      currencyModel = currencyMapper.map(entity.currencyCode),
+      currencyModel = CurrencyModel.toCurrencyModel(entity.currencyCode),
     )
 }

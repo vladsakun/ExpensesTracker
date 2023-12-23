@@ -12,7 +12,6 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
-import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.domain.account.GetAccountSnapshotByIdUseCase
 import com.emendo.expensestracker.core.model.data.Amount
@@ -34,10 +33,9 @@ class AccountDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   getAccountSnapshotByIdUseCase: GetAccountSnapshotByIdUseCase,
   numericKeyboardCommander: NumericKeyboardCommander,
-  private val currencyMapper: CurrencyMapper,
+  calculatorFormatter: CalculatorFormatter,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
-  private val calculatorFormatter: CalculatorFormatter,
 ) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
   private val accountId: Long = requireNotNull(savedStateHandle[AccountDetailScreenDestination.arguments[0].name])
@@ -103,7 +101,7 @@ class AccountDetailViewModel @Inject constructor(
   }
 
   fun updateCurrencyByCode(code: String) {
-    updateCurrencyByCode(amountFormatter, currencyMapper, code)
+    updateCurrencyByCode(amountFormatter, code)
   }
 
   private fun deleteAccount() {

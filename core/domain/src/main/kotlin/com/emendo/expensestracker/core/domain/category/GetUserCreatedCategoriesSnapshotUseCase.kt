@@ -9,6 +9,6 @@ class GetUserCreatedCategoriesSnapshotUseCase @Inject constructor(
   private val isPrepopulatedCategoryUseCase: IsPrepopulatedCategoryUseCase,
 ) {
   operator fun invoke(): List<CategoryModel> =
-    categoryRepository.categoriesSnapshot
+    categoryRepository.getCategoriesSnapshot()
       .filterNot { isPrepopulatedCategoryUseCase(it.id) }
 }

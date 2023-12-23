@@ -13,7 +13,7 @@ class GetLastUsedAccountUseCase @Inject constructor(
 ) {
 
   operator fun invoke(): Flow<AccountModel?> =
-    transactionRepository.lastTransactionFull.flatMapLatest { transaction ->
+    transactionRepository.getLastTransactionFull().flatMapLatest { transaction ->
       val sourceId = transaction?.source?.id ?: return@flatMapLatest accountRepository.getLastAccount()
       accountRepository.getById(sourceId)
     }

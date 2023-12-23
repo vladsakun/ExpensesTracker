@@ -10,7 +10,6 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
-import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -29,10 +28,9 @@ import javax.inject.Inject
 class CreateAccountViewModel @Inject constructor(
   currencyCacheManager: CurrencyCacheManager,
   numericKeyboardCommander: NumericKeyboardCommander,
-  private val currencyMapper: CurrencyMapper,
+  calculatorFormatter: CalculatorFormatter,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
-  private val calculatorFormatter: CalculatorFormatter,
   override val appNavigationEventBus: AppNavigationEventBus,
 ) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
@@ -105,6 +103,6 @@ class CreateAccountViewModel @Inject constructor(
   }
 
   fun updateCurrencyByCode(code: String) {
-    updateCurrencyByCode(amountFormatter, currencyMapper, code)
+    updateCurrencyByCode(amountFormatter, code)
   }
 }

@@ -12,7 +12,7 @@ class GetUserCreateCategoriesWithNotEmptyPrepopulatedUseCase @Inject constructor
   private val isPrepopulatedCategoryUseCase: IsPrepopulatedCategoryUseCase,
 ) {
   operator fun invoke(): Flow<List<CategoryWithTransactions>> =
-    categoryRepository.categoriesWithTransactions.map { it.filterNot(::isEmptyPrepopulatedCategory) }
+    categoryRepository.getCategoriesWithTransactions().map { it.filterNot(::isEmptyPrepopulatedCategory) }
 
   private fun isEmptyPrepopulatedCategory(category: CategoryWithTransactions): Boolean =
     isPrepopulatedCategoryUseCase(category.categoryModel.id) && category.transactions.isEmpty()

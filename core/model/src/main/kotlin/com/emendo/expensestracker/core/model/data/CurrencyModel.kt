@@ -1,5 +1,7 @@
 package com.emendo.expensestracker.core.model.data
 
+import java.util.Currency
+
 data class CurrencyModel(
   val currencyCode: String,
   val currencyName: String,
@@ -20,5 +22,15 @@ data class CurrencyModel(
       currencyName = "US dollar",
       currencySymbol = "$",
     )
+
+    fun toCurrencyModel(currencyCode: String): CurrencyModel =
+      Currency.getInstance(currencyCode).toCurrencyModel()
   }
 }
+
+fun Currency.toCurrencyModel(): CurrencyModel =
+  CurrencyModel(
+    currencyCode = currencyCode,
+    currencyName = displayName,
+    currencySymbol = if (symbol == currencyCode) null else symbol,
+  )

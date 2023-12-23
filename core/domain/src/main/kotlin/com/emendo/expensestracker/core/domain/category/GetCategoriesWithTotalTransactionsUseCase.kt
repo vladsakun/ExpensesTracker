@@ -32,7 +32,7 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
       combine(
         getUserCreateCategoriesWithNotEmptyPrepopulatedUseCase(),
         userDataRepository.generalCurrency,
-        currencyRateRepository.rates,
+        currencyRateRepository.getRates(),
       ) { transactions, currency, rates ->
         CategoryWithTotalTransactionsAndCurrencies(
           categoryWithTransactions = transactions,

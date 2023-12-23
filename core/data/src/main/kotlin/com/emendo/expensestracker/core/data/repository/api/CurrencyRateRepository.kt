@@ -5,8 +5,8 @@ import com.emendo.expensestracker.core.data.model.CurrencyRateModel
 import kotlinx.coroutines.flow.Flow
 
 interface CurrencyRateRepository : Syncable {
-  val rates: Flow<Map<String, CurrencyRateModel>>
-  val currencyCodes: Flow<List<String>>
+  fun getRates(): Flow<Map<String, CurrencyRateModel>>
+  fun getCurrencyCodes(): Flow<List<String>>
 
   fun getRatesSnapshot(): Map<String, CurrencyRateModel>
 

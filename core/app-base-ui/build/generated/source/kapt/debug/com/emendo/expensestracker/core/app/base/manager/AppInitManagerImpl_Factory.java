@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.app.base.manager;
 
-import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager;
 import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -25,33 +24,22 @@ import javax.inject.Provider;
 public final class AppInitManagerImpl_Factory implements Factory<AppInitManagerImpl> {
   private final Provider<CurrencyRateRepository> currencyRateRepositoryProvider;
 
-  private final Provider<CurrencyCacheManager> currencyCacheManagerProvider;
-
-  private final Provider<CreateTransactionRepository> createTransactionRepositoryProvider;
-
-  public AppInitManagerImpl_Factory(Provider<CurrencyRateRepository> currencyRateRepositoryProvider,
-      Provider<CurrencyCacheManager> currencyCacheManagerProvider,
-      Provider<CreateTransactionRepository> createTransactionRepositoryProvider) {
+  public AppInitManagerImpl_Factory(
+      Provider<CurrencyRateRepository> currencyRateRepositoryProvider) {
     this.currencyRateRepositoryProvider = currencyRateRepositoryProvider;
-    this.currencyCacheManagerProvider = currencyCacheManagerProvider;
-    this.createTransactionRepositoryProvider = createTransactionRepositoryProvider;
   }
 
   @Override
   public AppInitManagerImpl get() {
-    return newInstance(currencyRateRepositoryProvider.get(), currencyCacheManagerProvider.get(), createTransactionRepositoryProvider.get());
+    return newInstance(currencyRateRepositoryProvider.get());
   }
 
   public static AppInitManagerImpl_Factory create(
-      Provider<CurrencyRateRepository> currencyRateRepositoryProvider,
-      Provider<CurrencyCacheManager> currencyCacheManagerProvider,
-      Provider<CreateTransactionRepository> createTransactionRepositoryProvider) {
-    return new AppInitManagerImpl_Factory(currencyRateRepositoryProvider, currencyCacheManagerProvider, createTransactionRepositoryProvider);
+      Provider<CurrencyRateRepository> currencyRateRepositoryProvider) {
+    return new AppInitManagerImpl_Factory(currencyRateRepositoryProvider);
   }
 
-  public static AppInitManagerImpl newInstance(CurrencyRateRepository currencyRateRepository,
-      CurrencyCacheManager currencyCacheManager,
-      CreateTransactionRepository createTransactionRepository) {
-    return new AppInitManagerImpl(currencyRateRepository, currencyCacheManager, createTransactionRepository);
+  public static AppInitManagerImpl newInstance(CurrencyRateRepository currencyRateRepository) {
+    return new AppInitManagerImpl(currencyRateRepository);
   }
 }

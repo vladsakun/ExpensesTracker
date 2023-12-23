@@ -54,18 +54,13 @@ class OfflineFirstCategoryRepository @Inject constructor(
       .stateInLazilyList(scope)
   }
 
-  override val categories: Flow<List<CategoryModel>>
-    get() = categoriesState
-
-  override val categoriesWithTransactions: Flow<List<CategoryWithTransactions>>
-    get() = categoriesWithTransactionState
-
-  override val categoriesSnapshot: List<CategoryModel>
-    get() = categoriesState.value
-
   init {
     createDefaultCategories()
   }
+
+  override fun getCategories(): Flow<List<CategoryModel>> = categoriesState
+  override fun getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>> = categoriesWithTransactionState
+  override fun getCategoriesSnapshot(): List<CategoryModel> = categoriesState.value
 
   override suspend fun createCategory(
     name: String,

@@ -15,7 +15,7 @@ class GetUsedCurrenciesUseCase @Inject constructor(
 ) {
 
   operator fun invoke(): Flow<List<CurrencyModel>> {
-    val accountCurrenciesFlow = accountRepository.accounts.map { accounts ->
+    val accountCurrenciesFlow = accountRepository.getAccounts().map { accounts ->
       accounts.map { it.currency }
     }
     return combine(userDataRepository.generalCurrency, accountCurrenciesFlow) { generalCurrency, accountCurrencies ->

@@ -17,6 +17,7 @@ import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -29,35 +30,23 @@ class OfflineFirstAccountRepository @Inject constructor(
   @ApplicationScope private val scope: CoroutineScope,
 ) : AccountRepository {
 
-  private val accountsList = accountsDao.getAll()
-    .map { accountEntities -> accountEntities.map { accountMapper.map(it) } }
+  private val accountsList: StateFlow<List<AccountModel>> = accountsDao
+    .getAll()
+    .map { accounts -> accounts.map { accountMapper.map(it) } }
     .stateInLazilyList(scope)
 
-  override val accounts: Flow<List<AccountModel>>
-    get() = accountsList
+  override fun getAccounts(): Flow<List<AccountModel>> = accountsList
+  override fun getAccountsSnapshot(): List<AccountModel> = accountsList.value
 
-  override val accountsSnapshot: List<AccountModel>
-    get() = accountsList.value
+  override fun getLastAccount(): Flow<AccountModel?> =
+    accountsDao
+      .getLastAccount()
+      .map { account -> account?.let { accountMapper.map(it) } }
 
-  override fun getLastAccount(): Flow<AccountModel?> {
-    return accountsDao.getLastAccount().map { entity ->
-      entity?.let { accountMapper.map(it) }
-    }
-  }
-
-  override suspend fun retrieveLastAccount(): AccountModel? {
-    return withContext(ioDispatcher) {
-      accountsDao.retrieveLastAccount()?.let { accountMapper.map(it) }
-    }
-  }
-
-  override fun getById(id: Long): Flow<AccountModel> {
-    return accountsDao.getById(id).map(accountMapper::map)
-  }
-
-  override suspend fun retrieveById(id: Long): AccountModel? = withContext(ioDispatcher) {
-    accountsDao.retrieveById(id)?.let { accountMapper.map(it) }
-  }
+  override fun getById(id: Long): Flow<AccountModel> =
+    accountsDao
+      .getById(id)
+      .map(accountMapper::map)
 
   override suspend fun createAccount(
     currency: CurrencyModel,
@@ -87,24 +76,23 @@ class OfflineFirstAccountRepository @Inject constructor(
     icon: IconModel,
     color: ColorModel,
     balance: BigDecimal,
-    ordinalIndex: Int?,
   ) {
     withContext(ioDispatcher) {
-      if (ordinalIndex == null) {
-        accountsDao.updateAccountDetail(
-          AccountDetailUpdate(
-            id = id,
-            name = name,
-            balance = balance,
-            currencyCode = currency.currencyCode,
-            iconId = icon.id,
-            colorId = color.id,
-          )
+      accountsDao.updateAccountDetail(
+        AccountDetailUpdate(
+          id = id,
+          name = name,
+          balance = balance,
+          currencyCode = currency.currencyCode,
+          iconId = icon.id,
+          colorId = color.id,
         )
+      )
+    }
+  }
 
-        return@withContext
-      }
-
+  override suspend fun updateOrdinalIndex(id: Long, ordinalIndex: Int) {
+    withContext(ioDispatcher) {
       accountsDao.updateOrdinalIndex(
         AccountOrdinalIndexUpdate(
           id = id,

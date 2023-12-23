@@ -12,6 +12,6 @@ class GetUserCreatedCategoriesUseCase @Inject constructor(
 ) {
   operator fun invoke(): Flow<List<CategoryModel>> =
     categoryRepository
-      .categories
+      .getCategories()
       .map { categories -> categories.filterNot { isPrepopulatedCategoryUseCase(it.id) } }
 }

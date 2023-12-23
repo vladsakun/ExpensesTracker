@@ -4,19 +4,22 @@ import androidx.paging.*
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
+import com.emendo.expensestracker.core.data.mapper.transactionType
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.data.model.category.CategoryModel
 import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.toTransactionType
-import com.emendo.expensestracker.core.data.model.transaction.*
+import com.emendo.expensestracker.core.data.model.transaction.TransactionModel
+import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
+import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
+import com.emendo.expensestracker.core.data.model.transaction.TransactionValueWithType
 import com.emendo.expensestracker.core.data.repository.api.TransactionRepository
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -28,23 +31,20 @@ import javax.inject.Inject
 
 private const val PAGE_SIZE = 50
 
-// Todo refactor constructor. Too much mappers
 class OfflineFirstTransactionRepository @Inject constructor(
   private val accountDao: AccountDao,
   private val transactionDao: TransactionDao,
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
-  private val currencyMapper: CurrencyMapper,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @ApplicationScope private val scope: CoroutineScope,
 ) : TransactionRepository {
 
-  override val lastTransactionFull: Flow<TransactionModel?>
-    get() = transactionDao
-      .getLastTransaction()
-      .map { transaction ->
-        transaction?.let { transactionMapper.map(it) }
-      }
+  override fun getLastTransactionFull(): Flow<TransactionModel?> = transactionDao
+    .getLastTransaction()
+    .map { transaction ->
+      transaction?.let { transactionMapper.map(it) }
+    }
 
   override val transactionsPagingFlow: Flow<PagingData<TransactionModel>> by lazy {
     Pager(
@@ -55,6 +55,26 @@ class OfflineFirstTransactionRepository @Inject constructor(
       .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
       .cachedIn(scope)
   }
+
+  override suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel? =
+    withContext(ioDispatcher) {
+      transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }
+    }
+
+  override suspend fun deleteTransaction(id: Long) {
+    withContext(ioDispatcher) {
+      transactionDao.deleteById(id)
+    }
+  }
+
+  override suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType> =
+    transactionDao.retrieveTransactionsInPeriod(from, to).map { transaction ->
+      TransactionValueWithType(
+        type = transaction.transactionType,
+        value = transaction.transactionEntity.value,
+        currency = CurrencyModel.toCurrencyModel(transaction.transactionEntity.currencyCode),
+      )
+    }
 
   override suspend fun createTransaction(
     source: TransactionSource,
@@ -84,46 +104,6 @@ class OfflineFirstTransactionRepository @Inject constructor(
       }
     }
   }
-
-  override suspend fun retrieveLastTransaction(): TransactionModel? = withContext(ioDispatcher) {
-    transactionDao.retrieveLastTransaction()?.let { transactionMapper.map(it) }
-  }
-
-  override suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel? =
-    withContext(ioDispatcher) {
-      transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }
-    }
-
-  override suspend fun retrieveTransaction(id: Long): TransactionModel? = withContext(ioDispatcher) {
-    transactionDao.retrieveTransactionById(id)?.let { transactionMapper.map(it) }
-  }
-
-  override suspend fun deleteTransaction(id: Long) {
-    withContext(ioDispatcher) {
-      transactionDao.deleteById(id)
-    }
-  }
-
-  override suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType> =
-    transactionDao.retrieveTransactionsInPeriod(from, to).map { transaction ->
-      val type: TransactionType = when {
-        transaction.targetAccount != null -> {
-          TransactionType.TRANSFER
-        }
-
-        transaction.targetCategory != null -> {
-          val categoryType = CategoryType.getById(transaction.targetCategory!!.type)
-          categoryType.toTransactionType()
-        }
-
-        else -> throw IllegalStateException("Can't get transaction type for $transaction")
-      }
-      TransactionValueWithType(
-        type = type,
-        value = transaction.transactionEntity.value,
-        currency = currencyMapper.map(transaction.transactionEntity.currencyCode),
-      )
-    }
 
   private suspend fun createExpenseTransaction(
     source: AccountModel,

@@ -49,11 +49,9 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
       .getCurrencyCodes()
       .stateInLazilyList(scope)
 
-  override val rates: Flow<Map<String, CurrencyRateModel>>
-    get() = ratesStateFlow
+  override fun getRates(): Flow<Map<String, CurrencyRateModel>> = ratesStateFlow
 
-  override val currencyCodes: Flow<List<String>>
-    get() = currencies
+  override fun getCurrencyCodes(): Flow<List<String>> = currencies
 
   override fun getRatesSnapshot(): Map<String, CurrencyRateModel> =
     ratesStateFlow.value

@@ -20,5 +20,5 @@ class GetLastTransferAccountOrRandomUseCase @Inject constructor(
   }
 
   private fun getRandomAccount(sourceAccountId: Long?): AccountModel? =
-    accountRepository.accountsSnapshot.shuffled().firstOrNull { it.id != sourceAccountId }
+    accountRepository.getAccountsSnapshot().shuffled().firstOrNull { it.id != sourceAccountId }
 }

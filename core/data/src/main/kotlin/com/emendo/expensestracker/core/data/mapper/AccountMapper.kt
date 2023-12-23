@@ -7,17 +7,17 @@ import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
 import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.database.model.AccountEntity
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AccountMapper @Inject constructor(
   private val amountFormatter: AmountFormatter,
-  private val currencyMapper: CurrencyMapper,
 ) : Mapper<AccountEntity, AccountModel> {
 
   override suspend fun map(from: AccountEntity): AccountModel = with(from) {
-    val currencyModel = currencyMapper.map(currencyCode)
+    val currencyModel = CurrencyModel.toCurrencyModel(currencyCode)
     AccountModel(
       id = id,
       name = textValueOf(name),

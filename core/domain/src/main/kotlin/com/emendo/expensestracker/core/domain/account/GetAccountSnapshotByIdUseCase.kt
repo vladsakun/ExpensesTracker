@@ -9,6 +9,6 @@ class GetAccountSnapshotByIdUseCase @Inject constructor(
 ) {
 
   operator fun invoke(id: Long): AccountModel? {
-    return accountRepository.accountsSnapshot.firstOrNull { it.id == id }
+    return accountRepository.getAccountsSnapshot().firstOrNull { it.id == id }
   }
 }

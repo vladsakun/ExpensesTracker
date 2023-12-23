@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface CurrencyCacheManager {
   val currencyCodes: StateFlow<Map<String, CurrencyModel>?>
-  fun startCaching()
   fun getCurrenciesMapSnapshot(): Map<String, CurrencyModel>?
   fun getGeneralCurrencySnapshot(): CurrencyModel
 }

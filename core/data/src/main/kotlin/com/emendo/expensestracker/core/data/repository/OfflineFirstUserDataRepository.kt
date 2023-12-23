@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.data.mapper.CurrencyMapper
 import com.emendo.expensestracker.core.data.repository.api.UserDataRepository
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -13,13 +12,12 @@ import javax.inject.Inject
 class OfflineFirstUserDataRepository @Inject constructor(
   @ApplicationScope scope: CoroutineScope,
   private val expePreferencesDataStore: ExpePreferencesDataStore,
-  private val currencyMapper: CurrencyMapper,
 ) : UserDataRepository {
 
   override val generalCurrency: Flow<CurrencyModel> =
-    expePreferencesDataStore.generalCurrencyCode.map {
-      currencyMapper.map(it)
-    }
+    expePreferencesDataStore
+      .generalCurrencyCode
+      .map(CurrencyModel::toCurrencyModel)
 
   override val userData: Flow<UserData> =
     expePreferencesDataStore.userData
@@ -34,7 +32,7 @@ class OfflineFirstUserDataRepository @Inject constructor(
 
   override val favouriteCurrencies: Flow<Set<CurrencyModel>> =
     expePreferencesDataStore.favouriteCurrenciesCodes.map { currencyCodes ->
-      currencyCodes.map { currencyMapper.map(it) }.toSet()
+      currencyCodes.map(CurrencyModel::toCurrencyModel).toSet()
     }
 
   override suspend fun shouldUseDynamicColor() =

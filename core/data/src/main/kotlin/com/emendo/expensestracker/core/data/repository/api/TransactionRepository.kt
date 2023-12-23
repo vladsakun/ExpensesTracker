@@ -11,12 +11,10 @@ import kotlinx.datetime.Instant
 
 interface TransactionRepository {
 
-  val lastTransactionFull: Flow<TransactionModel?>
   val transactionsPagingFlow: Flow<PagingData<TransactionModel>>
+  fun getLastTransactionFull(): Flow<TransactionModel?>
 
-  suspend fun retrieveLastTransaction(): TransactionModel?
   suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel?
-  suspend fun retrieveTransaction(id: Long): TransactionModel?
   suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType>
 
   suspend fun createTransaction(

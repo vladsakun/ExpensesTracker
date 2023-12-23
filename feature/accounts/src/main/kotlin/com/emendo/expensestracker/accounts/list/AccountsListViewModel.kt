@@ -26,7 +26,7 @@ class AccountsListViewModel @Inject constructor(
   val uiState: StateFlow<AccountsListUiState> = accountsUiState(accountRepository)
     .stateInLazily(
       scope = viewModelScope,
-      initialValue = AccountsListUiState.DisplayAccountsList(accountRepository.accountsSnapshot.toImmutableList()),
+      initialValue = AccountsListUiState.DisplayAccountsList(accountRepository.getAccountsSnapshot().toImmutableList()),
     )
 
   val isSelectMode: Boolean
@@ -44,7 +44,7 @@ class AccountsListViewModel @Inject constructor(
 }
 
 private fun accountsUiState(accountRepository: AccountRepository): Flow<AccountsListUiState> {
-  return accountRepository.accounts.asResult().map { accountsResult ->
+  return accountRepository.getAccounts().asResult().map { accountsResult ->
     when (accountsResult) {
       is Result.Success -> AccountsListUiState.DisplayAccountsList(accountsResult.data.toImmutableList())
       is Result.Error -> AccountsListUiState.Error("Error loading accounts")
