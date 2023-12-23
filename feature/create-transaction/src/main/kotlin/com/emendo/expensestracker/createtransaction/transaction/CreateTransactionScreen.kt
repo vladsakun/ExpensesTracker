@@ -203,7 +203,7 @@ private fun CreateTransactionContent(
             } else {
               TransferAccount(onAccountClick, source)
               TransferAmount(
-                text = state.screenData.amount.formattedValue,
+                text = state.amount.formattedValue,
                 onClick = onSourceAmountClick,
               )
               EditableAmount(
@@ -240,7 +240,7 @@ private fun CreateTransactionContent(
             },
         ) {
           Amount(
-            text = state.screenData.amount.formattedValue,
+            text = state.amount.formattedValue,
             transactionType = state.screenData.transactionType,
             error = state.screenData.amountError == triggered,
             onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },

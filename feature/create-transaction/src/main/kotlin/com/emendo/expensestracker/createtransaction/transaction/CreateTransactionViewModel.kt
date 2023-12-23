@@ -77,7 +77,7 @@ class CreateTransactionViewModel @Inject constructor(
   private val sourceCurrency: Flow<CurrencyModel?> = createTransactionRepository
     .getSource()
     .map { source ->
-      val amount = uiState.value.screenData.amount
+      val amount = uiState.value.amount
       if (shouldKeepUserSelectedCurrency(amount)) {
         amount.currency
       } else {
@@ -173,7 +173,7 @@ class CreateTransactionViewModel @Inject constructor(
 
         val source = createTransactionRepository.getSourceSnapshot() ?: return@launch
         val transferReceivedAmount = getConvertedFormattedValue(
-          value = uiState.value.screenData.amount.value,
+          value = uiState.value.amount.value,
           fromCurrency = source.currency,
           toCurrency = target.currency,
         )
@@ -221,10 +221,10 @@ class CreateTransactionViewModel @Inject constructor(
 
     hasSelectedCustomCurrency = true
     val nextCurrency = getNextCurrency(currencies)
-    _uiState.updateScreenData { screenData ->
-      screenData.copy(
+    _uiState.update { state ->
+      state.copy(
         amount = amountFormatter.replaceCurrency(
-          amount = screenData.amount,
+          amount = state.amount,
           newCurrencyModel = nextCurrency,
         )
       )
@@ -252,7 +252,7 @@ class CreateTransactionViewModel @Inject constructor(
       }
     }
     val amount = if (sourceTrigger) {
-      uiState.value.screenData.amount
+      uiState.value.amount
     } else {
       uiState.value.transferReceivedAmount
     }
@@ -371,7 +371,7 @@ class CreateTransactionViewModel @Inject constructor(
 
       if (screenData.transactionType != TransactionType.TRANSFER) {
         return@update state.copy(
-          screenData = screenData.copy(amount = formattedAmount)
+          amount = formattedAmount
         )
       }
 
@@ -385,7 +385,7 @@ class CreateTransactionViewModel @Inject constructor(
 
       // Transfer Source amount to be changed
       return@update state.copy(
-        screenData = screenData.copy(amount = formattedAmount),
+        amount = formattedAmount,
         transferReceivedAmount = getTransferReceivedAmount(state, amount),
       )
     }
@@ -410,12 +410,12 @@ class CreateTransactionViewModel @Inject constructor(
     val screenData = state.screenData
     val currency: CurrencyModel = if (screenData.transactionType == TransactionType.TRANSFER) {
       when {
-        state.sourceAmountFocused -> screenData.amount.currency
+        state.sourceAmountFocused -> state.amount.currency
         state.transferTargetAmountFocused -> checkNotNull(state.transferReceivedAmount?.currency) { "Transfer target amount must not be focused with null Amount" }
         else -> throw IllegalStateException("There's no focused Amount input. We can't get the currency")
       }
     } else {
-      screenData.amount.currency
+      state.amount.currency
     }
     return currency
   }
@@ -452,10 +452,8 @@ class CreateTransactionViewModel @Inject constructor(
 
     val source = createTransactionRepository.getSourceSnapshot()
     return CreateTransactionUiState(
-      screenData = CreateTransactionScreenData(
-        amount = payload?.transactionAmount ?: getDefaultAmount(source?.currency),
-        transactionType = getTransactionType(payload)
-      ),
+      amount = payload?.transactionAmount ?: getDefaultAmount(source?.currency),
+      screenData = CreateTransactionScreenData(transactionType = getTransactionType(payload)),
       target = createTransactionRepository.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
       source = source?.toTransactionItemModel(),
       note = payload?.note,

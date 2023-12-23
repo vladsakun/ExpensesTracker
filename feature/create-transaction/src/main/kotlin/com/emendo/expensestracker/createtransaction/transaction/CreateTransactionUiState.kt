@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 data class CreateTransactionUiState(
+  val amount: Amount,
   val screenData: CreateTransactionScreenData,
   val target: TransactionItemModel?,
   val source: TransactionItemModel?,
@@ -26,7 +27,6 @@ data class CreateTransactionUiState(
 
 @Stable
 data class CreateTransactionScreenData(
-  val amount: Amount,
   val transactionType: TransactionType,
   val deleteEnabled: Boolean = false,
   val duplicateEnabled: Boolean = false,
