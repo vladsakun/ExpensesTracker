@@ -144,12 +144,22 @@ private fun CreateTransactionContent(
       }
     },
   )
+
+  val state = stateProvider()
+
+  // Todo extract navigate up to a separate flow
+  NavigationEventEffect(
+    event = state.screenData.navigateUp,
+    onConsumed = onConsumedNavigateUpEvent,
+    action = onBackPressed,
+  )
+
   BottomSheetScaffold(
     scaffoldState = scaffoldState,
     sheetContent = {
-      val state = bottomSheetStateProvider().data
-      if (state != null) {
-        BottomSheetContent(sheetData = state)
+      val bottomSheetData = bottomSheetStateProvider().data
+      if (bottomSheetData != null) {
+        BottomSheetContent(sheetData = bottomSheetData)
       }
     },
     // Workaround for issue https://issuetracker.google.com/issues/265444789
@@ -160,7 +170,7 @@ private fun CreateTransactionContent(
           val tabsResId = persistentListOf(R.string.income, R.string.expense, R.string.transfer)
           // Todo improve transaction type switch animation
           TextSwitch(
-            selectedIndex = stateProvider().screenData.transactionType.ordinal,
+            selectedIndex = state.screenData.transactionType.ordinal,
             items = tabsResId.map { stringResource(id = it) }.toPersistentList(),
             onSelectionChange = { tabIndex ->
               onTransactionTypeChange(tabIndex.toTransactionType())
@@ -187,13 +197,6 @@ private fun CreateTransactionContent(
         .verticalScroll(rememberScrollState())
         .padding(paddingValues)
     ) {
-      val state = stateProvider()
-      // Todo extract navigate up to a separate flow
-      NavigationEventEffect(
-        event = state.screenData.navigateUp,
-        onConsumed = onConsumedNavigateUpEvent,
-        action = onBackPressed,
-      )
       if (state.screenData.transactionType == TransactionType.TRANSFER) {
         TransferRow {
           TransferColumn {
@@ -202,15 +205,13 @@ private fun CreateTransactionContent(
               CreateAccountButton(onAccountClick)
             } else {
               TransferAccount(onAccountClick, source)
-              TransferAmount(
-                text = state.amount.formattedValue,
-                onClick = onSourceAmountClick,
-              )
-              EditableAmount(
-                textProvider = calculatorTextStateProvider,
-                focused = state.sourceAmountFocused,
-                modifier = Modifier.fillMaxWidth(),
-              )
+              Column(modifier = Modifier.clickable(onClick = onSourceAmountClick)) {
+                TransferAmount(text = state.amount.formattedValue)
+                EditableAmount(
+                  textProvider = calculatorTextStateProvider(),
+                  focused = state.sourceAmountFocused,
+                )
+              }
             }
           }
           Chevron()
@@ -220,13 +221,17 @@ private fun CreateTransactionContent(
               CreateAccountButton(onAccountClick)
             } else {
               TransferAccount(onTransferTargetAccountClick, target)
-              state.transferReceivedAmount?.let { amount ->
-                TransferAmount(
-                  text = amount.formattedValue,
-                  textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
-                  onClick = onTargetAmountClick,
-                )
-                //                EditableAmount(calculatorTextStateProvider = , focused =state.transferTargetAmountFocused )
+              Column(modifier = Modifier.clickable(onClick = onTargetAmountClick)) {
+                state.transferReceivedAmount?.let { amount ->
+                  TransferAmount(
+                    text = amount.formattedValue,
+                    textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
+                  )
+                  EditableAmount(
+                    textProvider = "test",
+                    focused = state.transferTargetAmountFocused,
+                  )
+                }
               }
             }
           }
@@ -246,7 +251,7 @@ private fun CreateTransactionContent(
             onErrorConsumed = { onErrorConsumed(FieldWithError.Amount) },
           )
           EditableAmount(
-            textProvider = calculatorTextStateProvider,
+            textProvider = calculatorTextStateProvider(),
             focused = state.sourceAmountFocused,
             modifier = Modifier
               .fillMaxWidth()
@@ -304,12 +309,12 @@ private fun CreateTransactionContent(
 
 @Composable
 private fun EditableAmount(
-  textProvider: () -> String,
+  textProvider: String,
   focused: Boolean,
   modifier: Modifier = Modifier,
 ) {
   AutoSizableTextField(
-    text = textProvider(),
+    text = textProvider,
     minFontSize = MaterialTheme.typography.labelSmall.fontSize,
     textAlign = TextAlign.End,
     style = MaterialTheme.typography.labelSmall,
@@ -394,13 +399,12 @@ private fun Chevron() {
 @Composable
 private fun TransferAmount(
   text: String,
-  onClick: () -> Unit,
   modifier: Modifier = Modifier,
   textColor: Color = MaterialTheme.typography.headlineMedium.color,
 ) {
   AutoSizableText(
     text = text,
-    modifier = modifier.clickable(onClick = onClick),
+    modifier = modifier,
     minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
     style = MaterialTheme.typography.headlineMedium,
     color = textColor,
