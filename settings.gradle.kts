@@ -17,6 +17,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "expensestracker"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":core:app-resources")
 include(":core:app-base-ui")
@@ -37,3 +39,5 @@ include(":feature:settings")
 include(":feature:create-transaction")
 include(":sync:work")
 include(":sync:sync-test")
+include(":benchmark")
+include(":baselineprofile")

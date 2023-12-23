@@ -5,6 +5,7 @@ plugins {
   id("expensestracker.android.application")
   id("expensestracker.android.application.compose")
   id("expensestracker.android.hilt")
+  alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -36,6 +37,7 @@ android {
       applicationIdSuffix = ExpeBuildType.DEBUG.applicationIdSuffix
       isDebuggable = true
     }
+
     val release by getting {
       applicationIdSuffix = ExpeBuildType.RELEASE.applicationIdSuffix
       isMinifyEnabled = true
@@ -43,6 +45,17 @@ android {
       isDebuggable = false
       signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    }
+
+    create("benchmark") {
+      // Enable all the optimizations from release build through initWith(release).
+      initWith(release)
+      matchingFallbacks += listOf("release")
+      // Debug key signing is available to everyone.
+      signingConfig = signingConfigs.getByName("debug")
+      isDebuggable = false
+      isMinifyEnabled = true
+      proguardFiles("benchmark-rules.pro")
     }
   }
 
@@ -55,20 +68,20 @@ android {
 }
 
 dependencies {
-  implementation(project(":feature:accounts"))
-  implementation(project(":feature:transactions"))
-  implementation(project(":feature:categories"))
-  implementation(project(":feature:settings"))
-  implementation(project(":feature:create-transaction"))
+  implementation(projects.feature.accounts)
+  implementation(projects.feature.transactions)
+  implementation(projects.feature.categories)
+  implementation(projects.feature.settings)
+  implementation(projects.feature.createTransaction)
 
-  implementation(project(":core:app-base-ui"))
-  implementation(project(":core:common"))
-  implementation(project(":core:data"))
-  implementation(project(":core:model"))
-  implementation(project(":core:designsystem"))
-  implementation(project(":core:ui"))
+  implementation(projects.core.appBaseUi)
+  implementation(projects.core.common)
+  implementation(projects.core.data)
+  implementation(projects.core.model)
+  implementation(projects.core.designsystem)
+  implementation(projects.core.ui)
 
-  implementation(project(":sync:work"))
+  implementation(projects.sync.work)
 
   implementation(libs.accompanist.systemuicontroller)
   implementation(libs.androidx.activity.compose)
@@ -81,6 +94,9 @@ dependencies {
   implementation(libs.androidx.window.manager)
   implementation(libs.compose.destinations)
   implementation(libs.kotlinx.datetime)
+  implementation(libs.androidx.profileinstaller)
+
+  baselineProfile(projects.baselineprofile)
 
   ksp(libs.compose.destinations.ksp)
 }
