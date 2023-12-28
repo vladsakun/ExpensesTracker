@@ -16,7 +16,8 @@ class BaselineProfileGenerator {
 
   @Test
   fun generate() = rule.collect(
-    "com.emendo.expensestracker"
+    "com.emendo.expensestracker",
+    includeInStartupProfile = true,
   ) {
     startActivityAndWait()
     device.wait(Until.hasObject(By.text("Categories")), 30_000)

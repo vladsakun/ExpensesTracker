@@ -11,6 +11,8 @@ plugins {
 android {
   compileSdk = libs.versions.compileSdk.get().toInt()
 
+  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
+
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
     versionCode = 1
