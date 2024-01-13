@@ -6,12 +6,14 @@ plugins {
   id("expensestracker.android.application.compose")
   id("expensestracker.android.hilt")
   alias(libs.plugins.baselineprofile)
+  alias(libs.plugins.android.application)
 }
 
 android {
   compileSdk = libs.versions.compileSdk.get().toInt()
 
-  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
+  // Todo uncomment when baseline profile is ready
+  //  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
 
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
@@ -96,7 +98,7 @@ dependencies {
   implementation(libs.androidx.window.manager)
   implementation(libs.compose.destinations)
   implementation(libs.kotlinx.datetime)
-  implementation(libs.androidx.profileinstaller)
+  //  implementation(libs.androidx.profileinstaller)
 
   baselineProfile(projects.baselineprofile)
 

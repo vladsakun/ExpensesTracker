@@ -1,7 +1,6 @@
 package com.emendo.expensestracker
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -13,9 +12,6 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.rememberNavController
-import androidx.profileinstaller.ProfileVerifier
-import androidx.profileinstaller.ProfileVerifier.CompilationStatus.RESULT_CODE_COMPILED_WITH_PROFILE
-import androidx.profileinstaller.ProfileVerifier.CompilationStatus.RESULT_CODE_NO_PROFILE
 import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
 import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
@@ -23,8 +19,6 @@ import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
