@@ -1,9 +1,12 @@
 Engineering To-Do:
 
-1) Support foldable devices
-2) Export data via GDrive
-3) Baseline profiles
-4) Dynamic colors
+1) Playground
+2) Refactor modules
+3) api modules
+4) Support foldable devices
+5) Export data via GDrive
+6) Baseline profiles
+7) Dynamic colors
 
 Features:
 
@@ -40,4 +43,4 @@ Features:
 29) Pin code for app (biometrics)
 30) Transactions period like 1Money instead of MoneyFlow
 31) Last transactions block on Overview (work on Dashboard)
-32) Put custom PLACE!
+32) Put custom location PLACE!
