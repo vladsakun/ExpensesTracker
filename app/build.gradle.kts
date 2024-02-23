@@ -13,7 +13,7 @@ android {
   compileSdk = libs.versions.compileSdk.get().toInt()
 
   // Todo uncomment when baseline profile is ready
-  //  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
+//  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
 
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
@@ -47,7 +47,7 @@ android {
       isMinifyEnabled = true
       isShrinkResources = true
       isDebuggable = false
-      signingConfig = signingConfigs.getByName("release")
+//      signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 

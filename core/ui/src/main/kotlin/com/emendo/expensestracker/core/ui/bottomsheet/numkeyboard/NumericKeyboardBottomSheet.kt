@@ -24,16 +24,17 @@ fun NumericKeyboardBottomSheet(
   actions: InitialBalanceKeyboardActions,
   numericKeyboardActions: NumericKeyboardActions,
   decimalSeparator: String,
+  modifier: Modifier = Modifier,
 ) {
   BaseNumericalKeyboardBottomSheet(
     // Todo fix
     equalButtonStateProvider = equalButtonStateProvider,
     decimalSeparator = decimalSeparator,
-    firstAction = { modifier ->
+    firstAction = { actionModifier ->
       RoundedCornerSmallButton(
         onClick = actions::onChangeSignClick,
         colors = ButtonDefaults.filledTonalButtonColors(),
-        modifier = modifier,
+        modifier = actionModifier,
         contentPadding = PaddingValues(0.dp),
       ) {
         Text(
@@ -43,12 +44,12 @@ fun NumericKeyboardBottomSheet(
         )
       }
     },
-    secondAction = { modifier ->
+    secondAction = { actionModifier ->
       RoundedCornerSmallButton(
         onClick = {},
         enabled = false,
         colors = ButtonDefaults.filledTonalButtonColors(),
-        modifier = modifier,
+        modifier = actionModifier,
         contentPadding = PaddingValues(0.dp),
       ) {
         Text(
@@ -65,5 +66,6 @@ fun NumericKeyboardBottomSheet(
     onPrecisionClick = numericKeyboardActions::onPrecisionClick,
     onDoneClick = numericKeyboardActions::onDoneClick,
     onEqualClick = numericKeyboardActions::onEqualClick,
+    modifier = modifier,
   )
 }

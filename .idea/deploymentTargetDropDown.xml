@@ -18,9 +18,6 @@
           <timeTargetWasSelectedWithDropDown value="2024-01-05T15:42:01.311605Z" />
         </State>
       </entry>
-      <entry key="StartupBenchmark">
-        <State />
-      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -29,12 +26,12 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_6a_API_34.avd" />
+                  <value value="$USER_HOME$/.android/avd/Pixel_3a_API_34.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-01-05T17:06:33.323382Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-02-23T14:46:24.725857Z" />
         </State>
       </entry>
     </value>

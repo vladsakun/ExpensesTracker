@@ -22,11 +22,15 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
           targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
           resourceConfigurations += setOf("en")
           ndk {
-            val localProperties = gradleLocalProperties(rootDir)
-            val localAbiFilters = localProperties.getProperty("android.abis").split(",")
-            // Removing all ABI except ARM
-            // Remove if we need to support x86
-            abiFilters += localAbiFilters
+            try {
+              val localProperties = gradleLocalProperties(rootDir)
+              val localAbiFilters = localProperties.getProperty("android.abis").split(",")
+              // Removing all ABI except ARM
+              // Remove if we need to support x86
+              abiFilters += localAbiFilters
+            } catch (e: Exception) {
+              println("No local.properties found, using default abiFilters")
+            }
           }
         }
       }

@@ -24,11 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-  companion object {
-    private const val TAG = "MainActivity"
-  }
-
-  val viewModel: MainActivityViewModel by viewModels()
+  private val viewModel: MainActivityViewModel by viewModels()
 
   private val localeBroadcastReceiver by lazy { LocaleBroadcastReceiver(viewModel::updateLocale) }
   private val timeZoneBroadcastReceiver by lazy { TimeZoneBroadcastReceiver(viewModel::updateTimeZone) }

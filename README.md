@@ -40,3 +40,4 @@ Features:
 29) Pin code for app (biometrics)
 30) Transactions period like 1Money instead of MoneyFlow
 31) Last transactions block on Overview (work on Dashboard)
+32) Put custom PLACE!
