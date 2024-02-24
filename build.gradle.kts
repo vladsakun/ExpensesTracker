@@ -8,6 +8,7 @@ plugins {
   alias(libs.plugins.android.test) apply false
   alias(libs.plugins.baselineprofile) apply false
   alias(libs.plugins.kotlinAndroid) apply false
+  alias(libs.plugins.module.assertion) apply false
 }
 
 buildscript {
@@ -35,5 +36,3 @@ subprojects {
     }
   }
 }
-
-apply(from = file("gradle/projectDependencyGraph.gradle"))

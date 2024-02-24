@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.cli.common.arguments.CommonToolArguments
-import org.jetbrains.kotlin.gradle.dsl.copyFreeCompilerArgsToArgs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

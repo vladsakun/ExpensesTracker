@@ -57,11 +57,13 @@ timber = "5.0.1"
 composeStateEvents = "2.0.3"
 composeCompilerReportGenerator = "1.1.0"
 pagingVersion = "3.2.1"
+junit = "1.1.5"
+moduleAssertion = "2.5.0"
+
 # Android SDK versions
 compileSdk = "34"
 targetSdk = "34"
 minSdk = "26"
-junit = "1.1.5"
 
 [libraries]
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
@@ -174,3 +176,4 @@ secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugi
 compose-compiler-report = { id = "dev.shreyaspatil.compose-compiler-report-generator", version.ref = "composeCompilerReportGenerator" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
+module-assertion = { id = "com.jraska.module.graph.assertion", version.ref = "moduleAssertion" }

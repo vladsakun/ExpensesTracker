@@ -5,6 +5,7 @@ plugins {
   id("expensestracker.android.application")
   id("expensestracker.android.application.compose")
   id("expensestracker.android.hilt")
+  alias(libs.plugins.module.assertion)
   alias(libs.plugins.baselineprofile)
   alias(libs.plugins.android.application)
 }
