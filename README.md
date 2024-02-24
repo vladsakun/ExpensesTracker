@@ -1,3 +1,9 @@
+#Expenses tracker app
+
+And here's how to show the (automatically kept) up to date dependency graph for the project in a README file:
+
+![](gradle/dependency-graph/project.dot.png)
+
 Engineering To-Do:
 
 1) Playground
