@@ -7,9 +7,9 @@ import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
-import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountsListViewModel @Inject constructor(
   accountRepository: AccountRepository,
-  private val createTransactionRepository: CreateTransactionRepository,
+  private val createTransactionController: CreateTransactionController,
 ) : ViewModel() {
 
   val uiState: StateFlow<AccountsListUiState> = accountsUiState(accountRepository)
@@ -30,16 +30,16 @@ class AccountsListViewModel @Inject constructor(
     )
 
   val isSelectMode: Boolean
-    get() = createTransactionRepository.isSelectMode()
+    get() = createTransactionController.isSelectMode()
   val titleResId: Int
     @StringRes get() = if (isSelectMode) R.string.select_account else R.string.accounts
 
   fun selectAccountItem(account: AccountModel) {
-    createTransactionRepository.selectAccount(account)
+    createTransactionController.selectAccount(account)
   }
 
   override fun onCleared() {
-    createTransactionRepository.finishSelectMode()
+    createTransactionController.finishSelectMode()
   }
 }
 

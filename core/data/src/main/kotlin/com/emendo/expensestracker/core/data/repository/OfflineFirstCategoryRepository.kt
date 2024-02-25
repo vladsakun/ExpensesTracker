@@ -17,6 +17,7 @@ import com.emendo.expensestracker.core.database.model.CategoryEntity
 import com.emendo.expensestracker.core.database.model.CategoryOrdinalIndexUpdate
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
+import com.emendo.expensestracker.data.api.DefaultTransactionTargetOrdinalIndex
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryWithTransactions
@@ -30,9 +31,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-internal const val DefaultTransactionTargetOrdinalIndex = Int.MAX_VALUE
-internal const val DefaultTransactionTargetName = ""
 
 class OfflineFirstCategoryRepository @Inject constructor(
   private val categoryDao: CategoryDao,

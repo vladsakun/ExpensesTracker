@@ -2,10 +2,10 @@ package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.*
-import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetName
 import com.emendo.expensestracker.core.database.model.CategoryEntity
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
+import com.emendo.expensestracker.data.api.DefaultTransactionTargetName
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 

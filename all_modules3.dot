@@ -11,6 +11,7 @@ digraph G {
     ":app" -> ":core:model"
     ":app" -> ":core:designsystem"
     ":app" -> ":core:ui"
+    ":app" -> ":core:domain"
     ":app" -> ":sync:work"
     ":feature:accounts" -> ":core:model"
     ":feature:accounts" -> ":core:ui"
@@ -54,7 +55,6 @@ digraph G {
     ":app-base-ui" -> ":core:ui"
     ":app-base-ui" -> ":core:model"
     ":app-base-ui" -> ":core:designsystem"
-    ":core:common" -> ":core:model" [color = red style = bold]
     ":core:data" -> ":core:data:api"
     ":core:data" -> ":app-resources"
     ":core:data" -> ":core:common"
@@ -66,19 +66,20 @@ digraph G {
     ":core:designsystem" -> ":app-resources"
     ":core:ui" -> ":core:designsystem"
     ":core:ui" -> ":core:model"
+    ":core:domain" -> ":core:data:api" [color = red style = bold]
+    ":core:domain" -> ":core:common"
+    ":core:domain" -> ":core:model"
+    ":core:domain" -> ":app-resources"
     ":sync:work" -> ":app-resources"
     ":sync:work" -> ":core:common"
     ":sync:work" -> ":core:datastore"
     ":sync:work" -> ":core:model"
     ":sync:work" -> ":core:data:api"
     ":core:data:api" -> ":core:model"
-    ":core:data:api" -> ":app-resources"
-    ":core:data:api" -> ":core:datastore" [color = red style = bold]
-    ":core:domain" -> ":core:data:api" [color = red style = bold]
-    ":core:domain" -> ":core:common"
-    ":core:domain" -> ":core:model"
-    ":app-resources" -> ":core:model"
-    ":core:datastore" -> ":core:common" [color = red style = bold]
+    ":core:data:api" -> ":app-resources" [color = red style = bold]
+    ":core:data:api" -> ":core:datastore"
+    ":app-resources" -> ":core:model" [color = red style = bold]
+    ":core:datastore" -> ":core:common"
     ":core:datastore" -> ":core:model"
     ":core:database" -> ":core:model"
     ":core:network" -> ":core:common"

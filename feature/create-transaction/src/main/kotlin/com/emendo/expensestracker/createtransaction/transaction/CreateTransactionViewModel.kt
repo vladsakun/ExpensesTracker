@@ -13,6 +13,7 @@ import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.domain.account.GetLastTransferAccountOrRandomUseCase
+import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.Amount
@@ -32,7 +33,6 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.labelResId
-import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
@@ -51,7 +51,7 @@ class CreateTransactionViewModel @Inject constructor(
   private val amountFormatter: AmountFormatter,
   private val currencyCacheManager: CurrencyCacheManager,
   @DecimalSeparator private val decimalSeparator: String,
-  private val createTransactionRepository: CreateTransactionRepository,
+  private val createTransactionController: CreateTransactionController,
   private val transactionRepository: TransactionRepository,
   private val calculatorFormatter: CalculatorFormatter,
   private val appNavigationEventBus: AppNavigationEventBus,
@@ -63,8 +63,8 @@ class CreateTransactionViewModel @Inject constructor(
     MutableStateFlow(getDefaultCreateTransactionUiState())
   internal val uiState: StateFlow<CreateTransactionUiState> = combine(
     _uiState,
-    createTransactionRepository.getTarget(),
-    createTransactionRepository.getSource(),
+    createTransactionController.getTarget(),
+    createTransactionController.getSource(),
     transform = ::combineCreateTransactionUiState,
   )
     .stateInWhileSubscribed(viewModelScope, getDefaultCreateTransactionUiState())
@@ -73,9 +73,9 @@ class CreateTransactionViewModel @Inject constructor(
     MutableStateFlow(getInitialCalculatorState())
 
   private val _calculatorCurrencyState: MutableStateFlow<CurrencyModel?> =
-    MutableStateFlow(createTransactionRepository.getSourceSnapshot()?.currency)
+    MutableStateFlow(createTransactionController.getSourceSnapshot()?.currency)
   private val sourceCurrency: Flow<CurrencyModel?> =
-    sourceCurrencyFlow(createTransactionRepository, ::shouldKeepUserSelectedCurrency)
+    sourceCurrencyFlow(createTransactionController, ::shouldKeepUserSelectedCurrency)
 
   private val currencyState: Flow<CurrencyModel?> = merge(_calculatorCurrencyState, sourceCurrency)
     .onEach { currency ->
@@ -104,7 +104,7 @@ class CreateTransactionViewModel @Inject constructor(
     MutableStateFlow(
       CreateTransactionBottomSheetState(
         data = getCalculatorBottomSheetData(),
-        show = createTransactionRepository.isBottomSheetVisibleOnInit(),
+        show = createTransactionController.isBottomSheetVisibleOnInit(),
       )
     )
   }
@@ -156,19 +156,19 @@ class CreateTransactionViewModel @Inject constructor(
     numericKeyboardCommander.doMath()
 
     if (type != TransactionType.TRANSFER) {
-      createTransactionRepository.setTarget(createTransactionRepository.getDefaultTarget(type))
+      createTransactionController.setTarget(createTransactionController.getDefaultTarget(type))
       return
     }
 
     viewModelScope.launch {
-      val target = getLastTransferAccountOrRandomUseCase(createTransactionRepository.getSourceSnapshot()?.id)
-      createTransactionRepository.setTarget(target)
+      val target = getLastTransferAccountOrRandomUseCase(createTransactionController.getSourceSnapshot()?.id)
+      createTransactionController.setTarget(target)
 
       if (target == null) {
         return@launch
       }
 
-      val source = createTransactionRepository.getSourceSnapshot() ?: return@launch
+      val source = createTransactionController.getSourceSnapshot() ?: return@launch
       val transferReceivedAmount = getConvertedFormattedValue(
         value = uiState.value.amount.value,
         fromCurrency = source.currency,
@@ -269,7 +269,7 @@ class CreateTransactionViewModel @Inject constructor(
     )
 
   fun saveTransaction() {
-    val source = createTransactionRepository.getSourceSnapshot()
+    val source = createTransactionController.getSourceSnapshot()
 
     if (source == null) {
       _uiState.updateScreenData { screenData ->
@@ -286,7 +286,7 @@ class CreateTransactionViewModel @Inject constructor(
     }
 
     val transactionType = checkNotNull(uiState.value).screenData.transactionType
-    val target = createTransactionRepository.getTargetSnapshot() ?: getTargetDefaultValue(transactionType)
+    val target = createTransactionController.getTargetSnapshot() ?: getTargetDefaultValue(transactionType)
     createTransaction(source, target)
   }
 
@@ -380,12 +380,12 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   fun duplicateTransaction() {
-    val payload = createTransactionRepository.getTransactionPayload() ?: return
+    val payload = createTransactionController.getTransactionPayload() ?: return
     shouldClearTarget = false
     appNavigationEventBus.navigate(
       AppNavigationEvent.CreateTransaction(
-        source = createTransactionRepository.getSourceSnapshot(),
-        target = createTransactionRepository.getTargetSnapshot(),
+        source = createTransactionController.getSourceSnapshot(),
+        target = createTransactionController.getTargetSnapshot(),
         payload = payload.copy(transactionId = null),
         shouldNavigateUp = true,
       )
@@ -403,7 +403,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   private fun deleteTransaction() {
-    val id = createTransactionRepository.getTransactionPayload()?.transactionId ?: return
+    val id = createTransactionController.getTransactionPayload()?.transactionId ?: return
     viewModelScope.launch {
       transactionRepository.deleteTransaction(id)
     }
@@ -461,8 +461,8 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   private fun getConvertedTransferAmount(amount: BigDecimal): Amount? {
-    val target: AccountModel = createTransactionRepository.getTargetSnapshot() as? AccountModel ?: return null
-    val source = createTransactionRepository.getSourceSnapshot() ?: return null
+    val target: AccountModel = createTransactionController.getTargetSnapshot() as? AccountModel ?: return null
+    val source = createTransactionController.getSourceSnapshot() ?: return null
 
     return getConvertedFormattedValue(
       value = amount,
@@ -485,16 +485,16 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   private fun getDefaultCreateTransactionUiState(): CreateTransactionUiState {
-    val payload = createTransactionRepository.getTransactionPayload()
+    val payload = createTransactionController.getTransactionPayload()
     payload?.transactionAmount?.let { transactionValue ->
       numericKeyboardCommander.setInitialValue(calculatorFormatter.formatFinalWithPrecision(transactionValue.value))
     }
 
-    val source = createTransactionRepository.getSourceSnapshot()
+    val source = createTransactionController.getSourceSnapshot()
     return CreateTransactionUiState(
       amount = payload?.transactionAmount ?: getDefaultAmount(source?.currency),
       screenData = CreateTransactionScreenData(transactionType = getTransactionType(payload)),
-      target = createTransactionRepository.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
+      target = createTransactionController.getTargetSnapshot().orDefault(TransactionType.DEFAULT),
       source = source?.toTransactionItemModel(),
       note = payload?.note,
       sourceAmountFocused = payload == null,
@@ -511,7 +511,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   private fun getTargetDefaultValue(transactionType: TransactionType): TransactionTarget =
-    createTransactionRepository.getDefaultTarget(transactionType)
+    createTransactionController.getDefaultTarget(transactionType)
 
   private fun getInitialCalculatorState(): CalculatorBottomSheetState =
     CalculatorBottomSheetState.initial(
@@ -547,7 +547,7 @@ class CreateTransactionViewModel @Inject constructor(
 
   override fun onCleared() {
     super.onCleared()
-    createTransactionRepository.clear(shouldClearTarget)
+    createTransactionController.clear(shouldClearTarget)
   }
 
   private fun shouldKeepUserSelectedCurrency(): Boolean {
@@ -567,13 +567,13 @@ class CreateTransactionViewModel @Inject constructor(
   }
 }
 
-private fun CreateTransactionRepository.isBottomSheetVisibleOnInit(): StateEvent =
+private fun CreateTransactionController.isBottomSheetVisibleOnInit(): StateEvent =
   if (getTransactionPayload() == null) triggered else consumed
 
 private fun sourceCurrencyFlow(
-  createTransactionRepository: CreateTransactionRepository,
+  createTransactionController: CreateTransactionController,
   shouldKeepUserSelectedCurrency: () -> Boolean,
-): Flow<CurrencyModel?> = createTransactionRepository
+): Flow<CurrencyModel?> = createTransactionController
   .getSource()
   .transform { source ->
     if (!shouldKeepUserSelectedCurrency()) {

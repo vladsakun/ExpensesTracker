@@ -1,32 +1,32 @@
-package com.emendo.expensestracker.core.data.repository
+package com.emendo.expensestracker.core.domain.transaction.controller
 
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerly
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
+import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
+import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
+import com.emendo.expensestracker.data.api.DefaultTransactionTargetOrdinalIndex
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
-import com.emendo.expensestracker.data.api.repository.AccountRepository
-import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
-import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import com.emendo.expensestracker.core.app.resources.R as AppR
 
-class OfflineFirstCreateTransactionRepository @Inject constructor(
-  private val transactionRepository: TransactionRepository,
-  private val accountRepository: AccountRepository,
+class CreateTransactionControllerImpl @Inject constructor(
+  getLastUsedAccountUseCase: GetLastUsedAccountUseCase,
   @ApplicationScope private val scope: CoroutineScope,
-) : CreateTransactionRepository {
+) : CreateTransactionController {
+
   private val transactionTargetState: MutableStateFlow<TransactionTarget?> by lazy { MutableStateFlow(null) }
 
   private val transactionSourceMutableState: MutableStateFlow<TransactionSource?> by lazy { MutableStateFlow(null) }
@@ -137,13 +137,5 @@ class OfflineFirstCreateTransactionRepository @Inject constructor(
     finishSelectSourceFlow()
     finishSelectTransferTargetFlow()
     payload = null
-  }
-
-  // Todo rethink copy-paste from GetLastUsedAccountUseCase
-  private fun getLastUsedAccountUseCase(): Flow<TransactionSource?> {
-    return transactionRepository.getLastTransactionFull().flatMapLatest { transaction ->
-      val sourceId = transaction?.source?.id ?: return@flatMapLatest accountRepository.getLastAccount()
-      accountRepository.getById(sourceId)
-    }
   }
 }

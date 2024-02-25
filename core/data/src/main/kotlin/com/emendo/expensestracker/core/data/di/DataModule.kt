@@ -43,8 +43,4 @@ interface DataModule {
   @Binds
   @Singleton
   fun bindsCurrencyCacheManager(currencyCacheManagerImpl: CurrencyCacheManagerImpl): CurrencyCacheManager
-
-  @Binds
-  @Singleton
-  fun bindsCreateTransactionRepository(createTransactionRepository: OfflineFirstCreateTransactionRepository): CreateTransactionRepository
 }

@@ -8,10 +8,10 @@ import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
+import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
-import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
 import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
   appNavigationEventBus: AppNavigationEventBus,
-  private val createTransactionRepository: CreateTransactionRepository,
+  private val createTransactionController: CreateTransactionController,
   private val localeManager: ExpeLocaleManager,
   private val timeZoneManager: ExpeTimeZoneManager,
 ) : ViewModel() {
@@ -30,12 +30,12 @@ class MainActivityViewModel @Inject constructor(
   val navigationEvent: Flow<NavigationEvent> = appNavigationEventBus.eventFlow.map { event ->
     when (event) {
       is CreateTransaction -> {
-        event.handleEventData(createTransactionRepository)
+        event.handleEventData(createTransactionController)
         CreatetransactionNavGraph.asNavigationEvent(event.shouldNavigateUp)
       }
 
       is SelectAccount -> {
-        event.handleEventData(createTransactionRepository)
+        event.handleEventData(createTransactionController)
         AccountsScreenRouteDestination.asNavigationEvent()
       }
 
@@ -64,17 +64,17 @@ fun Direction.asNavigationEvent(navigateUp: Boolean = false) =
   NavigationEvent(direction = this, navigateUp = navigateUp)
 
 private fun CreateTransaction.handleEventData(
-  createTransactionRepository: CreateTransactionRepository,
+  createTransactionController: CreateTransactionController,
 ) {
-  target?.let(createTransactionRepository::setTarget)
-  source?.let(createTransactionRepository::setSource)
-  payload?.let(createTransactionRepository::setTransactionPayload)
+  target?.let(createTransactionController::setTarget)
+  source?.let(createTransactionController::setSource)
+  payload?.let(createTransactionController::setTransactionPayload)
 }
 
-private fun SelectAccount.handleEventData(createTransactionRepository: CreateTransactionRepository) {
+private fun SelectAccount.handleEventData(createTransactionController: CreateTransactionController) {
   if (isTransferTargetSelect) {
-    createTransactionRepository.startSelectTransferTargetFlow()
+    createTransactionController.startSelectTransferTargetFlow()
   } else {
-    createTransactionRepository.startSelectSourceFlow()
+    createTransactionController.startSelectSourceFlow()
   }
 }

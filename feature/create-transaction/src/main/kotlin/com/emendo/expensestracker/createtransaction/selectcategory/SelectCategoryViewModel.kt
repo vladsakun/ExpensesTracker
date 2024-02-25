@@ -7,13 +7,13 @@ import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
+import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesSnapshotUseCase
 import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
-import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -25,12 +25,12 @@ import javax.inject.Inject
 class SelectCategoryViewModel @Inject constructor(
   getUserCreatedCategoriesUseCase: GetUserCreatedCategoriesUseCase,
   getUserCreatedCategoriesSnapshotUseCase: GetUserCreatedCategoriesSnapshotUseCase,
-  private val createTransactionRepository: CreateTransactionRepository,
+  private val createTransactionController: CreateTransactionController,
   private val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
   private val categoryTypeFromRepository: CategoryType by lazy {
-    (createTransactionRepository.getTargetSnapshot() as? CategoryModel)?.type
+    (createTransactionController.getTargetSnapshot() as? CategoryModel)?.type
       ?: CategoryType.EXPENSE // Todo remove hardcoded
   }
 
@@ -45,7 +45,7 @@ class SelectCategoryViewModel @Inject constructor(
       )
 
   fun saveCategory(category: CategoryModel) {
-    createTransactionRepository.setTarget(category)
+    createTransactionController.setTarget(category)
   }
 
   fun openCreateCategoryScreen() {

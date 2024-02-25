@@ -9,7 +9,7 @@ android {
 
 dependencies {
   api(libs.timber)
-  implementation(project(":core:model"))
+
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.androidx.lifecycle.ktx)
 }
