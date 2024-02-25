@@ -2,18 +2,17 @@
 
 And here's how to show the (automatically kept) up to date dependency graph for the project in a README file:
 
-![](gradle/dependency-graph/project.dot.png)
+![](all_modules3.dot.png)
 
 Engineering To-Do:
 
-1) Playground
-2) Refactor modules
-3) api modules
-4) Support foldable devices
-5) Export data via GDrive
-6) Baseline profiles
-7) Dynamic colors
-8) Test 123
+1) [ ] Playground
+2) [x] Refactor modules
+3) [x] api modules (data.api)
+4) [ ] Support foldable devices
+5) [ ] Export data via GDrive
+6) [ ] Baseline profiles
+7) [ ] Dynamic colors
 
 Features:
 
