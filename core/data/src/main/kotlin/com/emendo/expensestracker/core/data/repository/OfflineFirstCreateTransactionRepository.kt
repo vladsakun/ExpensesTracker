@@ -5,14 +5,18 @@ import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
-import com.emendo.expensestracker.core.data.model.category.CategoryModelImpl
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
+import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
+import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.data.api.model.AccountModel
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
-import com.emendo.expensestracker.data.api.repository.*
+import com.emendo.expensestracker.data.api.repository.AccountRepository
+import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
+import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -71,7 +75,7 @@ class OfflineFirstCreateTransactionRepository @Inject constructor(
   }
 
   override fun getDefaultTarget(transactionType: TransactionType): TransactionTarget =
-    CategoryModelImpl(
+    CategoryModel(
       id = if (transactionType == TransactionType.EXPENSE) {
         DefaultTransactionTargetExpenseId
       } else {

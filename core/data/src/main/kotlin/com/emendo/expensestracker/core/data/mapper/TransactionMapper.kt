@@ -2,7 +2,6 @@ package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.core.data.formatPositive
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
-import com.emendo.expensestracker.core.data.model.category.asExternalModel
 import com.emendo.expensestracker.core.database.model.TransactionFull
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter

@@ -19,7 +19,6 @@ import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
-import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
@@ -120,16 +119,15 @@ private fun CategoriesListPreview() {
       stateProvider = {
         SelectCategoryUiState.DisplayCategoryList(
           categories = List(6) { index ->
-            // Todo refactor
-            object : CategoryModel {
-              override val id = index.toLong()
-              override val name = textValueOf("Childcare")
-              override val icon = IconModel.random
-              override val color = ColorModel.random
-              override val type = CategoryType.EXPENSE
-              override val ordinalIndex = index
-              override val currency: CurrencyModel? = null
-            }
+            CategoryModel(
+              id = index.toLong(),
+              name = textValueOf("Childcare"),
+              icon = IconModel.random,
+              color = ColorModel.random,
+              type = CategoryType.EXPENSE,
+              ordinalIndex = index,
+              currency = null,
+            )
           }.toImmutableList(),
         )
       },

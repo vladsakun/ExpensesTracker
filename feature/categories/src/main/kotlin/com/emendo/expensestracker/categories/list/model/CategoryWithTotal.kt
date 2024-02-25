@@ -46,17 +46,15 @@ data class CategoryWithTotal(
   }
 }
 
-// Todo refactor
 fun toCategoryModel(category: CategoryWithTotal.Category): CategoryModel =
-  object : CategoryModel {
-    override val id: Long = category.id
-    override val name = category.name
-    override val icon = category.icon
-    override val color = category.color
-    override val ordinalIndex = category.ordinalIndex
-    override val type = category.type
-    override val currency = category.currency
-  }
+  CategoryModel(
+    id = category.id,
+    name = category.name,
+    icon = category.icon,
+    color = category.color,
+    ordinalIndex = category.ordinalIndex,
+    type = category.type,
+  )
 
 fun toCategoryWithTotal(category: CategoryWithTotalTransactions): CategoryWithTotal =
   CategoryWithTotal(

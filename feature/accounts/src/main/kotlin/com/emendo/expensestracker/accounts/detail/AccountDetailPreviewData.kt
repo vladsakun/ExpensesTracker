@@ -10,19 +10,19 @@ import com.emendo.expensestracker.data.api.model.AccountModel
 
 internal class AccountDetailPreviewData : PreviewParameterProvider<AccountDetailScreenData> {
   val data = AccountDetailScreenData.getDefaultState(
-    accountModel = object : AccountModel {
-      override val id: Long = 1
-      override val currency = CurrencyModel(
+    accountModel = AccountModel(
+      id = 1,
+      currency = CurrencyModel(
         currencyCode = "USD",
         currencyName = "US dollar",
         currencySymbol = null,
-      )
-      override val name = textValueOf("Bank")
-      override val icon = IconModel.EDUCATION
-      override val color = ColorModel.Blue
-      override val balance = Amount.Mock
-      override val ordinalIndex = 0
-    }
+      ),
+      name = textValueOf("Bank"),
+      icon = IconModel.EDUCATION,
+      color = ColorModel.Blue,
+      balance = Amount.Mock,
+      ordinalIndex = 0,
+    ),
   )
   override val values: Sequence<AccountDetailScreenData> = sequenceOf(data)
 }

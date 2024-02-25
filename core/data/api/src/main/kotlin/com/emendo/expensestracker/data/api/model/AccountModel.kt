@@ -8,12 +8,12 @@ import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 
-interface AccountModel : TransactionSource, TransactionTarget {
-  override val id: Long
-  override val currency: CurrencyModel
-  override val name: TextValue.Value
-  override val icon: IconModel
-  override val color: ColorModel
-  override val ordinalIndex: Int
-  val balance: Amount
-}
+data class AccountModel(
+  override val id: Long = 0,
+  override val currency: CurrencyModel,
+  override val name: TextValue.Value,
+  override val icon: IconModel,
+  override val color: ColorModel,
+  override val ordinalIndex: Int,
+  val balance: Amount,
+) : TransactionSource, TransactionTarget

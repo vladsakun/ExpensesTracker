@@ -4,7 +4,6 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
-import com.emendo.expensestracker.core.data.model.AccountModelImpl
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
@@ -19,7 +18,7 @@ class AccountMapper @Inject constructor(
 
   override suspend fun map(from: AccountEntity): AccountModel = with(from) {
     val currencyModel = CurrencyModel.toCurrencyModel(currencyCode)
-    AccountModelImpl(
+    AccountModel(
       id = id,
       name = textValueOf(name),
       balance = amountFormatter.format(balance, currencyModel),

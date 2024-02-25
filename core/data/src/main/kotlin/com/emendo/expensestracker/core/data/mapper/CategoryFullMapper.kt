@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
-import com.emendo.expensestracker.core.data.model.category.asExternalModel
 import com.emendo.expensestracker.core.database.model.CategoryFull
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.model.data.CurrencyModel

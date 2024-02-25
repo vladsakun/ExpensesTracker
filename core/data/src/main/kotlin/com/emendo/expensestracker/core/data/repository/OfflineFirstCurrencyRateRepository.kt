@@ -5,8 +5,8 @@ import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.data.model.toCurrencyRateEntity
-import com.emendo.expensestracker.core.data.model.toCurrencyRateModel
+import com.emendo.expensestracker.core.data.mapper.toCurrencyRateEntity
+import com.emendo.expensestracker.core.data.mapper.toCurrencyRateModel
 import com.emendo.expensestracker.core.data.suspendRunCatching
 import com.emendo.expensestracker.core.database.dao.CurrencyRateDao
 import com.emendo.expensestracker.core.database.model.CurrencyRateEntity
@@ -99,8 +99,7 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
     currencyRatesDao.deleteAll()
   }
 
-  private suspend fun fetchCurrencyRateEntities(): List<CurrencyRateEntity> {
-    return network.getCurrencyRates().rates.map(::toCurrencyRateEntity)
-  }
+  private suspend fun fetchCurrencyRateEntities(): List<CurrencyRateEntity> =
+    network.getCurrencyRates().rates.map(::toCurrencyRateEntity)
 }
 
