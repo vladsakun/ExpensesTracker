@@ -3,7 +3,9 @@ package com.emendo.expensestracker.categories.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.categories.common.CategoryDelegate
+import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
 import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.*
@@ -26,7 +28,14 @@ class CategoryDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
   private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
-) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(), CategoryDelegate {
+  override val appNavigationEventBus: AppNavigationEventBus,
+) : ViewModel(),
+    ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
+    CategoryDelegate,
+    CategoryScreenNavigator {
+
+  override val categoryDelegate: CategoryDelegate
+    get() = this
 
   private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
   private val category by lazy { getCategorySnapshotByIdUseCase(categoryId) }

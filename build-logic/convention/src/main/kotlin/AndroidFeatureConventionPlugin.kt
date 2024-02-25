@@ -1,7 +1,7 @@
 import com.android.build.gradle.LibraryExtension
 import com.emendo.expensestracker.Constants.NAMESPACE_PREFIX
+import com.emendo.expensestracker.composeDestinations
 import com.emendo.expensestracker.libs
-import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -21,11 +21,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         namespace = NAMESPACE_PREFIX + moduleName
       }
 
-      extensions.configure<KspExtension> {
-        arg("compose-destinations.mode", "navgraphs")
-        arg("compose-destinations.moduleName", moduleName)
-        arg("compose-destinations.useComposableVisibility", "true")
-      }
+      composeDestinations(moduleName)
 
       dependencies {
         add("implementation", project(":core:model"))
@@ -34,7 +30,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         add("implementation", project(":core:data:api"))
         add("implementation", project(":core:common"))
         add("implementation", project(":core:domain"))
-        add("implementation", project(":app-base-ui"))
+        add("implementation", project(":app-base-ui:api"))
 
         add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
         add("implementation", libs.findLibrary("androidx.lifecycle.viewModelCompose").get())

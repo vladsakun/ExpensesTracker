@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.app.base.eventbus
+package com.emendo.expensestracker.app.base.api
 
 import kotlinx.coroutines.flow.Flow
 

@@ -2,9 +2,9 @@ package com.emendo.expensestracker
 
 import androidx.lifecycle.ViewModel
 import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
+import com.emendo.expensestracker.app.base.api.AppNavigationEvent.*
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent.*
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination

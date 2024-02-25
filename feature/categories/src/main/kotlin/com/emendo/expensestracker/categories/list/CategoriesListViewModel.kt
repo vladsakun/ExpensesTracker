@@ -7,8 +7,6 @@ import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.categories.list.model.toCategoryModel
 import com.emendo.expensestracker.categories.list.model.toCategoryWithTotal
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
@@ -43,7 +41,7 @@ import javax.inject.Inject
 class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appContext: Application,
-  private val appNavigationEventBus: AppNavigationEventBus,
+  private val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
   private val categoryRepository: CategoryRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
@@ -86,7 +84,7 @@ class CategoriesListViewModel @Inject constructor(
 
   fun openCreateTransactionScreen(category: CategoryWithTotal) {
     appNavigationEventBus.navigate(
-      AppNavigationEvent.CreateTransaction(
+      com.emendo.expensestracker.app.base.api.AppNavigationEvent.CreateTransaction(
         source = null,
         target = toCategoryModel(category.category),
         shouldNavigateUp = true

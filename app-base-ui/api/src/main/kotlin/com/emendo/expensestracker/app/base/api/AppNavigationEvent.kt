@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.app.base.eventbus
+package com.emendo.expensestracker.app.base.api
 
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.data.api.model.category.CategoryType

@@ -2,8 +2,6 @@ package com.emendo.expensestracker.createtransaction.selectcategory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
@@ -26,7 +24,7 @@ class SelectCategoryViewModel @Inject constructor(
   getUserCreatedCategoriesUseCase: GetUserCreatedCategoriesUseCase,
   getUserCreatedCategoriesSnapshotUseCase: GetUserCreatedCategoriesSnapshotUseCase,
   private val createTransactionController: CreateTransactionController,
-  private val appNavigationEventBus: AppNavigationEventBus,
+  private val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
 ) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
   private val categoryTypeFromRepository: CategoryType by lazy {
@@ -49,7 +47,11 @@ class SelectCategoryViewModel @Inject constructor(
   }
 
   fun openCreateCategoryScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.CreateCategory(categoryTypeFromRepository))
+    appNavigationEventBus.navigate(
+      com.emendo.expensestracker.app.base.api.AppNavigationEvent.CreateCategory(
+        categoryTypeFromRepository
+      )
+    )
   }
 }
 

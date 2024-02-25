@@ -1,8 +1,7 @@
-import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import org.gradle.api.Plugin
 import com.android.build.gradle.LibraryExtension
 import com.emendo.expensestracker.configureKotlinAndroid
-import com.emendo.expensestracker.libs
+import com.emendo.expensestracker.setupExpeFeatures
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
@@ -21,6 +20,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
           resourceConfigurations += setOf("en")
         }
       }
+
+      setupExpeFeatures()
     }
   }
 }

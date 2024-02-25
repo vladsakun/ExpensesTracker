@@ -6,8 +6,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.categories.common.CategoryContent
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.data.api.model.category.CategoryType
@@ -41,8 +39,8 @@ fun CreateCategoryRoute(
     stateProvider = state::value,
     onNavigationClick = navigator::navigateUp,
     onTitleChanged = remember { viewModel::changeTitle },
-    onIconSelectClick = remember { { navigator.navigate(SelectIconScreenDestination(viewModel.selectedIconId)) } },
-    onColorSelectClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColorId)) } },
+    onIconSelectClick = remember { viewModel::openSelectIconScreen },
+    onColorSelectClick = remember { viewModel::openSelectColorScreen },
     onConfirmActionClick = remember { viewModel::createCategory },
   )
 }

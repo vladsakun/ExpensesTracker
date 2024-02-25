@@ -24,6 +24,7 @@
             <option value="$PROJECT_DIR$/android-api" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/app-base-ui" />
+            <option value="$PROJECT_DIR$/app-base-ui/api" />
             <option value="$PROJECT_DIR$/app-resources" />
             <option value="$PROJECT_DIR$/baselineprofile" />
             <option value="$PROJECT_DIR$/benchmark" />

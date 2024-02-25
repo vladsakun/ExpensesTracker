@@ -3,7 +3,6 @@ package com.emendo.expensestracker.accounts.common
 import androidx.lifecycle.ViewModel
 import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
-import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.ui.bottomsheet.BalanceBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceKeyboardActions
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
@@ -11,10 +10,14 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetState
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 
+interface NumericKeyboardDelegate {
+
+}
+
 // Todo use composition over inheritance
-abstract class AccountViewModel(
+abstract class AccountViewModelComposition(
   private val calculatorFormatter: CalculatorFormatter,
-  private val numericKeyboardCommander: NumericKeyboardCommander,
+  private val numericKeyboardCommander: com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
 ) : ViewModel(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),

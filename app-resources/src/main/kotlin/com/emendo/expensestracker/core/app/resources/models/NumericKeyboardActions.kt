@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.ui.bottomsheet
+package com.emendo.expensestracker.core.app.resources.models
 
 import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.model.data.keyboard.MathOperation

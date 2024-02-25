@@ -81,6 +81,7 @@ dependencies {
 
   implementation(projects.androidApi)
   implementation(projects.appBaseUi)
+  implementation(projects.appBaseUi.api)
   implementation(projects.core.common)
   implementation(projects.core.data)
   implementation(projects.core.model)

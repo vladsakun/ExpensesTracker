@@ -2,8 +2,6 @@ package com.emendo.expensestracker.accounts.create
 
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountViewModel
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
-import com.emendo.expensestracker.core.app.base.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -27,11 +25,11 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
   currencyCacheManager: CurrencyCacheManager,
-  numericKeyboardCommander: NumericKeyboardCommander,
+  numericKeyboardCommander: com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander,
   calculatorFormatter: CalculatorFormatter,
   private val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
-  override val appNavigationEventBus: AppNavigationEventBus,
+  override val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
 ) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
 
   private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(

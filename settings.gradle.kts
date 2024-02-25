@@ -21,7 +21,7 @@ rootProject.name = "expensestracker"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":app-resources")
-include(":app-base-ui")
+include(":app-base-ui", "app-base-ui:api")
 include(":core:data", ":core:data:api")
 include(":core:common")
 include(":core:domain")

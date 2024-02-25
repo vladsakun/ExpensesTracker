@@ -3,7 +3,9 @@ package com.emendo.expensestracker.categories.create
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.categories.common.CategoryDelegate
+import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
@@ -24,7 +26,11 @@ import javax.inject.Inject
 class CreateCategoryViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
-) : ViewModel(), CategoryDelegate {
+  override val appNavigationEventBus: AppNavigationEventBus,
+) : ViewModel(), CategoryDelegate, CategoryScreenNavigator {
+
+  override val categoryDelegate: CategoryDelegate
+    get() = this
 
   private val _state = MutableStateFlow(CreateCategoryScreenData.getDefault())
   override val state = _state.asStateFlow()

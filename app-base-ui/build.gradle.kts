@@ -1,4 +1,4 @@
-import com.google.devtools.ksp.gradle.KspExtension
+import com.emendo.expensestracker.composeDestinations
 
 plugins {
   alias(libs.plugins.expensestracker.android.library)
@@ -10,14 +10,12 @@ plugins {
 android {
   namespace = "com.emendo.expensestracker.core.app.base.ui"
 
-  configure<KspExtension> {
-    arg("compose-destinations.mode", "navgraphs")
-    arg("compose-destinations.moduleName", "app.base.ui")
-    arg("compose-destinations.useComposableVisibility", "true")
-  }
+  composeDestinations("app.base.ui")
 }
 
 dependencies {
+  api(projects.appBaseUi.api)
+
   implementation(projects.core.data.api)
   implementation(projects.core.domain)
   implementation(projects.core.common)

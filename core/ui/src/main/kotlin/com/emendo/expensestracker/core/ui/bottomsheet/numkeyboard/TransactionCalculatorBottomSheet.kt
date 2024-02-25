@@ -14,9 +14,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.core.app.resources.models.NumericKeyboardActions
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
-import com.emendo.expensestracker.core.ui.bottomsheet.NumericKeyboardActions
 
 @Stable
 data class CalculatorBottomSheetState(

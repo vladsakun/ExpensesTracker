@@ -13,9 +13,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.accounts.common.design.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.design.AccountContent
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurrencyScreenDestination
-import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
@@ -55,10 +52,10 @@ fun AccountDetailScreen(
       stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
       onNameChange = remember { viewModel::setAccountName },
-      onIconRowClick = remember { { navigator.navigate(SelectIconScreenDestination(viewModel.selectedIconId)) } },
-      onColorRowClick = remember { { navigator.navigate(SelectColorScreenDestination(viewModel.selectedColorId)) } },
+      onIconRowClick = remember { viewModel::openSelectIconScreen },
+      onColorRowClick = remember { viewModel::openSelectColorScreen },
       onBalanceRowClick = remember { viewModel::showBalanceBottomSheet },
-      onCurrencyRowClick = remember { { navigator.navigate(SelectCurrencyScreenDestination) } },
+      onCurrencyRowClick = remember { viewModel::openSelectCurrencyScreen },
       onConfirmAccountDetailsClick = remember { viewModel::updateAccount },
       onDeleteClick = remember { viewModel::showConfirmDeleteAccountBottomSheet },
     )

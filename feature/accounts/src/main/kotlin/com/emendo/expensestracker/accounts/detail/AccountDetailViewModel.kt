@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountViewModel
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
-import com.emendo.expensestracker.core.app.base.helper.NumericKeyboardCommander
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
+import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel

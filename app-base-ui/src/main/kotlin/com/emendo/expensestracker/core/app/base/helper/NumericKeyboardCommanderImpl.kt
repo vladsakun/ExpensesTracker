@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 class NumericKeyboardCommanderImpl @Inject constructor(
   private val calculatorInput: CalculatorInput,
-) : NumericKeyboardCommander {
+) : com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander {
 
   override val calculatorTextState by lazy { MutableStateFlow(INITIAL_CALCULATOR_TEXT) }
   override val equalButtonState by lazy { MutableStateFlow(EqualButtonState.Default) }

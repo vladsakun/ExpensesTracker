@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
+import com.emendo.expensestracker.core.app.resources.models.NumericKeyboardActions
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
-import com.emendo.expensestracker.core.ui.bottomsheet.NumericKeyboardActions
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
 import kotlinx.coroutines.flow.StateFlow

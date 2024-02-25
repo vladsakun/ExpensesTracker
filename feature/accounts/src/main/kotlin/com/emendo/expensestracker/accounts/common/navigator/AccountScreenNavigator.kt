@@ -1,8 +1,8 @@
 package com.emendo.expensestracker.accounts.common.navigator
 
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
+import com.emendo.expensestracker.app.base.api.AppNavigationEvent
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 
 interface AccountScreenNavigator {
   val appNavigationEventBus: AppNavigationEventBus

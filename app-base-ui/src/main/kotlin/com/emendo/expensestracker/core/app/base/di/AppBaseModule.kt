@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.app.base.di
 
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBusImpl
 import dagger.Binds
 import dagger.Module

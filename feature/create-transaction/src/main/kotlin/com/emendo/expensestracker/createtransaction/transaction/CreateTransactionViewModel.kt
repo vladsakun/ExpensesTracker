@@ -4,9 +4,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEvent
-import com.emendo.expensestracker.core.app.base.eventbus.AppNavigationEventBus
-import com.emendo.expensestracker.core.app.base.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
@@ -47,14 +44,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(
   getUsedCurrenciesUseCase: GetUsedCurrenciesUseCase,
-  private val numericKeyboardCommander: NumericKeyboardCommander,
+  private val numericKeyboardCommander: com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
   private val currencyCacheManager: CurrencyCacheManager,
   @DecimalSeparator private val decimalSeparator: String,
   private val createTransactionController: CreateTransactionController,
   private val transactionRepository: TransactionRepository,
   private val calculatorFormatter: CalculatorFormatter,
-  private val appNavigationEventBus: AppNavigationEventBus,
+  private val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
   private val getLastTransferAccountOrRandomUseCase: GetLastTransferAccountOrRandomUseCase,
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
 ) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(), CalculatorKeyboardActions {
@@ -291,7 +288,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   fun openAccountListScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectAccount())
+    appNavigationEventBus.navigate(com.emendo.expensestracker.app.base.api.AppNavigationEvent.SelectAccount())
   }
 
   private fun createTransaction(source: TransactionSource, target: TransactionTarget) {
@@ -375,7 +372,7 @@ class CreateTransactionViewModel @Inject constructor(
 
   fun selectTransferTargetAccount() {
     appNavigationEventBus.navigate(
-      AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
+      com.emendo.expensestracker.app.base.api.AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
     )
   }
 
@@ -383,7 +380,7 @@ class CreateTransactionViewModel @Inject constructor(
     val payload = createTransactionController.getTransactionPayload() ?: return
     shouldClearTarget = false
     appNavigationEventBus.navigate(
-      AppNavigationEvent.CreateTransaction(
+      com.emendo.expensestracker.app.base.api.AppNavigationEvent.CreateTransaction(
         source = createTransactionController.getSourceSnapshot(),
         target = createTransactionController.getTargetSnapshot(),
         payload = payload.copy(transactionId = null),
