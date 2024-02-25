@@ -4,10 +4,10 @@ import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
-import com.emendo.expensestracker.core.data.model.transaction.TransactionElement
-import com.emendo.expensestracker.core.data.model.transaction.TransactionType
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
+import com.emendo.expensestracker.data.api.model.transaction.TransactionElement
+import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow

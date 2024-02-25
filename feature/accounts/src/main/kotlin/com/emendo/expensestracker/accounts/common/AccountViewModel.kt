@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.core.app.base.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.data.amount.AmountFormatter
-import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.ui.bottomsheet.BalanceBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceKeyboardActions
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
+import com.emendo.expensestracker.data.api.amount.AmountFormatter
+import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 
 // Todo use composition over inheritance
 abstract class AccountViewModel(

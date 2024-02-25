@@ -3,11 +3,11 @@ package com.emendo.expensestracker.categories.list.model
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
-import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
 
 data class CategoryWithTotal(
   val category: Category,
@@ -46,16 +46,17 @@ data class CategoryWithTotal(
   }
 }
 
-fun CategoryWithTotal.Category.toCategoryModel(): CategoryModel =
-  CategoryModel(
-    id = id,
-    name = name,
-    icon = icon,
-    color = color,
-    ordinalIndex = ordinalIndex,
-    type = type,
-    currency = currency,
-  )
+// Todo refactor
+fun toCategoryModel(category: CategoryWithTotal.Category): CategoryModel =
+  object : CategoryModel {
+    override val id: Long = category.id
+    override val name = category.name
+    override val icon = category.icon
+    override val color = category.color
+    override val ordinalIndex = category.ordinalIndex
+    override val type = category.type
+    override val currency = category.currency
+  }
 
 fun toCategoryWithTotal(category: CategoryWithTotalTransactions): CategoryWithTotal =
   CategoryWithTotal(

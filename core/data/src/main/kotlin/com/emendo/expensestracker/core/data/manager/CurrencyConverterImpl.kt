@@ -2,9 +2,10 @@ package com.emendo.expensestracker.core.data.manager
 
 import com.emendo.expensestracker.core.data.applyDefaultDecimalStyle
 import com.emendo.expensestracker.core.data.divideWithScale
-import com.emendo.expensestracker.core.data.model.CurrencyRateModel
 import com.emendo.expensestracker.core.model.data.CurrencyModels
 import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
+import com.emendo.expensestracker.data.api.manager.CurrencyConverter
+import com.emendo.expensestracker.data.api.model.CurrencyRateModel
 import java.math.BigDecimal
 import javax.inject.Inject
 

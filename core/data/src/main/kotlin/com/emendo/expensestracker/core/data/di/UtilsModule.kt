@@ -1,19 +1,22 @@
 package com.emendo.expensestracker.core.data.di
 
-import com.emendo.expensestracker.core.data.amount.AmountFormatter
+import com.emendo.expensestracker.core.android.api.OnAppCreate
+import com.emendo.expensestracker.core.data.RepositorySetup
 import com.emendo.expensestracker.core.data.amount.AmountFormatterImpl
-import com.emendo.expensestracker.core.data.amount.CalculatorFormatter
 import com.emendo.expensestracker.core.data.amount.CalculatorFormatterImpl
-import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
 import com.emendo.expensestracker.core.data.manager.ExpeLocaleManagerImpl
-import com.emendo.expensestracker.core.data.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.core.data.manager.ExpeTimeZoneManagerImpl
-import com.emendo.expensestracker.core.data.repository.*
+import com.emendo.expensestracker.data.api.DecimalSeparator
+import com.emendo.expensestracker.data.api.amount.AmountFormatter
+import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
+import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
+import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
 @Module
@@ -36,6 +39,10 @@ interface UtilsModule {
   @Singleton
   fun bindsTimeZoneManager(timeZoneManagerImpl: ExpeTimeZoneManagerImpl): ExpeTimeZoneManager
 
+  @Binds
+  @IntoSet
+  fun setupRepositoryOnCreate(repositorySetup: RepositorySetup): OnAppCreate
+
   companion object {
 
     @Provides
@@ -45,4 +52,3 @@ interface UtilsModule {
   }
 }
 
-annotation class DecimalSeparator

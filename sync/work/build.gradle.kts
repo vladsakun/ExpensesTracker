@@ -13,7 +13,7 @@ android {
 dependencies {
     implementation(project(":core:app-resources"))
     implementation(project(":core:common"))
-    implementation(project(":core:data"))
+  implementation(projects.core.data.api)
     implementation(project(":core:datastore"))
     implementation(project(":core:model"))
 

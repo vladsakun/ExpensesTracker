@@ -2,31 +2,9 @@ package com.emendo.expensestracker.core.data
 
 import com.emendo.expensestracker.core.datastore.ChangeListVersions
 import com.emendo.expensestracker.core.network.model.NetworkChangeList
+import com.emendo.expensestracker.data.api.Synchronizer
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
-
-interface Synchronizer {
-  suspend fun getChangeListVersions(): ChangeListVersions
-
-  suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions)
-
-  /**
-   * Syntactic sugar to call [Syncable.syncWith] while omitting the synchronizer argument
-   */
-  suspend fun Syncable.sync() = this@sync.syncWith(this@Synchronizer)
-}
-
-/**
- * Interface marker for a class that is synchronized with a remote source. Syncing must not be
- * performed concurrently and it is the [Synchronizer]'s responsibility to ensure this.
- */
-interface Syncable {
-  /**
-   * Synchronizes the local database backing the repository with the network.
-   * Returns if the sync was successful or not.
-   */
-  suspend fun syncWith(synchronizer: Synchronizer): Boolean
-}
 
 /**
  * Attempts [block], returning a successful [Result] if it succeeds, otherwise a [Result.Failure]

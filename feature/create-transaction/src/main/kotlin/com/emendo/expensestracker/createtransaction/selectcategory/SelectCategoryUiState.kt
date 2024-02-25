@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.createtransaction.selectcategory
 
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface SelectCategoryUiState {

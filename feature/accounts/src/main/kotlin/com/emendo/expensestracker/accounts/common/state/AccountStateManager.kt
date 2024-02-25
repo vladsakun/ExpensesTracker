@@ -3,9 +3,9 @@ package com.emendo.expensestracker.accounts.common.state
 import com.emendo.expensestracker.accounts.common.model.AccountScreenData
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.amount.AmountFormatter
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import kotlinx.coroutines.flow.StateFlow
 
 interface AccountStateManager {

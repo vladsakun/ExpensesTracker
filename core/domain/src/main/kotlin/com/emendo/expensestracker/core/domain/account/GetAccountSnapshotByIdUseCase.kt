@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.domain.account
 
-import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.repository.api.AccountRepository
+import com.emendo.expensestracker.data.api.model.AccountModel
+import com.emendo.expensestracker.data.api.repository.AccountRepository
 import javax.inject.Inject
 
 class GetAccountSnapshotByIdUseCase @Inject constructor(

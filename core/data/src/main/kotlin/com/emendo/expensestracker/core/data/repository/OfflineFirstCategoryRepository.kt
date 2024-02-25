@@ -10,16 +10,18 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.mapper.CategoryFullMapper
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
-import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.category.CategoryWithTransactions
 import com.emendo.expensestracker.core.data.model.category.asExternalModel
-import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.database.dao.CategoryDao
 import com.emendo.expensestracker.core.database.model.CategoryDetailUpdate
 import com.emendo.expensestracker.core.database.model.CategoryEntity
 import com.emendo.expensestracker.core.database.model.CategoryOrdinalIndexUpdate
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.data.api.model.category.CategoryWithTransactions
+import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
+import com.emendo.expensestracker.data.api.repository.DefaultTransactionTargetExpenseId
+import com.emendo.expensestracker.data.api.repository.DefaultTransactionTargetIncomeId
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,8 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-const val DefaultTransactionTargetExpenseId = 1L
-const val DefaultTransactionTargetIncomeId = 2L
 const val DefaultTransactionTargetOrdinalIndex = Int.MAX_VALUE
 const val DefaultTransactionTargetName = ""
 
@@ -140,7 +140,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
 
   // Todo remove
   private fun getDefaultTarget(transactionType: CategoryType): TransactionTarget =
-    CategoryModel(
+    com.emendo.expensestracker.core.data.model.category.CategoryModelImpl(
       id = if (transactionType == CategoryType.EXPENSE) {
         DefaultTransactionTargetExpenseId
       } else {

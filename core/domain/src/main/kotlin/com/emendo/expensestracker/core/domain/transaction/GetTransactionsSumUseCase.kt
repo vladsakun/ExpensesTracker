@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.domain.transaction
 
-import com.emendo.expensestracker.core.data.model.transaction.TransactionType
-import com.emendo.expensestracker.core.data.model.transaction.TransactionValueWithType
+import com.emendo.expensestracker.data.api.model.transaction.TransactionType
+import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
 import java.math.BigDecimal
 import javax.inject.Inject
 

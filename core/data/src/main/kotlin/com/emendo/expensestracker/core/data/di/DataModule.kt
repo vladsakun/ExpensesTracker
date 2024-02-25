@@ -1,10 +1,11 @@
 package com.emendo.expensestracker.core.data.di
 
-import com.emendo.expensestracker.core.data.manager.*
-import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManager
-import com.emendo.expensestracker.core.data.manager.cache.CurrencyCacheManagerImpl
+import com.emendo.expensestracker.core.data.manager.CurrencyCacheManagerImpl
+import com.emendo.expensestracker.core.data.manager.CurrencyConverterImpl
 import com.emendo.expensestracker.core.data.repository.*
-import com.emendo.expensestracker.core.data.repository.api.*
+import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
+import com.emendo.expensestracker.data.api.manager.CurrencyConverter
+import com.emendo.expensestracker.data.api.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -42,4 +43,8 @@ interface DataModule {
   @Binds
   @Singleton
   fun bindsCurrencyCacheManager(currencyCacheManagerImpl: CurrencyCacheManagerImpl): CurrencyCacheManager
+
+  @Binds
+  @Singleton
+  fun bindsCreateTransactionRepository(createTransactionRepository: CreateTransactionRepositoryImpl): CreateTransactionRepository
 }

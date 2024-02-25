@@ -1,10 +1,10 @@
 package com.emendo.expensestracker.core.app.base.helper
 
-import com.emendo.expensestracker.core.data.CalculatorInput
 import com.emendo.expensestracker.core.model.data.keyboard.CalculatorConstants.INITIAL_CALCULATOR_TEXT
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
 import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardNumber
+import com.emendo.expensestracker.data.api.CalculatorInput
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import java.math.BigDecimal

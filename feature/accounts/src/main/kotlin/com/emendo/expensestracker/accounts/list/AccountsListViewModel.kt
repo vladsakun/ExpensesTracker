@@ -3,13 +3,13 @@ package com.emendo.expensestracker.accounts.list
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.core.app.base.manager.CreateTransactionRepository
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.repository.api.AccountRepository
+import com.emendo.expensestracker.data.api.model.AccountModel
+import com.emendo.expensestracker.data.api.repository.AccountRepository
+import com.emendo.expensestracker.data.api.repository.CreateTransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow

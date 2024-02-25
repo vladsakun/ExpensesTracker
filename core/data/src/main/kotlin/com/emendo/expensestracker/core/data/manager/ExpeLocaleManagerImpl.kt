@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.data.manager
 
+import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

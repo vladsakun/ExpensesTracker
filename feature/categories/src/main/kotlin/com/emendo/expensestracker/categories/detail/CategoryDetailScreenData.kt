@@ -5,7 +5,7 @@ import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.TextValue
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 
 @Stable
 data class CategoryDetailScreenData(

@@ -8,8 +8,8 @@ import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDes
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.textValueOf
-import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
+import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered

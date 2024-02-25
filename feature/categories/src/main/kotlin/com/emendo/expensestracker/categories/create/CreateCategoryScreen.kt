@@ -9,8 +9,8 @@ import com.emendo.expensestracker.categories.common.CategoryContent
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectColorScreenDestination
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
 import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.ui.handleValueResult
+import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.OpenResultRecipient

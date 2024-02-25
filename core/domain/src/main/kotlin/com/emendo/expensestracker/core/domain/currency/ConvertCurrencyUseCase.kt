@@ -1,8 +1,8 @@
 package com.emendo.expensestracker.core.domain.currency
 
-import com.emendo.expensestracker.core.data.manager.CurrencyConverter
-import com.emendo.expensestracker.core.data.repository.api.CurrencyRateRepository
 import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
+import com.emendo.expensestracker.data.api.manager.CurrencyConverter
+import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository
 import java.math.BigDecimal
 import javax.inject.Inject
 

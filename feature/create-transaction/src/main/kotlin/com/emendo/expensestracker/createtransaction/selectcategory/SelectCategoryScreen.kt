@@ -14,17 +14,18 @@ import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.app.resources.models.textValueOf
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
-import com.emendo.expensestracker.core.data.model.category.CategoryType
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
+import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.ImmutableList
@@ -119,14 +120,16 @@ private fun CategoriesListPreview() {
       stateProvider = {
         SelectCategoryUiState.DisplayCategoryList(
           categories = List(6) { index ->
-            CategoryModel(
-              id = index.toLong(),
-              name = textValueOf("Childcare"),
-              icon = IconModel.random,
-              color = ColorModel.random,
-              type = CategoryType.EXPENSE,
-              ordinalIndex = index,
-            )
+            // Todo refactor
+            object : CategoryModel {
+              override val id = index.toLong()
+              override val name = textValueOf("Childcare")
+              override val icon = IconModel.random
+              override val color = ColorModel.random
+              override val type = CategoryType.EXPENSE
+              override val ordinalIndex = index
+              override val currency: CurrencyModel? = null
+            }
           }.toImmutableList(),
         )
       },

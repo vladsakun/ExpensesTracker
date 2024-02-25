@@ -16,13 +16,6 @@ import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
-import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.label
-import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.toCategoryType
-import com.emendo.expensestracker.core.data.model.category.CategoryType.Companion.toPageIndex
-import com.emendo.expensestracker.core.data.model.category.CategoryWithTotalTransactions
-import com.emendo.expensestracker.core.data.model.category.toCategoryWithOrdinalIndex
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
@@ -30,6 +23,13 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
+import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.label
+import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toCategoryType
+import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toPageIndex
+import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
+import com.emendo.expensestracker.data.api.model.category.toCategoryWithOrdinalIndex
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.sync.initializers.Sync
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -88,7 +88,7 @@ class CategoriesListViewModel @Inject constructor(
     appNavigationEventBus.navigate(
       AppNavigationEvent.CreateTransaction(
         source = null,
-        target = category.category.toCategoryModel(),
+        target = toCategoryModel(category.category),
         shouldNavigateUp = true
       )
     )

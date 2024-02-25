@@ -7,13 +7,13 @@ import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.mapper.AccountMapper
-import com.emendo.expensestracker.core.data.model.AccountModel
-import com.emendo.expensestracker.core.data.repository.api.AccountRepository
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.data.api.model.AccountModel
+import com.emendo.expensestracker.data.api.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

@@ -3,9 +3,9 @@ package com.emendo.expensestracker.accounts.detail
 import com.emendo.expensestracker.accounts.common.model.AccountScreenData
 import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.data.api.model.AccountModel
 
 data class AccountDetailScreenData(
   override val name: String,

@@ -5,8 +5,8 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.sync.initializers.syncForegroundInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

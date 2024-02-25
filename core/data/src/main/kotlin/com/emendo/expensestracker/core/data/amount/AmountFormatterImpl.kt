@@ -3,9 +3,10 @@ package com.emendo.expensestracker.core.data.amount
 import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
 import com.emendo.expensestracker.core.data.isFloatingPointNumber
-import com.emendo.expensestracker.core.data.manager.ExpeLocaleManager
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.data.api.amount.AmountFormatter
+import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
 import java.math.BigDecimal
 import java.util.Locale
 import javax.inject.Inject

@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.accounts.list
 
-import com.emendo.expensestracker.core.data.model.AccountModel
+import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface AccountsListUiState {

@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.data.di
 
-import com.emendo.expensestracker.core.data.CalculatorInput
 import com.emendo.expensestracker.core.data.CalculatorInputImpl
+import com.emendo.expensestracker.data.api.CalculatorInput
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

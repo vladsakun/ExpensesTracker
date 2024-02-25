@@ -79,6 +79,7 @@ dependencies {
   implementation(projects.feature.settings)
   implementation(projects.feature.createTransaction)
 
+  implementation(projects.core.androidApi)
   implementation(projects.core.appBaseUi)
   implementation(projects.core.common)
   implementation(projects.core.data)

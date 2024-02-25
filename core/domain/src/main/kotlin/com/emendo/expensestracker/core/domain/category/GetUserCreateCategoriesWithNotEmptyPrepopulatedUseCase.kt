@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.domain.category
 
-import com.emendo.expensestracker.core.data.model.category.CategoryWithTransactions
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
+import com.emendo.expensestracker.data.api.model.category.CategoryWithTransactions
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

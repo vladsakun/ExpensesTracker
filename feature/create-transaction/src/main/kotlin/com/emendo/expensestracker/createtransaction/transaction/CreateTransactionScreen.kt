@@ -30,8 +30,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
-import com.emendo.expensestracker.core.data.model.transaction.TransactionType
-import com.emendo.expensestracker.core.data.model.transaction.TransactionType.Companion.toTransactionType
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
@@ -45,6 +43,8 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.createtransaction.destinations.SelectCategoryScreenDestination
+import com.emendo.expensestracker.data.api.model.transaction.TransactionType
+import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.toTransactionType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

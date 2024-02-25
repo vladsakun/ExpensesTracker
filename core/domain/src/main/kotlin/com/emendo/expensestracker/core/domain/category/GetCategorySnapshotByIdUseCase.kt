@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.domain.category
 
-import com.emendo.expensestracker.core.data.model.category.CategoryModel
-import com.emendo.expensestracker.core.data.repository.api.CategoryRepository
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import javax.inject.Inject
 
 class GetCategorySnapshotByIdUseCase @Inject constructor(

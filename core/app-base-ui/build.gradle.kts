@@ -18,12 +18,12 @@ android {
 }
 
 dependencies {
-  implementation(project(":core:data"))
-  implementation(project(":core:domain"))
-  implementation(project(":core:common"))
-  implementation(project(":core:ui"))
-  implementation(project(":core:model"))
-  implementation(project(":core:designsystem"))
+  implementation(projects.core.data.api)
+  implementation(projects.core.domain)
+  implementation(projects.core.common)
+  implementation(projects.core.ui)
+  implementation(projects.core.model)
+  implementation(projects.core.designsystem)
 
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.ktx)

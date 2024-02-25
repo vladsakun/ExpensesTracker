@@ -18,13 +18,13 @@ import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestin
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
-import com.emendo.expensestracker.core.data.model.AccountModel
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.component.ExpeTopBar
 import com.emendo.expensestracker.core.ui.AccountItem
 import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.data.api.model.AccountModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

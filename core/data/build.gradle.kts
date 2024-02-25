@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+  api(projects.core.data.api)
+
   // Todo Get rid of compose in data module
   implementation(project(":core:app-resources"))
   implementation(project(":core:common"))
@@ -16,6 +18,7 @@ dependencies {
   implementation(project(":core:datastore"))
   implementation(project(":core:model"))
   implementation(project(":core:network"))
+  implementation(projects.core.androidApi)
 
   implementation(libs.androidx.core.ktx)
   implementation(libs.kotlinx.coroutines.android)

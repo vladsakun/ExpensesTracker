@@ -1,9 +1,9 @@
 package com.emendo.expensestracker.core.app.base.eventbus
 
-import com.emendo.expensestracker.core.data.model.category.CategoryType
-import com.emendo.expensestracker.core.data.model.transaction.TransactionSource
-import com.emendo.expensestracker.core.data.model.transaction.TransactionTarget
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
+import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
+import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow

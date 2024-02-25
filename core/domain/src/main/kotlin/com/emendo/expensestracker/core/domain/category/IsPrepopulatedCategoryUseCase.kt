@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.domain.category
 
-import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetExpenseId
-import com.emendo.expensestracker.core.data.repository.DefaultTransactionTargetIncomeId
+import com.emendo.expensestracker.data.api.repository.DefaultTransactionTargetExpenseId
+import com.emendo.expensestracker.data.api.repository.DefaultTransactionTargetIncomeId
 import javax.inject.Inject
 
 class IsPrepopulatedCategoryUseCase @Inject constructor() {
