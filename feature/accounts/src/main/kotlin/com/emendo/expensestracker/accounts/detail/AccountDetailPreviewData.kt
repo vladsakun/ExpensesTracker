@@ -9,7 +9,7 @@ import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.textValueOf
 
 internal class AccountDetailPreviewData : PreviewParameterProvider<AccountDetailScreenData> {
-  val data = AccountDetailScreenData.getDefaultState(
+  val data = getDefaultAccountDetailScreenState(
     accountModel = AccountModel(
       id = 1,
       currency = CurrencyModel(

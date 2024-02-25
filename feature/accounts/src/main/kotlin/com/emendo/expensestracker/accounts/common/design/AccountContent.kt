@@ -24,7 +24,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 internal fun AccountContent(
-  stateProvider: () -> AccountScreenData,
+  stateProvider: () -> AccountScreenData<*>,
   title: String,
   onNavigationClick: () -> Unit,
   onNameChange: (String) -> Unit,

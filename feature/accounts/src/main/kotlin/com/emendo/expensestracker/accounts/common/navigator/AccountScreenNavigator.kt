@@ -6,7 +6,7 @@ import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 
 interface AccountScreenNavigator {
   val appNavigationEventBus: AppNavigationEventBus
-  val accountStateManager: AccountStateManager
+  val accountStateManager: AccountStateManager<*>
 
   fun openSelectIconScreen() {
     appNavigationEventBus.navigate(AppNavigationEvent.SelectIcon(accountStateManager.selectedIconId))

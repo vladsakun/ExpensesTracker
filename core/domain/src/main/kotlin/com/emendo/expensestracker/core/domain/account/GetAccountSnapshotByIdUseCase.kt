@@ -8,7 +8,6 @@ class GetAccountSnapshotByIdUseCase @Inject constructor(
   private val accountRepository: AccountRepository,
 ) {
 
-  operator fun invoke(id: Long): AccountModel? {
-    return accountRepository.getAccountsSnapshot().firstOrNull { it.id == id }
-  }
+  operator fun invoke(id: Long): AccountModel? =
+    accountRepository.getAccountsSnapshot().firstOrNull { it.id == id }
 }

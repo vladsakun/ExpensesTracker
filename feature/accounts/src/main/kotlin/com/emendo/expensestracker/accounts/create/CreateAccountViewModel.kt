@@ -1,23 +1,24 @@
 package com.emendo.expensestracker.accounts.create
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.accounts.common.AccountViewModel
+import com.emendo.expensestracker.accounts.common.AccountBalanceUtils
+import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetContract
+import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
+import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
+import com.emendo.expensestracker.accounts.common.state.AccountStateManager
+import com.emendo.expensestracker.accounts.common.state.AccountStateManagerDelegate
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
+import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
-import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.repository.AccountRepository
-import com.emendo.expensestracker.model.ui.ColorModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -25,26 +26,24 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
   currencyCacheManager: CurrencyCacheManager,
-  numericKeyboardCommander: com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander,
-  calculatorFormatter: CalculatorFormatter,
-  private val amountFormatter: AmountFormatter,
+  override val appNavigationEventBus: AppNavigationEventBus,
+  override val numericKeyboardCommander: NumericKeyboardCommander,
+  override val calculatorFormatter: CalculatorFormatter,
+  override val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
-  override val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
-) : AccountViewModel(calculatorFormatter, numericKeyboardCommander, amountFormatter) {
+) : ViewModel(),
+    AccountStateManager<Boolean> by AccountStateManagerDelegate(
+      getDefaultCreateAccountScreenData(amountFormatter, currencyCacheManager),
+    ),
+    ModalBottomSheetStateManager by AccountBottomSheetDelegate(numericKeyboardCommander),
+    AccountScreenNavigator,
+    AccountBottomSheetContract,
+    AccountBalanceUtils {
 
-  private val _state: MutableStateFlow<CreateAccountScreenData> = MutableStateFlow(
-    getDefaultCreateAccountScreenData(currencyCacheManager)
-  )
-
-  private fun getDefaultCreateAccountScreenData(currencyCacheManager: CurrencyCacheManager): CreateAccountScreenData {
-    val currency = currencyCacheManager.getGeneralCurrencySnapshot()
-    return CreateAccountScreenData.getDefaultState(
-      currency = currency,
-      balance = amountFormatter.format(BigDecimal.ZERO, currency),
-    )
-  }
-
-  override val state: StateFlow<CreateAccountScreenData> = _state.asStateFlow()
+  override val accountStateManager: AccountStateManager<Boolean>
+    get() = this
+  override val modalBottomSheetStateManager: ModalBottomSheetStateManager
+    get() = this
 
   private var createAccountJob: Job? = null
 
@@ -55,30 +54,6 @@ class CreateAccountViewModel @Inject constructor(
         showBalanceBottomSheet()
       }
     }
-  }
-
-  override fun updateBalance(balance: Amount) {
-    _state.update { it.copy(balance = balance) }
-  }
-
-  override fun updateCurrency(currency: CurrencyModel) {
-    _state.update { it.copy(currency = currency) }
-  }
-
-  override fun updateIcon(icon: IconModel) {
-    _state.update { it.copy(icon = icon) }
-  }
-
-  override fun updateColor(color: ColorModel) {
-    _state.update { it.copy(color = color) }
-  }
-
-  override fun updateName(name: String) {
-    _state.update { it.copy(name = name) }
-  }
-
-  override fun updateConfirmEnabled(enabled: Boolean) {
-    _state.update { it.copy(isCreateAccountButtonEnabled = enabled) }
   }
 
   fun createNewAccount() {
@@ -99,8 +74,15 @@ class CreateAccountViewModel @Inject constructor(
       }
     }
   }
+}
 
-  fun updateCurrencyByCode(code: String) {
-    updateCurrencyByCode(amountFormatter, code)
-  }
+private fun getDefaultCreateAccountScreenData(
+  amountFormatter: AmountFormatter,
+  currencyCacheManager: CurrencyCacheManager,
+): CreateAccountScreenData {
+  val currency = currencyCacheManager.getGeneralCurrencySnapshot()
+  return getDefaultCreateAccountState(
+    currency = currency,
+    balance = amountFormatter.format(BigDecimal.ZERO, currency),
+  )
 }

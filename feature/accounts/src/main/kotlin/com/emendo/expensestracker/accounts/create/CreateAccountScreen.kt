@@ -81,7 +81,7 @@ private fun CreateAccountContent(
     ExpeButton(
       textResId = R.string.create,
       onClick = onCreateAccountClick,
-      enabled = stateProvider().isCreateAccountButtonEnabled,
+      enabled = stateProvider().confirmEnabled,
     )
   }
 }
