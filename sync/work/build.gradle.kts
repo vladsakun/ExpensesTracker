@@ -1,30 +1,30 @@
 plugins {
-    id("expensestracker.android.library")
-    id("expensestracker.android.hilt")
+  id("expensestracker.android.library")
+  id("expensestracker.android.hilt")
 }
 
 android {
-    defaultConfig {
-        //        testInstrumentationRunner = "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
-    }
-    namespace = "com.emendo.expensestracker.sync"
+  defaultConfig {
+    //        testInstrumentationRunner = "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
+  }
+  namespace = "com.emendo.expensestracker.sync"
 }
 
 dependencies {
-    implementation(project(":core:app-resources"))
-    implementation(project(":core:common"))
+  implementation(projects.appResources)
+  implementation(projects.core.common)
+  implementation(projects.core.datastore)
+  implementation(projects.core.model)
   implementation(projects.core.data.api)
-    implementation(project(":core:datastore"))
-    implementation(project(":core:model"))
 
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.tracing.ktx)
-    implementation(libs.androidx.work.ktx)
-    implementation(libs.hilt.ext.work)
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.serialization.json)
+  implementation(libs.androidx.lifecycle.livedata.ktx)
+  implementation(libs.androidx.tracing.ktx)
+  implementation(libs.androidx.work.ktx)
+  implementation(libs.hilt.ext.work)
+  implementation(libs.kotlinx.coroutines.android)
+  implementation(libs.kotlinx.serialization.json)
 
-    kapt(libs.hilt.ext.compiler)
+  kapt(libs.hilt.ext.compiler)
 
-    androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.androidx.work.testing)
 }

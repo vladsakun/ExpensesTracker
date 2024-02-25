@@ -8,10 +8,10 @@ android {
 }
 
 dependencies {
-  api(libs.androidx.compose.material.iconsExtended)
   api(libs.timber)
+  implementation(libs.androidx.compose.material.iconsExtended)
 
   // Todo consider moving to core:uimodels
-  implementation(project(":core:model"))
+  implementation(projects.core.model)
   implementation(libs.androidx.compose.foundation)
 }

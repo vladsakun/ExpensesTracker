@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-  api(project(":core:app-resources"))
+  api(project(":app-resources"))
 
   api(libs.androidx.compose.foundation)
   api(libs.androidx.compose.foundation.layout)

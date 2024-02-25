@@ -9,8 +9,8 @@ android {
 
 dependencies {
   implementation(projects.core.data.api)
-  implementation(project(":core:common"))
-  implementation(project(":core:model"))
+  implementation(projects.core.common)
+  implementation(projects.core.model)
 
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.datetime)

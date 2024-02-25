@@ -9,7 +9,7 @@ android {
 
 dependencies {
   implementation(projects.core.model)
-  implementation(projects.core.appResources)
+  implementation(projects.appResources)
   implementation(projects.core.datastore)
 
   implementation(libs.kotlinx.datetime)
