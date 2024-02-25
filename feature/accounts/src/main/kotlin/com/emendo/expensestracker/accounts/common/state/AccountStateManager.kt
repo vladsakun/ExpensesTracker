@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.accounts.common.state
 
-import com.emendo.expensestracker.accounts.common.model.AccountScreenData
+import com.emendo.expensestracker.accounts.common.AccountScreenData
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -22,7 +22,6 @@ interface AccountStateManager<T> {
   fun updateConfirmEnabled(enabled: Boolean)
   fun updateIcon(icon: IconModel)
   fun updateColor(color: ColorModel)
-  //  fun updateCurrencyByCode(code: String)
 
   fun updateColorById(id: Int) {
     updateColor(ColorModel.getById(id))

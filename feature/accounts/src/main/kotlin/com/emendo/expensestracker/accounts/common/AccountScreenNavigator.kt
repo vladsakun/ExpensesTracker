@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.accounts.common.navigator
+package com.emendo.expensestracker.accounts.common
 
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.app.base.api.AppNavigationEvent

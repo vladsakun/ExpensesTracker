@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.emendo.expensestracker.accounts.common.model.AccountScreenData
+import com.emendo.expensestracker.accounts.common.AccountScreenData
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar

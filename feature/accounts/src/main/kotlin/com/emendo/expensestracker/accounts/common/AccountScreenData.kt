@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.accounts.common.model
+package com.emendo.expensestracker.accounts.common
 
 import androidx.compose.runtime.Immutable
 import com.emendo.expensestracker.core.app.resources.models.IconModel

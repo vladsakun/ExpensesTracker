@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountBalanceUtils
+import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetContract
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
-import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.accounts.common.state.AccountStateManagerDelegate
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination

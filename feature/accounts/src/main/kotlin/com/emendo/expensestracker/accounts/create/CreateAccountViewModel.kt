@@ -3,9 +3,9 @@ package com.emendo.expensestracker.accounts.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountBalanceUtils
+import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetContract
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
-import com.emendo.expensestracker.accounts.common.navigator.AccountScreenNavigator
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.accounts.common.state.AccountStateManagerDelegate
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
