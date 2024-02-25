@@ -11,6 +11,7 @@ dependencies {
   implementation(projects.core.data.api)
   implementation(projects.core.common)
   implementation(projects.core.model)
+  implementation(projects.core.modelUi)
   implementation(projects.appResources)
 
   implementation(libs.kotlinx.coroutines.android)

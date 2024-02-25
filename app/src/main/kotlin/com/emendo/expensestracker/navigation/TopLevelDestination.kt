@@ -3,8 +3,8 @@ package com.emendo.expensestracker.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.accounts.AccountsNavGraph
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.CategoriesNavGraph
-import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.emendo.expensestracker.settings.SettingsNavGraph

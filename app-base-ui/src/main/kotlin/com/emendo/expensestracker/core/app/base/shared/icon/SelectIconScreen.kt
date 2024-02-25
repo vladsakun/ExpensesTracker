@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.base.shared.SelectedItemConstants
 import com.emendo.expensestracker.core.app.base.shared.destinations.SelectIconScreenDestination
-import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens

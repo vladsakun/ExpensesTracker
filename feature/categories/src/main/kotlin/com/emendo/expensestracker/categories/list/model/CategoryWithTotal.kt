@@ -1,13 +1,13 @@
 package com.emendo.expensestracker.categories.list.model
 
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.TextValue
 
 data class CategoryWithTotal(
   val category: Category,

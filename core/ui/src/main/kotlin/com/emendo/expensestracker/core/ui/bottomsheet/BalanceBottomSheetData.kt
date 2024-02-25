@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.core.ui.bottomsheet
 
-import com.emendo.expensestracker.core.app.resources.models.NumericKeyboardActions
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
+import com.emendo.expensestracker.model.ui.NumericKeyboardActions
 import kotlinx.coroutines.flow.StateFlow
 
 data class BalanceBottomSheetData(

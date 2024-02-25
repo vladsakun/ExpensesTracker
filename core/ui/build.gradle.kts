@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+  api(projects.core.modelUi)
+
   implementation(projects.core.designsystem)
   implementation(projects.core.model)
 

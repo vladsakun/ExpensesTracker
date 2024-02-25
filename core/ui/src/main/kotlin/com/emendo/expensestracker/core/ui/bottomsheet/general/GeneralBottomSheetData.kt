@@ -3,9 +3,9 @@ package com.emendo.expensestracker.core.ui.bottomsheet.general
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.emendo.expensestracker.core.app.resources.models.TextValue
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
+import com.emendo.expensestracker.model.ui.TextValue
 
 class GeneralBottomSheetData private constructor(
   val title: TextValue?,

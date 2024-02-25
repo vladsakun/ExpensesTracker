@@ -9,6 +9,7 @@ android {
 
 dependencies {
   implementation(projects.core.model)
+  implementation(projects.core.modelUi)
   implementation(projects.appResources)
   implementation(projects.core.datastore)
 

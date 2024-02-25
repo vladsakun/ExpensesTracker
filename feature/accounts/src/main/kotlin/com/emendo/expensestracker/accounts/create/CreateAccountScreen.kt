@@ -11,7 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.accounts.common.design.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.design.AccountContent
-import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.theme.Dimens

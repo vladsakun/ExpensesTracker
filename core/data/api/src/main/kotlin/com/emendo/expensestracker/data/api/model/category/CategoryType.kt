@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.model.category
 
 import androidx.annotation.StringRes
-import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
 enum class CategoryType(val id: Int) {

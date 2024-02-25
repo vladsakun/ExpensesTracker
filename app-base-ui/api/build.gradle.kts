@@ -9,7 +9,7 @@ android {
 dependencies {
   implementation(projects.core.data.api)
   implementation(projects.core.model)
-  implementation(projects.appResources)
+  implementation(projects.core.modelUi)
 
   implementation(libs.kotlinx.coroutines.android)
 }

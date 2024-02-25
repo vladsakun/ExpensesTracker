@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.app.resources.models
+package com.emendo.expensestracker.model.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

@@ -3,6 +3,7 @@ package com.emendo.expensestracker.categories.list
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.categories.list.model.toCategoryModel
@@ -12,8 +13,6 @@ import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
-import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
@@ -28,6 +27,7 @@ import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion
 import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.data.api.model.category.toCategoryWithOrdinalIndex
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
+import com.emendo.expensestracker.model.ui.resourceValueOf
 import com.emendo.expensestracker.sync.initializers.Sync
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf

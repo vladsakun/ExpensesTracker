@@ -1,11 +1,11 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.textValueOf
 
 internal class CreateTransactionStatePreviewProvider : PreviewParameterProvider<CreateTransactionUiState> {
 

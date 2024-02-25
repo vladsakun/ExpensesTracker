@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.model.transaction
 
 import androidx.annotation.StringRes
-import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.app.resources.R
 
 enum class TransactionType {
   INCOME,

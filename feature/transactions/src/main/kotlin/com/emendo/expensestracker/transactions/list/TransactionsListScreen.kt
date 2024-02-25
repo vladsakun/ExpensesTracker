@@ -20,9 +20,8 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.emendo.expensestracker.core.app.resources.R
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
@@ -34,6 +33,7 @@ import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
+import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.Flow

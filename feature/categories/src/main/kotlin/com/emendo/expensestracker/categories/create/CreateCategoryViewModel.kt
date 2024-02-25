@@ -7,11 +7,11 @@ import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.categories.common.CategoryDelegate
 import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.textValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered

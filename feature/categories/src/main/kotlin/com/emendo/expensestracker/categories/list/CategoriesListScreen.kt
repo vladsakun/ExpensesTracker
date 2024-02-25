@@ -21,13 +21,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_TRANSACTION
-import com.emendo.expensestracker.core.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
@@ -41,6 +40,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

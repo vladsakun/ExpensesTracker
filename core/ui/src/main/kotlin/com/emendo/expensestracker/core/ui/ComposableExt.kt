@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.stringResource
-import com.emendo.expensestracker.core.app.resources.models.TextValue
+import com.emendo.expensestracker.model.ui.TextValue
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.OpenResultRecipient
 

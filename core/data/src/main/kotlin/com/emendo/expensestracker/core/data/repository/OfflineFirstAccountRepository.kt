@@ -4,7 +4,6 @@ import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.mapper.AccountMapper
 import com.emendo.expensestracker.core.database.dao.AccountDao
@@ -52,7 +51,7 @@ class OfflineFirstAccountRepository @Inject constructor(
     currency: CurrencyModel,
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     balance: BigDecimal,
   ) {
     withContext(ioDispatcher) {
@@ -74,7 +73,7 @@ class OfflineFirstAccountRepository @Inject constructor(
     currency: CurrencyModel,
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     balance: BigDecimal,
   ) {
     withContext(ioDispatcher) {

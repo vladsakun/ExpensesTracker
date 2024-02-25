@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.data.api.repository
 
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
@@ -18,7 +17,7 @@ interface AccountRepository {
     currency: CurrencyModel,
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     balance: BigDecimal,
   )
 
@@ -27,7 +26,7 @@ interface AccountRepository {
     currency: CurrencyModel,
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     balance: BigDecimal,
   )
 

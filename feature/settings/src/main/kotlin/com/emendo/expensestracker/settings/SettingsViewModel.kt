@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.emendo.expensestracker.core.app.resources.R as AppR
+import com.emendo.expensestracker.app.resources.R as AppR
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(

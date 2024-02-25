@@ -4,11 +4,11 @@ import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.model.data.keyboard.MathOperation
 import com.emendo.expensestracker.core.model.data.keyboard.NumericKeyboardNumber
 import com.emendo.expensestracker.data.api.KeyboardCallbacks
+import com.emendo.expensestracker.model.ui.NumericKeyboardActions
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 
-interface NumericKeyboardCommander : com.emendo.expensestracker.core.app.resources.models.NumericKeyboardActions,
-                                     KeyboardCallbacks {
+interface NumericKeyboardCommander : NumericKeyboardActions, KeyboardCallbacks {
   val calculatorTextState: StateFlow<String>
   val equalButtonState: StateFlow<EqualButtonState>
   val currentValue: BigDecimal

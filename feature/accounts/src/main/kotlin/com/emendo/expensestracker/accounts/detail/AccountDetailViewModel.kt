@@ -6,10 +6,8 @@ import com.emendo.expensestracker.accounts.common.AccountViewModel
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
-import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.domain.account.GetAccountSnapshotByIdUseCase
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
@@ -18,6 +16,8 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 import com.emendo.expensestracker.data.api.repository.AccountRepository
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.resourceValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

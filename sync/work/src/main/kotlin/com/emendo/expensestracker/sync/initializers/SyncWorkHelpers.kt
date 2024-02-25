@@ -8,7 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
-import com.emendo.expensestracker.core.app.resources.R as AppR
+import com.emendo.expensestracker.app.resources.R as AppR
 
 const val SYNC_TOPIC = "sync"
 private const val SYNC_NOTIFICATION_ID = 0

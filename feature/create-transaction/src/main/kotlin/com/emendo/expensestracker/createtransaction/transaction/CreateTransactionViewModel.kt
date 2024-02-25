@@ -4,11 +4,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
-import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.domain.account.GetLastTransferAccountOrRandomUseCase
 import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
@@ -31,6 +30,7 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.labelResId
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
+import com.emendo.expensestracker.model.ui.resourceValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed

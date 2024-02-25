@@ -29,7 +29,7 @@ include(":core:designsystem")
 include(":core:database")
 include(":core:datastore")
 include(":core:network")
-include(":core:model")
+include(":core:model", ":core:model-ui")
 include(":core:ui")
 include(":android-api")
 

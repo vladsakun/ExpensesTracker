@@ -10,10 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
-import com.emendo.expensestracker.core.app.resources.models.ColorModel.Companion.color
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.textValueOf
 import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
@@ -25,11 +22,14 @@ import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.model.ui.textValueOf
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import com.emendo.expensestracker.core.app.resources.R as AppR
+import com.emendo.expensestracker.app.resources.R as AppR
 
 @Destination
 @Composable

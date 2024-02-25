@@ -1,14 +1,12 @@
 package com.emendo.expensestracker.core.data.repository
 
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
 import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.data.mapper.CategoryFullMapper
 import com.emendo.expensestracker.core.data.mapper.asExternalModel
 import com.emendo.expensestracker.core.database.dao.CategoryDao
@@ -23,6 +21,7 @@ import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryWithTransactions
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
+import com.emendo.expensestracker.model.ui.resourceValueOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -63,7 +62,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
   override suspend fun createCategory(
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     type: CategoryType,
   ) {
     withContext(ioDispatcher) {
@@ -100,7 +99,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
     id: Long,
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     type: CategoryType,
   ) {
     withContext(ioDispatcher) {
@@ -146,7 +145,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
       },
       name = resourceValueOf(R.string.uncategorized),
       icon = IconModel.UNKNOWN,
-      color = ColorModel.Base,
+      color = com.emendo.expensestracker.model.ui.ColorModel.Base,
       type = if (transactionType == CategoryType.EXPENSE) {
         CategoryType.EXPENSE
       } else {

@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.data.api.repository
 
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
@@ -15,7 +14,7 @@ interface CategoryRepository {
   suspend fun createCategory(
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     type: CategoryType,
   )
 
@@ -23,7 +22,7 @@ interface CategoryRepository {
     id: Long,
     name: String,
     icon: IconModel,
-    color: ColorModel,
+    color: com.emendo.expensestracker.model.ui.ColorModel,
     type: CategoryType,
   )
 

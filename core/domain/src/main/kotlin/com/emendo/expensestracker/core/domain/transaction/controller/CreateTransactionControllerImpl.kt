@@ -2,9 +2,7 @@ package com.emendo.expensestracker.core.domain.transaction.controller
 
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerly
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.app.resources.models.ColorModel
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.app.resources.models.resourceValueOf
 import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
 import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
@@ -17,10 +15,12 @@ import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.resourceValueOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import com.emendo.expensestracker.core.app.resources.R as AppR
+import com.emendo.expensestracker.app.resources.R as AppR
 
 class CreateTransactionControllerImpl @Inject constructor(
   getLastUsedAccountUseCase: GetLastUsedAccountUseCase,

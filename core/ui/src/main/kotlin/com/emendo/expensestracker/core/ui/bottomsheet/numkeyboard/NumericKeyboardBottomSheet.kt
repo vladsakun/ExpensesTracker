@@ -11,8 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.emendo.expensestracker.core.app.resources.R
-import com.emendo.expensestracker.core.app.resources.models.NumericKeyboardActions
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceKeyboardActions
@@ -22,7 +21,7 @@ fun NumericKeyboardBottomSheet(
   currency: String,
   equalButtonStateProvider: () -> EqualButtonState,
   actions: InitialBalanceKeyboardActions,
-  numericKeyboardActions: NumericKeyboardActions,
+  numericKeyboardActions: com.emendo.expensestracker.model.ui.NumericKeyboardActions,
   decimalSeparator: String,
   modifier: Modifier = Modifier,
 ) {
