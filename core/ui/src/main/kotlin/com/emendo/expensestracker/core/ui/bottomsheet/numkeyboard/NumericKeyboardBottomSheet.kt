@@ -15,18 +15,20 @@ import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.core.ui.bottomsheet.InitialBalanceKeyboardActions
+import com.emendo.expensestracker.model.ui.NumericKeyboardActions
 
 @Composable
 fun NumericKeyboardBottomSheet(
   currency: String,
   equalButtonStateProvider: () -> EqualButtonState,
   actions: InitialBalanceKeyboardActions,
-  numericKeyboardActions: com.emendo.expensestracker.model.ui.NumericKeyboardActions,
+  numericKeyboardActions: NumericKeyboardActions,
   decimalSeparator: String,
   modifier: Modifier = Modifier,
+  textStateProvider: (() -> String)? = null,
 ) {
   BaseNumericalKeyboardBottomSheet(
-    // Todo fix
+    textStateProvider = textStateProvider,
     equalButtonStateProvider = equalButtonStateProvider,
     decimalSeparator = decimalSeparator,
     firstAction = { actionModifier ->

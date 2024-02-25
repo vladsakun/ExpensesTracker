@@ -16,18 +16,19 @@ import androidx.compose.ui.unit.sp
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.designsystem.component.RoundedCornerSmallButton
 import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
+import com.emendo.expensestracker.model.ui.NumericKeyboardActions
 
 @Stable
 data class CalculatorBottomSheetState(
   val currency: String?,
   val equalButtonState: EqualButtonState,
   @StringRes val transactionTypeLabelResId: Int,
-  val numericKeyboardActions: com.emendo.expensestracker.model.ui.NumericKeyboardActions,
+  val numericKeyboardActions: NumericKeyboardActions,
 ) {
   companion object {
     fun initial(
       @StringRes transactionTypeLabelResId: Int,
-      numericKeyboardActions: com.emendo.expensestracker.model.ui.NumericKeyboardActions,
+      numericKeyboardActions: NumericKeyboardActions,
     ) = CalculatorBottomSheetState(
       currency = null,
       equalButtonState = EqualButtonState.Default,
@@ -48,7 +49,7 @@ fun TransactionCalculatorBottomSheet(
   stateProvider: () -> CalculatorBottomSheetState,
   decimalSeparator: String,
   calculatorActions: CalculatorKeyboardActions,
-  numericKeyboardActions: com.emendo.expensestracker.model.ui.NumericKeyboardActions,
+  numericKeyboardActions: NumericKeyboardActions,
   modifier: Modifier = Modifier,
 ) {
   BaseNumericalKeyboardBottomSheet(

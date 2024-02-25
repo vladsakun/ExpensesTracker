@@ -44,6 +44,7 @@ internal fun BaseNumericalKeyboardBottomSheet(
   onDoneClick: () -> Unit,
   onEqualClick: () -> Unit,
   modifier: Modifier = Modifier,
+  textStateProvider: (() -> String)? = null,
 ) {
   Column(
     modifier = modifier
@@ -65,7 +66,9 @@ internal fun BaseNumericalKeyboardBottomSheet(
         .weight(DIGIT_BUTTON_WEIGHT)
         .applyKeyboardPadding()
     }
-
+    if (textStateProvider != null) {
+      ResultText(textProvider = textStateProvider)
+    }
     CalculatorRow {
       firstAction(digitModifier)
       secondAction(digitModifier)

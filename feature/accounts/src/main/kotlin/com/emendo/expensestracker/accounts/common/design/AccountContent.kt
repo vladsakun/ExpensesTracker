@@ -60,16 +60,6 @@ internal fun AccountContent(
         text = stateProvider().name,
         onValueChange = onNameChange,
       )
-      SelectRowWithIcon(
-        labelResId = R.string.icon,
-        imageVectorProvider = { stateProvider().icon.imageVector },
-        onClick = onIconRowClick,
-      )
-      SelectRowWithColor(
-        labelResId = R.string.color,
-        colorProvider = { stateProvider().color },
-        onClick = onColorRowClick,
-      )
       SelectRow(
         labelResId = R.string.balance,
         onClick = onBalanceRowClick,
@@ -83,6 +73,16 @@ internal fun AccountContent(
             textAlign = TextAlign.End,
           )
         }
+      )
+      SelectRowWithIcon(
+        labelResId = R.string.icon,
+        imageVectorProvider = { stateProvider().icon.imageVector },
+        onClick = onIconRowClick,
+      )
+      SelectRowWithColor(
+        labelResId = R.string.color,
+        colorProvider = { stateProvider().color },
+        onClick = onColorRowClick,
       )
       SelectRow(
         labelResId = R.string.currency,

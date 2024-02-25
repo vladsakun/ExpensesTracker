@@ -3,6 +3,7 @@ package com.emendo.expensestracker.categories.list
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.base.api.AppNavigationEvent
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
@@ -84,7 +85,7 @@ class CategoriesListViewModel @Inject constructor(
 
   fun openCreateTransactionScreen(category: CategoryWithTotal) {
     appNavigationEventBus.navigate(
-      com.emendo.expensestracker.app.base.api.AppNavigationEvent.CreateTransaction(
+      AppNavigationEvent.CreateTransaction(
         source = null,
         target = toCategoryModel(category.category),
         shouldNavigateUp = true
