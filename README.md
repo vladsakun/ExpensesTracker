@@ -1,6 +1,6 @@
-#Expenses tracker app
+# Expenses tracker app 🫰
 
-And here's how to show the (automatically kept) up to date dependency graph for the project in a README file:
+Gradle dependency graph:
 
 ![](all_modules3.dot.png)
 
