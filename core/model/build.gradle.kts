@@ -1,5 +1,5 @@
 plugins {
-  id("expensestracker.jvm.library")
+  alias(libs.plugins.expensestracker.jvm.library)
   id("kotlinx-serialization")
 }
 

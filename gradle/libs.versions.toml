@@ -177,3 +177,13 @@ compose-compiler-report = { id = "dev.shreyaspatil.compose-compiler-report-gener
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
 module-assertion = { id = "com.jraska.module.graph.assertion", version.ref = "moduleAssertion" }
+
+# Plugins defined by this project
+expensestracker-android-application = { id = "expensestracker.android.application", version = "unspecified" }
+expensestracker-android-application-compose = { id = "expensestracker.android.application.compose", version = "unspecified" }
+expensestracker-android-library = { id = "expensestracker.android.library", version = "unspecified" }
+expensestracker-android-library-compose = { id = "expensestracker.android.library.compose", version = "unspecified" }
+expensestracker-android-feature = { id = "expensestracker.android.feature", version = "unspecified" }
+expensestracker-android-room = { id = "expensestracker.android.room", version = "unspecified" }
+expensestracker-android-hilt = { id = "expensestracker.android.hilt", version = "unspecified" }
+expensestracker-jvm-library = { id = "expensestracker.jvm.library", version = "unspecified" }

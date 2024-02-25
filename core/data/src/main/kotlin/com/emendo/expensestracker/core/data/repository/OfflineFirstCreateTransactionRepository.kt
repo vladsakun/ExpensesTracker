@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import com.emendo.expensestracker.core.app.resources.R as AppR
 
-class CreateTransactionRepositoryImpl @Inject constructor(
+class OfflineFirstCreateTransactionRepository @Inject constructor(
   private val transactionRepository: TransactionRepository,
   private val accountRepository: AccountRepository,
   @ApplicationScope private val scope: CoroutineScope,

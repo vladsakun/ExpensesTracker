@@ -1,7 +1,7 @@
-plugins{
-  id("expensestracker.android.library")
-  id("expensestracker.android.hilt")
-  id("expensestracker.android.room")
+plugins {
+  alias(libs.plugins.expensestracker.android.library)
+  alias(libs.plugins.expensestracker.android.hilt)
+  alias(libs.plugins.expensestracker.android.room)
 }
 
 android {

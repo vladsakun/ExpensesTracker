@@ -2,9 +2,9 @@ import com.emendo.expensestracker.ExpeBuildType
 import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
-  id("expensestracker.android.application")
-  id("expensestracker.android.application.compose")
-  id("expensestracker.android.hilt")
+  alias(libs.plugins.expensestracker.android.application)
+  alias(libs.plugins.expensestracker.android.application.compose)
+  alias(libs.plugins.expensestracker.android.hilt)
   alias(libs.plugins.module.assertion)
   alias(libs.plugins.baselineprofile)
   alias(libs.plugins.android.application)
@@ -14,7 +14,7 @@ android {
   compileSdk = libs.versions.compileSdk.get().toInt()
 
   // Todo uncomment when baseline profile is ready
-//  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
+  //  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
 
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
@@ -48,7 +48,7 @@ android {
       isMinifyEnabled = true
       isShrinkResources = true
       isDebuggable = false
-//      signingConfig = signingConfigs.getByName("release")
+      //      signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 

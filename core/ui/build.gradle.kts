@@ -1,6 +1,6 @@
 plugins {
-  id("expensestracker.android.library")
-  id("expensestracker.android.library.compose")
+  alias(libs.plugins.expensestracker.android.library)
+  alias(libs.plugins.expensestracker.android.library.compose)
 }
 
 android {
@@ -8,6 +8,9 @@ android {
 }
 
 dependencies {
+  implementation(projects.core.designsystem)
+  implementation(projects.core.model)
+
   api(libs.androidx.compose.foundation)
   api(libs.androidx.compose.foundation.layout)
   api(libs.androidx.compose.material.iconsExtended)
@@ -23,8 +26,6 @@ dependencies {
 
   debugApi(libs.androidx.compose.ui.tooling)
 
-  implementation(project(":core:designsystem"))
-  implementation(project(":core:model"))
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.ktx)
   implementation(libs.coil.kt)

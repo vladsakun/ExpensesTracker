@@ -1,6 +1,6 @@
 plugins {
-  id("expensestracker.android.library")
-  id("expensestracker.android.library.compose")
+  alias(libs.plugins.expensestracker.android.library)
+  alias(libs.plugins.expensestracker.android.library.compose)
 }
 
 android {

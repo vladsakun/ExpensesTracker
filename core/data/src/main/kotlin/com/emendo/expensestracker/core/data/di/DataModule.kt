@@ -46,5 +46,5 @@ interface DataModule {
 
   @Binds
   @Singleton
-  fun bindsCreateTransactionRepository(createTransactionRepository: CreateTransactionRepositoryImpl): CreateTransactionRepository
+  fun bindsCreateTransactionRepository(createTransactionRepository: OfflineFirstCreateTransactionRepository): CreateTransactionRepository
 }

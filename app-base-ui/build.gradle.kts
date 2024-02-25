@@ -1,9 +1,9 @@
 import com.google.devtools.ksp.gradle.KspExtension
 
 plugins {
-  id("expensestracker.android.library")
-  id("expensestracker.android.library.compose")
-  id("expensestracker.android.hilt")
+  alias(libs.plugins.expensestracker.android.library)
+  alias(libs.plugins.expensestracker.android.library.compose)
+  alias(libs.plugins.expensestracker.android.hilt)
   id("com.google.devtools.ksp")
 }
 
