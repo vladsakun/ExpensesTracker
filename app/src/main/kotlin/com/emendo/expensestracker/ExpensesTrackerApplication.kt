@@ -13,9 +13,6 @@ import javax.inject.Inject
 @HiltAndroidApp
 class ExpensesTrackerApplication : Application() {
 
-  @Inject
-  lateinit var appCreatePlugins: @JvmSuppressWildcards Set<OnAppCreate>
-
   companion object {
     var applicationScope = MainScope()
   }
@@ -25,8 +22,6 @@ class ExpensesTrackerApplication : Application() {
     // Initialize Sync; the system responsible for keeping data in the app up to date.
     Sync.initialize(context = this)
     Timber.plant(Timber.DebugTree())
-
-    initApp()
   }
 
   override fun onLowMemory() {
@@ -35,7 +30,10 @@ class ExpensesTrackerApplication : Application() {
     applicationScope = MainScope()
   }
 
-  private fun initApp() {
+  @Inject
+  fun initApp(
+    appCreatePlugins: @JvmSuppressWildcards Set<OnAppCreate>,
+  ) {
     applicationScope.launch {
       appCreatePlugins.forEach { it.onCreate() }
     }

@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG = "category_detail_delete_category_dialog"
+
 @HiltViewModel
 class CategoryDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
@@ -87,7 +89,11 @@ class CategoryDetailViewModel @Inject constructor(
 
   fun showDeleteCategoryBottomSheet() {
     showModalBottomSheet(
-      GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteCategory))
+      GeneralBottomSheetData
+        .Builder(
+          id = CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG,
+          positiveAction = Action(resourceValueOf(R.string.delete), ::deleteCategory),
+        )
         .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()

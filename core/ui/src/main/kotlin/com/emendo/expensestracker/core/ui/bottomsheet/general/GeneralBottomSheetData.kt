@@ -8,17 +8,20 @@ import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.model.ui.TextValue
 
 class GeneralBottomSheetData private constructor(
+  override val id: String,
   val title: TextValue?,
   val positiveAction: Action,
   val negativeAction: Action?,
 ) : BottomSheetData {
+
   private constructor(builder: Builder) : this(
+    id = builder.id,
     title = builder.title,
     positiveAction = builder.positiveAction,
     negativeAction = builder.negativeAction,
   )
 
-  class Builder(val positiveAction: Action) {
+  class Builder(val id: String, val positiveAction: Action) {
     internal var title: TextValue? = null
       private set
     internal var negativeAction: Action? = null

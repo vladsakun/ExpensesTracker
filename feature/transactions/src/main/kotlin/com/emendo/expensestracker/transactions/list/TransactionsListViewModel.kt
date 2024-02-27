@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
+import com.emendo.expensestracker.app.base.api.AppNavigationEvent
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
@@ -134,7 +135,7 @@ class TransactionsListViewModel @Inject constructor(
 
   fun openTransactionDetails(transactionModel: TransactionModel) {
     appNavigationEventBus.navigate(
-      com.emendo.expensestracker.app.base.api.AppNavigationEvent.CreateTransaction(
+      AppNavigationEvent.CreateTransaction(
         source = transactionModel.source,
         target = transactionModel.target,
         payload = CreateTransactionEventPayload(

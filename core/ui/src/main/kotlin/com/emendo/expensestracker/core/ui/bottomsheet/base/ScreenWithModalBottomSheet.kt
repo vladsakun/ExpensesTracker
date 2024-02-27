@@ -7,10 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
@@ -55,7 +53,7 @@ private fun BaseScreenWithModalBottomSheet(
   val coroutineScope = rememberCoroutineScope()
   val modalBottomSheetState = rememberModalBottomSheetState(
     skipPartiallyExpanded = true,
-    confirmValueChange = confirmValueChange
+    confirmValueChange = confirmValueChange,
   )
   val hideBottomSheet: () -> Unit = remember(modalBottomSheetState) {
     {

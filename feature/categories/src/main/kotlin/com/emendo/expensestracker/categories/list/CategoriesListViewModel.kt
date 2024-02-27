@@ -38,6 +38,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_category_dialog"
+
 @HiltViewModel
 class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
@@ -119,7 +121,10 @@ class CategoriesListViewModel @Inject constructor(
   fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {
     showModalBottomSheet(
       GeneralBottomSheetData
-        .Builder(DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.category.id) })
+        .Builder(
+          id = CATEGORY_LIST_DELETE_CATEGORY_DIALOG,
+          positiveAction = DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.category.id) },
+        )
         .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()

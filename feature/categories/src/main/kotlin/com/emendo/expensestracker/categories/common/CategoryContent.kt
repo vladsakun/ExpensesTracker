@@ -6,7 +6,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -25,7 +24,6 @@ import com.emendo.expensestracker.core.ui.SelectRowWithIcon
 import com.emendo.expensestracker.core.ui.stringValue
 import kotlinx.collections.immutable.persistentListOf
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CategoryContent(
   title: String,

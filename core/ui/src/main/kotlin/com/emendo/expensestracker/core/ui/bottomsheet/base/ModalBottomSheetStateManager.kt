@@ -20,5 +20,8 @@ interface ModalBottomSheetStateManager {
   fun navigateUp()
 
   @OptIn(ExperimentalMaterial3Api::class)
-  fun confirmValueChange(sheetValue: SheetValue): Boolean = true
+  fun confirmValueChange(
+    sheetValue: SheetValue,
+    bottomSheetState: BottomSheetData? = modalBottomSheetState.value.bottomSheetData,
+  ): Boolean = true
 }

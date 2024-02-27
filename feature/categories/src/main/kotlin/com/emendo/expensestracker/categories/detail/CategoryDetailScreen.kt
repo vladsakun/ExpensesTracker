@@ -42,7 +42,7 @@ fun CategoryDetailScreen(
     CategoryDetailContent(
       stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
-      onTitleChanged = remember { viewModel::changeTitle },
+      onTitleChanged = viewModel::changeTitle,
       onIconSelectClick = remember { viewModel::openSelectIconScreen },
       onColorSelectClick = remember { viewModel::openSelectColorScreen },
       onConfirmActionClick = remember { viewModel::updateCategory },

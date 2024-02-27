@@ -26,6 +26,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val ACCOUNT_DETAIL_DELETE_ACCOUNT_DIALOG = "account_detail_delete_account_dialog"
+
 @HiltViewModel
 class AccountDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
@@ -76,7 +78,11 @@ class AccountDetailViewModel @Inject constructor(
 
   fun showConfirmDeleteAccountBottomSheet() {
     showModalBottomSheet(
-      GeneralBottomSheetData.Builder(Action(resourceValueOf(R.string.delete), ::deleteAccount))
+      GeneralBottomSheetData
+        .Builder(
+          id = ACCOUNT_DETAIL_DELETE_ACCOUNT_DIALOG,
+          positiveAction = Action(resourceValueOf(R.string.delete), ::deleteAccount)
+        )
         .title(resourceValueOf(R.string.account_detail_dialog_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()

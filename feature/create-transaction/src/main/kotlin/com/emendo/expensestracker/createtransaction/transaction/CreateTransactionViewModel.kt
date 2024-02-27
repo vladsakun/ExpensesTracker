@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.base.api.AppNavigationEvent
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
@@ -14,6 +15,7 @@ import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
@@ -40,6 +42,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
+
+private const val CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG = "create_transaction_delete_transaction_dialog"
 
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(
@@ -125,7 +129,11 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   @ExperimentalMaterial3Api
-  override fun confirmValueChange(sheetValue: SheetValue): Boolean {
+  override fun confirmValueChange(sheetValue: SheetValue, bottomSheetState: BottomSheetData?): Boolean {
+    if (bottomSheetState?.id == CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG) {
+      return super.confirmValueChange(sheetValue, bottomSheetState)
+    }
+
     numericKeyboardCommander.doMath()
     if (sheetValue == SheetValue.Hidden) {
       _uiState.update { state ->
@@ -135,7 +143,7 @@ class CreateTransactionViewModel @Inject constructor(
         )
       }
     }
-    return super.confirmValueChange(sheetValue)
+    return super.confirmValueChange(sheetValue, bottomSheetState)
   }
 
   fun changeTransactionType(type: TransactionType) {
@@ -288,7 +296,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   fun openAccountListScreen() {
-    appNavigationEventBus.navigate(com.emendo.expensestracker.app.base.api.AppNavigationEvent.SelectAccount())
+    appNavigationEventBus.navigate(AppNavigationEvent.SelectAccount())
   }
 
   private fun createTransaction(source: TransactionSource, target: TransactionTarget) {
@@ -372,7 +380,7 @@ class CreateTransactionViewModel @Inject constructor(
 
   fun selectTransferTargetAccount() {
     appNavigationEventBus.navigate(
-      com.emendo.expensestracker.app.base.api.AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
+      AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
     )
   }
 
@@ -380,7 +388,7 @@ class CreateTransactionViewModel @Inject constructor(
     val payload = createTransactionController.getTransactionPayload() ?: return
     shouldClearTarget = false
     appNavigationEventBus.navigate(
-      com.emendo.expensestracker.app.base.api.AppNavigationEvent.CreateTransaction(
+      AppNavigationEvent.CreateTransaction(
         source = createTransactionController.getSourceSnapshot(),
         target = createTransactionController.getTargetSnapshot(),
         payload = payload.copy(transactionId = null),
@@ -392,7 +400,10 @@ class CreateTransactionViewModel @Inject constructor(
   fun showConfirmDeleteTransactionBottomSheet() {
     showModalBottomSheet(
       GeneralBottomSheetData
-        .Builder(Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction))
+        .Builder(
+          id = CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG,
+          positiveAction = Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction)
+        )
         .title(resourceValueOf(R.string.transaction_detail_dialog_delete_confirm_title))
         .negativeAction(resourceValueOf(R.string.cancel), ::hideModalBottomSheet)
         .build()
@@ -404,6 +415,7 @@ class CreateTransactionViewModel @Inject constructor(
     viewModelScope.launch {
       transactionRepository.deleteTransaction(id)
     }
+    hideModalBottomSheet()
     navigateUp()
   }
 
