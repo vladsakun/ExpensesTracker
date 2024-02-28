@@ -27,7 +27,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 internal fun CategoryContent(
   title: String,
-  stateProvider: () -> CategoryScreenData,
+  stateProvider: () -> CategoryScreenData<*>,
   onNavigationClick: () -> Unit,
   onTitleChanged: (String) -> Unit,
   onIconSelectClick: () -> Unit,

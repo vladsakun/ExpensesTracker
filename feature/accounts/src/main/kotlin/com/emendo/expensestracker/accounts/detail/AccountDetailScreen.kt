@@ -11,7 +11,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.accounts.common.UiState
 import com.emendo.expensestracker.accounts.common.design.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.design.AccountContent
 import com.emendo.expensestracker.app.resources.R
@@ -24,6 +23,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottom
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.handleValueResult
+import com.emendo.expensestracker.model.ui.UiState
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.FULL_ROUTE_PLACEHOLDER

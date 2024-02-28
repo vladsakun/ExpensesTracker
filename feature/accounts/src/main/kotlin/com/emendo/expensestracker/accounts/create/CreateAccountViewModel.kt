@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountBalanceUtils
 import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
-import com.emendo.expensestracker.accounts.common.UiState
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetContract
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
@@ -17,6 +16,7 @@ import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.repository.AccountRepository
+import com.emendo.expensestracker.model.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

@@ -15,6 +15,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottom
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.handleValueResult
+import com.emendo.expensestracker.model.ui.UiState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.OpenResultRecipient
@@ -52,15 +53,8 @@ fun CategoryDetailScreen(
 }
 
 @Composable
-private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
-  when (type) {
-    is GeneralBottomSheetData -> GeneralBottomSheet(type)
-  }
-}
-
-@Composable
 private fun CategoryDetailContent(
-  stateProvider: () -> CategoryDetailScreenData,
+  stateProvider: () -> UiState<CategoryDetailScreenData>,
   onNavigationClick: () -> Unit,
   onTitleChanged: (String) -> Unit,
   onIconSelectClick: () -> Unit,
@@ -68,20 +62,33 @@ private fun CategoryDetailContent(
   onConfirmActionClick: () -> Unit,
   onDeleteActionClick: () -> Unit,
 ) {
-  CategoryContent(
-    title = stringResource(id = R.string.category),
-    stateProvider = stateProvider,
-    onNavigationClick = onNavigationClick,
-    onTitleChanged = onTitleChanged,
-    onIconSelectClick = onIconSelectClick,
-    onColorSelectClick = onColorSelectClick,
-    onConfirmActionClick = onConfirmActionClick,
-    confirmButtonText = stringResource(id = R.string.save)
-  ) {
-    ExpeButton(
-      textResId = R.string.delete,
-      onClick = onDeleteActionClick,
-      colors = ButtonDefaults.textButtonColors(),
-    )
+  when (val state = stateProvider()) {
+    is UiState.Data -> {
+      CategoryContent(
+        title = stringResource(id = R.string.category),
+        stateProvider = state::data,
+        onNavigationClick = onNavigationClick,
+        onTitleChanged = onTitleChanged,
+        onIconSelectClick = onIconSelectClick,
+        onColorSelectClick = onColorSelectClick,
+        onConfirmActionClick = onConfirmActionClick,
+        confirmButtonText = stringResource(id = R.string.save)
+      ) {
+        ExpeButton(
+          textResId = R.string.delete,
+          onClick = onDeleteActionClick,
+          colors = ButtonDefaults.textButtonColors(),
+        )
+      }
+    }
+
+    else -> Unit
+  }
+}
+
+@Composable
+private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
+  when (type) {
+    is GeneralBottomSheetData -> GeneralBottomSheet(type)
   }
 }

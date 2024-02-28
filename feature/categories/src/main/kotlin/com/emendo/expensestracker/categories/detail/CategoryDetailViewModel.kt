@@ -5,68 +5,61 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.categories.common.CategoryDelegate
 import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
+import com.emendo.expensestracker.categories.common.CategoryStateManager
+import com.emendo.expensestracker.categories.common.CategoryStateManagerDelegate
 import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
-import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.domain.category.GetCategorySnapshotByIdUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
+import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
-import com.emendo.expensestracker.model.ui.ColorModel
-import com.emendo.expensestracker.model.ui.resourceValueOf
-import com.emendo.expensestracker.model.ui.textValueOf
-import com.emendo.expensestracker.model.ui.textValueOrBlank
+import com.emendo.expensestracker.model.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG = "category_detail_delete_category_dialog"
+private const val KEY_CATEGORY_MODEL = "CategoryModel"
 
 @HiltViewModel
 class CategoryDetailViewModel @Inject constructor(
-  savedStateHandle: SavedStateHandle,
+  private val savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
   private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
   override val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(),
+    CategoryStateManager<Nothing> by CategoryStateManagerDelegate(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
-    CategoryDelegate,
     CategoryScreenNavigator {
 
-  override val categoryDelegate: CategoryDelegate
+  override val stateManager: CategoryStateManager<*>
     get() = this
 
   private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
-  private val category: Flow<CategoryModel> by lazy { getCategorySnapshotByIdUseCase(categoryId) }
-
-  private val _state = MutableStateFlow(CategoryDetailScreenData.getDefault(TODO()))
-  override val state = _state.asStateFlow()
-
   private var updateCategoryJob: Job? = null
+  private var categoryType: CategoryType?
+    get() = savedStateHandle.get<Int>(KEY_CATEGORY_MODEL)?.let { CategoryType.getById(it) }
+    set(value) {
+      savedStateHandle[KEY_CATEGORY_MODEL] = value?.id
+    }
 
-  override fun updateTitle(title: String) {
-    _state.update { it.copy(title = textValueOf(title)) }
-  }
+  init {
+    if (state.value.dataValue() == null) {
+      viewModelScope.launch {
+        val category: CategoryModel = getCategorySnapshotByIdUseCase(categoryId).first()
 
-  override fun updateConfirmButtonEnabled(enabled: Boolean) {
-    _state.update { it.copy(confirmButtonEnabled = enabled) }
-  }
-
-  fun updateColor(colorId: Int) {
-    _state.update { it.copy(color = ColorModel.getById(colorId)) }
-  }
-
-  fun updateIcon(iconId: Int) {
-    _state.update { it.copy(icon = IconModel.getById(iconId)) }
+        categoryType = category.type
+        // Todo handle error case
+        _state.update { UiState.Data(getDefaultCategoryDetailScreenData(category)) }
+      }
+    }
   }
 
   fun updateCategory() {
@@ -75,13 +68,13 @@ class CategoryDetailViewModel @Inject constructor(
     }
 
     updateCategoryJob = viewModelScope.launch {
-      with(state.value) {
+      with(state.value.requireDataValue()) {
         categoryRepository.updateCategory(
           id = categoryId,
           name = title.textValueOrBlank(),
           icon = icon,
           color = color,
-          type = TODO(),
+          type = checkNotNull(categoryType),
         )
       }
 
@@ -108,4 +101,13 @@ class CategoryDetailViewModel @Inject constructor(
       navigateUp()
     }
   }
+}
+
+private fun getDefaultCategoryDetailScreenData(categoryModel: CategoryModel) = with(categoryModel) {
+  CategoryDetailScreenData(
+    title = name,
+    icon = icon,
+    color = color,
+    confirmButtonEnabled = false,
+  )
 }

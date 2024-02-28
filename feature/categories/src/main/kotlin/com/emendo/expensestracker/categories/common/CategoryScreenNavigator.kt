@@ -5,13 +5,13 @@ import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 
 interface CategoryScreenNavigator {
   val appNavigationEventBus: AppNavigationEventBus
-  val categoryDelegate: CategoryDelegate
+  val stateManager: CategoryStateManager<*>
 
   fun openSelectIconScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectIcon(categoryDelegate.selectedIconId))
+    appNavigationEventBus.navigate(AppNavigationEvent.SelectIcon(stateManager.selectedIconId))
   }
 
   fun openSelectColorScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectColor(categoryDelegate.selectedColorId))
+    appNavigationEventBus.navigate(AppNavigationEvent.SelectColor(stateManager.selectedColorId))
   }
 }

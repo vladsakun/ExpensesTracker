@@ -1,12 +1,12 @@
 package com.emendo.expensestracker.accounts.common.state
 
 import com.emendo.expensestracker.accounts.common.AccountScreenData
-import com.emendo.expensestracker.accounts.common.UiState
-import com.emendo.expensestracker.accounts.common.updateData
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.UiState
+import com.emendo.expensestracker.model.ui.updateData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
