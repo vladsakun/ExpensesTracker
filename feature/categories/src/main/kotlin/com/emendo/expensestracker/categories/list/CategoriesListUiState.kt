@@ -27,9 +27,6 @@ sealed interface CategoriesListUiState {
   ) : CategoriesListUiState
 }
 
-val CategoriesListUiState.successValue: CategoriesListUiState.DisplayCategoriesList?
-  get() = this as? CategoriesListUiState.DisplayCategoriesList
-
 val CategoriesListState.successValue: CategoriesListState.DisplayCategoriesList?
   get() = this as? CategoriesListState.DisplayCategoriesList
 

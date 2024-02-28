@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
+import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
 import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
@@ -42,6 +43,8 @@ class MainActivity : ComponentActivity() {
     // including IME animations, and go edge-to-edge
     // This also sets up the initial system bar style based on the platform theme
     enableEdgeToEdge()
+
+    var isNavControllerInitialized = false
 
     setContent {
       val darkTheme = isSystemInDarkTheme()
@@ -77,6 +80,19 @@ class MainActivity : ComponentActivity() {
           navController = navController,
         )
       }
+
+      // Uncomment to Test complex deeplinks
+      //      navController.addOnDestinationChangedListener { controller, destination, arguments ->
+      //        if (isNavControllerInitialized) {
+      //          return@addOnDestinationChangedListener
+      //        }
+      //
+      //        isNavControllerInitialized = true
+      //        controller.navigate(CategoryDetailScreenDestination(categoryId = 1L))
+      //        controller.navigate(AccountsScreenRouteDestination)
+      //        controller.navigate(AccountDetailScreenDestination(accountId = 1L))
+      //        controller.navigate(CreateTransactionScreenDestination)
+      //      }
     }
   }
 
@@ -103,12 +119,14 @@ class MainActivity : ComponentActivity() {
   private fun getPendingIntent(): PendingIntent {
     val deepLinkPrefix = "https://emendo.com"
     val profileDeepLink = "$deepLinkPrefix/accounts"
+    val profileDetailsDeepLink = "$deepLinkPrefix/accounts/${AccountDetailScreenDestination(accountId = 1L).route}"
+    val deepLinkTest = "$deepLinkPrefix/test"
 
     return TaskStackBuilder.create(applicationContext).run {
       addNextIntentWithParentStack(
         Intent(
           Intent.ACTION_VIEW,
-          profileDeepLink.toUri(),
+          profileDetailsDeepLink.toUri(),
           applicationContext,
           MainActivity::class.java
         )

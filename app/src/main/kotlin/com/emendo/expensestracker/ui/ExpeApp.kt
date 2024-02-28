@@ -22,7 +22,6 @@ import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ExpeApp(
   windowSizeClass: WindowSizeClass,

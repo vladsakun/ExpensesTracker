@@ -14,6 +14,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.resourceValueOf
@@ -21,6 +22,7 @@ import com.emendo.expensestracker.model.ui.textValueOf
 import com.emendo.expensestracker.model.ui.textValueOrBlank
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -44,9 +46,9 @@ class CategoryDetailViewModel @Inject constructor(
     get() = this
 
   private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
-  private val category by lazy { getCategorySnapshotByIdUseCase(categoryId) }
+  private val category: Flow<CategoryModel> by lazy { getCategorySnapshotByIdUseCase(categoryId) }
 
-  private val _state = MutableStateFlow(CategoryDetailScreenData.getDefault(category))
+  private val _state = MutableStateFlow(CategoryDetailScreenData.getDefault(TODO()))
   override val state = _state.asStateFlow()
 
   private var updateCategoryJob: Job? = null
@@ -79,7 +81,7 @@ class CategoryDetailViewModel @Inject constructor(
           name = title.textValueOrBlank(),
           icon = icon,
           color = color,
-          type = category.type,
+          type = TODO(),
         )
       }
 

@@ -59,6 +59,7 @@ composeCompilerReportGenerator = "1.1.0"
 pagingVersion = "3.2.1"
 junit = "1.1.5"
 moduleAssertion = "2.5.0"
+rebugger = "1.0.0-rc02"
 
 # Android SDK versions
 compileSdk = "34"
@@ -151,6 +152,7 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 compose-state-events = { group = "com.github.leonard-palm", name = "compose-state-events", version.ref = "composeStateEvents" }
 paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingVersion" }
 paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingVersion" }
+rebugger = { group = "io.github.theapache64", name = "rebugger", version.ref = "rebugger" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

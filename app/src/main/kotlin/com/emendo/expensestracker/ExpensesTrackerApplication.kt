@@ -22,6 +22,11 @@ class ExpensesTrackerApplication : Application() {
     // Initialize Sync; the system responsible for keeping data in the app up to date.
     Sync.initialize(context = this)
     Timber.plant(Timber.DebugTree())
+
+    //    RebuggerConfig.init(
+    //      tag = "MyAppRebugger", // changing default tag
+    //      logger = { tag, message -> Timber.i(tag, message) } // use Timber for logging
+    //    )
   }
 
   override fun onLowMemory() {

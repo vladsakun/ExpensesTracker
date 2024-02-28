@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountBalanceUtils
 import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
+import com.emendo.expensestracker.accounts.common.UiState
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetContract
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
@@ -33,16 +34,16 @@ class CreateAccountViewModel @Inject constructor(
   private val accountRepository: AccountRepository,
 ) : ViewModel(),
     AccountStateManager<Boolean> by AccountStateManagerDelegate(
-      getDefaultCreateAccountScreenData(amountFormatter, currencyCacheManager),
+      defaultState = UiState.Data(getDefaultCreateAccountScreenData(amountFormatter, currencyCacheManager))
     ),
     ModalBottomSheetStateManager by AccountBottomSheetDelegate(numericKeyboardCommander),
     AccountScreenNavigator,
     AccountBottomSheetContract,
     AccountBalanceUtils {
 
-  override val accountStateManager: AccountStateManager<Boolean>
-    get() = this
   override val modalBottomSheetStateManager: ModalBottomSheetStateManager
+    get() = this
+  override val accountStateManager: AccountStateManager<*>
     get() = this
 
   private var createAccountJob: Job? = null
@@ -62,7 +63,7 @@ class CreateAccountViewModel @Inject constructor(
     }
 
     createAccountJob = viewModelScope.launch {
-      with(state.value) {
+      with(requireDataValue()) {
         accountRepository.createAccount(
           name = name,
           balance = balance.value,

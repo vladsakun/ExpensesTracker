@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.accounts.common.bottomsheet
 
+import com.emendo.expensestracker.accounts.common.dataValue
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.core.ui.bottomsheet.BalanceBottomSheetData
@@ -21,6 +22,8 @@ interface AccountBottomSheetContract : InitialBalanceKeyboardActions {
   }
 
   fun showBalanceBottomSheet() {
+    val dataValue = accountStateManager.state.value.dataValue() ?: return
+
     // Todo Maybe move to a base view model with init
     numericKeyboardCommander.setCallbacks(doneClick = ::doneClick, onMathDone = ::updateBalanceValue)
 
@@ -30,16 +33,18 @@ interface AccountBottomSheetContract : InitialBalanceKeyboardActions {
         actions = this,
         decimalSeparator = calculatorFormatter.decimalSeparator.toString(),
         equalButtonState = numericKeyboardCommander.equalButtonState,
-        currency = accountStateManager.state.value.currency.currencyName,
+        currency = dataValue.currency.currencyName,
         numericKeyboardActions = numericKeyboardCommander,
       )
     )
   }
 
   private fun updateBalanceValue(value: String): Boolean {
+    val dataValue = accountStateManager.state.value.dataValue() ?: return true
+
     val formattedValue = amountFormatter.format(
       amount = calculatorFormatter.toBigDecimal(value),
-      currency = accountStateManager.state.value.currency,
+      currency = dataValue.currency,
     )
     accountStateManager.updateBalance(formattedValue)
     return false

@@ -6,7 +6,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,8 +29,8 @@ import com.emendo.expensestracker.core.ui.SelectRowWithIcon
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-internal fun AccountContent(
-  stateProvider: () -> AccountScreenData<*>,
+internal fun <T> AccountContent(
+  stateProvider: () -> AccountScreenData<T>,
   title: String,
   onNavigationClick: () -> Unit,
   onNameChange: (String) -> Unit,
@@ -33,8 +39,16 @@ internal fun AccountContent(
   onBalanceRowClick: () -> Unit,
   onCurrencyRowClick: () -> Unit,
   onConfirmClick: () -> Unit,
+  shouldFocusTitleInputOnLaunch: Boolean = false,
   endContent: @Composable ColumnScope.() -> Unit,
 ) {
+  val focusRequester = remember { FocusRequester() }
+  val keyboardController = LocalSoftwareKeyboardController.current
+  LaunchedEffect(shouldFocusTitleInputOnLaunch) {
+    if (shouldFocusTitleInputOnLaunch) {
+      focusRequester.requestFocus()
+    }
+  }
   ExpeScaffoldWithTopBar(
     title = title,
     onNavigationClick = onNavigationClick,
@@ -49,16 +63,23 @@ internal fun AccountContent(
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .imePadding()
         .verticalScroll(rememberScrollState())
         .padding(paddingValues)
-        .padding(Dimens.margin_large_x),
+        .padding(Dimens.margin_large_x)
+        .imePadding(),
       verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     ) {
       ExpeTextFieldWithRoundedBackground(
         placeholder = stringResource(id = R.string.account_name),
         text = stateProvider().name,
         onValueChange = onNameChange,
+        modifier = Modifier
+          .focusRequester(focusRequester)
+          .onFocusChanged {
+            if (it.isFocused) {
+              keyboardController?.show()
+            }
+          },
       )
       SelectRow(
         labelResId = R.string.balance,

@@ -102,6 +102,7 @@ dependencies {
   implementation(libs.androidx.window.manager)
   implementation(libs.compose.destinations)
   implementation(libs.kotlinx.datetime)
+  implementation(libs.rebugger)
   //  implementation(libs.androidx.profileinstaller)
 
   baselineProfile(projects.baselineprofile)

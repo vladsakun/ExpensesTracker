@@ -1,20 +1,24 @@
 package com.emendo.expensestracker.accounts.common.state
 
 import com.emendo.expensestracker.accounts.common.AccountScreenData
+import com.emendo.expensestracker.accounts.common.UiState
+import com.emendo.expensestracker.accounts.common.dataValue
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.model.ui.ColorModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface AccountStateManager<T> {
-  val state: StateFlow<AccountScreenData<T>>
+  val _state: MutableStateFlow<UiState<AccountScreenData<T>>>
+  val state: StateFlow<UiState<AccountScreenData<T>>>
 
   val selectedColorId: Int
-    get() = state.value.color.id
+    get() = requireDataValue().color.id
 
   val selectedIconId: Int
-    get() = state.value.icon.id
+    get() = requireDataValue().icon.id
 
   fun updateBalance(balance: Amount)
   fun updateCurrency(currency: CurrencyModel)
@@ -33,6 +37,8 @@ interface AccountStateManager<T> {
 
   fun setAccountName(accountName: String) {
     updateName(accountName)
-    updateConfirmEnabled(state.value.name.isNotBlank())
+    updateConfirmEnabled(accountName.isNotBlank())
   }
+
+  fun requireDataValue() = state.value.dataValue()!!
 }

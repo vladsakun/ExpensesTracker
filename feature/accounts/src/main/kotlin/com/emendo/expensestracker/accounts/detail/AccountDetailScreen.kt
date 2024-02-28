@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.accounts.common.UiState
 import com.emendo.expensestracker.accounts.common.design.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.design.AccountContent
 import com.emendo.expensestracker.app.resources.R
@@ -23,11 +24,16 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottom
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.handleValueResult
+import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.FULL_ROUTE_PLACEHOLDER
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.OpenResultRecipient
+import timber.log.Timber
 
-@Destination
+@Destination(
+  deepLinks = [DeepLink(uriPattern = "https://emendo.com/accounts/$FULL_ROUTE_PLACEHOLDER")],
+)
 @Composable
 fun AccountDetailScreen(
   navigator: DestinationsNavigator,
@@ -37,6 +43,8 @@ fun AccountDetailScreen(
   iconResultRecipient: OpenResultRecipient<Int>,
   viewModel: AccountDetailViewModel = hiltViewModel(),
 ) {
+  Timber.d("AccountID: $accountId")
+
   colorResultRecipient.handleValueResult(viewModel::updateColorById)
   currencyResultRecipient.handleValueResult(viewModel::updateCurrencyByCode)
   iconResultRecipient.handleValueResult(viewModel::updateIconById)
@@ -64,7 +72,7 @@ fun AccountDetailScreen(
 
 @Composable
 private fun AccountDetailContent(
-  stateProvider: () -> AccountDetailScreenData,
+  stateProvider: () -> UiState<AccountDetailScreenData>,
   onNavigationClick: () -> Unit,
   onNameChange: (String) -> Unit,
   onIconRowClick: () -> Unit,
@@ -74,27 +82,33 @@ private fun AccountDetailContent(
   onConfirmAccountDetailsClick: () -> Unit,
   onDeleteClick: () -> Unit,
 ) {
-  AccountContent(
-    stateProvider = stateProvider,
-    title = stringResource(id = R.string.account),
-    onNavigationClick = onNavigationClick,
-    onNameChange = onNameChange,
-    onIconRowClick = onIconRowClick,
-    onColorRowClick = onColorRowClick,
-    onBalanceRowClick = onBalanceRowClick,
-    onCurrencyRowClick = onCurrencyRowClick,
-    onConfirmClick = onConfirmAccountDetailsClick
-  ) {
-    Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
-    ExpeButton(
-      textResId = R.string.save,
-      onClick = onConfirmAccountDetailsClick,
-    )
-    ExpeButton(
-      textResId = R.string.delete,
-      onClick = onDeleteClick,
-      colors = ButtonDefaults.textButtonColors(),
-    )
+  when (val state = stateProvider()) {
+    is UiState.Data<AccountDetailScreenData> -> {
+      AccountContent(
+        stateProvider = state::data,
+        title = stringResource(id = R.string.account),
+        onNavigationClick = onNavigationClick,
+        onNameChange = onNameChange,
+        onIconRowClick = onIconRowClick,
+        onColorRowClick = onColorRowClick,
+        onBalanceRowClick = onBalanceRowClick,
+        onCurrencyRowClick = onCurrencyRowClick,
+        onConfirmClick = onConfirmAccountDetailsClick,
+      ) {
+        Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
+        ExpeButton(
+          textResId = R.string.save,
+          onClick = onConfirmAccountDetailsClick,
+        )
+        ExpeButton(
+          textResId = R.string.delete,
+          onClick = onDeleteClick,
+          colors = ButtonDefaults.textButtonColors(),
+        )
+      }
+    }
+
+    is UiState.Loading, is UiState.Error -> Unit
   }
 }
 
@@ -115,7 +129,7 @@ private fun AccountDetailScreenPreview(
 ) {
   ExpensesTrackerTheme {
     AccountDetailContent(
-      stateProvider = { previewData },
+      stateProvider = { UiState.Data(previewData) },
       onNameChange = {},
       onConfirmAccountDetailsClick = {},
       onNavigationClick = {},

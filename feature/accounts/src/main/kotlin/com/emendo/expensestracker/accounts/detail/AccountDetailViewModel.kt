@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.common.AccountBalanceUtils
 import com.emendo.expensestracker.accounts.common.AccountScreenNavigator
+import com.emendo.expensestracker.accounts.common.UiState
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetContract
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
+import com.emendo.expensestracker.accounts.common.dataValue
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.accounts.common.state.AccountStateManagerDelegate
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
@@ -23,6 +25,9 @@ import com.emendo.expensestracker.data.api.repository.AccountRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,18 +36,14 @@ private const val ACCOUNT_DETAIL_DELETE_ACCOUNT_DIALOG = "account_detail_delete_
 @HiltViewModel
 class AccountDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
-  getAccountSnapshotByIdUseCase: GetAccountSnapshotByIdUseCase,
+  getAccountByIdUseCase: GetAccountSnapshotByIdUseCase,
   override val appNavigationEventBus: AppNavigationEventBus,
   override val numericKeyboardCommander: NumericKeyboardCommander,
   override val calculatorFormatter: CalculatorFormatter,
   override val amountFormatter: AmountFormatter,
   private val accountRepository: AccountRepository,
 ) : ViewModel(),
-    AccountStateManager<Boolean> by AccountStateManagerDelegate(
-      defaultScreenData = getDefaultAccountDetailScreenState(
-        requireNotNull(getAccountSnapshotByIdUseCase(savedStateHandle.getAccountId()))
-      ),
-    ),
+    AccountStateManager<Boolean> by AccountStateManagerDelegate(),
     ModalBottomSheetStateManager by AccountBottomSheetDelegate(numericKeyboardCommander),
     AccountScreenNavigator,
     AccountBottomSheetContract,
@@ -56,13 +57,25 @@ class AccountDetailViewModel @Inject constructor(
   private val accountId: Long = savedStateHandle.getAccountId()
   private var editAccountJob: Job? = null
 
+  init {
+    if (state.value.dataValue() == null) {
+      viewModelScope.launch {
+        val account = getAccountByIdUseCase(savedStateHandle.getAccountId())
+          .map(::getDefaultAccountDetailScreenState)
+          .first()
+
+        _state.update { UiState.Data(account) }
+      }
+    }
+  }
+
   fun updateAccount() {
     if (editAccountJob != null) {
       return
     }
 
     editAccountJob = viewModelScope.launch {
-      with(state.value) {
+      with(requireDataValue()) {
         accountRepository.updateAccount(
           id = accountId,
           name = name,

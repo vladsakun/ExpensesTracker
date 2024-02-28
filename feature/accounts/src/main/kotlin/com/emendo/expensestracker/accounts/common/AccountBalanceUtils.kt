@@ -11,8 +11,10 @@ interface AccountBalanceUtils {
   val calculatorFormatter: CalculatorFormatter
 
   fun updateCurrencyByCode(code: String) {
+    val stateData = accountStateManager.state.value.dataValue() ?: return
+
     val currency = CurrencyModel.toCurrencyModel(code)
-    val balance = amountFormatter.replaceCurrency(accountStateManager.state.value.balance, currency)
+    val balance = amountFormatter.replaceCurrency(stateData.balance, currency)
     accountStateManager.updateBalance(balance)
     accountStateManager.updateCurrency(currency)
   }

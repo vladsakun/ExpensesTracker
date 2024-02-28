@@ -58,6 +58,9 @@ class OfflineFirstCategoryRepository @Inject constructor(
   override fun getCategories(): Flow<List<CategoryModel>> = categoriesState
   override fun getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>> = categoriesWithTransactionState
   override fun getCategoriesSnapshot(): List<CategoryModel> = categoriesState.value
+  override fun getById(id: Long): Flow<CategoryModel> =
+    categoryDao.getById(id)
+      .map(::asExternalModel)
 
   override suspend fun createCategory(
     name: String,

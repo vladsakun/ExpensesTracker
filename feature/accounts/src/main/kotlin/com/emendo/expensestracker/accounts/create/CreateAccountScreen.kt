@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.accounts.common.UiState
 import com.emendo.expensestracker.accounts.common.design.AccountBottomSheetContent
 import com.emendo.expensestracker.accounts.common.design.AccountContent
 import com.emendo.expensestracker.app.resources.R
@@ -40,10 +41,10 @@ fun CreateAccountRoute(
     onNavigateUpClick = navigator::navigateUp,
     bottomSheetContent = { type -> AccountBottomSheetContent(type) },
   ) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val stateState = viewModel.state.collectAsStateWithLifecycle()
 
     CreateAccountContent(
-      stateProvider = state::value,
+      stateProvider = stateState::value,
       onNavigationClick = navigator::navigateUp,
       onNameChange = remember { viewModel::setAccountName },
       onIconRowClick = remember { viewModel::openSelectIconScreen },
@@ -57,7 +58,7 @@ fun CreateAccountRoute(
 
 @Composable
 private fun CreateAccountContent(
-  stateProvider: () -> CreateAccountScreenData,
+  stateProvider: () -> UiState<CreateAccountScreenData>,
   onNavigationClick: () -> Unit,
   onNameChange: (String) -> Unit,
   onIconRowClick: () -> Unit,
@@ -66,23 +67,30 @@ private fun CreateAccountContent(
   onCurrencyRowClick: () -> Unit,
   onCreateAccountClick: () -> Unit,
 ) {
-  AccountContent(
-    stateProvider = stateProvider,
-    title = stringResource(id = R.string.create_account),
-    onNavigationClick = onNavigationClick,
-    onNameChange = onNameChange,
-    onIconRowClick = onIconRowClick,
-    onColorRowClick = onColorRowClick,
-    onBalanceRowClick = onBalanceRowClick,
-    onCurrencyRowClick = onCurrencyRowClick,
-    onConfirmClick = onCreateAccountClick,
-  ) {
-    Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
-    ExpeButton(
-      textResId = R.string.create,
-      onClick = onCreateAccountClick,
-      enabled = stateProvider().confirmEnabled,
-    )
+  when (val state = stateProvider()) {
+    is UiState.Data<CreateAccountScreenData> -> {
+      AccountContent(
+        stateProvider = { state.data },
+        title = stringResource(id = R.string.create_account),
+        onNavigationClick = onNavigationClick,
+        onNameChange = onNameChange,
+        onIconRowClick = onIconRowClick,
+        onColorRowClick = onColorRowClick,
+        onBalanceRowClick = onBalanceRowClick,
+        onCurrencyRowClick = onCurrencyRowClick,
+        onConfirmClick = onCreateAccountClick,
+        shouldFocusTitleInputOnLaunch = true,
+      ) {
+        Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
+        ExpeButton(
+          textResId = R.string.create,
+          onClick = onCreateAccountClick,
+          enabled = state.data.confirmEnabled,
+        )
+      }
+    }
+
+    is UiState.Loading, is UiState.Error -> Unit
   }
 }
 
@@ -93,7 +101,7 @@ private fun CreateAccountScreenPreview(
 ) {
   ExpensesTrackerTheme {
     CreateAccountContent(
-      stateProvider = { previewData },
+      stateProvider = { UiState.Data(previewData) },
       onNameChange = {},
       onCreateAccountClick = {},
       onNavigationClick = {},
