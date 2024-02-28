@@ -25,13 +25,20 @@ import com.emendo.expensestracker.core.ui.AccountItem
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
 @RootNavGraph(start = true)
-@Destination
+@Destination(
+  deepLinks = [
+    DeepLink(
+      uriPattern = "https://emendo.com/accounts"
+    ),
+  ],
+)
 @Composable
 fun AccountsScreenRoute(
   navigator: DestinationsNavigator,

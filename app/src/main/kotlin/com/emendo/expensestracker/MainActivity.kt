@@ -1,5 +1,9 @@
 package com.emendo.expensestracker
 
+import android.annotation.SuppressLint
+import android.app.*
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -11,6 +15,8 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
 import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
@@ -78,12 +84,86 @@ class MainActivity : ComponentActivity() {
     super.onStart()
     localeBroadcastReceiver.register(this)
     timeZoneBroadcastReceiver.register(this)
+
+    displayNotification(
+      title = "Test deep link",
+      text = "Profile screen deep link",
+      notificationID = 100,
+      channel = "DEFAULT",
+      pendingIntent = getPendingIntent()
+    )
   }
 
   override fun onStop() {
     super.onStop()
     localeBroadcastReceiver.unregister(this)
     timeZoneBroadcastReceiver.unregister(this)
+  }
+
+  private fun getPendingIntent(): PendingIntent {
+    val deepLinkPrefix = "https://emendo.com"
+    val profileDeepLink = "$deepLinkPrefix/accounts"
+
+    return TaskStackBuilder.create(applicationContext).run {
+      addNextIntentWithParentStack(
+        Intent(
+          Intent.ACTION_VIEW,
+          profileDeepLink.toUri(),
+          applicationContext,
+          MainActivity::class.java
+        )
+      )
+      getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+    }
+  }
+
+  @SuppressLint("UnspecifiedImmutableFlag")
+  @Suppress("SameParameterValue")
+  private fun displayNotification(
+    title: String,
+    text: String,
+    notificationID: Int,
+    channel: String,
+    pendingIntent: PendingIntent?,
+  ) {
+    val notificationManager = applicationContext
+      .getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val defaultChannel =
+        NotificationChannel(
+          "DEFAULT",
+          "DEFAULT",
+          NotificationManager.IMPORTANCE_DEFAULT
+        )
+      defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+      notificationManager.createNotificationChannel(defaultChannel)
+    }
+    val builder = NotificationCompat.Builder(
+      applicationContext,
+      channel
+    )
+    builder.setContentTitle(title)
+    builder.setTicker(title)
+    builder.setContentText(text)
+    builder.setSmallIcon(R.drawable.ic_launcher_background)
+
+    builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS or NotificationCompat.DEFAULT_VIBRATE)
+    val notificationIntent = Intent(applicationContext, MainActivity::class.java)
+    builder.setContentIntent(
+      pendingIntent ?: PendingIntent.getActivity(
+        applicationContext,
+        0,
+        notificationIntent,
+        0
+      )
+    )
+    val notification = builder.build()
+
+    //Dismiss the notification on tap
+    notification.flags = notification.flags or Notification.FLAG_AUTO_CANCEL
+
+    //Update the proper notification
+    notificationManager.notify(notificationID, notification)
   }
 
   private suspend fun logCompilationStatus() {
