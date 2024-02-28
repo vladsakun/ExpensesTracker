@@ -54,7 +54,7 @@ fun CategoryDetailScreen(
 
 @Composable
 private fun CategoryDetailContent(
-  stateProvider: () -> UiState<CategoryDetailScreenData>,
+  stateProvider: () -> UiState<CategoryDetailScreenDataImpl>,
   onNavigationClick: () -> Unit,
   onTitleChanged: (String) -> Unit,
   onIconSelectClick: () -> Unit,

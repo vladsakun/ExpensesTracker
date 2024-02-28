@@ -19,7 +19,7 @@ fun <T> UiState<T>?.requireDataValue(): T {
   return dataValue() ?: throw IllegalStateException("UiState.Data expected")
 }
 
-fun <T> MutableStateFlow<UiState<T>>.updateData(
+inline fun <T> MutableStateFlow<UiState<T>>.updateData(
   function: (T) -> T,
 ) {
   update { state ->

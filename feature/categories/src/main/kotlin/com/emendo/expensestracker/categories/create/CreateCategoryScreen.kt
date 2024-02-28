@@ -43,7 +43,7 @@ fun CreateCategoryRoute(
 
 @Composable
 private fun CreateCategoryContent(
-  stateProvider: () -> UiState<CreateCategoryScreenData>,
+  stateProvider: () -> UiState<CategoryCreateScreenDataImpl>,
   onNavigationClick: () -> Unit,
   consumeNavigationEvent: () -> Unit,
   onTitleChanged: (String) -> Unit,
@@ -54,7 +54,7 @@ private fun CreateCategoryContent(
   when (val state = stateProvider()) {
     is UiState.Data -> {
       NavigationEventEffect(
-        event = checkNotNull(state.data.additionalData).navigateUpEvent,
+        event = state.data.navigateUpEvent,
         onConsumed = consumeNavigationEvent,
         action = onNavigationClick,
       )

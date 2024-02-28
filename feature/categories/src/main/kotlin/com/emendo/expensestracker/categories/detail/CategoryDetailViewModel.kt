@@ -35,7 +35,7 @@ class CategoryDetailViewModel @Inject constructor(
   private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
   override val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(),
-    CategoryStateManager<Nothing> by CategoryStateManagerDelegate(),
+    CategoryStateManager<CategoryDetailScreenDataImpl> by CategoryStateManagerDelegate(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
     CategoryScreenNavigator {
 
@@ -104,7 +104,7 @@ class CategoryDetailViewModel @Inject constructor(
 }
 
 private fun getDefaultCategoryDetailScreenData(categoryModel: CategoryModel) = with(categoryModel) {
-  CategoryDetailScreenData(
+  CategoryDetailScreenDataImpl(
     title = name,
     icon = icon,
     color = color,

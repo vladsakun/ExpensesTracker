@@ -16,8 +16,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,7 +25,7 @@ class CreateCategoryViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
   override val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(),
-    CategoryStateManager<CreateCategoryAdditionalScreenData> by CategoryStateManagerDelegate(UiState.Data(getDefault())),
+    CategoryStateManager<CategoryCreateScreenDataImpl> by CategoryStateManagerDelegate(UiState.Data(getDefault())),
     CategoryScreenNavigator {
 
   override val stateManager: CategoryStateManager<*>
@@ -37,8 +35,8 @@ class CreateCategoryViewModel @Inject constructor(
   private val categoryType: CategoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name]!!
 
   fun consumeNavigateUpEvent() {
-    _state.updateAdditionalData {
-      it?.copy(navigateUpEvent = consumed)
+    _state.updateData {
+      it.copy(navigateUpEvent = consumed)
     }
   }
 
@@ -56,37 +54,16 @@ class CreateCategoryViewModel @Inject constructor(
           type = categoryType,
         )
       }
-      _state.updateAdditionalData {
-        it?.copy(navigateUpEvent = triggered)
+      _state.updateData {
+        it.copy(navigateUpEvent = triggered)
       }
     }
   }
 }
 
-private fun MutableStateFlow<UiState<CreateCategoryScreenData>>.updateAdditionalData(
-  function: (CreateCategoryAdditionalScreenData?) -> CreateCategoryAdditionalScreenData?,
-) {
-  updateData {
-    it.copy(additionalData = function(it.additionalData))
-  }
-}
-
-fun <T> MutableStateFlow<UiState<T>>.updateData(
-  function: (T) -> T,
-) {
-  update { state ->
-    if (state is UiState.Data) {
-      state.copy(data = function(state.data))
-    } else {
-      state
-    }
-  }
-}
-
-fun getDefault() = CreateCategoryScreenData(
+fun getDefault() = CategoryCreateScreenDataImpl(
   title = textValueOf(""),
   icon = IconModel.random,
   color = ColorModel.random,
   confirmButtonEnabled = false,
-  additionalData = CreateCategoryAdditionalScreenData(),
 )
