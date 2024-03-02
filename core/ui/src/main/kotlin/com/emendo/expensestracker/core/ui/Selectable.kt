@@ -26,9 +26,9 @@ import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 
 @Composable
-fun SelectRow(
+inline fun SelectRow(
   @StringRes labelResId: Int,
-  onClick: () -> Unit,
+  noinline onClick: () -> Unit,
   labelModifier: @Composable RowScope.() -> Modifier = { Modifier },
   endLayout: @Composable RowScope.() -> Unit = {},
 ) {
@@ -53,10 +53,10 @@ fun SelectRow(
 }
 
 @Composable
-fun SelectRowWithIcon(
+inline fun SelectRowWithIcon(
   @StringRes labelResId: Int,
   imageVectorProvider: () -> ImageVector,
-  onClick: () -> Unit,
+  noinline onClick: () -> Unit,
 ) {
   val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
   SelectRow(
@@ -99,10 +99,10 @@ fun SelectRowWithText(
 }
 
 @Composable
-fun SelectRowWithColor(
+inline fun SelectRowWithColor(
   @StringRes labelResId: Int,
   colorProvider: () -> ColorModel,
-  onClick: () -> Unit,
+  noinline onClick: () -> Unit,
 ) {
   SelectRow(
     labelResId = labelResId,
