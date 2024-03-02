@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
+import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
 import com.emendo.expensestracker.categories.common.CategoryStateManager
 import com.emendo.expensestracker.categories.common.CategoryStateManagerDelegate
@@ -25,7 +26,7 @@ class CreateCategoryViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
   override val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(),
-    CategoryStateManager<CategoryCreateScreenDataImpl> by CategoryStateManagerDelegate(UiState.Data(getDefault())),
+    CategoryStateManager<CategoryCreateScreenData> by CategoryStateManagerDelegate(UiState.Data(getDefault())),
     CategoryScreenNavigator {
 
   override val stateManager: CategoryStateManager<*>
@@ -46,7 +47,7 @@ class CreateCategoryViewModel @Inject constructor(
     }
 
     createCategoryJob = viewModelScope.launch {
-      with(state.value.requireDataValue()) {
+      with(state.value.requireDataValue().categoryScreenData) {
         categoryRepository.createCategory(
           name = title.textValueOrBlank(),
           icon = icon,
@@ -61,9 +62,12 @@ class CreateCategoryViewModel @Inject constructor(
   }
 }
 
-fun getDefault() = CategoryCreateScreenDataImpl(
-  title = textValueOf(""),
-  icon = IconModel.random,
-  color = ColorModel.random,
-  confirmButtonEnabled = false,
-)
+private fun getDefault() =
+  CategoryCreateScreenData(
+    categoryScreenData = CategoryScreenData(
+      title = textValueOf(""),
+      icon = IconModel.random,
+      color = ColorModel.random,
+      confirmButtonEnabled = false,
+    )
+  )

@@ -66,7 +66,7 @@ private fun CategoryDetailContent(
     is UiState.Data -> {
       CategoryContent(
         title = stringResource(id = R.string.category),
-        stateProvider = state::data,
+        stateProvider = { state.data.categoryScreenData },
         onNavigationClick = onNavigationClick,
         onTitleChanged = onTitleChanged,
         onIconSelectClick = onIconSelectClick,

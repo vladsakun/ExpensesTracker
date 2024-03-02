@@ -1,20 +1,19 @@
 package com.emendo.expensestracker.categories.common
 
-import com.emendo.expensestracker.categories.detail.CategoryScreenDataContract
 import com.emendo.expensestracker.model.ui.UiState
 import com.emendo.expensestracker.model.ui.requireDataValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface CategoryStateManager<T : CategoryScreenDataContract> {
+interface CategoryStateManager<T : CategoryScreenState> {
 
   val _state: MutableStateFlow<UiState<T>>
   val state: StateFlow<UiState<T>>
 
   val selectedColorId: Int
-    get() = state.value.requireDataValue().color.id
+    get() = state.value.requireDataValue().categoryScreenData.color.id
   val selectedIconId: Int
-    get() = state.value.requireDataValue().icon.id
+    get() = state.value.requireDataValue().categoryScreenData.icon.id
 
   fun updateTitle(title: String)
   fun updateConfirmButtonEnabled(enabled: Boolean)

@@ -1,44 +1,51 @@
-@file:Suppress("UNCHECKED_CAST") // Todo remove this suppression
-
 package com.emendo.expensestracker.categories.common
 
-import com.emendo.expensestracker.categories.detail.CategoryScreenDataContract
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.UiState
+import com.emendo.expensestracker.model.ui.dataValue
 import com.emendo.expensestracker.model.ui.textValueOf
-import com.emendo.expensestracker.model.ui.updateData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
-class CategoryStateManagerDelegate<T : CategoryScreenDataContract>(defaultState: UiState<T>? = null) :
-  CategoryStateManager<T> {
+class CategoryStateManagerDelegate<T>(defaultState: UiState<T>? = null) :
+  CategoryStateManager<T> where T : CategoryScreenState {
 
   override val _state: MutableStateFlow<UiState<T>> = MutableStateFlow(defaultState ?: UiState.Loading())
   override val state: StateFlow<UiState<T>> = _state.asStateFlow()
 
   override fun updateTitle(title: String) {
-    _state.updateData {
-      it.copyMy(title = textValueOf(title)) as T
+    _state.updateScreenDataData {
+      it.copy(title = textValueOf(title))
     }
   }
 
   override fun updateConfirmButtonEnabled(enabled: Boolean) {
-    _state.updateData {
-      it.copyMy(confirmButtonEnabled = enabled) as T
+    _state.updateScreenDataData {
+      it.copy(confirmButtonEnabled = enabled)
     }
   }
 
   override fun updateColor(colorId: Int) {
-    _state.updateData {
-      it.copyMy(color = ColorModel.getById(colorId)) as T
+    _state.updateScreenDataData {
+      it.copy(color = ColorModel.getById(colorId))
     }
   }
 
   override fun updateIcon(iconId: Int) {
-    _state.updateData {
-      it.copyMy(icon = IconModel.getById(iconId)) as T
+    _state.updateScreenDataData {
+      it.copy(icon = IconModel.getById(iconId))
     }
+  }
+}
+
+fun <T> MutableStateFlow<UiState<T>>.updateScreenDataData(updateFunction: (CategoryScreenData) -> CategoryScreenData) where T : CategoryScreenState {
+  update {
+    val data = it.dataValue()?.categoryScreenData ?: return@update it
+    val updatedScreenData = updateFunction(data)
+    val newData: CategoryScreenState? = it.dataValue()?.copyScreenData(updatedScreenData)
+    UiState.Data(data = newData as T)
   }
 }

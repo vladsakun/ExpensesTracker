@@ -43,7 +43,7 @@ fun CreateCategoryRoute(
 
 @Composable
 private fun CreateCategoryContent(
-  stateProvider: () -> UiState<CategoryCreateScreenDataImpl>,
+  stateProvider: () -> UiState<CategoryCreateScreenData>,
   onNavigationClick: () -> Unit,
   consumeNavigationEvent: () -> Unit,
   onTitleChanged: (String) -> Unit,
@@ -61,7 +61,7 @@ private fun CreateCategoryContent(
 
       CategoryContent(
         title = stringResource(id = R.string.create_category),
-        stateProvider = state::data,
+        stateProvider = { state.data.categoryScreenData },
         onNavigationClick = onNavigationClick,
         onTitleChanged = onTitleChanged,
         onIconSelectClick = onIconSelectClick,

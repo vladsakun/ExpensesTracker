@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.resources.R
+import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
 import com.emendo.expensestracker.categories.common.CategoryStateManager
 import com.emendo.expensestracker.categories.common.CategoryStateManagerDelegate
@@ -68,7 +69,7 @@ class CategoryDetailViewModel @Inject constructor(
     }
 
     updateCategoryJob = viewModelScope.launch {
-      with(state.value.requireDataValue()) {
+      with(state.value.requireDataValue().categoryScreenData) {
         categoryRepository.updateCategory(
           id = categoryId,
           name = title.textValueOrBlank(),
@@ -105,9 +106,11 @@ class CategoryDetailViewModel @Inject constructor(
 
 private fun getDefaultCategoryDetailScreenData(categoryModel: CategoryModel) = with(categoryModel) {
   CategoryDetailScreenDataImpl(
-    title = name,
-    icon = icon,
-    color = color,
-    confirmButtonEnabled = false,
+    CategoryScreenData(
+      title = name,
+      icon = icon,
+      color = color,
+      confirmButtonEnabled = false,
+    )
   )
 }
