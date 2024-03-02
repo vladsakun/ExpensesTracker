@@ -1,14 +1,13 @@
 package com.emendo.expensestracker.categories.common.command
 
-import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
-import com.emendo.expensestracker.categories.common.state.CategoryStateManager
 import com.emendo.expensestracker.core.model.data.command.Command
 
 typealias CategoryCommand = Command<CategoryCommandReceiver>
 
 interface CategoryCommandReceiver {
-  val categoryScreenNavigator: CategoryScreenNavigator
-  val stateManager: CategoryStateManager<*>
+  fun changeTitle(newTitle: String)
+  fun openSelectIconScreen()
+  fun openSelectColorScreen()
 
   fun processCommand(categoryCommand: CategoryCommand) {
     categoryCommand.execute(this)
@@ -17,18 +16,18 @@ interface CategoryCommandReceiver {
 
 class UpdateTitleCategoryCommand(private val newTitle: String) : CategoryCommand {
   override fun execute(receiver: CategoryCommandReceiver) {
-    receiver.stateManager.changeTitle(newTitle)
+    receiver.changeTitle(newTitle)
   }
 }
 
 class OpenSelectIconScreenCategoryCommand : CategoryCommand {
   override fun execute(receiver: CategoryCommandReceiver) {
-    receiver.categoryScreenNavigator.openSelectIconScreen()
+    receiver.openSelectIconScreen()
   }
 }
 
 class OpenSelectColorScreenCategoryCommand : CategoryCommand {
   override fun execute(receiver: CategoryCommandReceiver) {
-    receiver.categoryScreenNavigator.openSelectColorScreen()
+    receiver.openSelectColorScreen()
   }
 }

@@ -1,13 +1,10 @@
 package com.emendo.expensestracker.categories.create
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.categories.common.CategoryScreenData
-import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
-import com.emendo.expensestracker.categories.common.state.CategoryStateManager
-import com.emendo.expensestracker.categories.common.state.CategoryStateManagerDelegate
+import com.emendo.expensestracker.categories.common.CategoryViewModel
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
@@ -23,17 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateCategoryViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
-  private val categoryRepository: CategoryRepository,
   override val appNavigationEventBus: AppNavigationEventBus,
-) : ViewModel(),
-    CategoryStateManager<CategoryCreateScreenData> by CategoryStateManagerDelegate(UiState.Data(getDefault())),
-    CategoryScreenNavigator,
-    CategoryCreateCommandReceiver {
-
-  override val stateManager: CategoryStateManager<*>
-    get() = this
-  override val categoryScreenNavigator: CategoryScreenNavigator
-    get() = this
+  private val categoryRepository: CategoryRepository,
+) : CategoryViewModel<CategoryCreateScreenData>(UiState.Data(getDefault())), CategoryCreateCommandReceiver {
 
   private var createCategoryJob: Job? = null
   private val categoryType: CategoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name]!!

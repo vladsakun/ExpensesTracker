@@ -1,14 +1,11 @@
 package com.emendo.expensestracker.categories.detail
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.common.CategoryScreenData
-import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
-import com.emendo.expensestracker.categories.common.state.CategoryStateManager
-import com.emendo.expensestracker.categories.common.state.CategoryStateManagerDelegate
+import com.emendo.expensestracker.categories.common.CategoryViewModel
 import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
 import com.emendo.expensestracker.core.domain.category.GetCategorySnapshotByIdUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
@@ -35,16 +32,9 @@ class CategoryDetailViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
   private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
   override val appNavigationEventBus: AppNavigationEventBus,
-) : ViewModel(),
-    CategoryStateManager<CategoryDetailScreenDataImpl> by CategoryStateManagerDelegate(),
+) : CategoryViewModel<CategoryDetailScreenDataImpl>(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
-    CategoryScreenNavigator,
     CategoryDetailsCommandReceiver {
-
-  override val stateManager: CategoryStateManager<*>
-    get() = this
-  override val categoryScreenNavigator: CategoryScreenNavigator
-    get() = this
 
   private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
   private var updateCategoryJob: Job? = null
