@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
-import com.emendo.expensestracker.categories.common.CategoryStateManager
-import com.emendo.expensestracker.categories.common.CategoryStateManagerDelegate
+import com.emendo.expensestracker.categories.common.state.CategoryStateManager
+import com.emendo.expensestracker.categories.common.state.CategoryStateManagerDelegate
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType

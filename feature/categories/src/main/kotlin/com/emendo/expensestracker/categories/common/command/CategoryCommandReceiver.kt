@@ -1,5 +1,7 @@
-package com.emendo.expensestracker.categories.common
+package com.emendo.expensestracker.categories.common.command
 
+import com.emendo.expensestracker.categories.common.CategoryScreenNavigator
+import com.emendo.expensestracker.categories.common.state.CategoryStateManager
 import com.emendo.expensestracker.core.model.data.command.Command
 
 typealias CategoryCommand = Command<CategoryCommandReceiver>

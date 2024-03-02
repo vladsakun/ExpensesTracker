@@ -1,5 +1,7 @@
-package com.emendo.expensestracker.categories.common
+package com.emendo.expensestracker.categories.common.state
 
+import com.emendo.expensestracker.categories.common.CategoryScreenData
+import com.emendo.expensestracker.categories.common.CategoryScreenState
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.UiState

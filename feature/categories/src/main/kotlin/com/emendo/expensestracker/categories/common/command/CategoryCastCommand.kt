@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.categories.common
+package com.emendo.expensestracker.categories.common.command
 
 import com.emendo.expensestracker.core.model.data.command.CastCommand
 

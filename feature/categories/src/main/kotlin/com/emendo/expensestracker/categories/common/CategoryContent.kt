@@ -25,17 +25,17 @@ import com.emendo.expensestracker.core.ui.stringValue
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-internal fun CategoryContent(
+internal inline fun CategoryContent(
   title: String,
-  stateProvider: () -> CategoryScreenData,
-  onNavigationClick: () -> Unit,
-  onTitleChanged: (String) -> Unit,
-  onIconSelectClick: () -> Unit,
-  onColorSelectClick: () -> Unit,
-  onConfirmActionClick: () -> Unit,
+  crossinline stateProvider: () -> CategoryScreenData,
+  noinline onNavigationClick: () -> Unit,
+  noinline onTitleChanged: (String) -> Unit,
+  noinline onIconSelectClick: () -> Unit,
+  noinline onColorSelectClick: () -> Unit,
+  noinline onConfirmActionClick: () -> Unit,
   confirmButtonText: String,
   shouldFocusTitleInputOnLaunch: Boolean = false,
-  additionalBottomContent: @Composable ColumnScope.() -> Unit = {},
+  crossinline additionalBottomContent: @Composable ColumnScope.() -> Unit = {},
 ) {
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current

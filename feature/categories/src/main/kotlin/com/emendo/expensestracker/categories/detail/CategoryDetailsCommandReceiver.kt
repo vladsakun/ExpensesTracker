@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.categories.detail
 
-import com.emendo.expensestracker.categories.common.CategoryCastCommand
-import com.emendo.expensestracker.categories.common.CategoryCommandReceiver
+import com.emendo.expensestracker.categories.common.command.CategoryCastCommand
+import com.emendo.expensestracker.categories.common.command.CategoryCommandReceiver
 
 interface CategoryDetailsCommandReceiver : CategoryCommandReceiver {
 

@@ -1,5 +1,6 @@
-package com.emendo.expensestracker.categories.common
+package com.emendo.expensestracker.categories.common.state
 
+import com.emendo.expensestracker.categories.common.CategoryScreenState
 import com.emendo.expensestracker.model.ui.UiState
 import com.emendo.expensestracker.model.ui.requireDataValue
 import kotlinx.coroutines.flow.MutableStateFlow
