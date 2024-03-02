@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.amount
 
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import java.math.BigDecimal
 
 interface AmountFormatter {

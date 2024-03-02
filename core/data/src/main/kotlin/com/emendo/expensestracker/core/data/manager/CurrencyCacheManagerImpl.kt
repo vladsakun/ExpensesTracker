@@ -2,8 +2,8 @@ package com.emendo.expensestracker.core.data.manager
 
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerly
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
-import com.emendo.expensestracker.core.model.data.CurrencyModel
-import com.emendo.expensestracker.core.model.data.toCurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.toCurrencyModel
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
 import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository

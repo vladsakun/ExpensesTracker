@@ -2,7 +2,7 @@ package com.emendo.expensestracker.data.api.model
 
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.model.ui.TextValue

@@ -1,12 +1,11 @@
 package com.emendo.expensestracker.categories.create
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.categories.common.CategoryContent
+import com.emendo.expensestracker.categories.common.*
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.model.ui.UiState
@@ -33,11 +32,7 @@ fun CreateCategoryRoute(
   CreateCategoryContent(
     stateProvider = state::value,
     onNavigationClick = navigator::navigateUp,
-    consumeNavigationEvent = remember { viewModel::consumeNavigateUpEvent },
-    onTitleChanged = remember { viewModel::changeTitle },
-    onIconSelectClick = remember { viewModel::openSelectIconScreen },
-    onColorSelectClick = remember { viewModel::openSelectColorScreen },
-    onConfirmActionClick = remember { viewModel::createCategory },
+    commandProcessor = viewModel::processCommand,
   )
 }
 
@@ -45,17 +40,13 @@ fun CreateCategoryRoute(
 private fun CreateCategoryContent(
   stateProvider: () -> UiState<CategoryCreateScreenData>,
   onNavigationClick: () -> Unit,
-  consumeNavigationEvent: () -> Unit,
-  onTitleChanged: (String) -> Unit,
-  onIconSelectClick: () -> Unit,
-  onColorSelectClick: () -> Unit,
-  onConfirmActionClick: () -> Unit,
+  commandProcessor: (CategoryCommand) -> Unit,
 ) {
   when (val state = stateProvider()) {
     is UiState.Data -> {
       NavigationEventEffect(
         event = state.data.navigateUpEvent,
-        onConsumed = consumeNavigationEvent,
+        onConsumed = { commandProcessor(ConsumeNavigateUpEventCommand()) },
         action = onNavigationClick,
       )
 
@@ -63,10 +54,10 @@ private fun CreateCategoryContent(
         title = stringResource(id = R.string.create_category),
         stateProvider = { state.data.categoryScreenData },
         onNavigationClick = onNavigationClick,
-        onTitleChanged = onTitleChanged,
-        onIconSelectClick = onIconSelectClick,
-        onColorSelectClick = onColorSelectClick,
-        onConfirmActionClick = onConfirmActionClick,
+        onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
+        onIconSelectClick = { commandProcessor(OpenSelectIconScreenCategoryCommand()) },
+        onColorSelectClick = { commandProcessor(OpenSelectColorScreenCategoryCommand()) },
+        onConfirmActionClick = { commandProcessor(CreateCategoryCommand()) },
         confirmButtonText = stringResource(id = R.string.create),
         shouldFocusTitleInputOnLaunch = true,
       )

@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.repository
 
-import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.UserData
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import kotlinx.coroutines.flow.Flow
 
 interface UserDataRepository {

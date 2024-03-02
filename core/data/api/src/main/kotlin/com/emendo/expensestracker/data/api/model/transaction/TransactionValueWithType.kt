@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.data.api.model.transaction
 
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import java.math.BigDecimal
 
 data class TransactionValueWithType(

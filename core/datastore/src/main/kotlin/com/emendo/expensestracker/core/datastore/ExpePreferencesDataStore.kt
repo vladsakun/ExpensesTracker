@@ -1,8 +1,8 @@
 package com.emendo.expensestracker.core.datastore
 
 import androidx.datastore.core.DataStore
-import com.emendo.expensestracker.core.model.data.CurrencyModels
 import com.emendo.expensestracker.core.model.data.UserData
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModels
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map

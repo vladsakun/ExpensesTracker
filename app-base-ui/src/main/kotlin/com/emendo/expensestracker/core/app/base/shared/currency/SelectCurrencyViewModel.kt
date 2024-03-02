@@ -3,7 +3,7 @@ package com.emendo.expensestracker.core.app.base.shared.currency
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList

@@ -10,7 +10,7 @@ import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher

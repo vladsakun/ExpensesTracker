@@ -4,7 +4,7 @@ import android.icu.text.DecimalFormat
 import android.icu.text.NumberFormat
 import com.emendo.expensestracker.core.data.isFloatingPointNumber
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
 import java.math.BigDecimal

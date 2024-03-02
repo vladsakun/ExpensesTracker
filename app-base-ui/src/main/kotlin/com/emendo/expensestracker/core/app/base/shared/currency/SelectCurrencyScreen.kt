@@ -17,7 +17,7 @@ import com.emendo.expensestracker.core.app.base.shared.destinations.SelectCurren
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomScreenTransition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

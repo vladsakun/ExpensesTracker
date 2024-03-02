@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.model.data
+package com.emendo.expensestracker.core.model.data.currency
 
 import java.util.Currency
 

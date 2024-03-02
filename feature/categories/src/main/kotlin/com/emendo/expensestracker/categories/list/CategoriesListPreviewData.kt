@@ -6,7 +6,7 @@ import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.textValueOf

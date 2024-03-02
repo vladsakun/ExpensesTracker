@@ -2,8 +2,8 @@ package com.emendo.expensestracker.core.data.repository
 
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
-import com.emendo.expensestracker.core.model.data.CurrencyModel
 import com.emendo.expensestracker.core.model.data.UserData
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*

@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.domain.category
 
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.manager.CurrencyConverter
 import com.emendo.expensestracker.data.api.model.CurrencyRateModel

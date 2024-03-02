@@ -2,7 +2,7 @@ package com.emendo.expensestracker.accounts.create
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 
 internal class CreateAccountPreviewData : PreviewParameterProvider<CreateAccountScreenData> {
 

@@ -38,9 +38,12 @@ class CategoryDetailViewModel @Inject constructor(
 ) : ViewModel(),
     CategoryStateManager<CategoryDetailScreenDataImpl> by CategoryStateManagerDelegate(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
-    CategoryScreenNavigator {
+    CategoryScreenNavigator,
+    CategoryDetailsCommandReceiver {
 
   override val stateManager: CategoryStateManager<*>
+    get() = this
+  override val categoryScreenNavigator: CategoryScreenNavigator
     get() = this
 
   private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
@@ -63,7 +66,7 @@ class CategoryDetailViewModel @Inject constructor(
     }
   }
 
-  fun updateCategory() {
+  override fun updateCategory() {
     if (updateCategoryJob != null) {
       return
     }
@@ -83,7 +86,7 @@ class CategoryDetailViewModel @Inject constructor(
     }
   }
 
-  fun showDeleteCategoryBottomSheet() {
+  override fun showDeleteCategoryBottomSheet() {
     showModalBottomSheet(
       GeneralBottomSheetData
         .Builder(

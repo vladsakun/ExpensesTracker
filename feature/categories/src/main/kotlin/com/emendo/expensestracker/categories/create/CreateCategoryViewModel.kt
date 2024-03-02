@@ -27,21 +27,24 @@ class CreateCategoryViewModel @Inject constructor(
   override val appNavigationEventBus: AppNavigationEventBus,
 ) : ViewModel(),
     CategoryStateManager<CategoryCreateScreenData> by CategoryStateManagerDelegate(UiState.Data(getDefault())),
-    CategoryScreenNavigator {
+    CategoryScreenNavigator,
+    CategoryCreateCommandReceiver {
 
   override val stateManager: CategoryStateManager<*>
+    get() = this
+  override val categoryScreenNavigator: CategoryScreenNavigator
     get() = this
 
   private var createCategoryJob: Job? = null
   private val categoryType: CategoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name]!!
 
-  fun consumeNavigateUpEvent() {
+  override fun consumeNavigateUpEvent() {
     _state.updateData {
       it.copy(navigateUpEvent = consumed)
     }
   }
 
-  fun createCategory() {
+  override fun createCategory() {
     if (createCategoryJob != null) {
       return
     }

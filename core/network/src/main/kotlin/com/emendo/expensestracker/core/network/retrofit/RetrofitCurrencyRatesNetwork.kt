@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.network.retrofit
 
-import com.emendo.expensestracker.core.model.data.CurrencyModels
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModels
 import com.emendo.expensestracker.core.network.CurrencyRatesNetworkDataSource
 import com.emendo.expensestracker.core.network.model.CurrencyRates
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory

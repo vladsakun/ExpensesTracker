@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.accounts.common
 
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 import com.emendo.expensestracker.model.ui.dataValue

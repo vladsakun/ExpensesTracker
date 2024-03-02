@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.data.api.manager
 
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import kotlinx.coroutines.flow.StateFlow
 
 interface CurrencyCacheManager {

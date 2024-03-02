@@ -14,7 +14,7 @@ import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate

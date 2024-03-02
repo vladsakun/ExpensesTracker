@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.model.transaction
 
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.model.ui.TextValue
 
 sealed interface TransactionElement {

@@ -2,7 +2,7 @@ package com.emendo.expensestracker.core.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.emendo.expensestracker.core.model.data.CurrencyModels
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModels
 import com.google.protobuf.InvalidProtocolBufferException
 import java.io.InputStream
 import java.io.OutputStream

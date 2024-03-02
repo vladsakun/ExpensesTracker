@@ -11,7 +11,7 @@ import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType

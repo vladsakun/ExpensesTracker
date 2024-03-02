@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.model.data
 
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import java.math.BigDecimal
 
 data class Amount(

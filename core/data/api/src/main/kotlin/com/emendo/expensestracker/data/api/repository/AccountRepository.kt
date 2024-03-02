@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.repository
 
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal

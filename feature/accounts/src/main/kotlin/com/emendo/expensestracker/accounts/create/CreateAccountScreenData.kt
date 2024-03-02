@@ -3,7 +3,7 @@ package com.emendo.expensestracker.accounts.create
 import com.emendo.expensestracker.accounts.common.AccountScreenData
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
-import com.emendo.expensestracker.core.model.data.CurrencyModel
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.model.ui.ColorModel
 
 typealias CreateAccountScreenData = AccountScreenData<Boolean>
