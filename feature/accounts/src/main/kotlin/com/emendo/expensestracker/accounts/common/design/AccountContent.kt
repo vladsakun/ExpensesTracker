@@ -25,18 +25,18 @@ import com.emendo.expensestracker.core.ui.SelectRowWithText
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-internal fun <T> AccountContent(
-  stateProvider: () -> AccountScreenData<T>,
+internal inline fun <T> AccountContent(
+  crossinline stateProvider: () -> AccountScreenData<T>,
   title: String,
-  onNavigationClick: () -> Unit,
-  onNameChange: (String) -> Unit,
-  onIconRowClick: () -> Unit,
-  onColorRowClick: () -> Unit,
-  onBalanceRowClick: () -> Unit,
-  onCurrencyRowClick: () -> Unit,
-  onConfirmClick: () -> Unit,
+  noinline onNavigationClick: () -> Unit,
+  noinline onNameChange: (String) -> Unit,
+  noinline onIconRowClick: () -> Unit,
+  noinline onColorRowClick: () -> Unit,
+  noinline onBalanceRowClick: () -> Unit,
+  noinline onCurrencyRowClick: () -> Unit,
+  noinline onConfirmClick: () -> Unit,
   shouldFocusTitleInputOnLaunch: Boolean = false,
-  endContent: @Composable ColumnScope.() -> Unit,
+  crossinline endContent: @Composable ColumnScope.() -> Unit,
 ) {
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
