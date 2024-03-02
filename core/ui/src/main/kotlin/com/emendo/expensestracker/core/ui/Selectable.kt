@@ -72,23 +72,21 @@ inline fun SelectRowWithIcon(
   )
 }
 
-// Todo make work without recomposition
 @Composable
-fun SelectRowWithText(
+inline fun SelectRowWithText(
   @StringRes labelResId: Int,
   textProvider: () -> String,
-  onClick: () -> Unit,
+  noinline onClick: () -> Unit,
   textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
   val labelModifier: @Composable RowScope.() -> Modifier = remember { { Modifier.weight(1f) } }
-  val text = textProvider()
   SelectRow(
     labelResId = labelResId,
     onClick = onClick,
     labelModifier = labelModifier,
     endLayout = {
       Text(
-        text = "text",
+        text = textProvider(),
         style = textStyle,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,

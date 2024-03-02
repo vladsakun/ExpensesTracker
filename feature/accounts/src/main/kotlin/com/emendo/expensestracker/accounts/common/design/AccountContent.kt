@@ -3,8 +3,6 @@ package com.emendo.expensestracker.accounts.common.design
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -14,8 +12,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import com.emendo.expensestracker.accounts.common.AccountScreenData
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
@@ -23,9 +19,9 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTo
 import com.emendo.expensestracker.core.designsystem.component.ExpeTextFieldWithRoundedBackground
 import com.emendo.expensestracker.core.designsystem.component.MenuAction
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.ui.SelectRow
 import com.emendo.expensestracker.core.ui.SelectRowWithColor
 import com.emendo.expensestracker.core.ui.SelectRowWithIcon
+import com.emendo.expensestracker.core.ui.SelectRowWithText
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -81,19 +77,10 @@ internal fun <T> AccountContent(
             }
           },
       )
-      SelectRow(
+      SelectRowWithText(
         labelResId = R.string.balance,
+        textProvider = { stateProvider().balance.formattedValue },
         onClick = onBalanceRowClick,
-        labelModifier = { Modifier.weight(1f) },
-        endLayout = {
-          Text(
-            text = stateProvider().balance.formattedValue,
-            style = MaterialTheme.typography.bodyLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.End,
-          )
-        }
       )
       SelectRowWithIcon(
         labelResId = R.string.icon,
@@ -105,19 +92,11 @@ internal fun <T> AccountContent(
         colorProvider = { stateProvider().color },
         onClick = onColorRowClick,
       )
-      SelectRow(
+      SelectRowWithText(
         labelResId = R.string.currency,
+        textProvider = { stateProvider().currency.currencySymbolOrCode },
         onClick = onCurrencyRowClick,
-        labelModifier = { Modifier.weight(1f) }
-      ) {
-        Text(
-          text = stateProvider().currency.currencySymbolOrCode,
-          style = MaterialTheme.typography.bodyLarge,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          textAlign = TextAlign.End,
-        )
-      }
+      )
       endContent()
     }
   }
