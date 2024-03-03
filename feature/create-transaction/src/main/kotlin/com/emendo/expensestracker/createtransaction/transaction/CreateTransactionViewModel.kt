@@ -58,7 +58,10 @@ class CreateTransactionViewModel @Inject constructor(
   private val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
   private val getLastTransferAccountOrRandomUseCase: GetLastTransferAccountOrRandomUseCase,
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
-) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(), CalculatorKeyboardActions {
+) : ViewModel(),
+    ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
+    CalculatorKeyboardActions,
+    CreateTransactionCommander {
 
   private val _uiState: MutableStateFlow<CreateTransactionUiState> =
     MutableStateFlow(getDefaultCreateTransactionUiState())
@@ -186,7 +189,7 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  fun updateNoteText(newNote: String) {
+  override fun updateNoteText(newNote: String) {
     _uiState.update { it.copy(note = newNote) }
   }
 
@@ -236,7 +239,7 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  fun showCalculatorBottomSheet(sourceTrigger: Boolean = true) {
+  override fun showCalculatorBottomSheet(sourceTrigger: Boolean) {
     numericKeyboardCommander.doMath()
     _uiState.update { state ->
       if (sourceTrigger) {
@@ -273,7 +276,7 @@ class CreateTransactionViewModel @Inject constructor(
       decimalSeparator = decimalSeparator,
     )
 
-  fun saveTransaction() {
+  override fun saveTransaction() {
     val source = createTransactionController.getSourceSnapshot()
 
     if (source == null) {
@@ -295,7 +298,7 @@ class CreateTransactionViewModel @Inject constructor(
     createTransaction(source, target)
   }
 
-  fun openAccountListScreen() {
+  override fun openAccountListScreen() {
     appNavigationEventBus.navigate(AppNavigationEvent.SelectAccount())
   }
 
@@ -334,7 +337,7 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  fun hideCalculatorBottomSheet() {
+  override fun hideCalculatorBottomSheet() {
     _bottomSheetState.update { sheetState ->
       sheetState.copy(hide = triggered)
     }
@@ -378,13 +381,13 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
-  fun selectTransferTargetAccount() {
+  override fun selectTransferTargetAccount() {
     appNavigationEventBus.navigate(
       AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
     )
   }
 
-  fun duplicateTransaction() {
+  override fun duplicateTransaction() {
     val payload = createTransactionController.getTransactionPayload() ?: return
     shouldClearTarget = false
     appNavigationEventBus.navigate(
@@ -397,7 +400,7 @@ class CreateTransactionViewModel @Inject constructor(
     )
   }
 
-  fun showConfirmDeleteTransactionBottomSheet() {
+  override fun showConfirmDeleteTransactionBottomSheet() {
     showModalBottomSheet(
       GeneralBottomSheetData
         .Builder(
@@ -419,7 +422,7 @@ class CreateTransactionViewModel @Inject constructor(
     navigateUp()
   }
 
-  fun consumeFieldError(field: FieldWithError) {
+  override fun consumeFieldError(field: FieldWithError) {
     _uiState.updateScreenData { state ->
       when (field) {
         is FieldWithError.Amount -> state.copy(amountError = consumed)
@@ -428,17 +431,17 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  fun consumeCloseEvent() {
+  override fun consumeCloseEvent() {
     _uiState.updateScreenData { state ->
       state.copy(navigateUp = triggered)
     }
   }
 
-  fun consumeShowCalculatorBottomSheet() {
+  override fun consumeShowCalculatorBottomSheet() {
     _bottomSheetState.update { it.copy(show = consumed) }
   }
 
-  fun consumeHideCalculatorBottomSheet() {
+  override fun consumeHideCalculatorBottomSheet() {
     _bottomSheetState.update { it.copy(hide = consumed) }
   }
 
