@@ -1,8 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
 import androidx.paging.*
-import com.emendo.expensestracker.core.app.common.network.Dispatcher
-import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.data.mapper.transactionType
@@ -20,11 +18,9 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import javax.inject.Inject
@@ -36,45 +32,41 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private val transactionDao: TransactionDao,
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
-  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @ApplicationScope private val scope: CoroutineScope,
 ) : TransactionRepository {
 
-  override fun getLastTransactionFull(): Flow<TransactionModel?> = transactionDao
-    .getLastTransaction()
-    .map { transaction ->
-      transaction?.let { transactionMapper.map(it) }
-    }
+  override fun getLastTransactionFull(): Flow<TransactionModel?> =
+    transactionDao
+      .getLastTransaction()
+      .map { transaction ->
+        transaction?.let { transactionMapper.map(it) }
+      }
 
   override val transactionsPagingFlow: Flow<PagingData<TransactionModel>> by lazy {
     Pager(
       config = PagingConfig(pageSize = PAGE_SIZE),
       pagingSourceFactory = { transactionDao.transactionsPagingSource() }
-    )
-      .flow
+    ).flow
       .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
       .cachedIn(scope)
   }
 
   override suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel? =
-    withContext(ioDispatcher) {
-      transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }
-    }
+    transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }
 
   override suspend fun deleteTransaction(id: Long) {
-    withContext(ioDispatcher) {
-      transactionDao.deleteById(id)
-    }
+    transactionDao.deleteById(id)
   }
 
   override suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType> =
-    transactionDao.retrieveTransactionsInPeriod(from, to).map { transaction ->
-      TransactionValueWithType(
-        type = transaction.transactionType,
-        value = transaction.transactionEntity.value,
-        currency = CurrencyModel.toCurrencyModel(transaction.transactionEntity.currencyCode),
-      )
-    }
+    transactionDao
+      .retrieveTransactionsInPeriod(from, to).map { transaction ->
+        TransactionValueWithType(
+          type = transaction.transactionType,
+          value = transaction.transactionEntity.value,
+          currency = CurrencyModel.toCurrencyModel(transaction.transactionEntity.currencyCode),
+        )
+      }
 
   override suspend fun createTransaction(
     source: TransactionSource,
@@ -83,25 +75,23 @@ class OfflineFirstTransactionRepository @Inject constructor(
     transferReceivedAmount: Amount?,
     note: String?,
   ) {
-    withContext(ioDispatcher) {
-      when {
-        source is AccountModel && target is CategoryModel -> {
-          when (target.type) {
-            CategoryType.EXPENSE -> createExpenseTransaction(source, target, amount, note)
-            CategoryType.INCOME -> createIncomeTransaction(source, target, amount, note)
-          }
+    when {
+      source is AccountModel && target is CategoryModel -> {
+        when (target.type) {
+          CategoryType.EXPENSE -> createExpenseTransaction(source, target, amount, note)
+          CategoryType.INCOME -> createIncomeTransaction(source, target, amount, note)
         }
-
-        source is AccountModel && target is AccountModel -> createTransferTransaction(
-          source = source,
-          target = target,
-          amount = amount,
-          note = note,
-          transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount should not be null in Transfer transaction" },
-        )
-
-        else -> throw IllegalArgumentException("Unsupported transaction type with source: $source, target: $target")
       }
+
+      source is AccountModel && target is AccountModel -> createTransferTransaction(
+        source = source,
+        target = target,
+        amount = amount,
+        note = note,
+        transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount should not be null in Transfer transaction" },
+      )
+
+      else -> throw IllegalArgumentException("Unsupported transaction type with source: $source, target: $target")
     }
   }
 
@@ -112,21 +102,19 @@ class OfflineFirstTransactionRepository @Inject constructor(
     note: String?,
     date: Instant = Clock.System.now(),
   ) {
-    withContext(ioDispatcher) {
-      databaseUtils.expeWithTransaction {
-        val newBalance = source.balance.value - amount.value
-        accountDao.updateBalance(source.id, newBalance)
-        transactionDao.save(
-          TransactionEntity(
-            sourceAccountId = source.id,
-            targetCategoryId = target.id,
-            value = amount.value.abs().negate(),
-            currencyCode = amount.currency.currencyCode,
-            date = date,
-            note = note,
-          )
+    databaseUtils.expeWithTransaction {
+      val newBalance = source.balance.value - amount.value
+      accountDao.updateBalance(source.id, newBalance)
+      transactionDao.save(
+        TransactionEntity(
+          sourceAccountId = source.id,
+          targetCategoryId = target.id,
+          value = amount.value.abs().negate(),
+          currencyCode = amount.currency.currencyCode,
+          date = date,
+          note = note,
         )
-      }
+      )
     }
   }
 
@@ -137,21 +125,19 @@ class OfflineFirstTransactionRepository @Inject constructor(
     note: String?,
     date: Instant = Clock.System.now(),
   ) {
-    withContext(ioDispatcher) {
-      databaseUtils.expeWithTransaction {
-        val newBalance = source.balance.value + amount.value
-        accountDao.updateBalance(source.id, newBalance)
-        transactionDao.save(
-          TransactionEntity(
-            sourceAccountId = source.id,
-            targetCategoryId = target.id,
-            value = amount.value,
-            currencyCode = amount.currency.currencyCode,
-            date = date,
-            note = note,
-          )
+    databaseUtils.expeWithTransaction {
+      val newBalance = source.balance.value + amount.value
+      accountDao.updateBalance(source.id, newBalance)
+      transactionDao.save(
+        TransactionEntity(
+          sourceAccountId = source.id,
+          targetCategoryId = target.id,
+          value = amount.value.abs(),
+          currencyCode = amount.currency.currencyCode,
+          date = date,
+          note = note,
         )
-      }
+      )
     }
   }
 
@@ -163,26 +149,24 @@ class OfflineFirstTransactionRepository @Inject constructor(
     transferReceivedAmount: Amount,
     date: Instant = Clock.System.now(),
   ) {
-    withContext(ioDispatcher) {
-      databaseUtils.expeWithTransaction {
-        val newSourceBalance = source.balance.value - amount.value
-        val newTargetBalance = target.balance.value + transferReceivedAmount.value
+    databaseUtils.expeWithTransaction {
+      val newSourceBalance = source.balance.value - amount.value
+      val newTargetBalance = target.balance.value + transferReceivedAmount.value
 
-        accountDao.updateBalance(source.id, newSourceBalance)
-        accountDao.updateBalance(target.id, newTargetBalance)
-        transactionDao.save(
-          TransactionEntity(
-            sourceAccountId = source.id,
-            targetAccountId = target.id,
-            value = amount.value.negate(),
-            currencyCode = amount.currency.currencyCode,
-            date = date,
-            note = note,
-            transferReceivedCurrencyCode = transferReceivedAmount.currency.currencyCode,
-            transferReceivedValue = transferReceivedAmount.value,
-          )
+      accountDao.updateBalance(source.id, newSourceBalance)
+      accountDao.updateBalance(target.id, newTargetBalance)
+      transactionDao.save(
+        TransactionEntity(
+          sourceAccountId = source.id,
+          targetAccountId = target.id,
+          value = amount.value.abs().negate(),
+          currencyCode = amount.currency.currencyCode,
+          date = date,
+          note = note,
+          transferReceivedCurrencyCode = transferReceivedAmount.currency.currencyCode,
+          transferReceivedValue = transferReceivedAmount.value.abs(),
         )
-      }
+      )
     }
   }
 }
