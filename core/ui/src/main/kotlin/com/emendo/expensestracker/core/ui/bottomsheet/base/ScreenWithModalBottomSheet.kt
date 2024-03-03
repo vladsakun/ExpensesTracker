@@ -1,16 +1,17 @@
 package com.emendo.expensestracker.core.ui.bottomsheet.base
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.core.designsystem.utils.ExpeBottomSheetShape
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
@@ -79,7 +80,7 @@ private fun BaseScreenWithModalBottomSheet(
 
   content()
 
-  ExpeModalBottomSheet(
+  BottomSheet(
     modalBottomSheetState = modalBottomSheetState,
     bottomSheetState = bottomSheetState,
     onDismissRequest = onBottomSheetDismissRequest,
@@ -109,7 +110,7 @@ private fun Effects(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun ExpeModalBottomSheet(
+private fun BottomSheet(
   modalBottomSheetState: SheetState,
   bottomSheetState: () -> BottomSheetState,
   onDismissRequest: () -> Unit,
@@ -117,25 +118,14 @@ private fun ExpeModalBottomSheet(
 ) {
   val shouldOpenBottomSheet = remember { derivedStateOf { bottomSheetState().bottomSheetData != null } }
   val focusManager = LocalFocusManager.current
-  val navBarInsets = WindowInsets.navigationBars.asPaddingValues()
 
   if (shouldOpenBottomSheet.value) {
     focusManager.clearFocus()
-    ModalBottomSheet(
+    ExpeModelBottomSheet(
+      modalBottomSheetState = modalBottomSheetState,
       onDismissRequest = onDismissRequest,
-      sheetState = modalBottomSheetState,
-      // Todo uncomment when fixed https://issuetracker.google.com/issues/275849044
-      // windowInsets = WindowInsets(0),
-      windowInsets = WindowInsets.statusBars,
-      shape = ExpeBottomSheetShape,
-      content = {
-        Column(
-          modifier = Modifier
-            .padding(bottom = navBarInsets.calculateBottomPadding())
-        ) {
-          bottomSheetContent(bottomSheetState().bottomSheetData!!)
-        }
-      },
+      bottomSheetContent = bottomSheetContent,
+      bottomSheetState = bottomSheetState,
     )
   }
 }
