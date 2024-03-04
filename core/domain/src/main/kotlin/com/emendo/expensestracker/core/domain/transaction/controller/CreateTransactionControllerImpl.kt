@@ -58,7 +58,7 @@ class CreateTransactionControllerImpl @Inject constructor(
   }
 
   override fun selectAccount(account: AccountModel) {
-    if (isSelectSourceFlow()) {
+    if (isSelectSourceFlow) {
       setSource(account)
       return
     }
@@ -93,7 +93,7 @@ class CreateTransactionControllerImpl @Inject constructor(
     )
 
   override fun isSelectMode(): Boolean =
-    isSelectSourceFlow() || isSelectTransferTargetFlow()
+    isSelectSourceFlow || isSelectTransferTargetFlow
 
   override fun finishSelectMode() {
     finishSelectSourceFlow()
@@ -104,26 +104,18 @@ class CreateTransactionControllerImpl @Inject constructor(
     isSelectSourceFlow = true
   }
 
-  override fun startSelectTransferTargetFlow() {
-    isSelectTransferTargetFlow = true
-  }
-
-  override fun getTransactionPayload(): CreateTransactionEventPayload? =
-    payload
-
-  override fun setTransactionPayload(newPayload: CreateTransactionEventPayload) {
-    payload = newPayload
-  }
-
-  private fun isSelectSourceFlow(): Boolean =
-    isSelectSourceFlow
-
   private fun finishSelectSourceFlow() {
     isSelectSourceFlow = false
   }
 
-  private fun isSelectTransferTargetFlow(): Boolean {
-    return isSelectTransferTargetFlow
+  override fun startSelectTransferTargetFlow() {
+    isSelectTransferTargetFlow = true
+  }
+
+  override fun getTransactionPayload(): CreateTransactionEventPayload? = payload
+
+  override fun setTransactionPayload(newPayload: CreateTransactionEventPayload) {
+    payload = newPayload
   }
 
   private fun finishSelectTransferTargetFlow() {

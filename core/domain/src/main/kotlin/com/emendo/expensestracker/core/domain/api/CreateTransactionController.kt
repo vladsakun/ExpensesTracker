@@ -31,3 +31,7 @@ interface CreateTransactionController {
 
   fun clear(shouldClearTarget: Boolean)
 }
+
+fun CreateTransactionController.getTargetOrDefault(transactionType: TransactionType): TransactionTarget {
+  return getTargetSnapshot() ?: getDefaultTarget(transactionType)
+}
