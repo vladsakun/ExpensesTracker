@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.createtransaction.transaction
+package com.emendo.expensestracker.createtransaction.transaction.data
 
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_TRANSFER_TRANSACTION
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload

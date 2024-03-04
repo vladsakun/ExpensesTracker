@@ -1,4 +1,7 @@
-package com.emendo.expensestracker.createtransaction.transaction
+package com.emendo.expensestracker.createtransaction.transaction.data
+
+import androidx.compose.runtime.Immutable
+import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
 /**
  *  onSourceAmountClick = remember { { viewModel.showCalculatorBottomSheet() } },
@@ -24,10 +27,9 @@ interface CreateTransactionCommander {
   fun selectTransferTargetAccount()
   fun saveTransaction()
   fun consumeFieldError(field: FieldWithError)
-  fun consumeCloseEvent()
   fun consumeShowCalculatorBottomSheet()
   fun consumeHideCalculatorBottomSheet()
-  fun changeTransactionType()
+  fun updateTransactionType(transactionType: TransactionType)
   fun updateNoteText(newNote: String)
   fun showConfirmDeleteTransactionBottomSheet()
   fun duplicateTransaction()
@@ -38,6 +40,7 @@ interface CreateTransactionCommander {
   }
 }
 
+@Immutable
 interface CreateTransactionCommand {
   fun execute(commander: CreateTransactionCommander)
 }
@@ -72,12 +75,6 @@ class ConsumeFieldErrorCommand(private val field: FieldWithError) : CreateTransa
   }
 }
 
-class ConsumeCloseEventCommand : CreateTransactionCommand {
-  override fun execute(commander: CreateTransactionCommander) {
-    commander.consumeCloseEvent()
-  }
-}
-
 class ConsumeShowCalculatorBottomSheetCommand : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
     commander.consumeShowCalculatorBottomSheet()
@@ -90,9 +87,9 @@ class ConsumeHideCalculatorBottomSheetCommand : CreateTransactionCommand {
   }
 }
 
-class ChangeTransactionTypeCommand : CreateTransactionCommand {
+class ChangeTransactionTypeCommand(private val transactionType: TransactionType) : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
-    commander.changeTransactionType()
+    commander.updateTransactionType(transactionType)
   }
 }
 

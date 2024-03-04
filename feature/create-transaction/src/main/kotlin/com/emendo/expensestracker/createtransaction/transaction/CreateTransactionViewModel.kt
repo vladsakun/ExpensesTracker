@@ -22,6 +22,10 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
+import com.emendo.expensestracker.createtransaction.transaction.data.CalculatorBottomSheetData
+import com.emendo.expensestracker.createtransaction.transaction.data.CreateTransactionCommander
+import com.emendo.expensestracker.createtransaction.transaction.data.FieldWithError
+import com.emendo.expensestracker.createtransaction.transaction.data.getTransactionType
 import com.emendo.expensestracker.data.api.DecimalSeparator
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
@@ -149,7 +153,7 @@ class CreateTransactionViewModel @Inject constructor(
     return super.confirmValueChange(sheetValue, bottomSheetState)
   }
 
-  fun changeTransactionType(type: TransactionType) {
+  override fun updateTransactionType(type: TransactionType) {
     _uiState.update { state ->
       state.copy(
         screenData = state.screenData.copy(transactionType = type),
@@ -193,13 +197,14 @@ class CreateTransactionViewModel @Inject constructor(
     _uiState.update { it.copy(note = newNote) }
   }
 
+  // Keyboard action
   override fun changeTransactionType() {
     if (uiState.value.screenData.transactionType == TransactionType.EXPENSE) {
-      changeTransactionType(TransactionType.INCOME)
+      updateTransactionType(TransactionType.INCOME)
       return
     }
 
-    changeTransactionType(TransactionType.EXPENSE)
+    updateTransactionType(TransactionType.EXPENSE)
   }
 
   override fun onCurrencyClick() {
@@ -431,12 +436,6 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
-  override fun consumeCloseEvent() {
-    _uiState.updateScreenData { state ->
-      state.copy(navigateUp = triggered)
-    }
-  }
-
   override fun consumeShowCalculatorBottomSheet() {
     _bottomSheetState.update { it.copy(show = consumed) }
   }
@@ -464,7 +463,7 @@ class CreateTransactionViewModel @Inject constructor(
       when {
         state.sourceAmountFocused -> state.amount.currency
         state.transferTargetAmountFocused -> checkNotNull(state.transferReceivedAmount?.currency) { "Transfer target amount must not be focused with null Amount" }
-        else -> throw IllegalStateException("There's no focused Amount input. We can't get the currency")
+        else -> state.amount.currency
       }
     } else {
       state.amount.currency

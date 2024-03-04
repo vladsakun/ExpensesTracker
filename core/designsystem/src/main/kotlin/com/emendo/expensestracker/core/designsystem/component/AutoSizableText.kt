@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.TextUnit
 
 @Composable
 fun AutoSizableText(
-  text: String,
+  textProvider: () -> String,
   minFontSize: TextUnit,
   modifier: Modifier = Modifier,
   textAlign: TextAlign? = null,
@@ -31,7 +31,7 @@ fun AutoSizableText(
     var nFontSize = style.fontSize
     val calculateParagraph = @Composable {
       Paragraph(
-        text = text,
+        text = textProvider(),
         style = style.copy(fontSize = nFontSize),
         density = LocalDensity.current,
         fontFamilyResolver = LocalFontFamilyResolver.current,
@@ -51,7 +51,7 @@ fun AutoSizableText(
 
     // Todo discover minIntrinsicWidth, maxIntrinsicWidth
     Text(
-      text = text,
+      text = textProvider(),
       modifier = Modifier
         .fillMaxWidth()
         .align(Alignment.BottomCenter),

@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.createtransaction.transaction
+package com.emendo.expensestracker.createtransaction.transaction.data
 
 sealed interface FieldWithError {
   data object Amount : FieldWithError

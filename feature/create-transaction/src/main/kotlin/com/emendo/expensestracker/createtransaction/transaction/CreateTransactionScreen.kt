@@ -1,8 +1,5 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
-import androidx.annotation.StringRes
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -10,19 +7,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +23,6 @@ import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
-import com.emendo.expensestracker.core.designsystem.theme.PlaceholderTextStyle
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomScreenTransition
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
@@ -42,22 +32,30 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.createtransaction.destinations.SelectCategoryScreenDestination
+import com.emendo.expensestracker.createtransaction.transaction.data.*
+import com.emendo.expensestracker.createtransaction.transaction.design.CreateTransactionRow
+import com.emendo.expensestracker.createtransaction.transaction.design.TopBar
+import com.emendo.expensestracker.createtransaction.transaction.design.TransactionElementRow
+import com.emendo.expensestracker.createtransaction.transaction.design.additional.AdditionalAction
+import com.emendo.expensestracker.createtransaction.transaction.design.amount.Amount
+import com.emendo.expensestracker.createtransaction.transaction.design.amount.EditableAmount
+import com.emendo.expensestracker.createtransaction.transaction.design.amount.TransferAmount
+import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferColumn
+import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferRow
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
-import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.theapache64.rebugger.Rebugger
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.NavigationEventEffect
 import de.palm.composestateevents.triggered
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 
-private val marginVertical = Dimens.margin_large_x
-private val marginHorizontal = Dimens.margin_large_x
-private const val ERROR_ANIMATION_DURATION_MILLIS = 500
-private const val TRANSFER_BLOCK_MIN_HEIGHT = 100
+internal val marginVertical = Dimens.margin_large_x
+internal val marginHorizontal = Dimens.margin_large_x
+internal const val ERROR_ANIMATION_DURATION_MILLIS = 500
+internal const val TRANSFER_BLOCK_MIN_HEIGHT = 100
+private const val CHEVRON_WIDTH = 12
 
 @RootNavGraph(start = true)
 @Destination(style = BottomScreenTransition::class)
@@ -79,7 +77,7 @@ fun CreateTransactionScreen(
       bottomSheetStateProvider = bottomSheetState::value,
       onBackPressed = remember { { navigator.navigateUp() } },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
-      commandProcessor = viewModel::proceedCommand,
+      commandProcessor = remember { viewModel::proceedCommand },
     )
   }
 }
@@ -93,8 +91,69 @@ private fun CreateTransactionContent(
   onBackPressed: () -> Unit,
   commandProcessor: (CreateTransactionCommand) -> Unit,
 ) {
-  val scope = rememberCoroutineScope()
   val scaffoldState = rememberBottomSheetScaffoldState()
+
+  BottomSheetEffects(bottomSheetStateProvider, commandProcessor, scaffoldState)
+
+  BottomSheetScaffold(
+    scaffoldState = scaffoldState,
+    topBar = { TopBar(stateProvider, commandProcessor, onBackPressed) },
+    sheetContent = {
+      val bottomSheetData = bottomSheetStateProvider().data
+      if (bottomSheetData != null) {
+        BottomSheetContent(bottomSheetData)
+      }
+    },
+    // Workaround for issue https://issuetracker.google.com/issues/265444789
+    sheetPeekHeight = 0.dp,
+    modifier = Modifier
+      .consumeWindowInsets(WindowInsets(0, 0, 0, 0))
+      .fillMaxSize(),
+  ) { paddingValues ->
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())
+        .padding(paddingValues),
+    ) {
+      val state = stateProvider()
+
+      Header(state, commandProcessor)
+      if (state.screenData.transactionType != TransactionType.TRANSFER) {
+        // Todo Extract to a common TransferBlock
+        CategorySelection(state.target, onCategoryClick)
+
+        // Todo extract to AccountSelection
+        TransactionElementRow(
+          transactionItem = state.source,
+          label = stringResource(id = R.string.account),
+          onClick = { commandProcessor(OpenAccountListScreenCommand()) },
+          error = state.screenData.sourceError == triggered,
+          onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
+        )
+        ExpeDivider()
+      }
+      // Todo think about commandProcessor passing
+      NoteTextField(
+        text = state.note,
+        onNoteValueChange = { commandProcessor(UpdateNoteTextCommand(it)) },
+        onFocused = { commandProcessor(HideCalculatorBottomSheetCommand()) },
+      )
+      ExpeDivider()
+      SaveButton { commandProcessor(SaveTransactionCommand()) }
+      AdditionalActions(commandProcessor)
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BottomSheetEffects(
+  bottomSheetStateProvider: () -> CreateTransactionBottomSheetState,
+  commandProcessor: (CreateTransactionCommand) -> Unit,
+  scaffoldState: BottomSheetScaffoldState,
+) {
+  val scope = rememberCoroutineScope()
 
   EventEffect(
     event = bottomSheetStateProvider().hide,
@@ -115,107 +174,6 @@ private fun CreateTransactionContent(
       }
     },
   )
-
-  val state = stateProvider()
-
-  // Todo extract navigate up to a separate flow
-  NavigationEventEffect(
-    event = state.screenData.navigateUp,
-    onConsumed = { commandProcessor(ConsumeCloseEventCommand()) },
-    action = onBackPressed,
-  )
-
-  BottomSheetScaffold(
-    scaffoldState = scaffoldState,
-    sheetContent = {
-      val bottomSheetData = bottomSheetStateProvider().data
-      if (bottomSheetData != null) {
-        BottomSheetContent(bottomSheetData)
-      }
-    },
-    // Workaround for issue https://issuetracker.google.com/issues/265444789
-    sheetPeekHeight = 0.dp,
-    topBar = {
-      ExpeCenterAlignedTopBar(
-        title = {
-          val tabsResId = persistentListOf(R.string.income, R.string.expense, R.string.transfer)
-          // Todo improve transaction type switch animation
-          TextSwitch(
-            selectedIndex = state.screenData.transactionType.ordinal,
-            items = tabsResId.map { stringResource(id = it) }.toPersistentList(),
-            onSelectionChange = { tabIndex ->
-              commandProcessor(ChangeTransactionTypeCommand())
-            },
-          )
-        },
-        navigationIcon = { NavigationBackIcon(onNavigationClick = onBackPressed) },
-        actions = persistentListOf(
-          MenuAction(
-            icon = ExpeIcons.Check,
-            onClick = { commandProcessor(SaveTransactionCommand()) },
-            contentDescription = stringResource(id = R.string.confirm),
-          )
-        ),
-      )
-    },
-    modifier = Modifier
-      .consumeWindowInsets(WindowInsets(0, 0, 0, 0))
-      .fillMaxSize(),
-  ) { paddingValues ->
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())
-        .padding(paddingValues)
-        .imePadding(),
-    ) {
-      Header(state, commandProcessor)
-      ExpeDivider()
-      if (state.screenData.transactionType != TransactionType.TRANSFER) {
-        TransactionElementRow(
-          transactionItem = state.target,
-          label = stringResource(id = R.string.category),
-          onClick = onCategoryClick,
-        )
-        TransactionElementRow(
-          transactionItem = state.source,
-          label = stringResource(id = R.string.account),
-          onClick = { commandProcessor(OpenAccountListScreenCommand()) },
-          error = state.screenData.sourceError == triggered,
-          onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
-        )
-        ExpeDivider()
-      }
-      NoteTextField(
-        text = state.note,
-        onNoteValueChange = { commandProcessor(UpdateNoteTextCommand(it)) },
-        onFocused = {
-          commandProcessor(HideCalculatorBottomSheetCommand())
-        },
-      )
-      ExpeDivider()
-      VerticalSpacer(marginVertical)
-      SaveButton { commandProcessor(SaveTransactionCommand()) }
-      VerticalSpacer(marginVertical)
-      Column {
-        CreateTransactionRow(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(marginVertical),
-        ) {
-          AdditionalAction(
-            titleResId = R.string.delete,
-            icon = ExpeIcons.Delete,
-            onClick = { commandProcessor(ShowConfirmDeleteTransactionBottomSheetCommand()) },
-          )
-          AdditionalAction(
-            titleResId = R.string.duplicate,
-            icon = ExpeIcons.FileCopy,
-            onClick = { commandProcessor(DuplicateTransactionCommand()) },
-          )
-        }
-      }
-    }
-  }
 }
 
 @Composable
@@ -223,105 +181,184 @@ private inline fun Header(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
 ) {
+  if (state.screenData.transactionType == TransactionType.TRANSFER) {
+    TransferBlock(state, commandProcessor)
+  } else {
+    IncomeExpenseBlock(state, commandProcessor)
+  }
+  ExpeDivider()
+}
+
+@Composable
+private inline fun IncomeExpenseBlock(
+  state: CreateTransactionUiState,
+  crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+) {
   val focusManager = LocalFocusManager.current
 
-  if (state.screenData.transactionType == TransactionType.TRANSFER) {
-    TransferRow {
-      TransferColumn {
-        val source = state.source
-        if (source == null) {
-          CreateAccountButton { commandProcessor(OpenAccountListScreenCommand()) }
-        } else {
-          TransferAccount({ commandProcessor(OpenAccountListScreenCommand()) }, source)
-          Column(
-            modifier = Modifier
-              .clickable(onClick = { commandProcessor(ShowCalculatorBottomSheetCommand()) })
-          ) {
-            TransferAmount(text = state.amount.formattedValue)
-            EditableAmount(
-              text = state.amountCalculatorHint,
-              focused = state.sourceAmountFocused,
-            )
-          }
-        }
-      }
-      Chevron()
-      TransferColumn {
-        val target = state.target
-        if (target == null) {
-          CreateAccountButton { commandProcessor(OpenAccountListScreenCommand()) }
-        } else {
-          TransferAccount({ commandProcessor(SelectTransferTargetAccountCommand()) }, target)
-          Column(
-            modifier = Modifier
-              .clickable(onClick = { commandProcessor(ShowCalculatorBottomSheetCommand(false)) })
-          ) {
-            state.transferReceivedAmount?.let { amount ->
-              TransferAmount(
-                text = amount.formattedValue,
-                textColor = if (state.isCustomTransferAmount) MaterialTheme.customColorsPalette.successColor else MaterialTheme.colorScheme.outline,
-              )
-              EditableAmount(
-                text = state.transferReceivedCalculatorHint,
-                focused = state.transferTargetAmountFocused,
-              )
-            }
-          }
-        }
-      }
-    }
-  } else {
-    Column(
+  Column(
+    modifier = Modifier
+      .clickable {
+        commandProcessor(ShowCalculatorBottomSheetCommand())
+        focusManager.clearFocus(force = true)
+      },
+  ) {
+    // Todo fix Amount recomposition on note edit
+    Rebugger(
+      trackMap = mapOf(
+        "formattedValue" to state.amount.formattedValue,
+        "transactionType" to state.screenData.transactionType,
+        "amountError" to state.screenData.amountError,
+        "commandProcessor" to { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) },
+      )
+    )
+    Amount(
+      text = { state.amount.formattedValue },
+      transactionType = { state.screenData.transactionType },
+      error = state.screenData.amountError == triggered,
+      onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) },
+    )
+    EditableAmount(
+      text = state.amountCalculatorHint,
+      focused = state.sourceAmountFocused,
       modifier = Modifier
-        .clickable {
-          commandProcessor(ShowCalculatorBottomSheetCommand())
-          focusManager.clearFocus(force = true)
-        },
-    ) {
-      Amount(
-        text = state.amount.formattedValue,
-        transactionType = state.screenData.transactionType,
-        error = state.screenData.amountError == triggered,
-        onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) },
+        .fillMaxWidth()
+        .padding(horizontal = marginHorizontal, vertical = Dimens.margin_small_xx),
+    )
+  }
+}
+
+@Composable
+private inline fun TransferBlock(
+  state: CreateTransactionUiState,
+  crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+) {
+  TransferRow {
+    TransferSource(state, commandProcessor)
+    Chevron(
+      width = CHEVRON_WIDTH.dp,
+      height = TRANSFER_BLOCK_MIN_HEIGHT.dp,
+    )
+    TransferTarget(state, commandProcessor)
+  }
+}
+
+@Composable
+private inline fun RowScope.TransferSource(
+  state: CreateTransactionUiState,
+  crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+) {
+  TransferEntity(
+    transactionItemModel = state.source,
+    amountCommand = ShowCalculatorBottomSheetCommand(),
+    commandProcessor = commandProcessor,
+  ) {
+    TransferAmount(text = state.amount.formattedValue)
+    EditableAmount(
+      text = state.amountCalculatorHint,
+      focused = state.sourceAmountFocused,
+    )
+  }
+}
+
+@Composable
+private inline fun RowScope.TransferTarget(
+  state: CreateTransactionUiState,
+  crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+) {
+  TransferEntity(
+    transactionItemModel = state.target,
+    commandProcessor = commandProcessor,
+    amountCommand = ShowCalculatorBottomSheetCommand(false),
+  ) {
+    state.transferReceivedAmount?.let { amount ->
+      TransferAmount(
+        text = amount.formattedValue,
+        textColor = transferTextColor(state),
       )
       EditableAmount(
-        text = state.amountCalculatorHint,
-        focused = state.sourceAmountFocused,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = marginHorizontal, vertical = Dimens.margin_small_xx),
+        text = state.transferReceivedCalculatorHint,
+        focused = state.transferTargetAmountFocused,
       )
     }
   }
 }
 
 @Composable
-private fun EditableAmount(
-  text: String,
-  focused: Boolean,
-  modifier: Modifier = Modifier,
+private inline fun RowScope.TransferEntity(
+  transactionItemModel: TransactionItemModel?,
+  amountCommand: CreateTransactionCommand,
+  crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  crossinline amountBlock: @Composable ColumnScope.() -> Unit,
 ) {
-  AutoSizableTextField(
-    text = text,
-    minFontSize = MaterialTheme.typography.labelSmall.fontSize,
-    textAlign = TextAlign.End,
-    style = MaterialTheme.typography.labelSmall,
-    maxLines = 1,
-    focused = focused,
-    modifier = modifier,
+  TransferColumn {
+    if (transactionItemModel == null) {
+      CreateAccountButton { commandProcessor(OpenAccountListScreenCommand()) }
+      return
+    }
+
+    TransferAccount({ commandProcessor(SelectTransferTargetAccountCommand()) }, transactionItemModel)
+    Column(
+      modifier = Modifier.clickable(onClick = { commandProcessor(amountCommand) }),
+    ) {
+      amountBlock()
+    }
+  }
+}
+
+@Composable
+private fun transferTextColor(state: CreateTransactionUiState) =
+  if (state.isCustomTransferAmount) {
+    MaterialTheme.customColorsPalette.successColor
+  } else {
+    MaterialTheme.colorScheme.outline
+  }
+
+@Composable
+private fun AdditionalActions(commandProcessor: (CreateTransactionCommand) -> Unit) {
+  Column {
+    CreateTransactionRow(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(marginVertical),
+    ) {
+      AdditionalAction(
+        titleResId = R.string.delete,
+        icon = ExpeIcons.Delete,
+        onClick = { commandProcessor(ShowConfirmDeleteTransactionBottomSheetCommand()) },
+      )
+      AdditionalAction(
+        titleResId = R.string.duplicate,
+        icon = ExpeIcons.FileCopy,
+        onClick = { commandProcessor(DuplicateTransactionCommand()) },
+      )
+    }
+  }
+}
+
+@Composable
+private fun CategorySelection(
+  category: TransactionItemModel?,
+  onCategoryClick: () -> Unit,
+) {
+  TransactionElementRow(
+    transactionItem = category,
+    label = stringResource(id = R.string.category),
+    onClick = onCategoryClick,
   )
 }
 
 @Composable
-private fun SaveButton(onClick: () -> Unit) {
+private fun SaveButton(
+  onClick: () -> Unit,
+) {
   ExpeButton(
     textResId = R.string.save_transaction,
     onClick = onClick,
-    modifier = Modifier.padding(horizontal = marginHorizontal)
+    modifier = Modifier
+      .padding(horizontal = marginHorizontal, vertical = marginVertical)
   )
 }
 
-// Todo hide calculator bottom sheet on note focus
 @Composable
 private fun NoteTextField(
   text: String?,
@@ -354,56 +391,8 @@ private fun CreateAccountButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun RowScope.TransferColumn(content: @Composable ColumnScope.() -> Unit) {
-  Column(
-    modifier = Modifier.weight(1f),
-    verticalArrangement = Arrangement.Center,
-    content = content,
-  )
-}
-
-@Composable
-private fun TransferRow(content: @Composable RowScope.() -> Unit) {
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .defaultMinSize(minHeight = TRANSFER_BLOCK_MIN_HEIGHT.dp)
-      .padding(horizontal = marginHorizontal, vertical = marginVertical),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(marginVertical),
-    content = content,
-  )
-}
-
-@Composable
-private fun Chevron() {
-  Chevron(
-    modifier = Modifier
-      .width(12.dp)
-      .height(TRANSFER_BLOCK_MIN_HEIGHT.dp)
-  )
-}
-
-@Composable
-private fun TransferAmount(
-  text: String,
-  modifier: Modifier = Modifier,
-  textColor: Color = MaterialTheme.typography.headlineMedium.color,
-) {
-  AutoSizableText(
-    text = text,
-    modifier = modifier,
-    minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
-    style = MaterialTheme.typography.headlineMedium,
-    color = textColor,
-    textAlign = TextAlign.End,
-    maxLines = 1,
-  )
-}
-
-@Composable
-private fun TransferAccount(
-  onClick: () -> Unit,
+private inline fun TransferAccount(
+  noinline onClick: () -> Unit,
   account: TransactionItemModel,
 ) {
   Row(
@@ -431,52 +420,6 @@ private fun TransferAccount(
 }
 
 @Composable
-private fun RowScope.AdditionalAction(
-  @StringRes titleResId: Int,
-  icon: ImageVector,
-  onClick: () -> Unit,
-  enabled: Boolean = true,
-) {
-  ExpeButtonWithIcon(
-    titleResId = titleResId,
-    icon = icon,
-    onClick = onClick,
-    enabled = enabled,
-    modifier = Modifier
-      .weight(1f)
-      .heightIn(min = Dimens.icon_button_size),
-  )
-}
-
-@Composable
-private fun Amount(
-  text: String,
-  transactionType: TransactionType,
-  error: Boolean,
-  onErrorConsumed: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  val backgroundColor = animateColorAsState(
-    targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
-    finishedListener = { onErrorConsumed() },
-    animationSpec = tween(ERROR_ANIMATION_DURATION_MILLIS),
-    label = "error"
-  )
-  AutoSizableText(
-    text = text,
-    minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
-    color = transactionType.amountColor(),
-    style = MaterialTheme.typography.headlineMedium,
-    textAlign = TextAlign.End,
-    maxLines = 1,
-    modifier = modifier
-      .fillMaxWidth()
-      .drawBehind { drawRect(backgroundColor.value) }
-      .padding(horizontal = marginHorizontal),
-  )
-}
-
-@Composable
 private fun ColumnScope.BottomSheetContent(sheetData: BottomSheetData) {
   when (sheetData) {
     is CalculatorBottomSheetData -> {
@@ -492,87 +435,6 @@ private fun ColumnScope.BottomSheetContent(sheetData: BottomSheetData) {
 
     is GeneralBottomSheetData -> GeneralBottomSheet(sheetData)
   }
-}
-
-@Composable
-private fun TransactionElementRow(
-  transactionItem: TransactionItemModel?,
-  label: String,
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-  error: Boolean = false,
-  onErrorConsumed: () -> Unit = {},
-) {
-  val backgroundColor = animateColorAsState(
-    targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
-    finishedListener = { onErrorConsumed() },
-    animationSpec = tween(ERROR_ANIMATION_DURATION_MILLIS),
-    label = "error"
-  )
-  CreateTransactionRow(
-    modifier = modifier
-      .clickable(onClick = onClick)
-      .drawBehind { drawRect(backgroundColor.value) },
-  ) {
-    Text(
-      text = label,
-      style = PlaceholderTextStyle,
-    )
-    Spacer(modifier = Modifier.width(Dimens.margin_small_x))
-    Spacer(modifier = Modifier.weight(1f))
-    transactionItem?.let { model ->
-      TransactionElement(
-        icon = model.icon.imageVector,
-        title = model.name.stringValue(),
-        tint = model.color.color,
-      )
-    }
-  }
-  ExpeDivider()
-}
-
-@Composable
-private fun TransactionElement(
-  icon: ImageVector,
-  title: String,
-  tint: Color,
-) {
-  Icon(
-    imageVector = icon,
-    contentDescription = null,
-    tint = tint,
-  )
-  Spacer(modifier = Modifier.width(Dimens.margin_small_xx))
-  Text(
-    text = title,
-    textAlign = TextAlign.End,
-    overflow = TextOverflow.Ellipsis,
-    maxLines = 1,
-  )
-}
-
-@Composable
-private fun CreateTransactionRow(
-  modifier: Modifier = Modifier,
-  horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-  content: @Composable RowScope.() -> Unit,
-) {
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = horizontalArrangement,
-    modifier = modifier.padding(vertical = marginVertical, horizontal = marginHorizontal),
-    content = content,
-  )
-}
-
-@Composable
-@ReadOnlyComposable
-fun TransactionType.amountColor(): Color {
-  if (this == TransactionType.INCOME) {
-    return MaterialTheme.customColorsPalette.successColor
-  }
-
-  return LocalTextStyle.current.color
 }
 
 @ExpePreview

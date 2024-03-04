@@ -9,6 +9,7 @@ android {
 
 dependencies {
   api(projects.core.modelUi)
+  api(libs.rebugger)
 
   implementation(projects.core.designsystem)
   implementation(projects.core.model)

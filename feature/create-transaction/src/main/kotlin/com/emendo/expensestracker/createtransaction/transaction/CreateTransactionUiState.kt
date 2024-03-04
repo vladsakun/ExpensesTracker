@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
@@ -13,6 +14,7 @@ import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
+@Immutable
 data class CreateTransactionUiState(
   val amount: Amount,
   val screenData: CreateTransactionScreenData,
@@ -34,7 +36,6 @@ data class CreateTransactionScreenData(
   val duplicateEnabled: Boolean = false,
   val amountError: StateEvent = consumed,
   val sourceError: StateEvent = consumed,
-  val navigateUp: StateEvent = consumed,
 )
 
 data class CreateTransactionBottomSheetState(
