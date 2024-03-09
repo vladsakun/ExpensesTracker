@@ -14,7 +14,7 @@ android {
   compileSdk = libs.versions.compileSdk.get().toInt()
 
   // Todo uncomment when baseline profile is ready
-  //  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
+  experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
 
   defaultConfig {
     applicationId = "com.emendo.expensestracker"
@@ -91,7 +91,6 @@ dependencies {
 
   implementation(projects.sync.work)
 
-  implementation(libs.accompanist.systemuicontroller)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core.ktx)
@@ -103,7 +102,7 @@ dependencies {
   implementation(libs.compose.destinations)
   implementation(libs.kotlinx.datetime)
   implementation(libs.rebugger)
-  //  implementation(libs.androidx.profileinstaller)
+  implementation(libs.androidx.profileinstaller)
 
   baselineProfile(projects.baselineprofile)
 

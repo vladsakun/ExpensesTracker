@@ -44,8 +44,6 @@ class MainActivity : ComponentActivity() {
     // This also sets up the initial system bar style based on the platform theme
     enableEdgeToEdge()
 
-    var isNavControllerInitialized = false
-
     setContent {
       val darkTheme = isSystemInDarkTheme()
       val navController = rememberNavController()

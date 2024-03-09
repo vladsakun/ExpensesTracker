@@ -1,5 +1,4 @@
 [versions]
-accompanist = "0.32.0"
 androidGradlePlugin = "8.3.0"
 androidxActivity = "1.8.2"
 androidxAppCompat = "1.6.1"
@@ -27,7 +26,7 @@ androidxUiAutomator = "2.3.0"
 androidxWindowManager = "1.2.0"
 androidxWork = "2.9.0"
 coil = "2.5.0"
-firebaseBom = "32.7.2"
+firebaseBom = "32.7.3"
 firebaseCrashlyticsPlugin = "2.9.9"
 firebasePerfPlugin = "1.4.2"
 gmsPlugin = "4.4.1"
@@ -38,11 +37,11 @@ hiltExt = "1.2.0"
 jacoco = "0.8.7"
 junit4 = "4.13.2"
 kotlin = "1.9.22"
-kotlinxCoroutines = "1.7.3"
+kotlinxCoroutines = "1.8.0"
 kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.2"
 ksp = "1.9.22-1.0.17"
-lint = "31.2.2"
+lint = "31.3.0"
 okhttp = "4.12.0"
 protobuf = "3.24.4"
 protobufPlugin = "0.9.4"
@@ -67,10 +66,6 @@ targetSdk = "34"
 minSdk = "26"
 
 [libraries]
-accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
-accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
-accompanist-testharness = { group = "com.google.accompanist", name = "accompanist-testharness", version.ref = "accompanist" }
-accompanist-navigation = { group = "com.google.accompanist", name = "accompanist-navigation-material", version.ref = "accompanist" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "androidxMacroBenchmark" }
