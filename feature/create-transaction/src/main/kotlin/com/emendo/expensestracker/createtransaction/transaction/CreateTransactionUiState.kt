@@ -11,6 +11,7 @@ import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.TextValue
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -20,6 +21,7 @@ data class CreateTransactionUiState(
   val screenData: CreateTransactionScreenData,
   val target: TransactionItemModel?,
   val source: TransactionItemModel?,
+  val accounts: ImmutableList<AccountUiModel>,
   val note: String? = null,
   val transferReceivedAmount: Amount? = null,
   val isCustomTransferAmount: Boolean = false,
@@ -27,6 +29,13 @@ data class CreateTransactionUiState(
   val transferTargetAmountFocused: Boolean = false,
   val amountCalculatorHint: String = "",
   val transferReceivedCalculatorHint: String = "",
+)
+
+data class AccountUiModel(
+  val id: Long,
+  val name: TextValue,
+  val icon: IconModel,
+  val selected: Boolean,
 )
 
 @Stable

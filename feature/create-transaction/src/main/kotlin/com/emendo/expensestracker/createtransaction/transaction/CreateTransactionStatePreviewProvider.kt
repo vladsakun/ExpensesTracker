@@ -6,6 +6,7 @@ import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.textValueOf
+import kotlinx.collections.immutable.persistentListOf
 
 internal class CreateTransactionStatePreviewProvider : PreviewParameterProvider<CreateTransactionUiState> {
 
@@ -14,6 +15,7 @@ internal class CreateTransactionStatePreviewProvider : PreviewParameterProvider<
     screenData = CreateTransactionScreenData(transactionType = TransactionType.DEFAULT),
     target = TransactionItemModel(IconModel.CHILDCARE, textValueOf("Childcare"), ColorModel.Base),
     source = TransactionItemModel(IconModel.CREDITCARD, textValueOf("Card"), ColorModel.Purple),
+    accounts = persistentListOf(),
   )
 
   override val values: Sequence<CreateTransactionUiState> = sequenceOf(data)

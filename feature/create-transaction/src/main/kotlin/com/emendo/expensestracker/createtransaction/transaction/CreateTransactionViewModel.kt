@@ -31,16 +31,20 @@ import com.emendo.expensestracker.createtransaction.transaction.domain.*
 import com.emendo.expensestracker.createtransaction.transaction.domain.GetDefaultAmountUseCase.Companion.DEFAULT_AMOUNT_VALUE
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
+import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.labelResId
+import com.emendo.expensestracker.data.api.repository.AccountRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -52,6 +56,7 @@ private const val CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG = "create_transac
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(
   getUsedCurrenciesUseCase: GetUsedCurrenciesUseCase,
+  private val accountRepository: AccountRepository,
   private val numericKeyboardCommander: NumericKeyboardCommander,
   private val amountFormatter: AmountFormatter,
   private val createTransactionController: CreateTransactionController,
@@ -75,6 +80,7 @@ class CreateTransactionViewModel @Inject constructor(
     _uiState,
     createTransactionController.getTarget(),
     createTransactionController.getSource(),
+    accountRepository.getAccounts(),
     transform = ::combineCreateTransactionUiState,
   )
     .stateInWhileSubscribed(viewModelScope, getDefaultCreateTransactionUiState())
@@ -472,14 +478,30 @@ class CreateTransactionViewModel @Inject constructor(
     uiState: CreateTransactionUiState,
     target: TransactionTarget?,
     source: TransactionSource?,
+    accounts: List<AccountModel>,
   ): CreateTransactionUiState {
     val screenData = uiState.screenData
+    // Todo extract to mapper
+    val accountUiModels = mapAccounts(accounts, source)
 
     return uiState.copy(
       target = target.orDefault(screenData.transactionType),
       source = source?.toTransactionItemModel(),
+      accounts = accountUiModels,
     )
   }
+
+  private fun mapAccounts(
+    accounts: List<AccountModel>,
+    source: TransactionSource?,
+  ): ImmutableList<AccountUiModel> = accounts.map {
+    AccountUiModel(
+      id = it.id,
+      name = it.name,
+      icon = it.icon,
+      selected = it.id == source?.id,
+    )
+  }.toPersistentList()
 
   /**
    * Checks if the user really changed Amount. Prevents state change on just focusing transfer target amount
@@ -520,6 +542,7 @@ class CreateTransactionViewModel @Inject constructor(
       note = payload?.note,
       sourceAmountFocused = payload == null,
       transferReceivedAmount = payload?.transferReceivedAmount,
+      accounts = mapAccounts(accountRepository.getAccountsSnapshot(), createTransactionController.getSourceSnapshot()),
     )
   }
 

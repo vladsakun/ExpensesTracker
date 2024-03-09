@@ -3,6 +3,9 @@ package com.emendo.expensestracker.createtransaction.transaction
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -49,6 +52,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.theapache64.rebugger.Rebugger
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
 internal val marginVertical = Dimens.margin_large_x
@@ -82,7 +86,7 @@ fun CreateTransactionScreen(
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun CreateTransactionContent(
   stateProvider: () -> CreateTransactionUiState,
@@ -124,14 +128,17 @@ private fun CreateTransactionContent(
         CategorySelection(state.target, onCategoryClick)
 
         // Todo extract to AccountSelection
-        TransactionElementRow(
-          transactionItem = state.source,
-          label = stringResource(id = R.string.account),
-          onClick = { commandProcessor(OpenAccountListScreenCommand()) },
-          error = state.screenData.sourceError == triggered,
-          onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
-        )
-        ExpeDivider()
+        //        TransactionElementRow(
+        //          transactionItem = state.source,
+        //          label = stringResource(id = R.string.account),
+        //          onClick = { commandProcessor(OpenAccountListScreenCommand()) },
+        //          error = state.screenData.sourceError == triggered,
+        //          onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
+        //        )
+        //        ExpeDivider()
+
+        // Todo fix Account recomposition on state change
+        Accounts(state.accounts)
       }
       // Todo think about commandProcessor passing
       NoteTextField(
@@ -144,6 +151,46 @@ private fun CreateTransactionContent(
       AdditionalActions(commandProcessor)
     }
   }
+}
+
+@Composable
+private fun Accounts(accountUiModels: ImmutableList<AccountUiModel>) {
+  if (accountUiModels.isNotEmpty()) {
+    LazyHorizontalStaggeredGrid(
+      rows = StaggeredGridCells.Fixed(2),
+      horizontalItemSpacing = 8.dp,
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+      contentPadding = PaddingValues(horizontal = marginHorizontal, vertical = marginVertical),
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(128.dp),
+    ) {
+      items(accountUiModels) { account ->
+        AccountChip(accountUiModel = account) {}
+      }
+    }
+
+    ExpeDivider()
+  }
+}
+
+@Composable
+fun AccountChip(accountUiModel: AccountUiModel, onClick: () -> Unit) {
+  FilterChip(
+    modifier = Modifier.heightIn(min = 48.dp),
+    onClick = onClick,
+    label = {
+      Text(accountUiModel.name.stringValue())
+    },
+    selected = accountUiModel.selected,
+    leadingIcon = {
+      Icon(
+        imageVector = accountUiModel.icon.imageVector,
+        contentDescription = "Done icon",
+        modifier = Modifier.size(FilterChipDefaults.IconSize)
+      )
+    }
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
