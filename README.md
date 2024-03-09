@@ -12,7 +12,7 @@ Engineering To-Do:
 4) [ ] Support foldable devices
 5) [ ] Export data via GDrive
 6) [ ] Baseline profiles
-7) [ ] Dynamic colors
+7) [x] Dynamic colors
 
 Features:
 

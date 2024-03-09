@@ -23,7 +23,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
           resourceConfigurations += setOf("en")
           ndk {
             try {
-              val localProperties = gradleLocalProperties(rootDir)
+              val localProperties = gradleLocalProperties(rootDir, providers)
               val localAbiFilters = localProperties.getProperty("android.abis").split(",")
               // Removing all ABI except ARM
               // Remove if we need to support x86
