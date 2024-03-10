@@ -10,13 +10,16 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_3_API_28.avd" />
+                  <value value="$USER_HOME$/.android/avd/Pixel_6_API_34.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-03-09T10:12:30.129123Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-03-10T06:31:48.903894Z" />
         </State>
+      </entry>
+      <entry key="StartupBenchmarks">
+        <State />
       </entry>
       <entry key="app">
         <State>

@@ -3,7 +3,6 @@ package com.emendo.expensestracker
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,13 +39,8 @@ class BaselineProfileGenerator {
 
   @Test
   fun generate() {
-    // This example works only with the variant with application id `com.emendo.expensestracker`."
-    rule.collect(
-      packageName = "com.emendo.expensestracker",
-
-      // See: https://d.android.com/topic/performance/baselineprofiles/dex-layout-optimizations
-      includeInStartupProfile = true
-    ) {
+    // The application id for the running build variant is read from the instrumentation arguments.
+    rule.collect("com.emendo.expensestracker") {
       // This block defines the app's critical user journey. Here we are interested in
       // optimizing for app startup. But you can also navigate and scroll through your most important UI.
 

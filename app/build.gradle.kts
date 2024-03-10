@@ -12,6 +12,7 @@ plugins {
 
 android {
   compileSdk = libs.versions.compileSdk.get().toInt()
+  namespace = "com.emendo.expensestracker"
 
   // Todo uncomment when baseline profile is ready
   experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
@@ -38,6 +39,9 @@ android {
   }
 
   buildTypes {
+    getByName("release") {
+      signingConfig = signingConfigs.getByName("release")
+    }
     debug {
       applicationIdSuffix = ExpeBuildType.DEBUG.applicationIdSuffix
       isDebuggable = true
@@ -48,20 +52,10 @@ android {
       isMinifyEnabled = true
       isShrinkResources = true
       isDebuggable = false
-      //      signingConfig = signingConfigs.getByName("release")
+      signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 
-    create("benchmark") {
-      // Enable all the optimizations from release build through initWith(release).
-      initWith(release)
-      matchingFallbacks += listOf("release")
-      // Debug key signing is available to everyone.
-      signingConfig = signingConfigs.getByName("debug")
-      isDebuggable = false
-      isMinifyEnabled = true
-      proguardFiles("benchmark-rules.pro")
-    }
   }
 
   compileOptions {
@@ -69,7 +63,12 @@ android {
     targetCompatibility = JavaVersion.VERSION_18
   }
 
-  namespace = "com.emendo.expensestracker"
+  packaging {
+    // Multiple dependency bring these files in. Exclude them to enable
+    // our test APK to build (has no effect on our AARs)
+    resources.excludes += "/META-INF/AL2.0"
+    resources.excludes += "/META-INF/LGPL2.1"
+  }
 }
 
 dependencies {

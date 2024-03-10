@@ -11,7 +11,7 @@ Engineering To-Do:
 3) [x] api modules (data.api)
 4) [ ] Support foldable devices
 5) [ ] Export data via GDrive
-6) [ ] Baseline profiles
+6) [x] Baseline profiles
 7) [x] Dynamic colors
 
 Features:

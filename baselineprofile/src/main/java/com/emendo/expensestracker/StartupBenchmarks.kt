@@ -7,7 +7,6 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +22,7 @@ import org.junit.runner.RunWith
  * Studio as an instrumentation test, or run all benchmarks for a variant, for example benchmarkRelease,
  * with this Gradle task:
  * ```
- * ./gradlew :baselineprofile2:connectedBenchmarkReleaseAndroidTest
+ * ./gradlew :baselineprofile:connectedBenchmarkReleaseAndroidTest
  * ```
  *
  * You should run the benchmarks on a physical device, not an Android emulator, because the
@@ -48,7 +47,7 @@ class StartupBenchmarks {
     benchmark(CompilationMode.Partial(BaselineProfileMode.Require))
 
   private fun benchmark(compilationMode: CompilationMode) {
-    // This example works only with the variant with application id `com.emendo.expensestracker`."
+    // The application id for the running build variant is read from the instrumentation arguments.
     rule.measureRepeated(
       packageName = "com.emendo.expensestracker",
       metrics = listOf(StartupTimingMetric()),

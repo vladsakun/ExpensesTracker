@@ -7,16 +7,16 @@ plugins {
 }
 
 android {
-  namespace = "com.emendo.expensestracker"
+  namespace = "com.emendo.expensestracker.baselineprofile"
   compileSdk = 34
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_18
+    targetCompatibility = JavaVersion.VERSION_18
   }
 
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = JavaVersion.VERSION_18.toString()
   }
 
   defaultConfig {
@@ -29,10 +29,10 @@ android {
   targetProjectPath = ":app"
 
   testOptions.managedDevices.devices {
-    create<ManagedVirtualDevice>("pixel6Api31") {
+    create<ManagedVirtualDevice>("pixel6Api34") {
       device = "Pixel 6"
-      apiLevel = 31
-      systemImageSource = "aosp"
+      apiLevel = 34
+      systemImageSource = "google"
     }
   }
 }
@@ -40,7 +40,7 @@ android {
 // This is the configuration block for the Baseline Profile plugin.
 // You can specify to run the generators on a managed devices or connected devices.
 baselineProfile {
-  managedDevices += "pixel6Api31"
+  managedDevices += "pixel6Api34"
   useConnectedDevices = false
 }
 
