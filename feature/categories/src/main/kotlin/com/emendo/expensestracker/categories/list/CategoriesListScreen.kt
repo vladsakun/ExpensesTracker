@@ -75,7 +75,7 @@ fun CategoriesListRoute(
           if (viewModel.isEditMode) {
             navigator.navigate(CategoryDetailScreenDestination(category.category.id))
           } else {
-            viewModel.openCreateTransactionScreen(category)
+            navigator.navigate(viewModel.getCreateTransactionScreenRoute(category))
           }
         }
       },

@@ -3,7 +3,7 @@ package com.emendo.expensestracker.categories.list
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.app.base.api.AppNavigationEvent
+import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
@@ -21,6 +21,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
+import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.label
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toCategoryType
@@ -44,10 +45,10 @@ private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_c
 class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appContext: Application,
-  private val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
+  private val appNavigationEventBus: AppNavigationEventBus,
   private val categoryRepository: CategoryRepository,
-  @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
+  private val createTransactionScreenApi: CreateTransactionScreenApi,
 ) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
   /**
@@ -85,15 +86,12 @@ class CategoriesListViewModel @Inject constructor(
   private var selectedPageIndex = DEFAULT_PAGE_INDEX
   private var categoriesOrderedList: List<CategoryWithTotal>? = null
 
-  fun openCreateTransactionScreen(category: CategoryWithTotal) {
-    appNavigationEventBus.navigate(
-      AppNavigationEvent.CreateTransaction(
-        source = null,
-        target = toCategoryModel(category.category),
-        shouldNavigateUp = true
-      )
+  fun getCreateTransactionScreenRoute(category: CategoryWithTotal): String =
+    createTransactionScreenApi.getRoute(
+      source = null,
+      target = toCategoryModel(category.category),
+      shouldNavigateUp = true
     )
-  }
 
   fun pageSelected(pageIndex: Int) {
     selectedPageIndex = pageIndex
@@ -137,7 +135,7 @@ class CategoriesListViewModel @Inject constructor(
 
   private fun deleteCategory(categoryId: Long) {
     hideModalBottomSheet()
-    viewModelScope.launch(ioDispatcher) {
+    viewModelScope.launch {
       handleDragEvents(categoriesOrderedList)
       categoryRepository.deleteCategory(categoryId)
     }

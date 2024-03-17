@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
+import com.emendo.expensestracker.core.designsystem.component.HorizontalSpacer
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.PlaceholderTextStyle
 import com.emendo.expensestracker.core.ui.stringValue
@@ -25,12 +26,12 @@ import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 
 @Composable
 internal fun TransactionElementRow(
-  transactionItem: TransactionItemModel?,
   label: String,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   error: Boolean = false,
   onErrorConsumed: () -> Unit = {},
+  endContent: @Composable () -> Unit,
 ) {
   val backgroundColor = animateColorAsState(
     targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
@@ -49,6 +50,27 @@ internal fun TransactionElementRow(
     )
     Spacer(modifier = Modifier.width(Dimens.margin_small_x))
     Spacer(modifier = Modifier.weight(1f))
+    endContent()
+  }
+  ExpeDivider()
+}
+
+@Composable
+internal fun TransactionElementRow(
+  transactionItem: TransactionItemModel?,
+  label: String,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  error: Boolean = false,
+  onErrorConsumed: () -> Unit = {},
+) {
+  TransactionElementRow(
+    label = label,
+    onClick = onClick,
+    modifier = modifier,
+    error = error,
+    onErrorConsumed = onErrorConsumed,
+  ) {
     transactionItem?.let { model ->
       TransactionElement(
         icon = model.icon.imageVector,
@@ -57,7 +79,6 @@ internal fun TransactionElementRow(
       )
     }
   }
-  ExpeDivider()
 }
 
 @Composable
@@ -71,7 +92,7 @@ private fun TransactionElement(
     contentDescription = null,
     tint = tint,
   )
-  Spacer(modifier = Modifier.width(Dimens.margin_small_xx))
+  HorizontalSpacer(Dimens.margin_small_xx)
   Text(
     text = title,
     textAlign = TextAlign.End,

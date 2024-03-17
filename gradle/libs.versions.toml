@@ -148,6 +148,10 @@ compose-state-events = { group = "com.github.leonard-palm", name = "compose-stat
 paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingVersion" }
 paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingVersion" }
 rebugger = { group = "io.github.theapache64", name = "rebugger", version.ref = "rebugger" }
+dagger-auto-core = { group = "se.ansman.dagger.auto", name = "core", version = "1.0.0" }
+dagger-auto-compiler = { group = "se.ansman.dagger.auto", name = "compiler", version = "1.0.0" }
+dagger-auto-android = { group = "se.ansman.dagger.auto", name = "android", version = "1.0.0" }
+javax-inject = { group = "javax.inject", name = "javax.inject", version = "1" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

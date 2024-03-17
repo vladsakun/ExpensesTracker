@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
-import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
 
 @Composable
 fun ExpeButton(
@@ -30,6 +29,7 @@ fun ExpeButton(
   contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   textStyle: TextStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+  fillWidth: Boolean = true,
 ) {
   ExpeButton(
     text = stringResource(id = textResId),
@@ -42,6 +42,7 @@ fun ExpeButton(
     contentPadding = contentPadding,
     interactionSource = interactionSource,
     textStyle = textStyle,
+    fillWidth = fillWidth,
   )
 }
 
@@ -58,11 +59,12 @@ fun ExpeButton(
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   textColor: Color? = null,
   textStyle: TextStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+  fillWidth: Boolean = true,
 ) {
   Button(
     onClick = onClick,
-    modifier = modifier.fillMaxWidth(),
-    shape = RoundedCornerNormalRadiusShape,
+    modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
+    //    shape = RoundedCornerNormalRadiusShape,
     enabled = enabled,
     colors = colors,
     elevation = elevation,
@@ -95,7 +97,7 @@ fun ExpeButtonWithIcon(
   Button(
     onClick = onClick,
     modifier = modifier,
-    shape = RoundedCornerNormalRadiusShape,
+    //    shape = RoundedCornerNormalRadiusShape,
     enabled = enabled,
     colors = colors,
     elevation = elevation,

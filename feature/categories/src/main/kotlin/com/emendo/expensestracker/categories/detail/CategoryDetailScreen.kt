@@ -3,14 +3,13 @@ package com.emendo.expensestracker.categories.detail
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.common.CategoryContent
 import com.emendo.expensestracker.categories.common.command.CategoryCommand
-import com.emendo.expensestracker.categories.common.command.OpenSelectColorScreenCategoryCommand
-import com.emendo.expensestracker.categories.common.command.OpenSelectIconScreenCategoryCommand
 import com.emendo.expensestracker.categories.common.command.UpdateTitleCategoryCommand
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
@@ -47,6 +46,8 @@ fun CategoryDetailScreen(
       stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
       commandProcessor = viewModel::processCommand,
+      onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
+      onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
     )
   }
 }
@@ -56,6 +57,8 @@ private fun CategoryDetailContent(
   stateProvider: () -> UiState<CategoryDetailScreenDataImpl>,
   onNavigationClick: () -> Unit,
   commandProcessor: (CategoryCommand) -> Unit,
+  onIconSelectClick: () -> Unit,
+  onColorSelectClick: () -> Unit,
 ) {
   when (val state = stateProvider()) {
     is UiState.Data -> {
@@ -64,8 +67,8 @@ private fun CategoryDetailContent(
         stateProvider = { state.data.categoryScreenData },
         onNavigationClick = onNavigationClick,
         onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
-        onIconSelectClick = { commandProcessor(OpenSelectIconScreenCategoryCommand()) },
-        onColorSelectClick = { commandProcessor(OpenSelectColorScreenCategoryCommand()) },
+        onIconSelectClick = onIconSelectClick,
+        onColorSelectClick = onColorSelectClick,
         onConfirmActionClick = { commandProcessor(UpdateCategoryCategoryDetailCommand()) },
         confirmButtonText = stringResource(id = R.string.save)
       ) {

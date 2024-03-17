@@ -47,10 +47,10 @@ fun CreateAccountRoute(
       stateProvider = stateState::value,
       onNavigationClick = navigator::navigateUp,
       onNameChange = remember { viewModel::setAccountName },
-      onIconRowClick = remember { viewModel::openSelectIconScreen },
-      onColorRowClick = remember { viewModel::openSelectColorScreen },
+      onIconRowClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
+      onColorRowClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
       onBalanceRowClick = remember { viewModel::showBalanceBottomSheet },
-      onCurrencyRowClick = remember { viewModel::openSelectCurrencyScreen },
+      onCurrencyRowClick = remember { { navigator.navigate(viewModel.getSelectCurrencyScreenRoute()) } },
       onCreateAccountClick = remember { viewModel::createNewAccount },
     )
   }

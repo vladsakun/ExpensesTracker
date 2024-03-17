@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.createtransaction.transaction.data
 
 import androidx.compose.runtime.Immutable
+import com.emendo.expensestracker.createtransaction.transaction.AccountUiModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
 /**
@@ -23,8 +24,6 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionType
  */
 interface CreateTransactionCommander {
   fun showCalculatorBottomSheet(sourceTrigger: Boolean)
-  fun openAccountListScreen()
-  fun selectTransferTargetAccount()
   fun saveTransaction()
   fun consumeFieldError(field: FieldWithError)
   fun consumeShowCalculatorBottomSheet()
@@ -32,8 +31,8 @@ interface CreateTransactionCommander {
   fun updateTransactionType(transactionType: TransactionType)
   fun updateNoteText(newNote: String)
   fun showConfirmDeleteTransactionBottomSheet()
-  fun duplicateTransaction()
   fun hideCalculatorBottomSheet()
+  fun selectAccount(account: AccountUiModel)
 
   fun proceedCommand(command: CreateTransactionCommand) {
     command.execute(this)
@@ -48,18 +47,6 @@ interface CreateTransactionCommand {
 class ShowCalculatorBottomSheetCommand(private val sourceTrigger: Boolean = true) : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
     commander.showCalculatorBottomSheet(sourceTrigger)
-  }
-}
-
-class OpenAccountListScreenCommand : CreateTransactionCommand {
-  override fun execute(commander: CreateTransactionCommander) {
-    commander.openAccountListScreen()
-  }
-}
-
-class SelectTransferTargetAccountCommand : CreateTransactionCommand {
-  override fun execute(commander: CreateTransactionCommander) {
-    commander.selectTransferTargetAccount()
   }
 }
 
@@ -105,14 +92,14 @@ class ShowConfirmDeleteTransactionBottomSheetCommand : CreateTransactionCommand 
   }
 }
 
-class DuplicateTransactionCommand : CreateTransactionCommand {
-  override fun execute(commander: CreateTransactionCommander) {
-    commander.duplicateTransaction()
-  }
-}
-
 class HideCalculatorBottomSheetCommand : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
     commander.hideCalculatorBottomSheet()
+  }
+}
+
+class SelectAccount(private val account: AccountUiModel) : CreateTransactionCommand {
+  override fun execute(commander: CreateTransactionCommander) {
+    commander.selectAccount(account)
   }
 }

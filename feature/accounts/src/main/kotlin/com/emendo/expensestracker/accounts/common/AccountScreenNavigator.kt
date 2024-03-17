@@ -1,22 +1,22 @@
 package com.emendo.expensestracker.accounts.common
 
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
-import com.emendo.expensestracker.app.base.api.AppNavigationEvent
-import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
+import com.emendo.expensestracker.app.base.api.screens.SelectColorScreenApi
+import com.emendo.expensestracker.app.base.api.screens.SelectCurrencyScreenApi
+import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 
 interface AccountScreenNavigator {
-  val appNavigationEventBus: AppNavigationEventBus
   val accountStateManager: AccountStateManager<*>
+  val selectCurrencyScreenApi: SelectCurrencyScreenApi
+  val selectIconScreenApi: SelectIconScreenApi
+  val selectColorScreenApi: SelectColorScreenApi
 
-  fun openSelectIconScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectIcon(accountStateManager.selectedIconId))
-  }
+  fun getSelectIconScreenRoute(): String =
+    selectIconScreenApi.getSelectIconScreenRoute(accountStateManager.selectedIconId)
 
-  fun openSelectColorScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectColor(accountStateManager.selectedColorId))
-  }
+  fun getSelectColorScreenRoute(): String =
+    selectColorScreenApi.getSelectColorScreenRoute(accountStateManager.selectedColorId)
 
-  fun openSelectCurrencyScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectCurrency)
-  }
+  fun getSelectCurrencyScreenRoute(): String =
+    selectCurrencyScreenApi.getSelectCurrencyScreenRoute()
 }

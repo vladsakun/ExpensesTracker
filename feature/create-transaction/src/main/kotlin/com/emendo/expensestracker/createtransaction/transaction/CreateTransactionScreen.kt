@@ -82,11 +82,21 @@ fun CreateTransactionScreen(
       onBackPressed = remember { { navigator.navigateUp() } },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
       commandProcessor = remember { viewModel::proceedCommand },
+      onCreateAccountClick = remember { { navigator.navigate(viewModel.getCreateAccountScreenRoute()) } },
+      onAccountListClick = remember { { navigator.navigate(viewModel.getAccountListScreenRoute()) } },
+      onTransferTargetAccountClick = remember { { navigator.navigate(viewModel.getSelectTransferTargetAccountRoute()) } },
+      onDuplicateClick = remember {
+        {
+          navigator.navigate(viewModel.getDuplicateTransactionScreenRoute()) {
+            // Todo pop screen to align navigateUp behavior
+          }
+        }
+      },
     )
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateTransactionContent(
   stateProvider: () -> CreateTransactionUiState,
@@ -94,6 +104,10 @@ private fun CreateTransactionContent(
   onCategoryClick: () -> Unit,
   onBackPressed: () -> Unit,
   commandProcessor: (CreateTransactionCommand) -> Unit,
+  onCreateAccountClick: () -> Unit,
+  onAccountListClick: () -> Unit,
+  onTransferTargetAccountClick: () -> Unit,
+  onDuplicateClick: () -> Unit,
 ) {
   val scaffoldState = rememberBottomSheetScaffoldState()
 
@@ -122,72 +136,84 @@ private fun CreateTransactionContent(
     ) {
       val state = stateProvider()
 
-      Header(state, commandProcessor)
+      Header(
+        state = state,
+        commandProcessor = commandProcessor,
+        onCreateAccountClick = onCreateAccountClick,
+        onSelectAccountClick = onAccountListClick,
+        onTransferTargetAccountClick = onTransferTargetAccountClick,
+      )
+      // Todo Extract to a common TransferBlock
       if (state.screenData.transactionType != TransactionType.TRANSFER) {
-        // Todo Extract to a common TransferBlock
         CategorySelection(state.target, onCategoryClick)
 
-        // Todo extract to AccountSelection
-        //        TransactionElementRow(
-        //          transactionItem = state.source,
-        //          label = stringResource(id = R.string.account),
-        //          onClick = { commandProcessor(OpenAccountListScreenCommand()) },
-        //          error = state.screenData.sourceError == triggered,
-        //          onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
-        //        )
-        //        ExpeDivider()
-
         // Todo fix Account recomposition on state change
-        Accounts(state.accounts)
+        if (state.accounts.isNotEmpty()) {
+          AccountsSection(
+            accounts = state.accounts,
+            onClick = { account -> commandProcessor(SelectAccount(account)) }
+          )
+        } else {
+          TransactionElementRow(
+            label = stringResource(id = R.string.account),
+            onClick = onCreateAccountClick
+          ) {
+            CreateAccountButton(
+              onClick = onCreateAccountClick
+            )
+          }
+        }
       }
       // Todo think about commandProcessor passing
       NoteTextField(
         text = state.note,
-        onNoteValueChange = { commandProcessor(UpdateNoteTextCommand(it)) },
+        onNoteValueChange = { note -> commandProcessor(UpdateNoteTextCommand(note)) },
         onFocused = { commandProcessor(HideCalculatorBottomSheetCommand()) },
       )
       ExpeDivider()
       SaveButton { commandProcessor(SaveTransactionCommand()) }
-      AdditionalActions(commandProcessor)
+      AdditionalActions(commandProcessor, onDuplicateClick)
     }
   }
 }
 
 @Composable
-private fun Accounts(accountUiModels: ImmutableList<AccountUiModel>) {
-  if (accountUiModels.isNotEmpty()) {
-    LazyHorizontalStaggeredGrid(
-      rows = StaggeredGridCells.Fixed(2),
-      horizontalItemSpacing = 8.dp,
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      contentPadding = PaddingValues(horizontal = marginHorizontal, vertical = marginVertical),
-      modifier = Modifier
-        .fillMaxWidth()
-        .height(128.dp),
-    ) {
-      items(accountUiModels) { account ->
-        AccountChip(accountUiModel = account) {}
-      }
+private fun AccountsSection(
+  accounts: ImmutableList<AccountUiModel>,
+  onClick: (AccountUiModel) -> Unit,
+) {
+  LazyHorizontalStaggeredGrid(
+    rows = StaggeredGridCells.Fixed(2),
+    horizontalItemSpacing = Dimens.margin_small_x,
+    verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+    contentPadding = PaddingValues(horizontal = marginHorizontal, vertical = marginVertical),
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(128.dp),
+  ) {
+    items(accounts) { account ->
+      AccountChip(
+        accountUiModel = account,
+        onClick = { onClick(account) },
+      )
     }
-
-    ExpeDivider()
   }
+
+  ExpeDivider()
 }
 
 @Composable
-fun AccountChip(accountUiModel: AccountUiModel, onClick: () -> Unit) {
+private fun AccountChip(accountUiModel: AccountUiModel, onClick: () -> Unit) {
   FilterChip(
-    modifier = Modifier.heightIn(min = 48.dp),
+    modifier = Modifier.heightIn(min = Dimens.icon_button_size),
     onClick = onClick,
-    label = {
-      Text(accountUiModel.name.stringValue())
-    },
+    label = { Text(accountUiModel.name.stringValue()) },
     selected = accountUiModel.selected,
     leadingIcon = {
       Icon(
         imageVector = accountUiModel.icon.imageVector,
-        contentDescription = "Done icon",
-        modifier = Modifier.size(FilterChipDefaults.IconSize)
+        contentDescription = null,
+        modifier = Modifier.size(FilterChipDefaults.IconSize),
       )
     }
   )
@@ -227,9 +253,18 @@ private fun BottomSheetEffects(
 private inline fun Header(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  noinline onCreateAccountClick: () -> Unit,
+  noinline onSelectAccountClick: () -> Unit,
+  noinline onTransferTargetAccountClick: () -> Unit,
 ) {
   if (state.screenData.transactionType == TransactionType.TRANSFER) {
-    TransferBlock(state, commandProcessor)
+    TransferBlock(
+      state = state,
+      commandProcessor = commandProcessor,
+      onCreateAccountClick = onCreateAccountClick,
+      onSelectAccountClick = onSelectAccountClick,
+      onTransferTargetAccountClick = onTransferTargetAccountClick,
+    )
   } else {
     IncomeExpenseBlock(state, commandProcessor)
   }
@@ -279,14 +314,27 @@ private inline fun IncomeExpenseBlock(
 private inline fun TransferBlock(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  noinline onCreateAccountClick: () -> Unit,
+  noinline onSelectAccountClick: () -> Unit,
+  noinline onTransferTargetAccountClick: () -> Unit,
 ) {
   TransferRow {
-    TransferSource(state, commandProcessor)
+    TransferSource(
+      state = state,
+      commandProcessor = commandProcessor,
+      onCreateAccountClick = onCreateAccountClick,
+      onAccountClick = onSelectAccountClick,
+    )
     Chevron(
       width = CHEVRON_WIDTH.dp,
       height = TRANSFER_BLOCK_MIN_HEIGHT.dp,
     )
-    TransferTarget(state, commandProcessor)
+    TransferTarget(
+      state = state,
+      commandProcessor = commandProcessor,
+      onCreateAccountClick = onCreateAccountClick,
+      onTransferTargetAccountClick = onTransferTargetAccountClick,
+    )
   }
 }
 
@@ -294,11 +342,15 @@ private inline fun TransferBlock(
 private inline fun RowScope.TransferSource(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  noinline onCreateAccountClick: () -> Unit,
+  noinline onAccountClick: () -> Unit,
 ) {
   TransferEntity(
     transactionItemModel = state.source,
     amountCommand = ShowCalculatorBottomSheetCommand(),
     commandProcessor = commandProcessor,
+    onCreateAccountClick = onCreateAccountClick,
+    onTransferTargetAccountClick = onAccountClick,
   ) {
     TransferAmount(text = state.amount.formattedValue)
     EditableAmount(
@@ -312,11 +364,15 @@ private inline fun RowScope.TransferSource(
 private inline fun RowScope.TransferTarget(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  noinline onCreateAccountClick: () -> Unit,
+  noinline onTransferTargetAccountClick: () -> Unit,
 ) {
   TransferEntity(
     transactionItemModel = state.target,
     commandProcessor = commandProcessor,
     amountCommand = ShowCalculatorBottomSheetCommand(false),
+    onCreateAccountClick = onCreateAccountClick,
+    onTransferTargetAccountClick = onTransferTargetAccountClick,
   ) {
     state.transferReceivedAmount?.let { amount ->
       TransferAmount(
@@ -336,15 +392,20 @@ private inline fun RowScope.TransferEntity(
   transactionItemModel: TransactionItemModel?,
   amountCommand: CreateTransactionCommand,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  noinline onCreateAccountClick: () -> Unit,
+  noinline onTransferTargetAccountClick: () -> Unit,
   crossinline amountBlock: @Composable ColumnScope.() -> Unit,
 ) {
   TransferColumn {
     if (transactionItemModel == null) {
-      CreateAccountButton { commandProcessor(OpenAccountListScreenCommand()) }
+      CreateAccountButton(onCreateAccountClick)
       return
     }
 
-    TransferAccount({ commandProcessor(SelectTransferTargetAccountCommand()) }, transactionItemModel)
+    TransferAccount(
+      onClick = onTransferTargetAccountClick,
+      account = transactionItemModel,
+    )
     Column(
       modifier = Modifier.clickable(onClick = { commandProcessor(amountCommand) }),
     ) {
@@ -362,7 +423,10 @@ private fun transferTextColor(state: CreateTransactionUiState) =
   }
 
 @Composable
-private fun AdditionalActions(commandProcessor: (CreateTransactionCommand) -> Unit) {
+private fun AdditionalActions(
+  commandProcessor: (CreateTransactionCommand) -> Unit,
+  onDuplicateClick: () -> Unit,
+) {
   Column {
     CreateTransactionRow(
       modifier = Modifier.fillMaxWidth(),
@@ -376,7 +440,7 @@ private fun AdditionalActions(commandProcessor: (CreateTransactionCommand) -> Un
       AdditionalAction(
         titleResId = R.string.duplicate,
         icon = ExpeIcons.FileCopy,
-        onClick = { commandProcessor(DuplicateTransactionCommand()) },
+        onClick = onDuplicateClick,
       )
     }
   }
@@ -432,12 +496,14 @@ private fun CreateAccountButton(onClick: () -> Unit) {
   ExpeButton(
     textResId = R.string.create_account,
     onClick = onClick,
-    colors = ButtonDefaults.outlinedButtonColors(),
-    textStyle = MaterialTheme.typography.labelLarge,
+    colors = ButtonDefaults.filledTonalButtonColors(),
+    textStyle = MaterialTheme.typography.labelSmall,
+    fillWidth = false,
   )
 }
 
 @Composable
+@Suppress("NOTHING_TO_INLINE") // inlined to avoid unnecessary recomposition
 private inline fun TransferAccount(
   noinline onClick: () -> Unit,
   account: TransactionItemModel,
@@ -492,10 +558,14 @@ private fun CreateTransactionScreenPreview(
   ExpensesTrackerTheme {
     CreateTransactionContent(
       stateProvider = { state },
-      bottomSheetStateProvider = { TODO() },
+      bottomSheetStateProvider = { CreateTransactionBottomSheetState() },
       onCategoryClick = {},
       onBackPressed = {},
       commandProcessor = {},
+      onCreateAccountClick = {},
+      onAccountListClick = {},
+      onTransferTargetAccountClick = {},
+      onDuplicateClick = {},
     )
   }
 }

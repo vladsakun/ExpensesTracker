@@ -4,7 +4,8 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":sync:work"))
+  implementation(projects.sync.work)
+  implementation(projects.feature.createTransaction.api)
 
   implementation(libs.androidx.activity.compose)
 }

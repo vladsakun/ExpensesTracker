@@ -11,5 +11,6 @@ dependencies {
   api(libs.timber)
 
   implementation(libs.kotlinx.coroutines.android)
+  implementation(libs.androidx.lifecycle.viewmodel.ktx)
   implementation(libs.androidx.lifecycle.ktx)
 }

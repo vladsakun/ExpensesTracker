@@ -29,7 +29,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.FULL_ROUTE_PLACEHOLDER
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.OpenResultRecipient
-import timber.log.Timber
 
 @Destination(
   deepLinks = [DeepLink(uriPattern = "https://emendo.com/accounts/$FULL_ROUTE_PLACEHOLDER")],
@@ -43,8 +42,6 @@ fun AccountDetailScreen(
   iconResultRecipient: OpenResultRecipient<Int>,
   viewModel: AccountDetailViewModel = hiltViewModel(),
 ) {
-  Timber.d("AccountID: $accountId")
-
   colorResultRecipient.handleValueResult(viewModel::updateColorById)
   currencyResultRecipient.handleValueResult(viewModel::updateCurrencyByCode)
   iconResultRecipient.handleValueResult(viewModel::updateIconById)
@@ -60,10 +57,10 @@ fun AccountDetailScreen(
       stateProvider = state::value,
       onNavigationClick = navigator::navigateUp,
       onNameChange = remember { viewModel::setAccountName },
-      onIconRowClick = remember { viewModel::openSelectIconScreen },
-      onColorRowClick = remember { viewModel::openSelectColorScreen },
+      onIconRowClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
+      onColorRowClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
       onBalanceRowClick = remember { viewModel::showBalanceBottomSheet },
-      onCurrencyRowClick = remember { viewModel::openSelectCurrencyScreen },
+      onCurrencyRowClick = remember { { navigator.navigate(viewModel.getSelectCurrencyScreenRoute()) } },
       onConfirmAccountDetailsClick = remember { viewModel::updateAccount },
       onDeleteClick = remember { viewModel::showConfirmDeleteAccountBottomSheet },
     )

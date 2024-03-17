@@ -20,6 +20,6 @@ class GetDefaultAmountUseCase @Inject constructor(
   }
 
   companion object {
-    val DEFAULT_AMOUNT_VALUE = BigDecimal.ZERO
+    val DEFAULT_AMOUNT_VALUE: BigDecimal = BigDecimal.ZERO
   }
 }

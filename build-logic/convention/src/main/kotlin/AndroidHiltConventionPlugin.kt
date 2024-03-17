@@ -2,8 +2,6 @@ import com.emendo.expensestracker.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.plugins
-import org.gradle.kotlin.dsl.version
 
 class AndroidHiltConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
@@ -19,6 +17,9 @@ class AndroidHiltConventionPlugin : Plugin<Project> {
         "implementation"(libs.findLibrary("hilt.android").get())
         "kapt"(libs.findLibrary("hilt.compiler").get())
         "kaptAndroidTest"(libs.findLibrary("hilt.compiler").get())
+
+        "implementation"(libs.findLibrary("dagger-auto-android").get())
+        "kapt"(libs.findLibrary("dagger-auto-compiler").get())
       }
     }
   }

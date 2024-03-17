@@ -6,13 +6,13 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
-import com.emendo.expensestracker.app.base.api.AppNavigationEvent
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.transaction.GetTransactionsSumUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
+import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
@@ -37,6 +37,7 @@ class TransactionsListViewModel @Inject constructor(
   private val currencyCacheManager: CurrencyCacheManager,
   private val getTransactionsSumUseCase: GetTransactionsSumUseCase,
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
+  private val createTransactionScreenApi: CreateTransactionScreenApi,
 ) : ViewModel() {
   private val repos: Flow<PagingData<UiModel.TransactionItem>> = transactionRepository
     .transactionsPagingFlow
@@ -133,22 +134,19 @@ class TransactionsListViewModel @Inject constructor(
   private fun Instant.month(zoneId: ZoneId) =
     this.toLocalDateTime(TimeZone.of(zoneId.id)).month
 
-  fun openTransactionDetails(transactionModel: TransactionModel) {
-    appNavigationEventBus.navigate(
-      AppNavigationEvent.CreateTransaction(
-        source = transactionModel.source,
-        target = transactionModel.target,
-        payload = CreateTransactionEventPayload(
-          transactionId = transactionModel.id,
-          note = transactionModel.note,
-          date = transactionModel.date,
-          transactionAmount = transactionModel.amount,
-          transactionType = transactionModel.type.id,
-          transferReceivedAmount = transactionModel.transferReceivedAmount,
-        ),
-      )
+  fun openTransactionDetails(transactionModel: TransactionModel): String =
+    createTransactionScreenApi.getRoute(
+      source = transactionModel.source,
+      target = transactionModel.target,
+      payload = CreateTransactionEventPayload(
+        transactionId = transactionModel.id,
+        note = transactionModel.note,
+        date = transactionModel.date,
+        transactionAmount = transactionModel.amount,
+        transactionType = transactionModel.type.id,
+        transferReceivedAmount = transactionModel.transferReceivedAmount,
+      ),
     )
-  }
 }
 
 private fun transactionUiState(

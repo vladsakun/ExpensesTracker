@@ -1,14 +1,13 @@
 package com.emendo.expensestracker.categories.create
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.common.CategoryContent
 import com.emendo.expensestracker.categories.common.command.CategoryCommand
-import com.emendo.expensestracker.categories.common.command.OpenSelectColorScreenCategoryCommand
-import com.emendo.expensestracker.categories.common.command.OpenSelectIconScreenCategoryCommand
 import com.emendo.expensestracker.categories.common.command.UpdateTitleCategoryCommand
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.data.api.model.category.CategoryType
@@ -37,6 +36,8 @@ fun CreateCategoryRoute(
     stateProvider = state::value,
     onNavigationClick = navigator::navigateUp,
     commandProcessor = viewModel::processCommand,
+    onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
+    onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
   )
 }
 
@@ -45,6 +46,8 @@ private fun CreateCategoryContent(
   stateProvider: () -> UiState<CategoryCreateScreenData>,
   onNavigationClick: () -> Unit,
   commandProcessor: (CategoryCommand) -> Unit,
+  onIconSelectClick: () -> Unit,
+  onColorSelectClick: () -> Unit,
 ) {
   when (val state = stateProvider()) {
     is UiState.Data -> {
@@ -59,8 +62,8 @@ private fun CreateCategoryContent(
         stateProvider = { state.data.categoryScreenData },
         onNavigationClick = onNavigationClick,
         onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
-        onIconSelectClick = { commandProcessor(OpenSelectIconScreenCategoryCommand()) },
-        onColorSelectClick = { commandProcessor(OpenSelectColorScreenCategoryCommand()) },
+        onIconSelectClick = onIconSelectClick,
+        onColorSelectClick = onColorSelectClick,
         onConfirmActionClick = { commandProcessor(CreateCategoryCommand()) },
         confirmButtonText = stringResource(id = R.string.create),
         shouldFocusTitleInputOnLaunch = true,

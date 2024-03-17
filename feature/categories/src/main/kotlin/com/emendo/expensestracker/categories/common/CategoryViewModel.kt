@@ -1,8 +1,8 @@
 package com.emendo.expensestracker.categories.common
 
 import androidx.lifecycle.ViewModel
-import com.emendo.expensestracker.app.base.api.AppNavigationEvent
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
+import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.categories.common.command.CategoryCommandReceiver
 import com.emendo.expensestracker.categories.common.state.CategoryStateManager
 import com.emendo.expensestracker.categories.common.state.CategoryStateManagerDelegate
@@ -15,12 +15,16 @@ abstract class CategoryViewModel<T : CategoryScreenState>(
     CategoryCommandReceiver {
 
   abstract val appNavigationEventBus: AppNavigationEventBus
+  abstract val selectIconScreenApi: SelectIconScreenApi
+  abstract val selectColorScreenApi: SelectIconScreenApi
 
-  override fun openSelectIconScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectIcon(selectedIconId))
-  }
+  fun getSelectIconScreenRoute(): String =
+    selectIconScreenApi.getSelectIconScreenRoute(selectedIconId)
 
-  override fun openSelectColorScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectColor(selectedColorId))
-  }
+  //  override fun openSelectIconScreen() {
+  //    appNavigationEventBus.navigate(AppNavigationEvent.SelectIcon(selectedIconId))
+  //  }
+
+  fun getSelectColorScreenRoute(): String =
+    selectColorScreenApi.getSelectIconScreenRoute(selectedColorId)
 }

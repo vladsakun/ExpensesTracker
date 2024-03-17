@@ -2,13 +2,16 @@ package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.app.base.api.AppNavigationEvent
+import com.emendo.expensestracker.accounts.api.CreateAccountScreenApi
+import com.emendo.expensestracker.accounts.api.SelectAccountScreenApi
 import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
+import com.emendo.expensestracker.core.app.common.ext.stateFlow
 import com.emendo.expensestracker.core.app.common.ext.stateInEagerlyList
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.domain.account.GetLastTransferAccountOrRandomUseCase
@@ -24,11 +27,15 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorBottomSheetState
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.CalculatorKeyboardActions
+import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.createtransaction.transaction.data.CreateTransactionCommander
 import com.emendo.expensestracker.createtransaction.transaction.data.FieldWithError
 import com.emendo.expensestracker.createtransaction.transaction.data.getTransactionType
-import com.emendo.expensestracker.createtransaction.transaction.domain.*
+import com.emendo.expensestracker.createtransaction.transaction.domain.GetCalculatorBottomSheetDataUseCase
+import com.emendo.expensestracker.createtransaction.transaction.domain.GetConvertedFormattedValueUseCase
+import com.emendo.expensestracker.createtransaction.transaction.domain.GetDefaultAmountUseCase
 import com.emendo.expensestracker.createtransaction.transaction.domain.GetDefaultAmountUseCase.Companion.DEFAULT_AMOUNT_VALUE
+import com.emendo.expensestracker.createtransaction.transaction.domain.GetTransferReceivedAmountUseCase
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 import com.emendo.expensestracker.data.api.model.AccountModel
@@ -55,6 +62,7 @@ private const val CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG = "create_transac
 
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(
+  savedStateHandle: SavedStateHandle,
   getUsedCurrenciesUseCase: GetUsedCurrenciesUseCase,
   private val accountRepository: AccountRepository,
   private val numericKeyboardCommander: NumericKeyboardCommander,
@@ -67,12 +75,18 @@ class CreateTransactionViewModel @Inject constructor(
   private val getDefaultAmountUseCase: GetDefaultAmountUseCase,
   private val getConvertedFormattedValueUseCase: GetConvertedFormattedValueUseCase,
   private val getCalculatorBottomSheetDataUseCase: GetCalculatorBottomSheetDataUseCase,
-  private val getTargetDefaultValueUseCase: GetTargetDefaultValueUseCase,
   private val getTransferReceivedAmountUseCase: GetTransferReceivedAmountUseCase,
+  private val createAccountScreenApi: CreateAccountScreenApi,
+  private val selectAccountScreenApi: SelectAccountScreenApi,
+  private val createTransactionScreenApi: CreateTransactionScreenApi,
 ) : ViewModel(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
     CalculatorKeyboardActions,
     CreateTransactionCommander {
+
+  private val selectedAccountId by savedStateHandle.stateFlow<Long?>(createTransactionController.getSourceSnapshot()?.id)
+  private val accountsFlow: Flow<ImmutableList<AccountUiModel>> =
+    combine(accountRepository.getAccounts(), selectedAccountId, ::mapAccounts)
 
   private val _uiState: MutableStateFlow<CreateTransactionUiState> =
     MutableStateFlow(getDefaultCreateTransactionUiState())
@@ -80,7 +94,7 @@ class CreateTransactionViewModel @Inject constructor(
     _uiState,
     createTransactionController.getTarget(),
     createTransactionController.getSource(),
-    accountRepository.getAccounts(),
+    accountsFlow,
     transform = ::combineCreateTransactionUiState,
   )
     .stateInWhileSubscribed(viewModelScope, getDefaultCreateTransactionUiState())
@@ -124,7 +138,7 @@ class CreateTransactionViewModel @Inject constructor(
     )
   }
 
-  internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState.asStateFlow() }
+  internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState }
 
   private var createTransactionJob: Job? = null
   private var shouldClearTarget = true
@@ -319,9 +333,9 @@ class CreateTransactionViewModel @Inject constructor(
     createTransaction(source, target)
   }
 
-  override fun openAccountListScreen() {
-    appNavigationEventBus.navigate(AppNavigationEvent.SelectAccount())
-  }
+  fun getAccountListScreenRoute(): String = selectAccountScreenApi.getSelectAccountScreenRoute()
+
+  fun getCreateAccountScreenRoute(): String = createAccountScreenApi.getCreateAccountScreenRoute()
 
   private fun createTransaction(source: TransactionSource, target: TransactionTarget) {
     if (createTransactionJob != null) {
@@ -367,6 +381,10 @@ class CreateTransactionViewModel @Inject constructor(
     }
   }
 
+  override fun selectAccount(account: AccountUiModel) {
+    selectedAccountId.update { account.id }
+  }
+
   private fun doneClick(): Boolean {
     hideCalculatorBottomSheet()
     return false
@@ -402,22 +420,19 @@ class CreateTransactionViewModel @Inject constructor(
     return false
   }
 
-  override fun selectTransferTargetAccount() {
-    appNavigationEventBus.navigate(
-      AppNavigationEvent.SelectAccount(isTransferTargetSelect = true)
-    )
-  }
+  fun getSelectTransferTargetAccountRoute(): String =
+    selectAccountScreenApi.getSelectAccountScreenRoute(isTransferTargetSelect = true)
 
-  override fun duplicateTransaction() {
-    val payload = createTransactionController.getTransactionPayload() ?: return
+  fun getDuplicateTransactionScreenRoute(): String {
+    val payload = createTransactionController.getTransactionPayload()
+      ?: throw IllegalStateException("Transaction payload must not be null")
     shouldClearTarget = false
-    appNavigationEventBus.navigate(
-      AppNavigationEvent.CreateTransaction(
-        source = createTransactionController.getSourceSnapshot(),
-        target = createTransactionController.getTargetSnapshot(),
-        payload = payload.copy(transactionId = null),
-        shouldNavigateUp = true,
-      )
+
+    return createTransactionScreenApi.getRoute(
+      source = createTransactionController.getSourceSnapshot(),
+      target = createTransactionController.getTargetSnapshot(),
+      payload = payload.copy(transactionId = null),
+      shouldNavigateUp = true,
     )
   }
 
@@ -465,7 +480,10 @@ class CreateTransactionViewModel @Inject constructor(
     val currency: CurrencyModel = if (screenData.transactionType == TransactionType.TRANSFER) {
       when {
         state.sourceAmountFocused -> state.amount.currency
-        state.transferTargetAmountFocused -> checkNotNull(state.transferReceivedAmount?.currency) { "Transfer target amount must not be focused with null Amount" }
+        state.transferTargetAmountFocused -> checkNotNull(state.transferReceivedAmount?.currency) {
+          "Transfer target amount must not be focused with null Amount"
+        }
+
         else -> state.amount.currency
       }
     } else {
@@ -478,28 +496,26 @@ class CreateTransactionViewModel @Inject constructor(
     uiState: CreateTransactionUiState,
     target: TransactionTarget?,
     source: TransactionSource?,
-    accounts: List<AccountModel>,
+    accounts: ImmutableList<AccountUiModel>,
   ): CreateTransactionUiState {
     val screenData = uiState.screenData
-    // Todo extract to mapper
-    val accountUiModels = mapAccounts(accounts, source)
 
     return uiState.copy(
       target = target.orDefault(screenData.transactionType),
       source = source?.toTransactionItemModel(),
-      accounts = accountUiModels,
+      accounts = accounts,
     )
   }
 
   private fun mapAccounts(
     accounts: List<AccountModel>,
-    source: TransactionSource?,
+    selectedAccountId: Long?,
   ): ImmutableList<AccountUiModel> = accounts.map {
     AccountUiModel(
       id = it.id,
       name = it.name,
       icon = it.icon,
-      selected = it.id == source?.id,
+      selected = it.id == selectedAccountId,
     )
   }.toPersistentList()
 
@@ -521,7 +537,7 @@ class CreateTransactionViewModel @Inject constructor(
   }
 
   private fun TransactionTarget?.orDefault(transactionType: TransactionType): TransactionItemModel {
-    val target = this ?: getTargetDefaultValueUseCase(transactionType)
+    val target = this ?: createTransactionController.getDefaultTarget(transactionType)
     return target.toTransactionItemModel()
   }
 
@@ -542,7 +558,10 @@ class CreateTransactionViewModel @Inject constructor(
       note = payload?.note,
       sourceAmountFocused = payload == null,
       transferReceivedAmount = payload?.transferReceivedAmount,
-      accounts = mapAccounts(accountRepository.getAccountsSnapshot(), createTransactionController.getSourceSnapshot()),
+      accounts = mapAccounts(
+        accounts = accountRepository.getAccountsSnapshot(),
+        selectedAccountId = createTransactionController.getSourceSnapshot()?.id,
+      ),
     )
   }
 

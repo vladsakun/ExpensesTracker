@@ -53,7 +53,7 @@ fun TransactionsListRoute(
 
   TransactionsListScreenContent(
     uiStateProvider = state::value,
-    onTransactionClick = remember { viewModel::openTransactionDetails }
+    onTransactionClick = remember { { navigator.navigate(viewModel.openTransactionDetails(it)) } }
   )
 }
 

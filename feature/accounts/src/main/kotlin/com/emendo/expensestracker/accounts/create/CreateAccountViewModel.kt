@@ -8,8 +8,10 @@ import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheet
 import com.emendo.expensestracker.accounts.common.bottomsheet.AccountBottomSheetDelegate
 import com.emendo.expensestracker.accounts.common.state.AccountStateManager
 import com.emendo.expensestracker.accounts.common.state.AccountStateManagerDelegate
-import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
+import com.emendo.expensestracker.app.base.api.screens.SelectColorScreenApi
+import com.emendo.expensestracker.app.base.api.screens.SelectCurrencyScreenApi
+import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
@@ -27,7 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
   currencyCacheManager: CurrencyCacheManager,
-  override val appNavigationEventBus: AppNavigationEventBus,
+  override val selectCurrencyScreenApi: SelectCurrencyScreenApi,
+  override val selectIconScreenApi: SelectIconScreenApi,
+  override val selectColorScreenApi: SelectColorScreenApi,
   override val numericKeyboardCommander: NumericKeyboardCommander,
   override val calculatorFormatter: CalculatorFormatter,
   override val amountFormatter: AmountFormatter,
