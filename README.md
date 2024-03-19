@@ -2,7 +2,7 @@
 
 Gradle dependency graph:
 
-![](all_modules3.dot.png)
+![](/gradle/graphs/all_modules9.dot.png)
 
 Engineering To-Do:
 
