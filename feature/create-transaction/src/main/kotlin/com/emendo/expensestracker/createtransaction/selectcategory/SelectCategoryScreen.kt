@@ -42,7 +42,7 @@ internal fun SelectCategoryScreen(
   SelectCategoryContent(
     stateProvider = uiState::value,
     onBackClick = navigator::navigateUp,
-    onCreateCategoryClick = viewModel::openCreateCategoryScreen,
+    onCreateCategoryClick = { navigator.navigate(viewModel.getCreateCategoryScreenRoute()) },
     onCategoryClick = { category ->
       viewModel.saveCategory(category)
       navigator.navigateUp()

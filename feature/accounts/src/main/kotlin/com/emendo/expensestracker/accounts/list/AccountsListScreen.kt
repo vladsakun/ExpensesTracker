@@ -1,26 +1,27 @@
 package com.emendo.expensestracker.accounts.list
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
-import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
-import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
-import com.emendo.expensestracker.core.designsystem.component.ExpeTopBar
+import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.ui.AccountItem
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
@@ -29,6 +30,7 @@ import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 
 @RootNavGraph(start = true)
@@ -69,7 +71,7 @@ fun AccountsScreenRoute(
   )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun AccountsListScreenContent(
   @StringRes titleRestId: Int,
@@ -81,9 +83,7 @@ private fun AccountsListScreenContent(
   val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
   ExpeScaffold(
-    modifier = Modifier
-      .fillMaxSize()
-      .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+    modifier = Modifier.fillMaxSize(),
     topBar = {
       ExpeTopBar(
         titleResId = titleRestId,
@@ -104,31 +104,72 @@ private fun AccountsListScreenContent(
       )
     },
   ) { padding ->
-    LazyColumn(
+    Box(
       modifier = Modifier
         .fillMaxSize()
-        .padding(padding),
-      horizontalAlignment = Alignment.CenterHorizontally,
+        .padding(padding)
+        .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+      contentAlignment = Alignment.Center,
     ) {
       when (val state = uiStateProvider()) {
         is AccountsListUiState.Empty -> Unit
-        is AccountsListUiState.Loading -> item { ExpLoadingWheel() }
-        is AccountsListUiState.Error -> item { Text(text = state.message) }
+        is AccountsListUiState.Loading -> ExpLoadingWheel()
+        is AccountsListUiState.Error -> Text(text = state.message)
         is AccountsListUiState.DisplayAccountsList -> {
-          items(
-            items = state.accountModels,
-            key = AccountModel::id,
-            contentType = { _ -> "account" }
-          ) { account ->
-            AccountItem(
-              color = account.color.color,
-              icon = account.icon.imageVector,
-              name = account.name.stringValue(),
-              balance = account.balance.formattedValue,
-              onClick = { onAccountClick(account) },
-            )
-            ExpeDivider()
-          }
+          AccountList(onAccountClick, state.accountModels, {})
+        }
+      }
+    }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun AccountList(
+  onAccountClick: (AccountModel) -> Unit,
+  accountModels: ImmutableList<AccountModel>,
+  onMove: (List<AccountModel>) -> Unit,
+) {
+  val mutableList = remember(accountModels) {
+    mutableStateListOf<AccountModel>().apply {
+      addAll(accountModels.toList())
+    }
+  }
+
+  val listState = rememberLazyListState()
+  val dragDropState = rememberDragDropState(
+    lazyListState = listState,
+    key = accountModels,
+  ) { fromIndex, toIndex ->
+    with(mutableList) {
+      add(toIndex, removeAt(fromIndex))
+      onMove(mutableList)
+    }
+  }
+
+  LazyColumn(
+    modifier = Modifier
+      .fillMaxSize()
+      .dragContainer(dragDropState),
+    state = listState,
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    itemsIndexed(
+      items = accountModels,
+      key = { _, item -> item.id },
+      contentType = { _, _ -> "account" },
+    ) { index, account ->
+      DraggableItem(dragDropState, index) { isDragging ->
+        val elevation by animateDpAsState(if (isDragging) 4.dp else 1.dp, label = "dragShadow")
+        Card(elevation = CardDefaults.cardElevation(elevation)) {
+          AccountItem(
+            color = account.color.color,
+            icon = account.icon.imageVector,
+            name = account.name.stringValue(),
+            balance = account.balance.formattedValue,
+            onClick = { onAccountClick(account) },
+          )
+          ExpeDivider()
         }
       }
     }

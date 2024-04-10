@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.categories.common
 
 import androidx.lifecycle.ViewModel
-import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.categories.common.command.CategoryCommandReceiver
 import com.emendo.expensestracker.categories.common.state.CategoryStateManager
@@ -14,7 +13,6 @@ abstract class CategoryViewModel<T : CategoryScreenState>(
     CategoryStateManager<T> by CategoryStateManagerDelegate(defaultState),
     CategoryCommandReceiver {
 
-  abstract val appNavigationEventBus: AppNavigationEventBus
   abstract val selectIconScreenApi: SelectIconScreenApi
   abstract val selectColorScreenApi: SelectIconScreenApi
 

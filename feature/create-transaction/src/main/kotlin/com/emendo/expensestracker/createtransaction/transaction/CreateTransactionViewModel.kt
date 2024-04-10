@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.api.CreateAccountScreenApi
 import com.emendo.expensestracker.accounts.api.SelectAccountScreenApi
-import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.base.api.helper.NumericKeyboardCommander
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.getNextItem
@@ -70,7 +69,6 @@ class CreateTransactionViewModel @Inject constructor(
   private val createTransactionController: CreateTransactionController,
   private val transactionRepository: TransactionRepository,
   private val calculatorFormatter: CalculatorFormatter,
-  private val appNavigationEventBus: AppNavigationEventBus,
   private val getLastTransferAccountOrRandomUseCase: GetLastTransferAccountOrRandomUseCase,
   private val getDefaultAmountUseCase: GetDefaultAmountUseCase,
   private val getConvertedFormattedValueUseCase: GetConvertedFormattedValueUseCase,

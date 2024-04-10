@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+  api(projects.feature.categories.api)
   implementation(projects.sync.work)
   implementation(projects.feature.createTransaction.api)
 

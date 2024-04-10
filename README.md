@@ -17,6 +17,7 @@ Engineering To-Do:
 Features:
 
 1) Accounts grouping (drag and drop)
+2) Add subaccounts (for 5 money envelopes in one account)
 2) Expense Analytics: Advanced analytics features like trends, patterns, and forecasting help users gain deeper insights into their spending habits.
 3) Interactive Reports: The app generates visually appealing reports with interactive graphs and charts, allowing users to analyze their spending patterns.
 4) Scheduled transactions (payments, transfers, etc.)

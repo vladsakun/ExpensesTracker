@@ -11,5 +11,6 @@ dependencies {
   implementation(projects.feature.createTransaction.api)
 
   implementation(libs.kotlinx.datetime)
-  implementation(project(":feature:accounts:api"))
+  implementation(projects.feature.accounts.api)
+  implementation(projects.feature.categories.api)
 }

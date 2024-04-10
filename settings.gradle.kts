@@ -34,7 +34,7 @@ include(":core:ui")
 include(":android-api")
 
 include(":feature:accounts", ":feature:accounts:api")
-include(":feature:categories")
+include(":feature:categories", ":feature:categories:api")
 include(":feature:transactions")
 include(":feature:settings")
 include(":feature:create-transaction", ":feature:create-transaction:api")

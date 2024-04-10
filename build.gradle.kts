@@ -34,5 +34,9 @@ subprojects {
         )
       }
     }
+    compilerOptions.freeCompilerArgs.addAll(
+      "-P",
+      "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
+    )
   }
 }

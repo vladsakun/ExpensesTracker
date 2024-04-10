@@ -2,7 +2,6 @@ package com.emendo.expensestracker.categories.create
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryViewModel
@@ -21,7 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateCategoryViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
-  override val appNavigationEventBus: AppNavigationEventBus,
   override val selectIconScreenApi: SelectIconScreenApi,
   override val selectColorScreenApi: SelectIconScreenApi,
   private val categoryRepository: CategoryRepository,

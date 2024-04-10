@@ -2,7 +2,9 @@ package com.emendo.expensestracker.data.api.model.transaction
 
 import androidx.annotation.StringRes
 import com.emendo.expensestracker.app.resources.R
+import javax.annotation.concurrent.Immutable
 
+@Immutable
 enum class TransactionType {
   INCOME,
   EXPENSE,

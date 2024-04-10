@@ -1,23 +1,27 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,7 +53,6 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.theapache64.rebugger.Rebugger
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
@@ -274,7 +277,7 @@ private inline fun Header(
 @Composable
 private inline fun IncomeExpenseBlock(
   state: CreateTransactionUiState,
-  crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
+  crossinline commandProcessor: @DisallowComposableCalls (CreateTransactionCommand) -> Unit,
 ) {
   val focusManager = LocalFocusManager.current
 
@@ -285,20 +288,11 @@ private inline fun IncomeExpenseBlock(
         focusManager.clearFocus(force = true)
       },
   ) {
-    // Todo fix Amount recomposition on note edit
-    Rebugger(
-      trackMap = mapOf(
-        "formattedValue" to state.amount.formattedValue,
-        "transactionType" to state.screenData.transactionType,
-        "amountError" to state.screenData.amountError,
-        "commandProcessor" to { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) },
-      )
-    )
     Amount(
-      text = { state.amount.formattedValue },
-      transactionType = { state.screenData.transactionType },
+      text = state.amount.formattedValue,
+      transactionType = state.screenData.transactionType,
       error = state.screenData.amountError == triggered,
-      onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) },
+      onErrorConsumed = remember { { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) } },
     )
     EditableAmount(
       text = state.amountCalculatorHint,
@@ -397,6 +391,7 @@ private inline fun RowScope.TransferEntity(
   crossinline amountBlock: @Composable ColumnScope.() -> Unit,
 ) {
   TransferColumn {
+    // Todo will be removed
     if (transactionItemModel == null) {
       CreateAccountButton(onCreateAccountClick)
       return
@@ -508,28 +503,87 @@ private inline fun TransferAccount(
   noinline onClick: () -> Unit,
   account: TransactionItemModel,
 ) {
-  Row(
+  var expanded by remember { mutableStateOf(false) }
+  val scrollState = rememberScrollState()
+  Box(
     modifier = Modifier
-      .heightIn(min = Dimens.icon_button_size)
-      .clickable(
-        onClick = onClick,
-        interactionSource = remember { MutableInteractionSource() },
-        indication = null,
-      )
-      .fillMaxWidth(),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.End,
+      .fillMaxSize()
+      .wrapContentSize(Alignment.TopStart)
   ) {
-    Icon(
-      modifier = Modifier.size(Dimens.icon_size),
-      imageVector = account.icon.imageVector,
-      contentDescription = null,
-    )
-    Text(
-      text = account.name.stringValue(),
-      style = MaterialTheme.typography.bodyLarge,
-    )
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+      modifier = Modifier
+        .fillMaxWidth()
+        .pointerInput(Unit) {
+          detectTapGestures(
+            onLongPress = {
+              expanded = !expanded
+            }
+          )
+        },
+    ) {
+      Icon(
+        modifier = Modifier.size(Dimens.icon_size),
+        imageVector = account.icon.imageVector,
+        contentDescription = null,
+      )
+      Text(
+        text = account.name.stringValue(),
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.weight(1f),
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+      )
+      Icon(
+        imageVector = Icons.Default.ArrowDropDown,
+        contentDescription = "Localized description",
+        modifier = Modifier.align(Alignment.CenterVertically)
+      )
+    }
+    // Todo make dropdown menu width as wide of Row
+    DropdownMenu(
+      expanded = expanded,
+      onDismissRequest = { expanded = false },
+      scrollState = scrollState,
+      offset = DpOffset(0.dp, Dimens.margin_small_x),
+    ) {
+      repeat(5) {
+        DropdownMenuItem(
+          text = { Text("Item ${it + 1}") },
+          onClick = { /* TODO */ },
+          leadingIcon = {
+            Icon(
+              Icons.Outlined.Edit,
+              contentDescription = null
+            )
+          }
+        )
+      }
+    }
   }
+  //  Row(
+  //    modifier = Modifier
+  //      .heightIn(min = Dimens.icon_button_size)
+  //      .clickable(
+  //        onClick = onClick,
+  //        interactionSource = remember { MutableInteractionSource() },
+  //        indication = null,
+  //      )
+  //      .fillMaxWidth(),
+  //    verticalAlignment = Alignment.CenterVertically,
+  //    horizontalArrangement = Arrangement.End,
+  //  ) {
+  //    Icon(
+  //      modifier = Modifier.size(Dimens.icon_size),
+  //      imageVector = account.icon.imageVector,
+  //      contentDescription = null,
+  //    )
+  //    Text(
+  //      text = account.name.stringValue(),
+  //      style = MaterialTheme.typography.bodyLarge,
+  //    )
+  //  }
 }
 
 @Composable

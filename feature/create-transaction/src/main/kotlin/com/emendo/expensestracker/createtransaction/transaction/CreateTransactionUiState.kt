@@ -38,7 +38,7 @@ data class AccountUiModel(
   val selected: Boolean,
 )
 
-@Stable
+@Immutable
 data class CreateTransactionScreenData(
   val transactionType: TransactionType,
   val deleteEnabled: Boolean = false,

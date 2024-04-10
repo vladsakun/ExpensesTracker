@@ -17,8 +17,8 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
 @Composable
 internal fun Amount(
-  text: () -> String,
-  transactionType: () -> TransactionType,
+  text: String,
+  transactionType: TransactionType,
   error: Boolean,
   onErrorConsumed: () -> Unit,
   modifier: Modifier = Modifier,
@@ -30,9 +30,9 @@ internal fun Amount(
     label = "error"
   )
   AutoSizableText(
-    textProvider = text,
+    textProvider = { text },
     minFontSize = MaterialTheme.typography.bodyMedium.fontSize,
-    color = transactionType().amountColor(),
+    color = transactionType.amountColor(),
     style = MaterialTheme.typography.headlineMedium,
     textAlign = TextAlign.End,
     maxLines = 1,

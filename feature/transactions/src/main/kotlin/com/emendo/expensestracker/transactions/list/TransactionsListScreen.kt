@@ -1,18 +1,17 @@
 package com.emendo.expensestracker.transactions.list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -162,71 +161,105 @@ private fun TransactionItem(
 ) {
   val isTransfer = transaction.target is AccountModel
 
-  Column(
-    modifier = modifier
+  var expanded by remember { mutableStateOf(false) }
+  val scrollState = rememberScrollState()
+  Box(
+    modifier = Modifier
       .fillMaxWidth()
-      .clickable(onClick = onClick)
-      .padding(horizontal = Dimens.margin_large_x)
-      .padding(vertical = Dimens.margin_small_x),
-    verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
+      .wrapContentSize(Alignment.TopStart)
   ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)) {
-      Icon(
-        imageVector = transaction.target.icon.imageVector,
-        contentDescription = "icon",
-        modifier = Modifier.size(Dimens.icon_size),
-        tint = transaction.target.color.color,
-      )
-      Text(
-        text = transaction.target.name.stringValue(),
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.weight(1f),
-      )
-      Text(
-        text = transaction.amount.formattedValue,
-        style = MaterialTheme.typography.bodyLarge,
-        color = transaction.textColor()
-      )
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-      if (isTransfer) {
-        HorizontalSpacer(width = Dimens.icon_size)
+    Column(
+      modifier = modifier
+        .fillMaxWidth()
+        .pointerInput(Unit) {
+          detectTapGestures(
+            onLongPress = {
+              expanded = !expanded
+            },
+            onTap = { onClick() }
+          )
+        }
+        .padding(horizontal = Dimens.margin_large_x, vertical = Dimens.margin_small_x),
+      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
+    ) {
+      Row(horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)) {
         Icon(
-          imageVector = ExpeIcons.SubdirectoryArrowRight,
-          modifier = Modifier.size(Dimens.icon_size_small),
-          contentDescription = null,
+          imageVector = transaction.target.icon.imageVector,
+          contentDescription = "icon",
+          modifier = Modifier.size(Dimens.icon_size),
+          tint = transaction.target.color.color,
         )
-      } else {
-        HorizontalSpacer(width = Dimens.icon_size)
+        Text(
+          text = transaction.target.name.stringValue(),
+          style = MaterialTheme.typography.bodyLarge,
+          modifier = Modifier.weight(1f),
+        )
+        Text(
+          text = transaction.amount.formattedValue,
+          style = MaterialTheme.typography.bodyLarge,
+          color = transaction.textColor()
+        )
       }
-      HorizontalSpacer(width = Dimens.margin_small_xx)
-      Icon(
-        imageVector = transaction.source.icon.imageVector,
-        contentDescription = null,
-        modifier = Modifier.size(Dimens.icon_size_small)
-      )
-      HorizontalSpacer(width = Dimens.margin_small_xx)
-      Text(
-        text = transaction.source.name.stringValue(),
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.weight(1f),
-      )
-      HorizontalSpacer(width = Dimens.margin_small_xx)
-      if (isTransfer) {
-        transaction.transferReceivedAmount?.formattedValue?.let { amount ->
-          Text(
-            text = amount,
-            style = MaterialTheme.typography.bodyLarge,
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        if (isTransfer) {
+          HorizontalSpacer(width = Dimens.icon_size)
+          Icon(
+            imageVector = ExpeIcons.SubdirectoryArrowRight,
+            modifier = Modifier.size(Dimens.icon_size_small),
+            contentDescription = null,
+          )
+        } else {
+          HorizontalSpacer(width = Dimens.icon_size)
+        }
+        HorizontalSpacer(width = Dimens.margin_small_xx)
+        Icon(
+          imageVector = transaction.source.icon.imageVector,
+          contentDescription = null,
+          modifier = Modifier.size(Dimens.icon_size_small)
+        )
+        HorizontalSpacer(width = Dimens.margin_small_xx)
+        Text(
+          text = transaction.source.name.stringValue(),
+          style = MaterialTheme.typography.bodyLarge,
+          modifier = Modifier.weight(1f),
+        )
+        HorizontalSpacer(width = Dimens.margin_small_xx)
+        if (isTransfer) {
+          transaction.transferReceivedAmount?.formattedValue?.let { amount ->
+            Text(
+              text = amount,
+              style = MaterialTheme.typography.bodyLarge,
+            )
+          }
+        }
+      }
+      transaction.note?.let { note ->
+        Text(
+          text = note,
+          style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
+          modifier = Modifier.padding(bottom = Dimens.margin_small_x),
+        )
+      }
+
+      // Todo make dropdown menu width as wide of Row
+      DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        scrollState = scrollState,
+      ) {
+        repeat(5) {
+          DropdownMenuItem(
+            text = { Text("Item ${it + 1}") },
+            onClick = { /* TODO */ },
+            leadingIcon = {
+              Icon(
+                Icons.Outlined.Edit,
+                contentDescription = null
+              )
+            }
           )
         }
       }
-    }
-    transaction.note?.let { note ->
-      Text(
-        text = note,
-        style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
-        modifier = Modifier.padding(bottom = Dimens.margin_small_x),
-      )
     }
   }
   ExpeDivider(

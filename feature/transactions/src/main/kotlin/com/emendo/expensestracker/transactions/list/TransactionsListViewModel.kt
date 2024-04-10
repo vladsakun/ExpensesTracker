@@ -32,7 +32,6 @@ import javax.inject.Inject
 class TransactionsListViewModel @Inject constructor(
   private val transactionRepository: TransactionRepository,
   timeZoneManager: ExpeTimeZoneManager,
-  private val appNavigationEventBus: com.emendo.expensestracker.app.base.api.AppNavigationEventBus,
   private val amountFormatter: AmountFormatter,
   private val currencyCacheManager: CurrencyCacheManager,
   private val getTransactionsSumUseCase: GetTransactionsSumUseCase,

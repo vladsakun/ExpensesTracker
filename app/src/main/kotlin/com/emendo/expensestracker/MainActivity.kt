@@ -14,17 +14,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
-import com.emendo.expensestracker.core.app.common.ext.collectWhenStarted
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
-import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -47,15 +44,6 @@ class MainActivity : ComponentActivity() {
     setContent {
       val darkTheme = isSystemInDarkTheme()
       val navController = rememberNavController()
-
-      LaunchedEffect(viewModel.navigationEvent) {
-        viewModel.navigationEvent.collectWhenStarted(this@MainActivity) { event ->
-          if (event.navigateUp) {
-            navController.navigateUp()
-          }
-          navController.navigate(event.direction)
-        }
-      }
 
       // Update the dark content of the system bars to match the theme
       DisposableEffect(darkTheme) {

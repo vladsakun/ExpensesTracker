@@ -3,7 +3,6 @@ package com.emendo.expensestracker.categories.list
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.emendo.expensestracker.app.base.api.AppNavigationEventBus
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
@@ -45,7 +44,6 @@ private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_c
 class CategoriesListViewModel @Inject constructor(
   getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appContext: Application,
-  private val appNavigationEventBus: AppNavigationEventBus,
   private val categoryRepository: CategoryRepository,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
