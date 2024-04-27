@@ -101,7 +101,7 @@ fun CategoriesGrid(
         icon = category.icon.imageVector,
         total = "",
         onClick = { onCategoryClick(category) },
-        isEditMode = { false },
+        editMode = { false },
         onDeleteClick = {},
       )
     }

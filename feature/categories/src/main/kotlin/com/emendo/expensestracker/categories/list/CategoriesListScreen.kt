@@ -80,7 +80,7 @@ fun CategoriesListRoute(
         }
       },
       onPageSelected = remember { viewModel::pageSelected },
-      onEditClick = remember { viewModel::inverseEditMode },
+      onEditClick = remember { viewModel::invertEditMode },
       onDeleteCategoryClick = remember { viewModel::showConfirmDeleteCategoryBottomSheet },
       onMove = remember { viewModel::onMove },
       enableEditMode = remember { viewModel::enableEditMode },
@@ -156,7 +156,7 @@ private fun CategoriesListScreenContent(
             ) { page ->
               CategoriesGrid(
                 categories = state.categories[page]!!,
-                isEditModeProvider = isEditModeProvider,
+                editModeProvider = isEditModeProvider,
                 onCategoryClick = onCategoryClick,
                 onCreateCategoryClick = onCreateCategoryClick,
                 onDeleteCategoryClick = onDeleteCategoryClick,
@@ -176,7 +176,7 @@ private fun CategoriesListScreenContent(
 @Composable
 private fun CategoriesGrid(
   categories: CategoriesList,
-  isEditModeProvider: () -> Boolean,
+  editModeProvider: () -> Boolean,
   onCategoryClick: (CategoryWithTotal) -> Unit,
   onCreateCategoryClick: () -> Unit,
   onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
@@ -211,7 +211,7 @@ private fun CategoriesGrid(
   CategoriesLazyVerticalGrid(
     modifier = Modifier
       .fillMaxSize()
-      .dragContainer(dragDropState, isEditModeProvider)
+      .dragContainer(dragDropState, editModeProvider)
       .combinedClickable(
         onLongClick = onLongClick,
         onClick = onClick,
@@ -233,7 +233,7 @@ private fun CategoriesGrid(
           icon = category.category.icon.imageVector,
           total = category.totalAmount.formattedValue,
           onClick = { onCategoryClick(category) },
-          isEditMode = isEditModeProvider,
+          editMode = editModeProvider,
           onDeleteClick = { onDeleteCategoryClick(category) },
           modifier = Modifier.shadow(elevation, RoundedCornerNormalRadiusShape),
         )

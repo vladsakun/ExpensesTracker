@@ -38,7 +38,7 @@ fun CategoryItem(
   total: String,
   onClick: () -> Unit,
   onDeleteClick: () -> Unit,
-  isEditMode: () -> Boolean,
+  editMode: () -> Boolean,
   modifier: Modifier = Modifier,
 ) {
   val infiniteTransition = rememberInfiniteTransition(label = "rotationTransition")
@@ -53,7 +53,7 @@ fun CategoryItem(
   )
 
   Box {
-    if (isEditMode()) {
+    if (editMode()) {
       IconButton(
         modifier = Modifier
           .zIndex(2f)
@@ -78,7 +78,7 @@ fun CategoryItem(
         .fillMaxSize()
         .padding(ItemPadding)
         .graphicsLayer {
-          if (isEditMode()) {
+          if (editMode()) {
             rotationZ = transition.value
             translationX = transition.value
           }
@@ -131,7 +131,7 @@ fun AddCategoryItem(
       icon = AccountIcons.ChildCare,
       total = "$100",
       onClick = { },
-      isEditMode = { false },
+      editMode = { false },
       onDeleteClick = {},
       modifier = Modifier.alpha(0f),
     )

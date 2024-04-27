@@ -5,37 +5,118 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
+import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
+import com.emendo.expensestracker.core.app.common.network.Dispatcher
+import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.domain.api.CreateTransactionController
+import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountsListViewModel @Inject constructor(
-  accountRepository: AccountRepository,
+  private val accountRepository: AccountRepository,
   private val createTransactionController: CreateTransactionController,
+  @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-  val uiState: StateFlow<AccountsListUiState> = accountsUiState(accountRepository)
-    .stateInLazily(
+  private val selectedAccounts: MutableStateFlow<Set<AccountModel>> = MutableStateFlow(emptySet())
+
+  val uiState: StateFlow<AccountsListUiState> =
+    combine(accountsUiState(accountRepository), selectedAccounts) { uiState, selectedAccounts ->
+      if (uiState is AccountsListUiState.DisplayAccountsList) {
+        val accountModels = (orderedAccounts ?: uiState.accountModels).map { accountUiModel ->
+          accountUiModel.copy(selected = selectedAccounts.contains(accountUiModel.accountModel))
+        }
+        AccountsListUiState.DisplayAccountsList(accountModels.toImmutableList())
+      } else {
+        uiState
+      }
+    }.stateInLazily(
       scope = viewModelScope,
-      initialValue = AccountsListUiState.DisplayAccountsList(accountRepository.getAccountsSnapshot().toImmutableList()),
+      initialValue = AccountsListUiState.DisplayAccountsList(
+        accountRepository
+          .getAccountsSnapshot()
+          .map { AccountUiModel(it) }
+          .toImmutableList()
+      ),
     )
+
+  val editMode: StateFlow<Boolean> =
+    selectedAccounts
+      .map { it.isNotEmpty() }
+      .stateInWhileSubscribed(
+        scope = viewModelScope,
+        initialValue = false,
+      )
 
   val isSelectMode: Boolean
     get() = createTransactionController.isSelectMode()
   val titleResId: Int
     @StringRes get() = if (isSelectMode) R.string.select_account else R.string.accounts
 
-  fun selectAccountItem(account: AccountModel) {
+  private var orderedAccounts: List<AccountUiModel>? = null
+
+  fun pickAccountItem(account: AccountModel) {
     createTransactionController.selectAccount(account)
+  }
+
+  fun selectAccountItem(account: AccountModel) {
+    selectedAccounts.update { accounts ->
+      accounts.toMutableSet().apply {
+        if (contains(account)) {
+          remove(account)
+        } else {
+          add(account)
+        }
+      }
+    }
+  }
+
+  private fun updateAccountsIndexes(eventsToHandle: List<AccountUiModel>?) =
+    viewModelScope.launch(defaultDispatcher) {
+      if (eventsToHandle == null) {
+        return@launch
+      }
+
+      val accounts: List<AccountUiModel> = uiState.value.successValue?.accountModels ?: return@launch
+      val diff: MutableSet<AccountWithOrdinalIndex> = mutableSetOf()
+
+      accounts.forEachIndexed { index, uiModel ->
+        val account = uiModel.accountModel
+        val newOrderedAccountByIndex = eventsToHandle[index].accountModel
+        if (account.id != newOrderedAccountByIndex.id) {
+          diff.add(
+            AccountWithOrdinalIndex(
+              id = newOrderedAccountByIndex.id,
+              ordinalIndex = account.ordinalIndex,
+            )
+          )
+        }
+      }
+
+      if (diff.isEmpty()) {
+        return@launch
+      }
+
+      accountRepository.updateOrdinalIndex(diff)
+    }
+
+  fun disableEditMode() {
+    selectedAccounts.update { mutableSetOf() }
+    updateAccountsIndexes(orderedAccounts)
+  }
+
+  fun saveAccountsOrder(accountUiModels: List<AccountUiModel>?) {
+    orderedAccounts = accountUiModels
   }
 
   override fun onCleared() {
@@ -46,7 +127,13 @@ class AccountsListViewModel @Inject constructor(
 private fun accountsUiState(accountRepository: AccountRepository): Flow<AccountsListUiState> {
   return accountRepository.getAccounts().asResult().map { accountsResult ->
     when (accountsResult) {
-      is Result.Success -> AccountsListUiState.DisplayAccountsList(accountsResult.data.toImmutableList())
+      is Result.Success -> AccountsListUiState.DisplayAccountsList(
+        accountsResult.data
+          .map(::AccountUiModel)
+          .sortedBy { it.accountModel.ordinalIndex }
+          .toImmutableList()
+      )
+
       is Result.Error -> AccountsListUiState.Error("Error loading accounts")
       is Result.Loading -> AccountsListUiState.Loading
       is Result.Empty -> AccountsListUiState.Empty

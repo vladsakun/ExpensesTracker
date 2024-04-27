@@ -95,7 +95,7 @@ class CategoriesListViewModel @Inject constructor(
     selectedPageIndex = pageIndex
   }
 
-  fun inverseEditMode() {
+  fun invertEditMode() {
     _editMode.update { isEditMode ->
       if (isEditMode) {
         viewModelScope.launch {

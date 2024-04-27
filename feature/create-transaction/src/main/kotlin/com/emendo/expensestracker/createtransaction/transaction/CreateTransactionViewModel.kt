@@ -193,17 +193,15 @@ class CreateTransactionViewModel @Inject constructor(
       return
     }
 
-    setNonTransferTransactionType()
+    setTransferTransactionType()
   }
 
-  private fun setNonTransferTransactionType() {
+  private fun setTransferTransactionType() {
     viewModelScope.launch {
       val target = getLastTransferAccountOrRandomUseCase(createTransactionController.getSourceSnapshot()?.id)
       createTransactionController.setTarget(target)
 
-      if (target == null) {
-        return@launch
-      }
+      target ?: return@launch
 
       val source = createTransactionController.getSourceSnapshot() ?: return@launch
       val transferReceivedAmount = getConvertedFormattedValueUseCase(

@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -260,17 +261,24 @@ private inline fun Header(
   noinline onSelectAccountClick: () -> Unit,
   noinline onTransferTargetAccountClick: () -> Unit,
 ) {
-  if (state.screenData.transactionType == TransactionType.TRANSFER) {
-    TransferBlock(
-      state = state,
-      commandProcessor = commandProcessor,
-      onCreateAccountClick = onCreateAccountClick,
-      onSelectAccountClick = onSelectAccountClick,
-      onTransferTargetAccountClick = onTransferTargetAccountClick,
-    )
-  } else {
-    IncomeExpenseBlock(state, commandProcessor)
+  // Todo remove Uncategorized visible during animation when switching transaction type
+  AnimatedContent(
+    targetState = state.screenData.transactionType == TransactionType.TRANSFER,
+    label = "header",
+  ) { isTransfer ->
+    if (isTransfer) {
+      TransferBlock(
+        state = state,
+        commandProcessor = commandProcessor,
+        onCreateAccountClick = onCreateAccountClick,
+        onSelectAccountClick = onSelectAccountClick,
+        onTransferTargetAccountClick = onTransferTargetAccountClick,
+      )
+    } else {
+      IncomeExpenseBlock(state, commandProcessor)
+    }
   }
+
   ExpeDivider()
 }
 

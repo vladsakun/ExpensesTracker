@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.data.api.repository
 
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.coroutines.flow.Flow
@@ -30,10 +31,7 @@ interface AccountRepository {
     balance: BigDecimal,
   )
 
-  suspend fun updateOrdinalIndex(
-    id: Long,
-    ordinalIndex: Int,
-  )
+  suspend fun updateOrdinalIndex(newOrderedList: Set<AccountWithOrdinalIndex>)
 
   suspend fun deleteAccount(id: Long)
 }

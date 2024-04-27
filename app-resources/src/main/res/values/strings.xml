@@ -68,4 +68,7 @@
   <string name="transaction_detail_dialog_delete_confirm_title">Are you sure that you want to delete the transaction?</string>
 
   <string name="create_transaction_note_placeholder">Note</string>
+
+  <string name="search">Search</string>
+  <string name="sort">Sort</string>
 </resources>

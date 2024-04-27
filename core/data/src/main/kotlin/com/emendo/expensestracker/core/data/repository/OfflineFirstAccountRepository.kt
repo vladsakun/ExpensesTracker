@@ -10,6 +10,8 @@ import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
 import com.emendo.expensestracker.core.database.model.AccountEntity
 import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
+import com.emendo.expensestracker.core.database.util.DatabaseUtils
+import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
@@ -27,6 +29,7 @@ class OfflineFirstAccountRepository @Inject constructor(
   private val accountMapper: AccountMapper,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @ApplicationScope private val scope: CoroutineScope,
+  private val databaseUtils: DatabaseUtils,
 ) : AccountRepository {
 
   private val accountsList: StateFlow<List<AccountModel>> = accountsDao
@@ -90,14 +93,16 @@ class OfflineFirstAccountRepository @Inject constructor(
     }
   }
 
-  override suspend fun updateOrdinalIndex(id: Long, ordinalIndex: Int) {
-    withContext(ioDispatcher) {
-      accountsDao.updateOrdinalIndex(
-        AccountOrdinalIndexUpdate(
-          id = id,
-          ordinalIndex = ordinalIndex,
+  override suspend fun updateOrdinalIndex(newOrderedList: Set<AccountWithOrdinalIndex>) {
+    databaseUtils.expeWithTransaction {
+      newOrderedList.forEach { update ->
+        accountsDao.updateOrdinalIndex(
+          AccountOrdinalIndexUpdate(
+            id = update.id,
+            ordinalIndex = update.ordinalIndex,
+          )
         )
-      )
+      }
     }
   }
 
