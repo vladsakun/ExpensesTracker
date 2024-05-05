@@ -1,6 +1,9 @@
 package com.emendo.expensestracker.core.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,6 +29,7 @@ import com.emendo.expensestracker.core.designsystem.component.AutoResizedText
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
 import com.emendo.expensestracker.core.designsystem.utils.toDp
+import kotlin.random.Random
 
 private val ItemPadding
   get() = Dimens.margin_small_x
@@ -48,22 +52,25 @@ fun CategoryItem(
     animationSpec = infiniteRepeatable(
       animation = tween(200, easing = LinearEasing),
       repeatMode = RepeatMode.Reverse,
+      initialStartOffset = StartOffset(Random.nextInt(0, 200))
     ),
     label = "rotation"
   )
 
   Box {
-    if (editMode()) {
-      IconButton(
-        modifier = Modifier
-          .zIndex(2f)
-          .graphicsLayer {
-            val translation = -20f
-            translationX = translation
-            translationY = translation
-          },
-        onClick = onDeleteClick
-      ) {
+    AnimatedVisibility(
+      visible = editMode(),
+      modifier = Modifier
+        .zIndex(2f)
+        .graphicsLayer {
+          val translation = -20f
+          translationX = translation
+          translationY = translation
+        },
+      enter = fadeIn(),
+      exit = fadeOut(),
+    ) {
+      IconButton(onClick = onDeleteClick) {
         Icon(
           imageVector = ExpeIcons.Remove,
           contentDescription = "remove",

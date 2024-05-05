@@ -17,7 +17,7 @@ Engineering To-Do:
 Features:
 
 1) Accounts grouping (drag and drop)
-2) Add subaccounts (for 5 money envelopes in one account)
+2) Add compound budget
 3) Put transactions via voice input (ChatGPT). I say. 100$ restaurant, 200$ cafe and 30$ groceries. The app should add all the transactions
 4) Shortruts for transactions (like in 1Money)
 5) Expense Analytics: Advanced analytics features like trends, patterns, and forecasting help users gain deeper insights into their spending habits.

@@ -21,6 +21,7 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
+import timber.log.Timber
 
 @Composable
 fun ExpeApp(
@@ -66,6 +67,9 @@ private fun ExpeBottomBar(
   appState: ExpeAppState,
   modifier: Modifier = Modifier,
 ) {
+  // Todo remove log
+  Timber.d("currentDestination: $currentDestination")
+
   val routesOnBackStack: MutableList<TopLevelDestination> =
     appState.topLevelDestination
       .mapNotNull {
