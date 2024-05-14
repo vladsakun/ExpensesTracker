@@ -34,7 +34,7 @@ import com.emendo.expensestracker.core.ui.piechart.PieChartConstants.DEFAULT_STR
  * @param isEllipsizeEnabled: Boolean flag for enabling ellipsize
  * @param sliceMinTextWidthToEllipsize: Minimum width of the label post which label will be ellipsized
  * @param sliceLabelEllipsizeAt: Position at which the label will be truncated or ellipsized
- * @param chartPadding: Padding for the Pie chart/Donut Chart
+ * @param chartPadding: Padding for the Pie chart/Donut Chart (in percentage)
  * @param isSumVisible: When no slice is selected show the sum of values, only used for Donut Chart
  * @param isClickOnSliceEnabled: Enable/Disable the click on slice
  * @param sumUnit: The unit of the sum of values, only used for Donut Chart
@@ -43,7 +43,7 @@ data class PieChartConfig(
     val startAngle: Float = DEFAULT_START_ANGLE,
     val showSliceLabels: Boolean = true,
     val sliceLabelTextSize: TextUnit = DEFAULT_SLICE_LABEL_TEXT_SIZE.sp,
-    val sliceLabelTextColor: Color = Color.White,
+    val sliceLabelTextColor: Color = Color.Magenta,
     val sliceLabelTypeface: Typeface = Typeface.DEFAULT,
     val isAnimationEnable: Boolean = false,
     @IntRange(from = 1) val animationDuration: Int = 500,
@@ -65,13 +65,13 @@ data class PieChartConfig(
     val sumUnit: String = "",
     val isClickOnSliceEnabled: Boolean = true,
 ) {
-  enum class LabelType {
-    PERCENTAGE,
-    VALUE
-  }
+    enum class LabelType {
+        PERCENTAGE,
+        VALUE,
+    }
 
-  enum class LabelColorType {
-    SPECIFIED_COLOR,
-    SLICE_COLOR
-  }
+    enum class LabelColorType {
+        SPECIFIED_COLOR,
+        SLICE_COLOR,
+    }
 }
