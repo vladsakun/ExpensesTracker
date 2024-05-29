@@ -7,11 +7,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
@@ -21,39 +23,44 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
-import timber.log.Timber
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun ExpeApp(
   windowSizeClass: WindowSizeClass,
   navController: NavHostController,
-  appState: ExpeAppState = rememberExpeAppState(
-    windowSizeClass = windowSizeClass,
-    navController = navController,
-  ),
+  appState: ExpeAppState =
+      rememberExpeAppState(
+          windowSizeClass = windowSizeClass,
+          navController = navController,
+      ),
 ) {
   ExpeScaffold(
     bottomBar = {
       if (appState.shouldShowBottomBar) {
       }
+
+        val routesOnBackStack = rememberRoutesOnBackStack(appState)
       ExpeBottomBar(
-        currentDestination = appState.currentDestination,
+          routesOnBackStack = routesOnBackStack.value,
         appState = appState,
       )
     },
   ) { padding ->
     Row(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(padding)
-        .consumeWindowInsets(padding)
-        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+        modifier =
+        Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .consumeWindowInsets(padding)
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
     ) {
       ExpeNavHost(
         appState = appState,
         onShowSnackbar = { message, action ->
           return@ExpeNavHost true
-        }
+        },
       )
     }
   }
@@ -61,27 +68,10 @@ fun ExpeApp(
 
 @Composable
 private fun ExpeBottomBar(
-  // Used to be recomposed on each navigation
-  @Suppress("UNUSED_PARAMETER")
-  currentDestination: NavDestination?,
+    routesOnBackStack: ImmutableList<TopLevelDestination>,
   appState: ExpeAppState,
   modifier: Modifier = Modifier,
 ) {
-  // Todo remove log
-  Timber.d("currentDestination: $currentDestination")
-
-  val routesOnBackStack: MutableList<TopLevelDestination> =
-    appState.topLevelDestination
-      .mapNotNull {
-        val isRouteOnBackStack = appState.navController.isRouteOnBackStack(it.screen.startRoute)
-        if (isRouteOnBackStack) it else null
-      }
-      .toMutableList()
-
-  if (routesOnBackStack.size > 1) {
-    routesOnBackStack.remove(TopLevelDestination.start)
-  }
-
   ExpeNavigationBar(modifier = modifier) {
     appState.topLevelDestination.forEach { item ->
       if (item == TopLevelDestination.CREATE_TRANSACTION) {
@@ -125,13 +115,30 @@ private fun ExpeBottomBar(
               textAlign = TextAlign.Center,
             )
           }
-        }
+        },
       )
     }
   }
 }
 
-private fun TopLevelDestination.isSelected(routesOnBackStack: MutableList<TopLevelDestination>): Boolean =
+@Composable
+private fun rememberRoutesOnBackStack(appState: ExpeAppState): MutableState<ImmutableList<TopLevelDestination>> =
+    remember(appState.currentDestination) {
+        val routesOnBackStack: MutableList<TopLevelDestination> =
+            appState.topLevelDestination
+                .mapNotNull {
+                    val isRouteOnBackStack =
+                        appState.navController.isRouteOnBackStack(it.screen.startRoute)
+                    if (isRouteOnBackStack) it else null
+                }
+                .toMutableList()
+        if (routesOnBackStack.size > 1) {
+            routesOnBackStack.remove(TopLevelDestination.start)
+        }
+        mutableStateOf(routesOnBackStack.toPersistentList())
+    }
+
+private fun TopLevelDestination.isSelected(routesOnBackStack: ImmutableList<TopLevelDestination>): Boolean =
   if (routesOnBackStack.contains(TopLevelDestination.CREATE_TRANSACTION)) {
     false
   } else {
