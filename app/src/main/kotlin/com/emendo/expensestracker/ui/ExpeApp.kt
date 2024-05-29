@@ -123,9 +123,9 @@ private fun ExpeBottomBar(
 private fun rememberRoutesOnBackStack(appState: ExpeAppState): MutableState<ImmutableList<TopLevelDestination>> =
   remember(appState.currentDestination) {
     val routesOnBackStack: MutableList<TopLevelDestination> = appState.topLevelDestination.mapNotNull {
-        val isRouteOnBackStack = appState.navController.isRouteOnBackStack(it.screen.startRoute)
-        if (isRouteOnBackStack) it else null
-      }.toMutableList()
+      val isRouteOnBackStack = appState.navController.isRouteOnBackStack(it.screen.startRoute)
+      if (isRouteOnBackStack) it else null
+    }.toMutableList()
     if (routesOnBackStack.size > 1) {
       routesOnBackStack.remove(TopLevelDestination.start)
     }
