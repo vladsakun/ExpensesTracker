@@ -30,31 +30,29 @@ import kotlinx.collections.immutable.toPersistentList
 fun ExpeApp(
   windowSizeClass: WindowSizeClass,
   navController: NavHostController,
-  appState: ExpeAppState =
-      rememberExpeAppState(
-          windowSizeClass = windowSizeClass,
-          navController = navController,
-      ),
+  appState: ExpeAppState = rememberExpeAppState(
+    windowSizeClass = windowSizeClass,
+    navController = navController,
+  ),
 ) {
   ExpeScaffold(
     bottomBar = {
       if (appState.shouldShowBottomBar) {
       }
 
-        val routesOnBackStack = rememberRoutesOnBackStack(appState)
+      val routesOnBackStack = rememberRoutesOnBackStack(appState)
       ExpeBottomBar(
-          routesOnBackStack = routesOnBackStack.value,
+        routesOnBackStack = routesOnBackStack.value,
         appState = appState,
       )
     },
   ) { padding ->
     Row(
-        modifier =
-        Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .consumeWindowInsets(padding)
-            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(padding)
+        .consumeWindowInsets(padding)
+        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
     ) {
       ExpeNavHost(
         appState = appState,
@@ -68,7 +66,7 @@ fun ExpeApp(
 
 @Composable
 private fun ExpeBottomBar(
-    routesOnBackStack: ImmutableList<TopLevelDestination>,
+  routesOnBackStack: ImmutableList<TopLevelDestination>,
   appState: ExpeAppState,
   modifier: Modifier = Modifier,
 ) {
@@ -123,20 +121,16 @@ private fun ExpeBottomBar(
 
 @Composable
 private fun rememberRoutesOnBackStack(appState: ExpeAppState): MutableState<ImmutableList<TopLevelDestination>> =
-    remember(appState.currentDestination) {
-        val routesOnBackStack: MutableList<TopLevelDestination> =
-            appState.topLevelDestination
-                .mapNotNull {
-                    val isRouteOnBackStack =
-                        appState.navController.isRouteOnBackStack(it.screen.startRoute)
-                    if (isRouteOnBackStack) it else null
-                }
-                .toMutableList()
-        if (routesOnBackStack.size > 1) {
-            routesOnBackStack.remove(TopLevelDestination.start)
-        }
-        mutableStateOf(routesOnBackStack.toPersistentList())
+  remember(appState.currentDestination) {
+    val routesOnBackStack: MutableList<TopLevelDestination> = appState.topLevelDestination.mapNotNull {
+        val isRouteOnBackStack = appState.navController.isRouteOnBackStack(it.screen.startRoute)
+        if (isRouteOnBackStack) it else null
+      }.toMutableList()
+    if (routesOnBackStack.size > 1) {
+      routesOnBackStack.remove(TopLevelDestination.start)
     }
+    mutableStateOf(routesOnBackStack.toPersistentList())
+  }
 
 private fun TopLevelDestination.isSelected(routesOnBackStack: ImmutableList<TopLevelDestination>): Boolean =
   if (routesOnBackStack.contains(TopLevelDestination.CREATE_TRANSACTION)) {
