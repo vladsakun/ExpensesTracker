@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.usersettings
+package com.emendo.expensestracker.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

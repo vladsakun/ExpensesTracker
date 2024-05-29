@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.usersettings
+package com.emendo.expensestracker.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

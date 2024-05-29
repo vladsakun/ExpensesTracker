@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.usersettings
+package com.emendo.expensestracker.settings
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector

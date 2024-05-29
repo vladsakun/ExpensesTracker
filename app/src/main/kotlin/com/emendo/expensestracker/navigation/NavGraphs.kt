@@ -4,8 +4,8 @@ import com.emendo.expensestracker.accounts.AccountsNavGraph
 import com.emendo.expensestracker.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.base.shared.AppbaseuiNavGraph
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
+import com.emendo.expensestracker.settings.SettingsNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
-import com.emendo.expensestracker.usersettings.UsersettingsNavGraph
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 
@@ -20,7 +20,7 @@ object NavGraphs {
                     CategoriesNavGraph,
                     AccountsNavGraph,
                     TransactionsNavGraph,
-                    UsersettingsNavGraph,
+                    SettingsNavGraph,
                     CreatetransactionNavGraph,
                     AppbaseuiNavGraph,
                 )

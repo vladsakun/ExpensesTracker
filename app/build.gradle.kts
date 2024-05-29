@@ -104,7 +104,7 @@ dependencies {
     implementation(projects.feature.accounts)
     implementation(projects.feature.transactions)
     implementation(projects.feature.categories)
-    implementation(projects.feature.userSettings)
+    implementation(projects.feature.settings)
     implementation(projects.feature.createTransaction)
 
     implementation(projects.androidApi)

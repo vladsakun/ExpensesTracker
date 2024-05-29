@@ -7,8 +7,8 @@ import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
+import com.emendo.expensestracker.settings.SettingsNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
-import com.emendo.expensestracker.usersettings.UsersettingsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 
 /**
@@ -52,7 +52,7 @@ enum class TopLevelDestination(
         titleTextId = R.string.transactions,
     ),
     SETTINGS(
-        screen = UsersettingsNavGraph,
+        screen = SettingsNavGraph,
         selectedIcon = ExpeIcons.Settings,
         unselectedIcon = ExpeIcons.Settings,
         iconTextId = R.string.settings,
