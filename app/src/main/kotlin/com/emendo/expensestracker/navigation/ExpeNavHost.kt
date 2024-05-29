@@ -9,9 +9,9 @@ import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDesti
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.accounts.detail.AccountDetailScreen
 import com.emendo.expensestracker.categories.create.CreateCategoryRoute
-import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
+import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.categories.detail.CategoryDetailScreen
+import com.emendo.expensestracker.categories.detail.CategoryDetailRoute
 import com.emendo.expensestracker.core.app.base.shared.color.selectColorResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.currency.selectCurrencyResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.icon.selectIconResultRecipient
@@ -24,57 +24,56 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun ExpeNavHost(
-  appState: ExpeAppState,
-  onShowSnackbar: suspend (String, String?) -> Boolean,
-  modifier: Modifier = Modifier,
+    appState: ExpeAppState,
+    onShowSnackbar: suspend (String, String?) -> Boolean,
+    modifier: Modifier = Modifier,
 ) {
-  val navController = appState.navController
+    val navController = appState.navController
 
-  if (IS_DEBUG_ACCOUNT) {
-    LaunchedEffect(key1 = Unit) {
-      delay(200)
-      navController.navigate(AccountsScreenRouteDestination)
+    if (IS_DEBUG_ACCOUNT) {
+        LaunchedEffect(key1 = Unit) {
+            delay(200)
+            navController.navigate(AccountsScreenRouteDestination)
+        }
     }
-  }
 
-  DestinationsNavHost(
-    navController = appState.navController,
-    navGraph = NavGraphs.root,
-    modifier = modifier,
-  ) {
-    composable(CreateAccountRouteDestination) {
-      CreateAccountRoute(
-        navigator = destinationsNavigator,
-        colorResultRecipient = selectColorResultRecipient(),
-        currencyResultRecipient = selectCurrencyResultRecipient(),
-        iconResultRecipient = selectIconResultRecipient(),
-      )
+    DestinationsNavHost(
+        navController = appState.navController,
+        navGraph = NavGraphs.root,
+        modifier = modifier,
+    ) {
+        composable(CreateAccountRouteDestination) {
+            CreateAccountRoute(
+                navigator = destinationsNavigator,
+                colorResultRecipient = selectColorResultRecipient(),
+                currencyResultRecipient = selectCurrencyResultRecipient(),
+                iconResultRecipient = selectIconResultRecipient(),
+            )
+        }
+        composable(AccountDetailScreenDestination) {
+            AccountDetailScreen(
+                navigator = destinationsNavigator,
+                accountId = navArgs.accountId,
+                colorResultRecipient = selectColorResultRecipient(),
+                currencyResultRecipient = selectCurrencyResultRecipient(),
+                iconResultRecipient = selectIconResultRecipient(),
+            )
+        }
+        composable(CreateCategoryRouteDestination) {
+            CreateCategoryRoute(
+                navigator = destinationsNavigator,
+                categoryType = navArgs.categoryType,
+                colorResultRecipient = selectColorResultRecipient(),
+                iconResultRecipient = selectIconResultRecipient(),
+            )
+        }
+        composable(CategoryDetailRouteDestination) {
+            CategoryDetailRoute(
+                navigator = destinationsNavigator,
+                categoryId = navArgs.categoryId,
+                colorResultRecipient = selectColorResultRecipient(),
+                iconResultRecipient = selectIconResultRecipient(),
+            )
+        }
     }
-    composable(AccountDetailScreenDestination) {
-      AccountDetailScreen(
-        navigator = destinationsNavigator,
-        accountId = navArgs.accountId,
-        colorResultRecipient = selectColorResultRecipient(),
-        currencyResultRecipient = selectCurrencyResultRecipient(),
-        iconResultRecipient = selectIconResultRecipient(),
-      )
-    }
-    composable(CreateCategoryRouteDestination) {
-      CreateCategoryRoute(
-        navigator = destinationsNavigator,
-        categoryType = navArgs.categoryType,
-        colorResultRecipient = selectColorResultRecipient(),
-        iconResultRecipient = selectIconResultRecipient(),
-      )
-    }
-    composable(CategoryDetailScreenDestination) {
-      CategoryDetailScreen(
-        navigator = destinationsNavigator,
-        categoryId = navArgs.categoryId,
-        colorResultRecipient = selectColorResultRecipient(),
-        iconResultRecipient = selectIconResultRecipient(),
-      )
-    }
-  }
 }
-

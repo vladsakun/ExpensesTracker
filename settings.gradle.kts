@@ -1,19 +1,19 @@
 pluginManagement {
-  includeBuild("build-logic")
-  repositories {
-    google()
-    mavenCentral()
-    gradlePluginPortal()
-  }
+    includeBuild("build-logic")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 
 dependencyResolutionManagement {
-  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-  repositories {
-    google()
-    mavenCentral()
-    maven("https://jitpack.io")
-  }
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
 }
 
 rootProject.name = "expensestracker"
@@ -36,7 +36,7 @@ include(":android-api")
 include(":feature:accounts", ":feature:accounts:api")
 include(":feature:categories", ":feature:categories:api")
 include(":feature:transactions")
-include(":feature:settings")
+include(":feature:user-settings")
 include(":feature:create-transaction", ":feature:create-transaction:api")
 include(":sync:work")
 include(":sync:sync-test")

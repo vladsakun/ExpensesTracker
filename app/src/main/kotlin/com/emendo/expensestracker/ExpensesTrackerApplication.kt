@@ -14,60 +14,60 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class ExpensesTrackerApplication : Application() {
-
-  companion object {
-    var applicationScope = MainScope()
-  }
-
-  override fun onCreate() {
-    enableStrictMode()
-
-    super.onCreate()
-    // Initialize Sync; the system responsible for keeping data in the app up to date.
-    Sync.initialize(context = this)
-    Timber.plant(Timber.DebugTree())
-
-    //    RebuggerConfig.init(
-    //      tag = "MyAppRebugger", // changing default tag
-    //      logger = { tag, message -> Timber.i(tag, message) } // use Timber for logging
-    //    )
-  }
-
-  override fun onLowMemory() {
-    super.onLowMemory()
-    applicationScope.cancel("onLowMemory() called by system")
-    applicationScope = MainScope()
-  }
-
-  @Inject
-  fun initApp(
-    appCreatePlugins: @JvmSuppressWildcards Set<OnAppCreate>,
-  ) {
-    applicationScope.launch {
-      appCreatePlugins.forEach { it.onCreate() }
+    companion object {
+        var applicationScope = MainScope()
     }
-  }
 
-  private fun enableStrictMode() {
-    if (BuildConfig.DEBUG) {
-      StrictMode.setThreadPolicy(
-        StrictMode.ThreadPolicy.Builder()
-          .detectDiskReads()
-          .detectDiskWrites()
-          .detectNetwork()
-          // or .detectAll() for all detectable problems
-          .penaltyFlashScreen()
-          .penaltyLog()
-          .build()
-      )
-      StrictMode.setVmPolicy(
-        StrictMode.VmPolicy.Builder()
-          .detectLeakedSqlLiteObjects()
-          .detectLeakedClosableObjects()
-          .penaltyLog()
-          .penaltyDeath()
-          .build()
-      )
+    override fun onCreate() {
+        enableStrictMode()
+
+        super.onCreate()
+        // Initialize Sync; the system responsible for keeping data in the app up to date.
+        Sync.initialize(context = this)
+        Timber.plant(Timber.DebugTree())
+
+        //        RecomposeLoggerConfig.isEnabled = true
+        //        RecomposeHighlighterConfig.isEnabled = true
+
+        //    RebuggerConfig.init(
+        //      tag = "MyAppRebugger", // changing default tag
+        //      logger = { tag, message -> Timber.i(tag, message) } // use Timber for logging
+        //    )
     }
-  }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        applicationScope.cancel("onLowMemory() called by system")
+        applicationScope = MainScope()
+    }
+
+    @Inject
+    fun initApp(appCreatePlugins: @JvmSuppressWildcards Set<OnAppCreate>) {
+        applicationScope.launch {
+            appCreatePlugins.forEach { it.onCreate() }
+        }
+    }
+
+    private fun enableStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    // or .detectAll() for all detectable problems
+                    .penaltyFlashScreen()
+                    .penaltyLog()
+                    .build(),
+            )
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build(),
+            )
+        }
+    }
 }

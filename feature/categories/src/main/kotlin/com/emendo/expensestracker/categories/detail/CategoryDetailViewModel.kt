@@ -6,7 +6,7 @@ import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryViewModel
-import com.emendo.expensestracker.categories.destinations.CategoryDetailScreenDestination
+import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
 import com.emendo.expensestracker.core.domain.category.GetCategorySnapshotByIdUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
@@ -27,84 +27,87 @@ private const val CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG = "category_detail_dele
 private const val KEY_CATEGORY_MODEL = "CategoryModel"
 
 @HiltViewModel
-class CategoryDetailViewModel @Inject constructor(
-  private val savedStateHandle: SavedStateHandle,
-  private val categoryRepository: CategoryRepository,
-  private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
-  override val selectIconScreenApi: SelectIconScreenApi,
-  override val selectColorScreenApi: SelectIconScreenApi,
-) : CategoryViewModel<CategoryDetailScreenDataImpl>(),
-    ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
-    CategoryDetailsCommandReceiver {
+class CategoryDetailViewModel
+    @Inject
+    constructor(
+        private val savedStateHandle: SavedStateHandle,
+        private val categoryRepository: CategoryRepository,
+        private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
+        override val selectIconScreenApi: SelectIconScreenApi,
+        override val selectColorScreenApi: SelectIconScreenApi,
+    ) : CategoryViewModel<CategoryDetailScreenDataImpl>(),
+        ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
+        CategoryDetailsCommandReceiver {
+        private val categoryId: Long by lazy { savedStateHandle[CategoryDetailRouteDestination.arguments[0].name]!! }
+        private var updateCategoryJob: Job? = null
+        private var categoryType: CategoryType?
+            get() = savedStateHandle.get<Int>(KEY_CATEGORY_MODEL)?.let { CategoryType.getById(it) }
+            set(value) {
+                savedStateHandle[KEY_CATEGORY_MODEL] = value?.id
+            }
 
-  private val categoryId: Long by lazy { savedStateHandle[CategoryDetailScreenDestination.arguments[0].name]!! }
-  private var updateCategoryJob: Job? = null
-  private var categoryType: CategoryType?
-    get() = savedStateHandle.get<Int>(KEY_CATEGORY_MODEL)?.let { CategoryType.getById(it) }
-    set(value) {
-      savedStateHandle[KEY_CATEGORY_MODEL] = value?.id
+        init {
+            if (state.value.dataValue() == null) {
+                viewModelScope.launch {
+                    val category: CategoryModel = getCategorySnapshotByIdUseCase(categoryId).first()
+
+                    categoryType = category.type
+                    // Todo handle error case
+                    _state.update { UiState.Data(getDefaultCategoryDetailScreenData(category)) }
+                }
+            }
+        }
+
+        override fun updateCategory() {
+            if (updateCategoryJob != null) {
+                return
+            }
+
+            updateCategoryJob =
+                viewModelScope.launch {
+                    with(state.value.requireDataValue().categoryScreenData) {
+                        categoryRepository.updateCategory(
+                            id = categoryId,
+                            name = title.textValueOrBlank(),
+                            icon = icon,
+                            color = color,
+                            type = checkNotNull(categoryType),
+                        )
+                    }
+
+                    navigateUp()
+                }
+        }
+
+        override fun showDeleteCategoryBottomSheet() {
+            showModalBottomSheet(
+                GeneralBottomSheetData
+                    .Builder(
+                        id = CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG,
+                        positiveAction = Action(resourceValueOf(R.string.delete), ::deleteCategory),
+                    )
+                    .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
+                    .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
+                    .build(),
+            )
+        }
+
+        private fun deleteCategory() {
+            viewModelScope.launch {
+                categoryRepository.deleteCategory(categoryId)
+                navigateUp()
+            }
+        }
     }
 
-  init {
-    if (state.value.dataValue() == null) {
-      viewModelScope.launch {
-        val category: CategoryModel = getCategorySnapshotByIdUseCase(categoryId).first()
-
-        categoryType = category.type
-        // Todo handle error case
-        _state.update { UiState.Data(getDefaultCategoryDetailScreenData(category)) }
-      }
-    }
-  }
-
-  override fun updateCategory() {
-    if (updateCategoryJob != null) {
-      return
-    }
-
-    updateCategoryJob = viewModelScope.launch {
-      with(state.value.requireDataValue().categoryScreenData) {
-        categoryRepository.updateCategory(
-          id = categoryId,
-          name = title.textValueOrBlank(),
-          icon = icon,
-          color = color,
-          type = checkNotNull(categoryType),
+private fun getDefaultCategoryDetailScreenData(categoryModel: CategoryModel) =
+    with(categoryModel) {
+        CategoryDetailScreenDataImpl(
+            CategoryScreenData(
+                title = name,
+                icon = icon,
+                color = color,
+                confirmButtonEnabled = false,
+            ),
         )
-      }
-
-      navigateUp()
     }
-  }
-
-  override fun showDeleteCategoryBottomSheet() {
-    showModalBottomSheet(
-      GeneralBottomSheetData
-        .Builder(
-          id = CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG,
-          positiveAction = Action(resourceValueOf(R.string.delete), ::deleteCategory),
-        )
-        .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
-        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
-        .build()
-    )
-  }
-
-  private fun deleteCategory() {
-    viewModelScope.launch {
-      categoryRepository.deleteCategory(categoryId)
-      navigateUp()
-    }
-  }
-}
-
-private fun getDefaultCategoryDetailScreenData(categoryModel: CategoryModel) = with(categoryModel) {
-  CategoryDetailScreenDataImpl(
-    CategoryScreenData(
-      title = name,
-      icon = icon,
-      color = color,
-      confirmButtonEnabled = false,
-    )
-  )
-}

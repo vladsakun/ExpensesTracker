@@ -17,59 +17,60 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.OpenResultRecipient
 import de.palm.composestateevents.NavigationEventEffect
 
+// @NonSkippableComposable
 @Destination
 @Composable
 fun CreateCategoryRoute(
-  navigator: DestinationsNavigator,
-  // retrieved in ViewModel via SavedStateHandle
-  @Suppress("UNUSED_PARAMETER") categoryType: CategoryType,
-  colorResultRecipient: OpenResultRecipient<Int>,
-  iconResultRecipient: OpenResultRecipient<Int>,
-  viewModel: CreateCategoryViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator,
+    // retrieved in ViewModel via SavedStateHandle
+    @Suppress("UNUSED_PARAMETER") categoryType: CategoryType,
+    colorResultRecipient: OpenResultRecipient<Int>,
+    iconResultRecipient: OpenResultRecipient<Int>,
+    viewModel: CreateCategoryViewModel = hiltViewModel(),
 ) {
-  colorResultRecipient.handleValueResult(viewModel::updateColor)
-  iconResultRecipient.handleValueResult(viewModel::updateIcon)
+    colorResultRecipient.handleValueResult(viewModel::updateColor)
+    iconResultRecipient.handleValueResult(viewModel::updateIcon)
 
-  val state = viewModel.state.collectAsStateWithLifecycle()
+    val state = viewModel.state.collectAsStateWithLifecycle()
 
-  CreateCategoryContent(
-    stateProvider = state::value,
-    onNavigationClick = navigator::navigateUp,
-    commandProcessor = viewModel::processCommand,
-    onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
-    onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
-  )
+    CreateCategoryContent(
+        stateProvider = state::value,
+        onNavigationClick = navigator::navigateUp,
+        commandProcessor = viewModel::processCommand,
+        onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
+        onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
+    )
 }
 
 @Composable
 private fun CreateCategoryContent(
-  stateProvider: () -> UiState<CategoryCreateScreenData>,
-  onNavigationClick: () -> Unit,
-  commandProcessor: (CategoryCommand) -> Unit,
-  onIconSelectClick: () -> Unit,
-  onColorSelectClick: () -> Unit,
+    stateProvider: () -> UiState<CategoryCreateScreenData>,
+    onNavigationClick: () -> Unit,
+    commandProcessor: (CategoryCommand) -> Unit,
+    onIconSelectClick: () -> Unit,
+    onColorSelectClick: () -> Unit,
 ) {
-  when (val state = stateProvider()) {
-    is UiState.Data -> {
-      NavigationEventEffect(
-        event = state.data.navigateUpEvent,
-        onConsumed = { commandProcessor(ConsumeNavigateUpEventCommand()) },
-        action = onNavigationClick,
-      )
+    when (val state = stateProvider()) {
+        is UiState.Data -> {
+            NavigationEventEffect(
+                event = state.data.navigateUpEvent,
+                onConsumed = { commandProcessor(ConsumeNavigateUpEventCommand()) },
+                action = onNavigationClick,
+            )
 
-      CategoryContent(
-        title = stringResource(id = R.string.create_category),
-        stateProvider = { state.data.categoryScreenData },
-        onNavigationClick = onNavigationClick,
-        onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
-        onIconSelectClick = onIconSelectClick,
-        onColorSelectClick = onColorSelectClick,
-        onConfirmActionClick = { commandProcessor(CreateCategoryCommand()) },
-        confirmButtonText = stringResource(id = R.string.create),
-        shouldFocusTitleInputOnLaunch = true,
-      )
+            CategoryContent(
+                title = stringResource(id = R.string.create_category),
+                stateProvider = { state.data.categoryScreenData },
+                onNavigationClick = onNavigationClick,
+                onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
+                onIconSelectClick = onIconSelectClick,
+                onColorSelectClick = onColorSelectClick,
+                onConfirmActionClick = { commandProcessor(CreateCategoryCommand()) },
+                confirmButtonText = stringResource(id = R.string.create),
+                shouldFocusTitleInputOnLaunch = true,
+            )
+        }
+
+        else -> Unit
     }
-
-    else -> Unit
-  }
 }
