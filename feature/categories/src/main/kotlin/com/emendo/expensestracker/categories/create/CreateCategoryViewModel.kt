@@ -2,6 +2,7 @@ package com.emendo.expensestracker.categories.create
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.app.base.api.screens.SelectColorScreenApi
 import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryViewModel
@@ -21,7 +22,7 @@ import javax.inject.Inject
 class CreateCategoryViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   override val selectIconScreenApi: SelectIconScreenApi,
-  override val selectColorScreenApi: SelectIconScreenApi,
+  override val selectColorScreenApi: SelectColorScreenApi,
   private val categoryRepository: CategoryRepository,
 ) : CategoryViewModel<CategoryCreateScreenData>(UiState.Data(getDefault())), CategoryCreateCommandReceiver {
 
