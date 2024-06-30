@@ -25,8 +25,8 @@ object Dimens {
   val margin_large_x = 16.dp
 
   //  val margin_large = 14.dp
-  //  val margin_normal = 12.dp
-  //  val margin_small = 10.dp
+  val margin_normal = 12.dp
+  val margin_small = 10.dp
   val margin_small_x = 8.dp
   val margin_small_xx = 4.dp
   //  val margin_small_xxx = 2.dp

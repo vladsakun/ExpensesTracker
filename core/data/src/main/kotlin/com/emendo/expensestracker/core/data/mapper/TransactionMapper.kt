@@ -3,6 +3,7 @@ package com.emendo.expensestracker.core.data.mapper
 import com.emendo.expensestracker.core.data.formatPositive
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
 import com.emendo.expensestracker.core.database.model.TransactionFull
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.model.AccountModel
@@ -10,7 +11,6 @@ import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toTransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import javax.inject.Inject
 import javax.inject.Singleton
 

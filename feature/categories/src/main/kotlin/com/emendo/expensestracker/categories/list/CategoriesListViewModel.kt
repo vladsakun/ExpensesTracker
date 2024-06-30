@@ -29,6 +29,7 @@ import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTrans
 import com.emendo.expensestracker.data.api.model.category.toCategoryWithOrdinalIndex
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf
+import com.emendo.expensestracker.settings.api.SettingsScreenApi
 import com.emendo.expensestracker.sync.initializers.Sync
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -47,6 +48,7 @@ class CategoriesListViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
+  private val settingsScreenApi: SettingsScreenApi,
 ) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
   /**
@@ -191,6 +193,8 @@ class CategoriesListViewModel @Inject constructor(
   override fun onCleared() {
     startReorderCategoriesWork()
   }
+
+  fun getSettingsRoute(): String = settingsScreenApi.getRoute()
 
   companion object {
     private val DEFAULT_PAGE_INDEX = CategoryType.EXPENSE.toPageIndex()

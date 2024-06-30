@@ -17,7 +17,7 @@ import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.id
+import com.emendo.expensestracker.data.api.model.transaction.id
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -38,14 +38,21 @@ class TransactionsListViewModel @Inject constructor(
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
 ) : ViewModel() {
+
   private val repos: Flow<PagingData<UiModel.TransactionItem>> = transactionRepository
     .transactionsPagingFlow
     .map { it.map(UiModel::TransactionItem) }
 
-  val list: Flow<PagingData<UiModel>> =
+  private val list: Flow<PagingData<UiModel>> =
     combine(timeZoneManager.timeZoneState, repos) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem> ->
       transformPagingData(pagingData, zoneId)
     }.cachedIn(viewModelScope)
+
+  internal val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository, list)
+    .stateInLazily(
+      scope = viewModelScope,
+      initialValue = TransactionScreenUiState.DisplayTransactionsList(list),
+    )
 
   private fun transformPagingData(
     pagingData: PagingData<UiModel.TransactionItem>,
@@ -101,11 +108,6 @@ class TransactionsListViewModel @Inject constructor(
     )
   }
 
-  val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository, list)
-    .stateInLazily(
-      scope = viewModelScope,
-      initialValue = TransactionScreenUiState.DisplayTransactionsList(list),
-    )
 
   sealed class UiModel {
     data class TransactionItem(val transaction: TransactionModel) : UiModel()

@@ -34,6 +34,8 @@ import com.emendo.expensestracker.core.ui.piechart.utils.getSliceCenterPoints
 import com.emendo.expensestracker.core.ui.piechart.utils.proportion
 import com.emendo.expensestracker.core.ui.piechart.utils.sweepAngles
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -45,190 +47,196 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun DonutPieChart(
-    modifier: Modifier,
-    pieChartData: PieChartData,
-    pieChartConfig: PieChartConfig,
-    onSliceClick: (PieChartData.Slice) -> Unit = {},
+  modifier: Modifier,
+  pieChartData: PieChartData,
+  pieChartConfig: PieChartConfig,
+  onSliceClick: (PieChartData.Slice) -> Unit = {},
 ) {
-    var animationPlayed by rememberSaveable { mutableStateOf(false) }
+  if (pieChartData.slices.isEmpty()) {
+    // Handle empty data
+    return
+  }
 
-    // Sum of all the values
-    val sumOfValues: Float = pieChartData.totalLength
+  var animationPlayed by rememberSaveable { mutableStateOf(false) }
 
-    // Calculate each proportion value
-    val proportions: List<Float> = pieChartData.slices.proportion(sumOfValues)
+  // Sum of all the values
+  val sumOfValues: Float = pieChartData.totalLength
 
-    // Convert each proportions to angle
-    val sweepAngles: List<Float> = proportions.sweepAngles()
+  // Calculate each proportion value
+  val proportions: List<Float> = pieChartData.slices.proportion(sumOfValues)
 
-    val progressSize: MutableList<Float> = mutableListOf(sweepAngles.first())
+  // Convert each proportions to angle
+  val sweepAngles: List<Float> = proportions.sweepAngles()
 
-    for (x in 1 until sweepAngles.size) {
-        progressSize.add(sweepAngles[x] + progressSize[x - 1])
+  val progressSize: MutableList<Float> = mutableListOf(sweepAngles.first())
+
+  for (x in 1 until sweepAngles.size) {
+    progressSize.add(sweepAngles[x] + progressSize[x - 1])
+  }
+
+  var activePie by rememberSaveable { mutableIntStateOf(NO_SELECTED_SLICE) }
+  BoxWithConstraints(modifier = modifier) {
+    val sideSize: Int = Integer.min(constraints.maxWidth, constraints.maxHeight)
+
+    // Padding in percentage
+    val padding = (sideSize * pieChartConfig.chartPadding) / 100f
+
+    val size = Size(sideSize.toFloat() - padding, sideSize.toFloat() - padding)
+
+    val pathPortion = remember { Animatable(initialValue = 0f) }
+
+    val animatablesSize: List<Animatable<Float, AnimationVector1D>> = sweepAngles.map { Animatable(0f) }
+    val animatablesAngleSize: List<Animatable<Float, AnimationVector1D>> = sweepAngles.map { Animatable(0f) }
+
+    if (pieChartConfig.isAnimationEnable) {
+      LaunchedEffect(key1 = Unit) {
+        pathPortion.animateTo(
+          targetValue = 1f,
+          animationSpec = tween(pieChartConfig.animationDuration),
+        )
+        animationPlayed = true
+      }
     }
-
-    var activePie by rememberSaveable { mutableIntStateOf(NO_SELECTED_SLICE) }
-    BoxWithConstraints(modifier = modifier) {
-        val sideSize: Int = Integer.min(constraints.maxWidth, constraints.maxHeight)
-
-        // Padding in percentage
-        val padding = (sideSize * pieChartConfig.chartPadding) / 100f
-
-        val size = Size(sideSize.toFloat() - padding, sideSize.toFloat() - padding)
-
-        val pathPortion = remember { Animatable(initialValue = 0f) }
-
-        val animatablesSize: List<Animatable<Float, AnimationVector1D>> = sweepAngles.map { Animatable(0f) }
-        val animatablesAngleSize: List<Animatable<Float, AnimationVector1D>> = sweepAngles.map { Animatable(0f) }
-
-        if (pieChartConfig.isAnimationEnable) {
-            LaunchedEffect(key1 = Unit) {
-                pathPortion.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(pieChartConfig.animationDuration),
-                )
-                animationPlayed = true
+    val coroutineScope = rememberCoroutineScope()
+    val surface = MaterialTheme.colorScheme.surface
+    Canvas(
+      modifier = Modifier
+        .width(sideSize.dp)
+        .height(sideSize.dp)
+        .pointerInput(Unit) {
+          detectTapGestures {
+            val clickedAngle =
+              convertTouchEventPointToAngle(
+                width = sideSize.toFloat(),
+                height = sideSize.toFloat(),
+                xPos = it.x,
+                yPos = it.y,
+              )
+            progressSize.forEachIndexed { index, item ->
+              if (clickedAngle <= item) {
+                activePie =
+                  if (activePie != index) {
+                    index
+                  } else {
+                    NO_SELECTED_SLICE
+                  }
+                onSliceClick(pieChartData.slices[index])
+                return@detectTapGestures
+              }
             }
+          }
+        },
+    ) {
+      var sAngle = pieChartConfig.startAngle
+      val sliceLabelPaint =
+        TextPaint().apply {
+          isAntiAlias = true
+          textSize = pieChartConfig.sliceLabelTextSize.toPx()
+          textAlign = Paint.Align.CENTER
+          color = pieChartConfig.sliceLabelTextColor.toArgb()
+          typeface = pieChartConfig.sliceLabelTypeface
         }
-        val coroutineScope = rememberCoroutineScope()
-        val surface = MaterialTheme.colorScheme.surface
-        Canvas(
-            modifier =
-                Modifier
-                    .width(sideSize.dp)
-                    .height(sideSize.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures {
-                            val clickedAngle =
-                                convertTouchEventPointToAngle(
-                                    width = sideSize.toFloat(),
-                                    height = sideSize.toFloat(),
-                                    xPos = it.x,
-                                    yPos = it.y,
-                                )
-                            progressSize.forEachIndexed { index, item ->
-                                if (clickedAngle <= item) {
-                                    activePie =
-                                        if (activePie != index) {
-                                            index
-                                        } else {
-                                            NO_SELECTED_SLICE
-                                        }
-                                    onSliceClick(pieChartData.slices[index])
-                                    return@detectTapGestures
-                                }
-                            }
-                        }
-                    },
-        ) {
-            var sAngle = pieChartConfig.startAngle
-            val sliceLabelPaint =
-                TextPaint().apply {
-                    isAntiAlias = true
-                    textSize = pieChartConfig.sliceLabelTextSize.toPx()
-                    textAlign = Paint.Align.CENTER
-                    color = pieChartConfig.sliceLabelTextColor.toArgb()
-                    typeface = pieChartConfig.sliceLabelTypeface
-                }
 
-            sweepAngles.forEachIndexed { index, arcProgress ->
-                val isActive = activePie == index
+      sweepAngles.forEachIndexed { index, arcProgress ->
+        val isActive = activePie == index
 
-                coroutineScope.launch {
-                    launch {
-                        if (isActive) {
-                            animatablesSize[index].animateTo(100f, tween(300, easing = LinearOutSlowInEasing))
-                        } else {
-                            animatablesSize[index].animateTo(0f, tween(200, easing = LinearOutSlowInEasing))
-                        }
-                    }
-
-                    launch {
-                        if (isActive) {
-                            animatablesAngleSize[index].animateTo(10f, tween(300, easing = LinearOutSlowInEasing))
-                        } else {
-                            animatablesAngleSize[index].animateTo(0f, tween(200, easing = LinearOutSlowInEasing))
-                        }
-                    }
-                }
-
-                val arcProgressAnimated =
-                    if (pieChartConfig.isAnimationEnable && !animationPlayed) {
-                        arcProgress * pathPortion.value
-                    } else {
-                        arcProgress
-                    }
-                drawPie(
-                    color = pieChartData.slices[index].color,
-                    startAngle = sAngle + animatablesAngleSize[index].value,
-                    arcProgress = arcProgressAnimated - animatablesAngleSize[index].value * 2,
-                    size = size,
-                    padding = padding,
-                    strokeWidth = pieChartConfig.strokeWidth + animatablesSize[index].value,
-                    isActive = isActive,
-                    pieChartConfig = pieChartConfig,
-                )
-
-                val (x, y) =
-                    getSliceCenterPoints(
-                        sAngle = sAngle,
-                        arcProgress = arcProgress,
-                        size = size,
-                        padding = padding,
-                        sizeChange = animatablesSize[index].value,
-                    )
-
-                // find the height of text
-                val height = pieChartData.slices[index].label.getTextHeight(sliceLabelPaint)
-
-                var label = pieChartData.slices[index].label
-
-                val ellipsizedText by lazy {
-                    TextUtils.ellipsize(
-                        label,
-                        sliceLabelPaint,
-                        pieChartConfig.sliceMinTextWidthToEllipsize.toPx(),
-                        pieChartConfig.sliceLabelEllipsizeAt,
-                    ).toString()
-                }
-
-                drawIntoCanvas {
-                    it.nativeCanvas.withRotation(0f, x, y) {
-                        if (pieChartConfig.labelVisible) {
-                            label = "$label ${proportions[index].roundToInt()}%"
-                        }
-                        it.nativeCanvas.drawText(
-                            if (pieChartConfig.isEllipsizeEnabled) ellipsizedText else label,
-                            x,
-                            y + abs(height) / 2,
-                            sliceLabelPaint,
-                        )
-                    }
-                }
-
-                sAngle += arcProgress
+        coroutineScope.launch {
+          launch {
+            if (isActive) {
+              animatablesSize[index].animateTo(100f, tween(300, easing = LinearOutSlowInEasing))
+            } else {
+              animatablesSize[index].animateTo(0f, tween(200, easing = LinearOutSlowInEasing))
             }
+          }
 
-            // Center circle to hide the part of the arc during the animation that goes into the center
-            drawCircle(
-                color = surface,
-                radius = (size.width - pieChartConfig.strokeWidth) / 2,
-                center = Offset(x = size.center.x + padding / 2, y = size.center.y + padding / 2),
-            )
+          launch {
+            if (isActive) {
+              animatablesAngleSize[index].animateTo(10f, tween(300, easing = LinearOutSlowInEasing))
+            } else {
+              animatablesAngleSize[index].animateTo(0f, tween(200, easing = LinearOutSlowInEasing))
+            }
+          }
         }
+
+        val arcProgressAnimated =
+          if (pieChartConfig.isAnimationEnable && !animationPlayed) {
+            arcProgress * pathPortion.value
+          } else {
+            arcProgress
+          }
+        drawPie(
+          color = pieChartData.slices[index].color,
+          startAngle = sAngle + animatablesAngleSize[index].value,
+          arcProgress = arcProgressAnimated - animatablesAngleSize[index].value * 2,
+          size = size,
+          padding = padding,
+          strokeWidth = pieChartConfig.strokeWidth + animatablesSize[index].value,
+          isActive = isActive,
+          pieChartConfig = pieChartConfig,
+        )
+
+        val (x, y) = getSliceCenterPoints(
+          sAngle = sAngle,
+          arcProgress = arcProgress,
+          size = size,
+          padding = padding,
+          sizeChange = animatablesSize[index].value,
+        )
+
+        // Todo handle corner case when after rounding the sum of all proportions is not equal to 100
+        val number = proportions[index]
+
+        if (number >= 5) {
+          val rounded = BigDecimal(number.toDouble()).setScale(2, RoundingMode.HALF_EVEN).toFloat()
+          val label = "$rounded%"
+
+          // find the height of text
+          val height = label.getTextHeight(sliceLabelPaint)
+
+          val ellipsizedText by lazy {
+            TextUtils.ellipsize(
+              label,
+              sliceLabelPaint,
+              pieChartConfig.sliceMinTextWidthToEllipsize.toPx(),
+              pieChartConfig.sliceLabelEllipsizeAt,
+            ).toString()
+          }
+
+          drawIntoCanvas {
+            it.nativeCanvas.withRotation(0f, x, y) {
+              it.nativeCanvas.drawText(
+                if (pieChartConfig.isEllipsizeEnabled) ellipsizedText else label,
+                x,
+                y + abs(height) / 2,
+                sliceLabelPaint,
+              )
+            }
+          }
+        }
+
+        sAngle += arcProgress
+      }
+
+      // Center circle to hide the part of the arc during the animation that goes into the center
+      drawCircle(
+        color = surface,
+        radius = (size.width - pieChartConfig.strokeWidth) / 2,
+        center = Offset(x = size.center.x + padding / 2, y = size.center.y + padding / 2),
+      )
     }
+  }
 }
 
 /**
  * return the height of text in canvas drawn text
  */
 fun String.getTextHeight(paint: Paint): Int {
-    val bounds = Rect()
-    paint.getTextBounds(
-        this,
-        0,
-        this.length,
-        bounds,
-    )
-    return bounds.height()
+  val bounds = Rect()
+  paint.getTextBounds(
+    this,
+    0,
+    this.length,
+    bounds,
+  )
+  return bounds.height()
 }

@@ -179,7 +179,7 @@ compose-compiler-report = { id = "dev.shreyaspatil.compose-compiler-report-gener
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
 module-assertion = { id = "com.jraska.module.graph.assertion", version.ref = "moduleAssertion" }
-vkompose = { id = "com.vk.vkompose", version = "0.5" }
+vkompose = { id = "com.vk.vkompose", version = "0.5.4-k2" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 # Plugins defined by this project

@@ -28,10 +28,10 @@ import com.emendo.expensestracker.core.designsystem.component.HorizontalSpacer
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerSmallRadiusShape
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -232,6 +232,25 @@ private fun TransactionItem(
             )
           }
         }
+        // Todo make dropdown menu width as wide of Row
+        DropdownMenu(
+          expanded = expanded,
+          onDismissRequest = { expanded = false },
+          scrollState = scrollState,
+        ) {
+          repeat(5) {
+            DropdownMenuItem(
+              text = { Text("Item ${it + 1}") },
+              onClick = { /* TODO */ },
+              leadingIcon = {
+                Icon(
+                  Icons.Outlined.Edit,
+                  contentDescription = null
+                )
+              }
+            )
+          }
+        }
       }
       transaction.note?.let { note ->
         Text(
@@ -239,26 +258,6 @@ private fun TransactionItem(
           style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
           modifier = Modifier.padding(bottom = Dimens.margin_small_x),
         )
-      }
-
-      // Todo make dropdown menu width as wide of Row
-      DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        scrollState = scrollState,
-      ) {
-        repeat(5) {
-          DropdownMenuItem(
-            text = { Text("Item ${it + 1}") },
-            onClick = { /* TODO */ },
-            leadingIcon = {
-              Icon(
-                Icons.Outlined.Edit,
-                contentDescription = null
-              )
-            }
-          )
-        }
       }
     }
   }

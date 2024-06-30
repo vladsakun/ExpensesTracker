@@ -71,4 +71,11 @@
 
   <string name="search">Search</string>
   <string name="sort">Sort</string>
+
+  <string name="report_title">Report</string>
+  <string name="report_all_expenses">All expenses</string>
+  <string name="report_all_incomes">All incomes</string>
+  <string name="report_current_balance">Current balance</string>
+  <string name="report_all_time">All time</string>
+  <string name="report_custom">Custom</string>
 </resources>

@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.text.style.TextAlign
 import com.emendo.expensestracker.core.designsystem.component.AutoSizableText
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.createtransaction.transaction.ERROR_ANIMATION_DURATION_MILLIS
 import com.emendo.expensestracker.createtransaction.transaction.design.amountColor
 import com.emendo.expensestracker.createtransaction.transaction.marginHorizontal
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
 @Composable
 internal fun Amount(

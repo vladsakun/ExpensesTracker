@@ -18,6 +18,7 @@ import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.domain.api.getTargetOrDefault
 import com.emendo.expensestracker.core.domain.currency.GetUsedCurrenciesUseCase
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
@@ -40,8 +41,7 @@ import com.emendo.expensestracker.data.api.amount.CalculatorFormatter
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.labelResId
+import com.emendo.expensestracker.data.api.model.transaction.labelResId
 import com.emendo.expensestracker.data.api.repository.AccountRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf

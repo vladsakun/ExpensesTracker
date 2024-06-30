@@ -13,7 +13,7 @@ import com.emendo.expensestracker.createtransaction.transaction.CreateTransactio
 import com.emendo.expensestracker.createtransaction.transaction.data.ChangeTransactionTypeCommand
 import com.emendo.expensestracker.createtransaction.transaction.data.CreateTransactionCommand
 import com.emendo.expensestracker.createtransaction.transaction.data.SaveTransactionCommand
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType.Companion.toTransactionType
+import com.emendo.expensestracker.data.api.model.transaction.toTransactionType
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 

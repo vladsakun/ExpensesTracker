@@ -86,8 +86,10 @@ fun AccountsScreenRoute(
       }
     },
     onAccountLongClick = { account ->
+      viewModel.enableEditMode()
       viewModel.selectAccountItem(account)
     },
+    enableEditMode = viewModel::enableEditMode,
     onBackClick = onBackClick,
     editModeProvider = editModeState::value,
     onDisableEditModelClick = viewModel::disableEditMode,
@@ -103,6 +105,7 @@ private fun AccountsListScreenContent(
   onAddAccountClick: () -> Unit,
   onAccountClick: (AccountModel) -> Unit,
   onAccountLongClick: (AccountModel) -> Unit,
+  enableEditMode: () -> Unit,
   onBackClick: (() -> Unit)?,
   editModeProvider: () -> Boolean,
   onDisableEditModelClick: () -> Unit,
@@ -133,7 +136,7 @@ private fun AccountsListScreenContent(
             }
           }
         },
-        actions = if (editModeProvider()) getEditModeActions() else getInitialModeActions()
+        actions = if (editModeProvider()) getEditModeActions() else getInitialModeActions(enableEditMode)
       )
     },
     floatingActionButtonPosition = FabPosition.End,
@@ -252,10 +255,10 @@ private fun AccountList(
 
 @Composable
 @ReadOnlyComposable
-private fun getInitialModeActions() = persistentListOf(
+private fun getInitialModeActions(onClick: () -> Unit) = persistentListOf(
   MenuAction(
     icon = ExpeIcons.Sort,
-    onClick = {},
+    onClick = onClick,
     contentDescription = stringResource(id = R.string.sort),
   ),
 )

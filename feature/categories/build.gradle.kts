@@ -37,6 +37,7 @@ dependencies {
     api(projects.feature.categories.api)
     implementation(projects.sync.work)
     implementation(projects.feature.createTransaction.api)
+  implementation(projects.feature.settings.api)
 
     implementation(libs.androidx.activity.compose)
 }

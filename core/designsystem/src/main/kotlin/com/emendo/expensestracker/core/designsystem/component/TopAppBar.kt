@@ -67,13 +67,7 @@ fun ExpeCenterAlignedTopBar(
     navigationIcon = navigationIcon,
     actions = {
       actions?.forEach { action ->
-        IconButton(onClick = action.onClick) {
-          Icon(
-            imageVector = action.icon,
-            contentDescription = action.contentDescription,
-            tint = MaterialTheme.colorScheme.onSurface,
-          )
-        }
+        ExpeToolbarIcon(action)
       }
     },
     colors = colors,
@@ -103,16 +97,7 @@ fun ExpeTopBar(
     navigationIcon = navigationIcon ?: {},
     actions = {
       actions?.forEach { action ->
-        IconButton(
-          onClick = action.onClick,
-          enabled = action.enabled,
-        ) {
-          Icon(
-            imageVector = action.icon,
-            contentDescription = action.contentDescription,
-            tint = MaterialTheme.colorScheme.onSurface,
-          )
-        }
+        ExpeToolbarIcon(action)
       }
     },
     colors = colors,
@@ -180,6 +165,20 @@ fun NavigationBackIcon(
       imageVector = ExpeIcons.ArrowBack,
       contentDescription = "navigate back",
       //      tint = MaterialTheme.colorScheme.onSurface,
+    )
+  }
+}
+
+@Composable
+fun ExpeToolbarIcon(action: MenuAction) {
+  IconButton(
+    onClick = action.onClick,
+    enabled = action.enabled,
+  ) {
+    Icon(
+      imageVector = action.icon,
+      contentDescription = action.contentDescription,
+      tint = MaterialTheme.colorScheme.onSurface,
     )
   }
 }

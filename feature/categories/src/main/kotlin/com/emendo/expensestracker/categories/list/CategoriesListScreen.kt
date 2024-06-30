@@ -56,203 +56,215 @@ private const val ADD_CATEGORY_KEY = "addCategory"
 @Destination
 @Composable
 fun CategoriesListRoute(
-    navigator: DestinationsNavigator,
-    viewModel: CategoriesListViewModel = hiltViewModel(),
+  navigator: DestinationsNavigator,
+  viewModel: CategoriesListViewModel = hiltViewModel(),
 ) {
-    val uiState = viewModel.categoriesListUiState.collectAsStateWithLifecycle()
-    val editModeState = viewModel.editMode.collectAsStateWithLifecycle()
+  val uiState = viewModel.categoriesListUiState.collectAsStateWithLifecycle()
+  val editModeState = viewModel.editMode.collectAsStateWithLifecycle()
 
-    ScreenWithModalBottomSheet(
-        stateManager = viewModel,
-        onNavigateUpClick = navigator::navigateUp,
-        bottomSheetContent = { BottomSheetContent(it) },
-    ) {
-        CategoriesListScreenContent(
-            stateProvider = uiState::value,
-            isEditModeProvider = editModeState::value,
-            onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
-            onCategoryClick =
-                remember {
-                    { category: CategoryWithTotal ->
-                        if (viewModel.isEditMode) {
-                            navigator.navigate(CategoryDetailRouteDestination(category.category.id))
-                        } else {
-                            navigator.navigate(viewModel.getCreateTransactionScreenRoute(category))
-                        }
-                    }
-                },
-            onPageSelected = remember { viewModel::pageSelected },
-            onEditClick = remember { viewModel::invertEditMode },
-            onDeleteCategoryClick = remember { viewModel::showConfirmDeleteCategoryBottomSheet },
-            onMove = remember { viewModel::onMove },
-            enableEditMode = remember { viewModel::enableEditMode },
-            disableEditMode = remember { viewModel::disableEditMode },
-        )
-    }
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
+    onNavigateUpClick = navigator::navigateUp,
+    bottomSheetContent = { BottomSheetContent(it) },
+  ) {
+    CategoriesListScreenContent(
+      stateProvider = uiState::value,
+      isEditModeProvider = editModeState::value,
+      onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
+      onCategoryClick =
+      remember {
+        { category: CategoryWithTotal ->
+          if (viewModel.isEditMode) {
+            navigator.navigate(CategoryDetailRouteDestination(category.category.id))
+          } else {
+            navigator.navigate(viewModel.getCreateTransactionScreenRoute(category))
+          }
+        }
+      },
+      onPageSelected = viewModel::pageSelected,
+      onEditClick = viewModel::invertEditMode,
+      onDeleteCategoryClick = viewModel::showConfirmDeleteCategoryBottomSheet,
+      onMove = viewModel::onMove,
+      enableEditMode = viewModel::enableEditMode,
+      disableEditMode = viewModel::disableEditMode,
+      openSettings = { navigator.navigate(viewModel.getSettingsRoute()) },
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun CategoriesListScreenContent(
-    stateProvider: () -> CategoriesListUiState,
-    isEditModeProvider: () -> Boolean,
-    onCreateCategoryClick: () -> Unit,
-    onCategoryClick: (CategoryWithTotal) -> Unit,
-    onPageSelected: (pageIndex: Int) -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
-    onMove: (List<CategoryWithTotal>) -> Unit,
-    enableEditMode: () -> Unit,
-    disableEditMode: () -> Unit,
+  stateProvider: () -> CategoriesListUiState,
+  isEditModeProvider: () -> Boolean,
+  onCreateCategoryClick: () -> Unit,
+  onCategoryClick: (CategoryWithTotal) -> Unit,
+  onPageSelected: (pageIndex: Int) -> Unit,
+  onEditClick: () -> Unit,
+  onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
+  onMove: (List<CategoryWithTotal>) -> Unit,
+  enableEditMode: () -> Unit,
+  disableEditMode: () -> Unit,
+  openSettings: () -> Unit,
 ) {
-    ExpeScaffold(
-        topBar = {
-            ExpeCenterAlignedTopBar(
-                title = stringResource(id = R.string.categories),
-                actions =
-                    persistentListOf(
-                        MenuAction(
-                            icon = ExpeIcons.Edit,
-                            onClick = onEditClick,
-                            contentDescription = stringResource(id = R.string.edit),
-                        ),
-                    ),
-            )
-        },
-    ) { paddingValues ->
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-            contentAlignment = Alignment.Center,
-        ) {
-            when (val state = stateProvider()) {
-                is CategoriesListUiState.Empty -> Unit
-                is CategoriesListUiState.Loading -> ExpLoadingWheel()
-                is CategoriesListUiState.Error -> Text(text = state.message)
-                is CategoriesListUiState.DisplayCategoriesList -> {
-                    val pagerState = rememberPagerState(pageCount = { state.categories.size })
-                    val coroutineScope = rememberCoroutineScope()
-                    val selectedPageIndex = rememberSaveable { mutableIntStateOf(0) }
-
-                    LaunchedEffect(pagerState) {
-                        snapshotFlow { pagerState.currentPage }.collect { page ->
-                            onPageSelected(page)
-                            selectedPageIndex.intValue = page
-                        }
-                    }
-
-                    Column {
-                        TextSwitch(
-                            selectedIndex = selectedPageIndex.intValue,
-                            items = state.tabs.map { stringResource(id = it.titleResId) }.toImmutableList(),
-                            onSelectionChange = { tabIndex ->
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(tabIndex)
-                                }
-                            },
-                            modifier = Modifier.padding(horizontal = Dimens.margin_large_x),
-                        )
-                        HorizontalPager(
-                            state = pagerState,
-                            contentPadding = PaddingValues(top = Dimens.margin_large_x),
-                        ) { page ->
-                            CategoriesGrid(
-                                categories = state.categories[page]!!,
-                                editModeProvider = isEditModeProvider,
-                                onCategoryClick = onCategoryClick,
-                                onCreateCategoryClick = onCreateCategoryClick,
-                                onDeleteCategoryClick = onDeleteCategoryClick,
-                                onMove = onMove,
-                                onLongClick = enableEditMode,
-                                onClick = disableEditMode,
-                            )
-                        }
-                    }
-                }
-            }
+  ExpeScaffold(
+    topBar = {
+      ExpeCenterAlignedTopBar(
+        title = stringResource(id = R.string.categories),
+        actions = getMenuActions(onEditClick),
+        navigationIcon = {
+          ExpeToolbarIcon(
+            action = MenuAction(
+              icon = ExpeIcons.Settings,
+              onClick = openSettings,
+              contentDescription = "settings",
+            ),
+          )
         }
+      )
+    },
+  ) { paddingValues ->
+    Box(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues),
+      contentAlignment = Alignment.Center,
+    ) {
+      when (val state = stateProvider()) {
+        is CategoriesListUiState.Empty -> Unit
+        is CategoriesListUiState.Loading -> ExpLoadingWheel()
+        is CategoriesListUiState.Error -> Text(text = state.message)
+        is CategoriesListUiState.DisplayCategoriesList -> {
+          val pagerState = rememberPagerState(pageCount = { state.categories.size })
+          val coroutineScope = rememberCoroutineScope()
+          val selectedPageIndex = rememberSaveable { mutableIntStateOf(0) }
+
+          LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.currentPage }.collect { page ->
+              onPageSelected(page)
+              selectedPageIndex.intValue = page
+            }
+          }
+
+          Column {
+            TextSwitch(
+              selectedIndex = selectedPageIndex.intValue,
+              items = state.tabs.map { stringResource(id = it.titleResId) }.toImmutableList(),
+              onSelectionChange = { tabIndex ->
+                coroutineScope.launch {
+                  pagerState.animateScrollToPage(tabIndex)
+                }
+              },
+              modifier = Modifier.padding(horizontal = Dimens.margin_large_x),
+            )
+            HorizontalPager(
+              state = pagerState,
+              contentPadding = PaddingValues(top = Dimens.margin_large_x),
+            ) { page ->
+              CategoriesGrid(
+                categories = state.categories[page]!!,
+                editModeProvider = isEditModeProvider,
+                onCategoryClick = onCategoryClick,
+                onCreateCategoryClick = onCreateCategoryClick,
+                onDeleteCategoryClick = onDeleteCategoryClick,
+                onMove = onMove,
+                onLongClick = enableEditMode,
+                onClick = disableEditMode,
+              )
+            }
+          }
+        }
+      }
     }
+  }
 }
+
+@Composable
+private fun getMenuActions(onEditClick: () -> Unit) = persistentListOf(
+  MenuAction(
+    icon = ExpeIcons.Edit,
+    onClick = onEditClick,
+    contentDescription = stringResource(id = R.string.edit),
+  ),
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CategoriesGrid(
-    categories: CategoriesList,
-    editModeProvider: () -> Boolean,
-    onCategoryClick: (CategoryWithTotal) -> Unit,
-    onCreateCategoryClick: () -> Unit,
-    onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
-    onMove: (List<CategoryWithTotal>) -> Unit,
-    onLongClick: () -> Unit,
-    onClick: () -> Unit,
+  categories: CategoriesList,
+  editModeProvider: () -> Boolean,
+  onCategoryClick: (CategoryWithTotal) -> Unit,
+  onCreateCategoryClick: () -> Unit,
+  onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
+  onMove: (List<CategoryWithTotal>) -> Unit,
+  onLongClick: () -> Unit,
+  onClick: () -> Unit,
 ) {
-    LaunchedEffect(categories) {
-        if (IS_DEBUG_CREATE_TRANSACTION && categories.dataList.isNotEmpty()) {
-            delay(200)
-            onCategoryClick(categories.dataList.first())
-        }
+  LaunchedEffect(categories) {
+    if (IS_DEBUG_CREATE_TRANSACTION && categories.dataList.isNotEmpty()) {
+      delay(200)
+      onCategoryClick(categories.dataList.first())
     }
-    val mutableList =
-        remember(categories) {
-            mutableStateListOf<CategoryWithTotal>().apply {
-                addAll(categories.dataList.toList())
-            }
-        }
-
-    val gridState = rememberLazyGridState()
-    val dragDropState =
-        rememberGridDragDropState(
-            gridState = gridState,
-            key = categories,
-            ignoreItem = { key -> key == ADD_CATEGORY_KEY },
-        ) { fromIndex, toIndex ->
-            mutableList.apply {
-                add(toIndex, removeAt(fromIndex))
-                onMove(mutableList)
-            }
-        }
-
-    CategoriesLazyVerticalGrid(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .dragContainer(dragDropState, editModeProvider)
-                .combinedClickable(
-                    onLongClick = onLongClick,
-                    onClick = onClick,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ),
-        state = gridState,
-    ) {
-        itemsIndexed(
-            items = mutableList,
-            key = { _, item -> item.category.id },
-            contentType = { _, _ -> "category" },
-        ) { index, category ->
-            DraggableItem(dragDropState, index) { isDragging ->
-                val elevation by animateDpAsState(if (isDragging) 24.dp else 4.dp, label = "drag_shadow")
-                CategoryItem(
-                    name = category.category.name.stringValue(),
-                    color = category.category.color.color,
-                    icon = category.category.icon.imageVector,
-                    total = category.totalAmount.formattedValue,
-                    onClick = { onCategoryClick(category) },
-                    editMode = editModeProvider,
-                    onDeleteClick = { onDeleteCategoryClick(category) },
-                    modifier = Modifier.shadow(elevation, RoundedCornerNormalRadiusShape),
-                )
-            }
-        }
-        uniqueItem(ADD_CATEGORY_KEY) {
-            AddCategoryItem(
-                onClick = onCreateCategoryClick,
-                modifier = Modifier.animateItemPlacement(),
-            )
-        }
+  }
+  val mutableList =
+    remember(categories) {
+      mutableStateListOf<CategoryWithTotal>().apply {
+        addAll(categories.dataList.toList())
+      }
     }
+
+  val gridState = rememberLazyGridState()
+  val dragDropState =
+    rememberGridDragDropState(
+      gridState = gridState,
+      key = categories,
+      ignoreItem = { key -> key == ADD_CATEGORY_KEY },
+    ) { fromIndex, toIndex ->
+      mutableList.apply {
+        add(toIndex, removeAt(fromIndex))
+        onMove(mutableList)
+      }
+    }
+
+  CategoriesLazyVerticalGrid(
+    modifier =
+    Modifier
+      .fillMaxSize()
+      .dragContainer(dragDropState, editModeProvider)
+      .combinedClickable(
+        onLongClick = onLongClick,
+        onClick = onClick,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+      ),
+    state = gridState,
+  ) {
+    itemsIndexed(
+      items = mutableList,
+      key = { _, item -> item.category.id },
+      contentType = { _, _ -> "category" },
+    ) { index, category ->
+      DraggableItem(dragDropState, index) { isDragging ->
+        val elevation by animateDpAsState(if (isDragging) 24.dp else 4.dp, label = "drag_shadow")
+        CategoryItem(
+          name = category.category.name.stringValue(),
+          color = category.category.color.color,
+          icon = category.category.icon.imageVector,
+          total = category.totalAmount.formattedValue,
+          onClick = { onCategoryClick(category) },
+          editMode = editModeProvider,
+          onDeleteClick = { onDeleteCategoryClick(category) },
+          modifier = Modifier.shadow(elevation, RoundedCornerNormalRadiusShape),
+        )
+      }
+    }
+    uniqueItem(ADD_CATEGORY_KEY) {
+      AddCategoryItem(
+        onClick = onCreateCategoryClick,
+        modifier = Modifier.animateItemPlacement(),
+      )
+    }
+  }
 }
 
 // private val itemAnimationSpec: SpringSpec<IntOffset> = spring(
@@ -262,31 +274,32 @@ private fun CategoriesGrid(
 
 @Composable
 private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
-    when (type) {
-        is GeneralBottomSheetData -> GeneralBottomSheet(type)
-    }
+  when (type) {
+    is GeneralBottomSheetData -> GeneralBottomSheet(type)
+  }
 }
 
 // @NonSkippableComposable
 @ExpePreview
 @Composable
 private fun CategoriesListPreview(
-    @PreviewParameter(CategoriesListPreviewData::class) previewData: CategoriesListUiState,
+  @PreviewParameter(CategoriesListPreviewData::class) previewData: CategoriesListUiState,
 ) {
-    ExpensesTrackerTheme {
-        CategoriesListScreenContent(
-            stateProvider = { previewData },
-            onCreateCategoryClick = {},
-            onCategoryClick = {},
-            onPageSelected = {},
-            onEditClick = {},
-            isEditModeProvider = { false },
-            onDeleteCategoryClick = {},
-            onMove = {},
-            enableEditMode = {},
-            disableEditMode = {},
-        )
-    }
+  ExpensesTrackerTheme {
+    CategoriesListScreenContent(
+      stateProvider = { previewData },
+      onCreateCategoryClick = {},
+      onCategoryClick = {},
+      onPageSelected = {},
+      onEditClick = {},
+      isEditModeProvider = { false },
+      onDeleteCategoryClick = {},
+      onMove = {},
+      enableEditMode = {},
+      disableEditMode = {},
+      openSettings = {},
+    )
+  }
 }
 
 //

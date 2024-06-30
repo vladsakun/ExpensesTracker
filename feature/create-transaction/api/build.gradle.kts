@@ -1,4 +1,5 @@
 plugins {
+  //  alias(libs.plugins.expensestracker.android.library)
   id("expensestracker.android.library") // Todo refactor to use alias
 }
 

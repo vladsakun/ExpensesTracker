@@ -2,7 +2,6 @@ package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -17,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,6 +30,7 @@ import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomScreenTransition
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
@@ -50,7 +49,6 @@ import com.emendo.expensestracker.createtransaction.transaction.design.amount.Ed
 import com.emendo.expensestracker.createtransaction.transaction.design.amount.TransferAmount
 import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferColumn
 import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferRow
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -523,13 +521,9 @@ private inline fun TransferAccount(
       horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
       modifier = Modifier
         .fillMaxWidth()
-        .pointerInput(Unit) {
-          detectTapGestures(
-            onLongPress = {
-              expanded = !expanded
-            }
-          )
-        },
+        .clickable {
+          expanded = !expanded
+        }
     ) {
       Icon(
         modifier = Modifier.size(Dimens.icon_size),

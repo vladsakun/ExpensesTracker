@@ -16,6 +16,7 @@ interface TransactionRepository {
 
   suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel?
   suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType>
+  fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionModel>>
 
   suspend fun createTransaction(
     source: TransactionSource,

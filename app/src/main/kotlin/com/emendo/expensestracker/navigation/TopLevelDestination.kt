@@ -7,7 +7,7 @@ import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
-import com.emendo.expensestracker.settings.SettingsNavGraph
+import com.emendo.expensestracker.report.ReportNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 
@@ -17,51 +17,51 @@ import com.ramcosta.composedestinations.spec.NavGraphSpec
  * next within a single destination will be handled directly in composables.
  */
 enum class TopLevelDestination(
-    val screen: NavGraphSpec,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    @StringRes val iconTextId: Int,
-    @StringRes val titleTextId: Int?,
+  val screen: NavGraphSpec,
+  val selectedIcon: ImageVector,
+  val unselectedIcon: ImageVector,
+  @StringRes val iconTextId: Int,
+  @StringRes val titleTextId: Int?,
 ) {
-    ACCOUNTS(
-        screen = AccountsNavGraph,
-        selectedIcon = ExpeIcons.CreditCard,
-        unselectedIcon = ExpeIcons.CreditCardBorder,
-        iconTextId = R.string.accounts,
-        titleTextId = R.string.accounts,
-    ),
-    CATEGORIES(
-        screen = CategoriesNavGraph,
-        selectedIcon = ExpeIcons.DonutLarge,
-        unselectedIcon = ExpeIcons.DonutLargeBorder,
-        iconTextId = R.string.categories,
-        titleTextId = R.string.categories,
-    ),
-    CREATE_TRANSACTION(
-        screen = CreatetransactionNavGraph,
-        selectedIcon = ExpeIcons.AddCircle,
-        unselectedIcon = ExpeIcons.AddCircle,
-        iconTextId = R.string.add,
-        titleTextId = null,
-    ),
-    TRANSACTIONS(
-        screen = TransactionsNavGraph,
-        selectedIcon = ExpeIcons.ReceiptLong,
-        unselectedIcon = ExpeIcons.ReceiptLongBorder,
-        iconTextId = R.string.transactions,
-        titleTextId = R.string.transactions,
-    ),
-    SETTINGS(
-        screen = SettingsNavGraph,
-        selectedIcon = ExpeIcons.Settings,
-        unselectedIcon = ExpeIcons.Settings,
-        iconTextId = R.string.settings,
-        titleTextId = R.string.settings,
-    ),
-    ;
+  ACCOUNTS(
+    screen = AccountsNavGraph,
+    selectedIcon = ExpeIcons.CreditCard,
+    unselectedIcon = ExpeIcons.CreditCardBorder,
+    iconTextId = R.string.accounts,
+    titleTextId = R.string.accounts,
+  ),
+  CATEGORIES(
+    screen = CategoriesNavGraph,
+    selectedIcon = ExpeIcons.DonutLarge,
+    unselectedIcon = ExpeIcons.DonutLargeBorder,
+    iconTextId = R.string.categories,
+    titleTextId = R.string.categories,
+  ),
+  CREATE_TRANSACTION(
+    screen = CreatetransactionNavGraph,
+    selectedIcon = ExpeIcons.AddCircle,
+    unselectedIcon = ExpeIcons.AddCircle,
+    iconTextId = R.string.add,
+    titleTextId = null,
+  ),
+  TRANSACTIONS(
+    screen = TransactionsNavGraph,
+    selectedIcon = ExpeIcons.ReceiptLong,
+    unselectedIcon = ExpeIcons.ReceiptLongBorder,
+    iconTextId = R.string.transactions,
+    titleTextId = R.string.transactions,
+  ),
+  REPORT(
+    screen = ReportNavGraph,
+    selectedIcon = ExpeIcons.Analytics,
+    unselectedIcon = ExpeIcons.Analytics,
+    iconTextId = R.string.report_title,
+    titleTextId = R.string.report_title,
+  ),
+  ;
 
-    companion object {
-        val start: TopLevelDestination
-            get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
-    }
+  companion object {
+    val start: TopLevelDestination
+      get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
+  }
 }

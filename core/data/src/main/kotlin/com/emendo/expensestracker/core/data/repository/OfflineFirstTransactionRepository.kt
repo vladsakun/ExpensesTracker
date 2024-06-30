@@ -68,6 +68,12 @@ class OfflineFirstTransactionRepository @Inject constructor(
         )
       }
 
+  override fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionModel>> =
+    transactionDao.getTransactionsInPeriod(from, to)
+      .map { transactions ->
+        transactions.map { transactionMapper.map(it) }
+      }
+
   override suspend fun createTransaction(
     source: TransactionSource,
     target: TransactionTarget,

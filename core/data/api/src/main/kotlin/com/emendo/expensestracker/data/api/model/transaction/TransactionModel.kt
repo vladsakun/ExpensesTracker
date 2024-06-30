@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.data.api.model.transaction
 
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.datetime.Instant
 

@@ -6,6 +6,7 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.domain.account.GetLastUsedAccountUseCase
 import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetOrdinalIndex
@@ -14,7 +15,6 @@ import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import kotlinx.coroutines.CoroutineScope

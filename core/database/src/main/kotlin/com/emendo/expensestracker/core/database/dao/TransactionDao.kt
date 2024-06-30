@@ -44,6 +44,10 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
 
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME WHERE date BETWEEN :from AND :to")
+  abstract fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionFull>>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE date BETWEEN :from AND :to")
   abstract suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionFull>
 
   @Transaction

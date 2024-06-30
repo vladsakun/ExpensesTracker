@@ -52,4 +52,7 @@ object ExpeIcons {
   val CheckCircle = Icons.Filled.CheckCircle
   val MoreVert = Icons.Outlined.MoreVert
   val Sort = Icons.AutoMirrored.Outlined.Sort
+  val Functions = Icons.Outlined.Functions
+  val UnfoldMore = Icons.Outlined.UnfoldMore
+  val Analytics = Icons.Outlined.Analytics
 }

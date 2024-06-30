@@ -12,8 +12,7 @@ class ExpeTimeZoneManagerImpl @Inject constructor() : ExpeTimeZoneManager {
   private val _timeZoneState: MutableStateFlow<ZoneId> = MutableStateFlow(ZoneId.systemDefault())
   override val timeZoneState: StateFlow<ZoneId> = _timeZoneState.asStateFlow()
 
-  override fun getZoneId(): ZoneId =
-    ZoneId.systemDefault()
+  override fun getZoneId(): ZoneId = timeZoneState.value
 
   override fun onZoneChange() {
     _timeZoneState.update { ZoneId.systemDefault() }

@@ -1,27 +1,9 @@
 package com.emendo.expensestracker.createtransaction.transaction.data
 
 import androidx.compose.runtime.Immutable
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.createtransaction.transaction.AccountUiModel
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
-/**
- *  onSourceAmountClick = remember { { viewModel.showCalculatorBottomSheet() } },
- *       onTargetAmountClick = remember { { viewModel.showCalculatorBottomSheet(sourceTrigger = false) } },
- * onAccountClick = remember { viewModel::openAccountListScreen },
- *       onTransferTargetAccountClick = remember { viewModel::selectTransferTargetAccount },
- *       onCreateTransactionClick = remember { viewModel::saveTransaction },
- *       onBackPressed = remember { { navigator.navigateUp() } },
- *       onErrorConsumed = remember { viewModel::consumeFieldError },
- *       onConsumedNavigateUpEvent = remember { viewModel::consumeCloseEvent },
- *       onConsumedShowCalculatorBottomSheetEvent = remember { viewModel::consumeShowCalculatorBottomSheet },
- *       onConsumedHideCalculatorBottomSheetEvent = remember { viewModel::consumeHideCalculatorBottomSheet },
- *       onTransactionTypeChange = remember { viewModel::changeTransactionType },
- *       onNoteValueChange = remember { viewModel::updateNoteText },
- *       onDeleteClick = remember { viewModel::showConfirmDeleteTransactionBottomSheet },
- *       onDuplicateClick = remember { viewModel::duplicateTransaction },
- *       hideCalculatorBottomSheet = remember { viewModel::hideCalculatorBottomSheet },
- *
- */
 interface CreateTransactionCommander {
   fun showCalculatorBottomSheet(sourceTrigger: Boolean)
   fun saveTransaction()

@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.createtransaction.transaction.CreateTransactionUiState
-import com.emendo.expensestracker.data.api.model.transaction.TransactionType
 
 @Composable
 @ReadOnlyComposable

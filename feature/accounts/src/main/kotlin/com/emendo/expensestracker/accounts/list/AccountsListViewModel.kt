@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
-import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
@@ -45,18 +44,13 @@ class AccountsListViewModel @Inject constructor(
       initialValue = AccountsListUiState.DisplayAccountsList(
         accountRepository
           .getAccountsSnapshot()
-          .map { AccountUiModel(it) }
+          .map(::AccountUiModel)
           .toImmutableList()
       ),
     )
 
-  val editMode: StateFlow<Boolean> =
-    selectedAccounts
-      .map { it.isNotEmpty() }
-      .stateInWhileSubscribed(
-        scope = viewModelScope,
-        initialValue = false,
-      )
+  private val _editMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  internal val editMode: StateFlow<Boolean> = _editMode
 
   val isSelectMode: Boolean
     get() = createTransactionController.isSelectMode()
@@ -67,6 +61,10 @@ class AccountsListViewModel @Inject constructor(
 
   fun pickAccountItem(account: AccountModel) {
     createTransactionController.selectAccount(account)
+  }
+
+  internal fun enableEditMode() {
+    _editMode.update { true }
   }
 
   fun selectAccountItem(account: AccountModel) {
@@ -111,6 +109,7 @@ class AccountsListViewModel @Inject constructor(
     }
 
   fun disableEditMode() {
+    _editMode.update { false }
     selectedAccounts.update { mutableSetOf() }
     updateAccountsIndexes(orderedAccounts)
   }
