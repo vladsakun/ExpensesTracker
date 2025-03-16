@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -43,7 +39,6 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerSmallRadiusShape
-import com.emendo.expensestracker.core.designsystem.utils.dpToPx
 import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
@@ -72,9 +67,11 @@ internal fun ReportScreen(
   viewModel: ReportViewModel = hiltViewModel(),
 ) {
   val state: State<NetworkViewState<ReportScreenData>> = viewModel.state.collectAsStateWithLifecycle()
+  val selectedPeriod: State<ReportPeriod> = viewModel.selectedPeriod.collectAsStateWithLifecycle()
 
   ReportScreenContent(
     stateProvider = state::value,
+    selectedPeriodProvider = selectedPeriod::value,
     commandProcessor = viewModel::proceedCommand,
   )
 }
@@ -82,6 +79,7 @@ internal fun ReportScreen(
 @Composable
 private fun ReportScreenContent(
   stateProvider: () -> NetworkViewState<ReportScreenData>,
+  selectedPeriodProvider: () -> ReportPeriod,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
   ExpeScaffoldWithTopBar(titleResId = R.string.report_title) { paddingValues ->
@@ -93,11 +91,54 @@ private fun ReportScreenContent(
       when (val stateValue = stateProvider()) {
         is NetworkViewState.Error -> Text(text = stateValue.message)
         is NetworkViewState.Loading -> ExpLoadingWheel()
-        is NetworkViewState.Success -> ReportScreenContent(
-          state = stateValue.data,
-          commandProcessor = commandProcessor,
-        )
+        is NetworkViewState.Success -> {
+          ReportScreenContent(
+            state = stateValue.data,
+            selectedPeriod = selectedPeriodProvider,
+            commandProcessor = commandProcessor,
+          )
+
+          DateRangePickerDialog(
+            showDialogProvider = { stateValue.data.showPickerDialog },
+            commandProcessor = commandProcessor,
+          )
+        }
       }
+    }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DateRangePickerDialog(
+  showDialogProvider: () -> Boolean,
+  commandProcessor: (ReportScreenCommand) -> Unit,
+) {
+  val datePickerState = rememberDateRangePickerState()
+  if (showDialogProvider()) {
+    DatePickerDialog(
+      onDismissRequest = { commandProcessor(HidePickerDialogCommand()) },
+      confirmButton = {
+        Button(
+          onClick = {
+            commandProcessor(
+              SelectDateCommand(
+                selectedStartDateMillis = datePickerState.selectedStartDateMillis,
+                selectedEndDateMillis = datePickerState.selectedEndDateMillis,
+              )
+            )
+          }
+        ) {
+          Text(text = stringResource(id = R.string.ok))
+        }
+      },
+      dismissButton = {
+        Button(onClick = { commandProcessor(HidePickerDialogCommand()) }) {
+          Text(text = stringResource(id = R.string.cancel))
+        }
+      }
+    ) {
+      DateRangePicker(state = datePickerState)
     }
   }
 }
@@ -105,6 +146,7 @@ private fun ReportScreenContent(
 @Composable
 private fun ReportScreenContent(
   state: ReportScreenData,
+  selectedPeriod: () -> ReportPeriod,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
   LazyColumn(
@@ -117,7 +159,7 @@ private fun ReportScreenContent(
     )
     periods(
       reportPeriods = state.periods,
-      selectedPeriod = state.selectedPeriod,
+      selectedPeriod = selectedPeriod,
       commandProcessor = commandProcessor,
     )
     balance(
@@ -136,65 +178,63 @@ private fun ReportScreenContent(
 
 private fun LazyListScope.periods(
   reportPeriods: ImmutableList<ReportPeriod>,
-  selectedPeriod: ReportPeriod,
+  selectedPeriod: () -> ReportPeriod,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
   uniqueItem("periods") {
-    val indicatorOffset = remember { Animatable(0f) }
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
-    val halfOfScreen = LocalConfiguration.current.screenWidthDp.dp.dpToPx() / 2
-    val selectedItemWidth = remember(reportPeriods) { Animatable(0f) }
     val coordinates = remember(reportPeriods) { mutableStateMapOf<ReportPeriod, LayoutCoordinates>() }
+    val indicatorOffset = remember { Animatable(0f) }
+    val selectedItemWidth = remember(reportPeriods, coordinates) { Animatable(0f) }
+
+    LaunchedEffect(selectedPeriod()) {
+      val period = reportPeriods.getOrNull(reportPeriods.indexOf(selectedPeriod())) ?: return@LaunchedEffect
+      val coordinate = coordinates[period]!!.positionInParent()
+      val x = coordinate.x
+      val width = coordinates[period]!!.size.width.toFloat()
+      val targetScrollPosition = scrollState.maxValue - x + scrollState.viewportSize / 2 - width / 2
+
+      val animationSpec = tween<Float>(200)
+      launch { scrollState.animateScrollTo(targetScrollPosition.roundToInt(), animationSpec) }
+      launch { selectedItemWidth.animateTo(width, animationSpec) }
+      launch { indicatorOffset.animateTo(x, animationSpec) }
+    }
 
     Row(
       modifier = Modifier
-        .fillMaxWidth()
+        .wrapContentWidth()
         .horizontalScroll(scrollState, reverseScrolling = true),
     ) {
-      reportPeriods.reversed().forEach { period ->
-        Column {
-          Text(
-            text = period.label.stringValue(),
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier
-              .onGloballyPositioned {
-                coordinates[period] = it
-              }
-              .clickable(
-                onClick = {
-                  commandProcessor(SetPeriodCommand(period))
-                  coroutineScope.launch {
-                    val coordinate = coordinates[period]!!.positionInWindow()
-                    val x = coordinate.x
-                    val width = coordinates[period]!!.size.width.toFloat()
-                    scrollState.animateScrollTo(x.roundToInt(), animationSpec = tween(200))
-                    selectedItemWidth.animateTo(width)
-                    indicatorOffset.animateTo(x)
-                  }
-                }
-              )
-              .padding(Dimens.margin_large_x)
-              .fillMaxWidth(),
-          )
+      Column {
+        Row(modifier = Modifier.wrapContentWidth()) {
+          reportPeriods.reversed().forEach { period ->
+            Text(
+              text = period.label.stringValue(),
+              style = MaterialTheme.typography.labelSmall,
+              modifier = Modifier
+                .onGloballyPositioned { coordinates[period] = it }
+                .clickable(onClick = { commandProcessor(SetPeriodCommand(period)) })
+                .padding(Dimens.margin_large_x),
+            )
+          }
         }
+        Box(
+          modifier = Modifier
+            .height(2.dp)
+            .width(with(LocalDensity.current) { selectedItemWidth.value.toDp() })
+            .offset {
+              // Use the animated offset as the offset of the Box.
+              IntOffset(
+                x = indicatorOffset.value.roundToInt(),
+                y = 0,
+              )
+            }
+            .clip(RoundedCornerSmallRadiusShape)
+            .background(MaterialTheme.colorScheme.primary),
+        )
       }
     }
 
-    Box(
-      modifier = Modifier
-        .height(2.dp)
-        .width(with(LocalDensity.current) { selectedItemWidth.value.toDp() })
-        .offset {
-          // Use the animated offset as the offset of the Box.
-          IntOffset(
-            x = indicatorOffset.value.roundToInt(),
-            y = 0,
-          )
-        }
-        .clip(RoundedCornerSmallRadiusShape)
-        .background(MaterialTheme.colorScheme.primary)
-    )
     VerticalSpacer(height = Dimens.margin_large_x)
   }
 }
@@ -466,17 +506,19 @@ private fun ReportScreenPreview() {
           end = Instant.DISTANT_FUTURE,
         ),
       ),
-      selectedPeriod = ReportPeriod.Date(
-        label = textValueOf("June '24"),
-        start = Instant.DISTANT_PAST,
-        end = Instant.DISTANT_FUTURE,
-      ),
     )
   ExpensesTrackerTheme {
     Surface {
       ReportScreenContent(
         stateProvider = { NetworkViewState.Success(screenData) },
         commandProcessor = {},
+        selectedPeriodProvider = {
+          ReportPeriod.Date(
+            label = textValueOf("June '24"),
+            start = Instant.DISTANT_PAST,
+            end = Instant.DISTANT_FUTURE,
+          )
+        }
       )
     }
   }

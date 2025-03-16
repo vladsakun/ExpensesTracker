@@ -54,6 +54,9 @@ class OfflineFirstTransactionRepository @Inject constructor(
   override suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel? =
     transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }
 
+  override suspend fun retrieveFirstTransaction(): TransactionModel? =
+    transactionDao.retrieveFirstTransaction()?.let { transactionMapper.map(it) }
+
   override suspend fun deleteTransaction(id: Long) {
     transactionDao.deleteById(id)
   }

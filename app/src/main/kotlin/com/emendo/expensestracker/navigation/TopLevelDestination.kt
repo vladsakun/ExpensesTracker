@@ -10,6 +10,7 @@ import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.emendo.expensestracker.report.ReportNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
+import com.ramcosta.composedestinations.utils.startDestination
 
 /**
  * Type for the top level destinations in the application. Each of these destinations
@@ -63,5 +64,11 @@ enum class TopLevelDestination(
   companion object {
     val start: TopLevelDestination
       get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
+
+    val routes = entries.map { it.screen.startRoute.startDestination.route }
+    val routesWithoutCreateTransaction = entries
+      .toMutableList()
+      .apply { remove(CREATE_TRANSACTION) }
+      .map { it.screen.startRoute.startDestination.route }
   }
 }

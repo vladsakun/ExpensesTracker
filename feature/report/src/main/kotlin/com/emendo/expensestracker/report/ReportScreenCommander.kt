@@ -7,6 +7,8 @@ interface ReportScreenCommander {
 
   fun setTransactionType(transactionType: TransactionType)
   fun setPeriod(period: ReportPeriod)
+  fun hideDatePicker()
+  fun selectCustomDate(selectedStartDateMillis: Long?, selectedEndDateMillis: Long?)
 
   fun proceedCommand(command: ReportScreenCommand) {
     command.execute(this)
@@ -27,5 +29,20 @@ class SetTransactionTypeCommand(private val transactionType: TransactionType) : 
 class SetPeriodCommand(private val period: ReportPeriod) : ReportScreenCommand {
   override fun execute(commander: ReportScreenCommander) {
     commander.setPeriod(period)
+  }
+}
+
+class HidePickerDialogCommand : ReportScreenCommand {
+  override fun execute(commander: ReportScreenCommander) {
+    commander.hideDatePicker()
+  }
+}
+
+class SelectDateCommand(
+  private val selectedStartDateMillis: Long?,
+  private val selectedEndDateMillis: Long?,
+) : ReportScreenCommand {
+  override fun execute(commander: ReportScreenCommander) {
+    commander.selectCustomDate(selectedStartDateMillis, selectedEndDateMillis)
   }
 }

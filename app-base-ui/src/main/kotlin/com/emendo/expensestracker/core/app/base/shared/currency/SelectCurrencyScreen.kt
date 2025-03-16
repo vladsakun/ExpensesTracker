@@ -34,7 +34,7 @@ fun SelectCurrencyScreen(
 ) {
   val state = viewModel.state.collectAsStateWithLifecycle()
   ExpeScaffoldWithTopBar(
-    titleResId = R.string.select_color,
+    titleResId = R.string.select_currency,
     onNavigationClick = navigator::navigateUp,
   ) { paddingValues ->
     val currencies = state.value

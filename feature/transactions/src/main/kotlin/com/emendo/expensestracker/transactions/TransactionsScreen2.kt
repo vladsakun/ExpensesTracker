@@ -84,7 +84,6 @@ private fun BottomSheetState(
     ModalBottomSheet(
       onDismissRequest = onDismissRequest,
       sheetState = bottomSheetState,
-      windowInsets = WindowInsets(0),
     ) {
       BottomSheet(bottomSheetType)
       Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))

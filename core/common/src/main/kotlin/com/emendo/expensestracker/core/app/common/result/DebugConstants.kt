@@ -5,3 +5,4 @@ const val IS_DEBUG_CREATE_ACCOUNT = false
 const val IS_DEBUG_CREATE_ACCOUNT_BALANCE_BOTTOM_SHEET = false
 const val IS_DEBUG_CREATE_TRANSACTION = false
 const val IS_DEBUG_TRANSFER_TRANSACTION = false
+const val IS_DEBUG_REPORT = false

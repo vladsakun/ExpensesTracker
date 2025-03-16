@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.data.repository
 
-import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
@@ -17,9 +16,8 @@ import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -35,7 +33,20 @@ class OfflineFirstAccountRepository @Inject constructor(
   private val accountsList: StateFlow<List<AccountModel>> = accountsDao
     .getAll()
     .map { accounts -> accounts.map { accountMapper.map(it) } }
-    .stateInLazilyList(scope)
+    .stateIn(scope, SharingStarted.Lazily, emptyList())
+
+  private val _accountsList = MutableStateFlow<List<AccountModel>>(emptyList())
+  private val accountsList2 = _accountsList.asStateFlow()
+
+  init {
+    scope.launch {
+      accountsDao.getAll()
+        .onEach { accounts ->
+          accounts.map { accountMapper.map(it) }
+        }
+        .launchIn(this)
+    }
+  }
 
   override fun getAccounts(): Flow<List<AccountModel>> = accountsList
   override fun getAccountsSnapshot(): List<AccountModel> = accountsList.value

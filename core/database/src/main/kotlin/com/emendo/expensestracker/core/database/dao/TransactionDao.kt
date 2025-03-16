@@ -54,6 +54,10 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   @Query("SELECT * FROM $TABLE_NAME WHERE sourceAccountId = :sourceAccountId AND targetAccountId != NULL ORDER BY date DESC LIMIT 1")
   abstract suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionFull?
 
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME ORDER BY date ASC LIMIT 1")
+  abstract suspend fun retrieveFirstTransaction(): TransactionFull?
+
   @Query("DELETE FROM $TABLE_NAME")
   abstract override suspend fun deleteAll()
 

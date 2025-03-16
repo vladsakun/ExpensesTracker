@@ -28,7 +28,7 @@ internal fun ExpeModelBottomSheet(
       sheetState = modalBottomSheetState,
       // Todo uncomment when fixed https://issuetracker.google.com/issues/275849044
       // windowInsets = WindowInsets(0),
-      windowInsets = WindowInsets.statusBars,
+      //      windowInsets = WindowInsets.statusBars,
       shape = ExpeBottomSheetShape,
       tonalElevation = 0.dp,
       content = {

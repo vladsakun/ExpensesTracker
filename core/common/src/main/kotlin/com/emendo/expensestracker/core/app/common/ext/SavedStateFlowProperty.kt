@@ -68,6 +68,7 @@ private fun <T> SavedStateHandle.getStateFlow(
 ): MutableStateFlow<T> {
   val currentValue = get(key) ?: initialValue
   val stateFlow = MutableStateFlow(currentValue)
+  // Todo add serialization
   stateFlow
     .onEach {
       withContext(Dispatchers.Main.immediate) {

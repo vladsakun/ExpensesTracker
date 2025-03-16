@@ -1,9 +1,11 @@
 package com.emendo.expensestracker.report
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.NetworkViewState
+import com.emendo.expensestracker.core.app.common.ext.stateFlow
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
@@ -24,13 +26,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.*
 import java.math.BigDecimal
 import java.time.Year
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
-// Todo add period switch
+// Todo add custom period
 @HiltViewModel
 class ReportViewModel @Inject constructor(
+  savedStateHandle: SavedStateHandle,
   userDataRepository: UserDataRepository,
   private val transactionRepository: TransactionRepository,
   private val amountFormatter: AmountFormatter,
@@ -38,25 +42,12 @@ class ReportViewModel @Inject constructor(
   private val localeManager: ExpeLocaleManager,
 ) : ViewModel(), ReportScreenCommander {
 
-  private val _transactionType: MutableStateFlow<TransactionType> = MutableStateFlow(TransactionType.DEFAULT)
-  private val _selectedPeriod: MutableStateFlow<ReportPeriod> =
-    MutableStateFlow(getDefaultPeriod(localeManager.getLocale()))
+  private val _transactionType: MutableStateFlow<TransactionType> by savedStateHandle.stateFlow(TransactionType.DEFAULT)
 
-  private fun getDefaultPeriod(locale: Locale): ReportPeriod {
-    val (start, end) = firstAndLastDayOfMonth(date = getNow())
-
-    return ReportPeriod.Date(
-      label = getPeriodLabel(start, locale),
-      start = start,
-      end = end,
-      selected = true,
-    )
-  }
-
-  private fun getPeriodLabel(
-    start: Instant,
-    locale: Locale,
-  ): TextValue = textValueOf(start.toLocalDateTime(TimeZone.UTC).month.getDisplayName(TextStyle.NARROW, locale))
+  // Todo move to savedStateHandle
+  private val _selectedPeriod: MutableStateFlow<ReportPeriod> = MutableStateFlow(getDefaultPeriod())
+  internal val selectedPeriod: StateFlow<ReportPeriod> = _selectedPeriod
+  private val _showPickerDialog: MutableStateFlow<Boolean> by savedStateHandle.stateFlow(false)
 
   private val transactionsFlow: Flow<List<TransactionModel>> = _selectedPeriod.flatMapLatest { period ->
     val (from, to) = getFromTo(period)
@@ -65,6 +56,9 @@ class ReportViewModel @Inject constructor(
         transactions.filter { it.type == TransactionType.EXPENSE }
       }
   }
+
+  // Todo move to savedStateHandle
+  private var periodsCache: Pair<Locale, ImmutableList<ReportPeriod>?> = localeManager.getLocale() to null
 
   private fun getFromTo(period: ReportPeriod): Pair<Instant, Instant> = when (period) {
     is ReportPeriod.Date -> period.start to period.end
@@ -77,8 +71,8 @@ class ReportViewModel @Inject constructor(
       userDataRepository.generalCurrency,
       transactionsFlow,
       _transactionType,
-      _selectedPeriod,
-    ) { currency, transactions, transactionType, selectedPeriod ->
+      _showPickerDialog,
+    ) { currency, transactions, transactionType, showPickerDialog ->
       val categoryWithTotal: List<Pair<CategoryModel, BigDecimal>> =
         getCategoriesWithTotalTransactionsUseCase(transactions, transactionType)
           .sortedByDescending { it.second }
@@ -107,19 +101,30 @@ class ReportViewModel @Inject constructor(
           }.toImmutableList(),
           transactionType = transactionType,
           reportSumLabel = resourceValueOf(getReportSumLabelResId(transactionType)),
-          periods = getPeriods(Clock.System.now()), // Todo get first transaction date
-          selectedPeriod = selectedPeriod,
+          periods = getPeriods(),
+          showPickerDialog = showPickerDialog,
         )
       )
     }.stateInWhileSubscribed(viewModelScope, NetworkViewState.Loading)
 
-  private fun getPeriods(firstTransaction: Instant): ImmutableList<ReportPeriod> {
+  private suspend fun getPeriods(): ImmutableList<ReportPeriod> {
+    val selectedPeriodValue = selectedPeriod.value
+    if (periodsCache.second != null && localeManager.getLocale() == periodsCache.first && selectedPeriodValue !is ReportPeriod.Custom) {
+      return periodsCache.second!!
+    }
+
+    val firstTransaction = transactionRepository.retrieveFirstTransaction()?.date ?: Clock.System.now()
+
     val now = getNow()
     val startYear = firstTransaction.toLocalDateTime(TimeZone.UTC).year
     val yearNow = now.year
     val diff = (yearNow - startYear).coerceAtMost(3) // Maximum 3 years history suggestion
 
-    val periods = mutableListOf(ReportPeriod.Custom(), ReportPeriod.AllTime())
+    // Years
+    val periods = mutableListOf(
+      if (selectedPeriodValue is ReportPeriod.Custom) selectedPeriodValue else ReportPeriod.Custom(),
+      ReportPeriod.AllTime()
+    )
     for (i in yearNow downTo yearNow - diff) {
       val year = Year.of(i)
       val start = year.atDay(1).atStartOfDay().toInstant(TimeZone.UTC.toJavaZoneOffset()).toKotlinInstant()
@@ -129,10 +134,11 @@ class ReportViewModel @Inject constructor(
           label = textValueOf(year.toString()),
           start = start,
           end = end,
-        )
+        ),
       )
     }
 
+    // Months
     for (i in yearNow downTo yearNow - diff) {
       val year = Year.of(i)
       val monthRange: OpenEndRange<Month> = if (year.value == now.year) {
@@ -146,28 +152,76 @@ class ReportViewModel @Inject constructor(
         val (start, end) = firstAndLastDayOfMonth(date)
         periods.add(
           ReportPeriod.Date(
-            label = textValueOf(
-              month.getDisplayName(
-                TextStyle.FULL_STANDALONE,
-                localeManager.getLocale()
-              ) + " '${year.toString().substring(2)}",
-            ),
+            label = getPeriodLabel(month, year),
             start = start,
             end = end,
-          )
+          ),
         )
       }
     }
 
-    return periods.toImmutableList()
+    val periodsImmutable = periods.toImmutableList()
+    periodsCache = localeManager.getLocale() to periodsImmutable
+
+    return periodsImmutable
   }
+
+  private fun getPeriodLabel(month: java.time.Month, year: Year): TextValue.Value =
+    textValueOf(month.getMonthLabel() + year.getYearLabel())
+
+  private fun Int.getYearLabel(): String = Year.of(this).getYearLabel()
+  private fun Year.getYearLabel(): String = " '${toString().substring(2)}"
+
+  private fun java.time.Month.getMonthLabel(): String? =
+    getDisplayName(TextStyle.FULL_STANDALONE, localeManager.getLocale())
 
   override fun setTransactionType(transactionType: TransactionType) {
     _transactionType.update { transactionType }
   }
 
   override fun setPeriod(period: ReportPeriod) {
+    if (period is ReportPeriod.Custom) {
+      _showPickerDialog.update { true }
+      return
+    }
+
     _selectedPeriod.update { period }
+  }
+
+  override fun hideDatePicker() {
+    _showPickerDialog.update { false }
+  }
+
+  override fun selectCustomDate(selectedStartDateMillis: Long?, selectedEndDateMillis: Long?) {
+    if (selectedStartDateMillis == null || selectedEndDateMillis == null) {
+      return hideDatePicker()
+    }
+
+    fun getCustomLabel(localDateTime: LocalDateTime): String {
+      val formatter = DateTimeFormatter.ofPattern("dd.MM.yy")
+      return localDateTime.toJavaLocalDateTime().format(formatter)
+    }
+
+    val startInstant = Instant.fromEpochMilliseconds(selectedStartDateMillis)
+    val startLocalDateTime = startInstant.toLocalDateTime(TimeZone.UTC)
+    val endInstant = Instant.fromEpochMilliseconds(selectedEndDateMillis)
+    val endLocalDateTime = endInstant.toLocalDateTime(TimeZone.UTC)
+
+    val labelStart = getCustomLabel(startLocalDateTime)
+    val labelEnd = getCustomLabel(endLocalDateTime)
+    val label = textValueOf("$labelStart - $labelEnd")
+
+    // Fix Custom is not selected after selecting custom period
+    _selectedPeriod.update {
+      ReportPeriod.Custom(
+        label = label,
+        start = startInstant,
+        end = endInstant,
+        selected = true,
+      )
+    }
+
+    hideDatePicker()
   }
 
   private fun firstAndLastDayOfMonth(date: LocalDateTime): Pair<Instant, Instant> {
@@ -181,6 +235,20 @@ class ReportViewModel @Inject constructor(
     val lastInstant = lastDayOfMonth.atTime(23, 59, 59).toInstant(TimeZone.UTC)
 
     return Pair(firstInstant, lastInstant)
+  }
+
+  private fun getDefaultPeriod(): ReportPeriod {
+    val (start, end) = firstAndLastDayOfMonth(date = getNow())
+    val localDateTime = start.toLocalDateTime(TimeZone.UTC)
+    val month = localDateTime.month
+    val year = Year.of(localDateTime.year)
+
+    return ReportPeriod.Date(
+      label = getPeriodLabel(month = month, year = year),
+      start = start,
+      end = end,
+      selected = true,
+    )
   }
 }
 

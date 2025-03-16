@@ -6,15 +6,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavHostController
+import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_REPORT
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
@@ -25,6 +23,7 @@ import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
+import timber.log.Timber
 
 @Composable
 fun ExpeApp(
@@ -40,11 +39,16 @@ fun ExpeApp(
       if (appState.shouldShowBottomBar) {
       }
 
-      val routesOnBackStack = rememberRoutesOnBackStack(appState)
-      ExpeBottomBar(
-        routesOnBackStack = routesOnBackStack.value,
-        appState = appState,
-      )
+      Timber.d("ExpeApp: appState.currentDestinationSpec: ${appState.currentDestinationSpec?.route}")
+      Timber.d("ExpeApp: routes: ${TopLevelDestination.routes}")
+
+      if (appState.shouldShowNavigationBar) {
+        val routesOnBackStack = rememberRoutesOnBackStack(appState)
+        ExpeBottomBar(
+          routesOnBackStack = routesOnBackStack.value,
+          appState = appState,
+        )
+      }
     },
   ) { padding ->
     Row(
@@ -70,6 +74,13 @@ private fun ExpeBottomBar(
   appState: ExpeAppState,
   modifier: Modifier = Modifier,
 ) {
+
+  LaunchedEffect(Unit) {
+    if (IS_DEBUG_REPORT) {
+      appState.navigateToTopLevelDestination(TopLevelDestination.REPORT)
+    }
+  }
+
   ExpeNavigationBar(modifier = modifier) {
     appState.topLevelDestination.forEach { item ->
       if (item == TopLevelDestination.CREATE_TRANSACTION) {

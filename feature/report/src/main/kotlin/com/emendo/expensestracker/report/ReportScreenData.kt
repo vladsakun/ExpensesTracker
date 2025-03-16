@@ -10,6 +10,7 @@ import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Immutable
 data class ReportScreenData(
@@ -21,8 +22,9 @@ data class ReportScreenData(
   val transactionType: TransactionType,
   val reportSumLabel: TextValue,
   val periods: ImmutableList<ReportPeriod>,
-  val selectedPeriod: ReportPeriod,
+  val showPickerDialog: Boolean = false,
 ) {
+
   data class CategoryValue(
     val categoryId: Long,
     val icon: IconModel,
@@ -37,26 +39,86 @@ data class ReportPieChartSlice(
   val color: ColorModel,
 )
 
-sealed class ReportPeriod(
-  open val label: TextValue,
-  open val selected: Boolean,
-) {
+@Serializable
+sealed class ReportPeriod {
+  abstract val label: TextValue
+  abstract val selected: Boolean
+
+  @Serializable
   data class Date(
     override val label: TextValue,
     override val selected: Boolean = false,
     val start: Instant,
     val end: Instant,
-  ) : ReportPeriod(label, selected)
+  ) : ReportPeriod() {
 
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as Date
+
+      if (label != other.label) return false
+      if (start != other.start) return false
+      if (end != other.end) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      var result = label.hashCode()
+      result = 31 * result + start.hashCode()
+      result = 31 * result + end.hashCode()
+      return result
+    }
+  }
+
+  @Serializable
   data class AllTime(
     override val label: TextValue = resourceValueOf(R.string.report_all_time),
     override val selected: Boolean = false,
-  ) : ReportPeriod(label, selected)
+  ) : ReportPeriod() {
 
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as AllTime
+
+      return label == other.label
+    }
+
+    override fun hashCode(): Int {
+      return label.hashCode()
+    }
+  }
+
+  @Serializable
   data class Custom(
     override val label: TextValue = resourceValueOf(R.string.report_custom),
     override val selected: Boolean = false,
     val start: Instant? = null,
     val end: Instant? = null,
-  ) : ReportPeriod(label, selected)
+  ) : ReportPeriod() {
+
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as Custom
+
+      if (label != other.label) return false
+      if (start != other.start) return false
+      if (end != other.end) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      var result = label.hashCode()
+      result = 31 * result + (start?.hashCode() ?: 0)
+      result = 31 * result + (end?.hashCode() ?: 0)
+      return result
+    }
+  }
 }

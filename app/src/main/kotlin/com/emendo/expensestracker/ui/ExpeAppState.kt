@@ -53,6 +53,9 @@ class ExpeAppState(
   val shouldShowBottomBar: Boolean
     get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
 
+  val shouldShowNavigationBar: Boolean
+    @Composable get() = currentDestinationSpec?.route in TopLevelDestination.routesWithoutCreateTransaction
+
   val shouldShowNavRail: Boolean
     get() = !shouldShowBottomBar
 

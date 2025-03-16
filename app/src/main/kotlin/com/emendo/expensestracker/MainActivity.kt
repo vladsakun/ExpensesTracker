@@ -34,12 +34,11 @@ class MainActivity : ComponentActivity() {
   private val timeZoneBroadcastReceiver by lazy { TimeZoneBroadcastReceiver(viewModel::updateTimeZone) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
     // Turn off the decor fitting system windows, which allows us to handle insets,
     // including IME animations, and go edge-to-edge
     // This also sets up the initial system bar style based on the platform theme
     enableEdgeToEdge()
+    super.onCreate(savedInstanceState)
 
     setContent {
       val darkTheme = isSystemInDarkTheme()
@@ -66,19 +65,6 @@ class MainActivity : ComponentActivity() {
           navController = navController,
         )
       }
-
-      // Uncomment to Test complex deeplinks
-      //      navController.addOnDestinationChangedListener { controller, destination, arguments ->
-      //        if (isNavControllerInitialized) {
-      //          return@addOnDestinationChangedListener
-      //        }
-      //
-      //        isNavControllerInitialized = true
-      //        controller.navigate(CategoryDetailScreenDestination(categoryId = 1L))
-      //        controller.navigate(AccountsScreenRouteDestination)
-      //        controller.navigate(AccountDetailScreenDestination(accountId = 1L))
-      //        controller.navigate(CreateTransactionScreenDestination)
-      //      }
     }
   }
 
