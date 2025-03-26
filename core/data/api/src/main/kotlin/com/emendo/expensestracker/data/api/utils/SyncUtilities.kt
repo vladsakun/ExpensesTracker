@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.data.api
+package com.emendo.expensestracker.data.api.utils
 
 import com.emendo.expensestracker.core.datastore.ChangeListVersions
 

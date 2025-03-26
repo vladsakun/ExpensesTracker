@@ -3557,7 +3557,7 @@ HSPLandroidx/compose/material3/ColorScheme;-><init>(JJJJJJJJJJJJJJJJJJJJJJJJJJJJ
 HSPLandroidx/compose/material3/ColorScheme;-><init>(JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 HSPLandroidx/compose/material3/ColorScheme;->getBackground-0d7_KjU()J
 HSPLandroidx/compose/material3/ColorScheme;->getDefaultIconButtonColorsCached$material3_release()Landroidx/compose/material3/IconButtonColors;
-HSPLandroidx/compose/material3/ColorScheme;->getDefaultLargeTopAppBarColorsCached$material3_release()Landroidx/compose/material3/TopAppBarColors;
+HSPLandroidx/compose/material3/ColorScheme;->getDefaulttopAppBarColorsCached$material3_release()Landroidx/compose/material3/TopAppBarColors;
 HSPLandroidx/compose/material3/ColorScheme;->getDefaultNavigationBarItemColorsCached$material3_release()Landroidx/compose/material3/NavigationBarItemColors;
 HSPLandroidx/compose/material3/ColorScheme;->getInverseOnSurface-0d7_KjU()J
 HSPLandroidx/compose/material3/ColorScheme;->getOnBackground-0d7_KjU()J
@@ -3574,7 +3574,7 @@ HSPLandroidx/compose/material3/ColorScheme;->getSurfaceTint-0d7_KjU()J
 HSPLandroidx/compose/material3/ColorScheme;->getSurfaceVariant-0d7_KjU()J
 HSPLandroidx/compose/material3/ColorScheme;->getTertiary-0d7_KjU()J
 HSPLandroidx/compose/material3/ColorScheme;->setDefaultIconButtonColorsCached$material3_release(Landroidx/compose/material3/IconButtonColors;)V
-HSPLandroidx/compose/material3/ColorScheme;->setDefaultLargeTopAppBarColorsCached$material3_release(Landroidx/compose/material3/TopAppBarColors;)V
+HSPLandroidx/compose/material3/ColorScheme;->setDefaulttopAppBarColorsCached$material3_release(Landroidx/compose/material3/TopAppBarColors;)V
 HSPLandroidx/compose/material3/ColorScheme;->setDefaultNavigationBarItemColorsCached$material3_release(Landroidx/compose/material3/NavigationBarItemColors;)V
 Landroidx/compose/material3/ColorSchemeKt;
 HSPLandroidx/compose/material3/ColorSchemeKt;-><clinit>()V
@@ -3961,9 +3961,9 @@ HSPLandroidx/compose/material3/TopAppBarColors;->getTitleContentColor-0d7_KjU()J
 Landroidx/compose/material3/TopAppBarDefaults;
 HSPLandroidx/compose/material3/TopAppBarDefaults;-><clinit>()V
 HSPLandroidx/compose/material3/TopAppBarDefaults;-><init>()V
-HSPLandroidx/compose/material3/TopAppBarDefaults;->getDefaultLargeTopAppBarColors$material3_release(Landroidx/compose/material3/ColorScheme;)Landroidx/compose/material3/TopAppBarColors;
+HSPLandroidx/compose/material3/TopAppBarDefaults;->getDefaulttopAppBarColors$material3_release(Landroidx/compose/material3/ColorScheme;)Landroidx/compose/material3/TopAppBarColors;
 HSPLandroidx/compose/material3/TopAppBarDefaults;->getWindowInsets(Landroidx/compose/runtime/Composer;I)Landroidx/compose/foundation/layout/WindowInsets;
-HSPLandroidx/compose/material3/TopAppBarDefaults;->largeTopAppBarColors(Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/TopAppBarColors;
+HSPLandroidx/compose/material3/TopAppBarDefaults;->topAppBarColors(Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/TopAppBarColors;
 Landroidx/compose/material3/TopAppBarScrollBehavior;
 Landroidx/compose/material3/Typography;
 HSPLandroidx/compose/material3/Typography;-><clinit>()V

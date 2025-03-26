@@ -1,15 +1,16 @@
 package com.emendo.expensestracker.accounts.list
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emendo.expensestracker.accounts.api.SelectAccountArgs
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
-import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
@@ -23,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountsListViewModel @Inject constructor(
   private val accountRepository: AccountRepository,
-  private val createTransactionController: CreateTransactionController,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
+  savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   private val selectedAccounts: MutableStateFlow<Set<AccountModel>> = MutableStateFlow(emptySet())
@@ -52,22 +53,20 @@ class AccountsListViewModel @Inject constructor(
   private val _editMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
   internal val editMode: StateFlow<Boolean> = _editMode
 
-  val isSelectMode: Boolean
-    get() = createTransactionController.isSelectMode()
-  val titleResId: Int
+  private val args by lazy(LazyThreadSafetyMode.NONE) { savedStateHandle.get<SelectAccountArgs>("args") }
+
+  internal val isSelectMode: Boolean
+    get() = args != null
+  internal val titleResId: Int
     @StringRes get() = if (isSelectMode) R.string.select_account else R.string.accounts
 
   private var orderedAccounts: List<AccountUiModel>? = null
-
-  fun pickAccountItem(account: AccountModel) {
-    createTransactionController.selectAccount(account)
-  }
 
   internal fun enableEditMode() {
     _editMode.update { true }
   }
 
-  fun selectAccountItem(account: AccountModel) {
+  internal fun selectAccountItem(account: AccountModel) {
     selectedAccounts.update { accounts ->
       accounts.toMutableSet().apply {
         if (contains(account)) {
@@ -108,18 +107,14 @@ class AccountsListViewModel @Inject constructor(
       accountRepository.updateOrdinalIndex(diff)
     }
 
-  fun disableEditMode() {
+  internal fun disableEditMode() {
     _editMode.update { false }
     selectedAccounts.update { mutableSetOf() }
     updateAccountsIndexes(orderedAccounts)
   }
 
-  fun saveAccountsOrder(accountUiModels: List<AccountUiModel>?) {
+  internal fun saveAccountsOrder(accountUiModels: List<AccountUiModel>?) {
     orderedAccounts = accountUiModels
-  }
-
-  override fun onCleared() {
-    createTransactionController.finishSelectMode()
   }
 }
 
@@ -129,7 +124,6 @@ private fun accountsUiState(accountRepository: AccountRepository): Flow<Accounts
       is Result.Success -> AccountsListUiState.DisplayAccountsList(
         accountsResult.data
           .map(::AccountUiModel)
-          .sortedBy { it.accountModel.ordinalIndex }
           .toImmutableList()
       )
 

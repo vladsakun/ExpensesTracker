@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.core.ui.piechart.models
 
 import androidx.compose.ui.graphics.Color
-import com.emendo.expensestracker.core.ui.piechart.models.PieChartData.Slice
 import com.emendo.expensestracker.core.ui.piechart.utils.sum
 import kotlinx.collections.immutable.ImmutableList
 
@@ -19,6 +18,7 @@ data class PieChartData(val slices: ImmutableList<Slice>) {
      * @param color: Color of the arc.
      */
     data class Slice(
+        val id: Long,
         val value: Float,
         val color: Color,
     )

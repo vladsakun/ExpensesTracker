@@ -14,15 +14,13 @@ import kotlinx.serialization.Serializable
 
 @Immutable
 data class ReportScreenData(
-  val balanceDate: String,
+  val balanceDate: TextValue,
   val balance: Amount,
-  val pieChartData: ImmutableList<ReportPieChartSlice>,
-  val allExpenses: Amount,
+  val pieChartData: ImmutableList<ReportPieChartSlice>?,
+  val reportSum: ReportSum,
   val categoryValues: ImmutableList<CategoryValue>,
   val transactionType: TransactionType,
-  val reportSumLabel: TextValue,
   val periods: ImmutableList<ReportPeriod>,
-  val showPickerDialog: Boolean = false,
 ) {
 
   data class CategoryValue(
@@ -32,15 +30,23 @@ data class ReportScreenData(
     val amount: Amount,
     val color: ColorModel,
   )
+
+  data class ReportSum(
+    val label: TextValue,
+    val value: Amount,
+    val type: TransactionType,
+  )
 }
 
 data class ReportPieChartSlice(
+  val categoryId: Long,
   val value: Float,
   val color: ColorModel,
 )
 
+// TODO remove java.io.Serializable
 @Serializable
-sealed class ReportPeriod {
+sealed class ReportPeriod : java.io.Serializable {
   abstract val label: TextValue
   abstract val selected: Boolean
 
@@ -120,5 +126,11 @@ sealed class ReportPeriod {
       result = 31 * result + (end?.hashCode() ?: 0)
       return result
     }
+  }
+
+  fun getFromAndTo(): Pair<Instant, Instant> = when (this) {
+    is Date -> start to end
+    is AllTime -> Instant.DISTANT_PAST to Instant.DISTANT_FUTURE
+    is Custom -> checkNotNull(start) to checkNotNull(end)
   }
 }

@@ -62,13 +62,14 @@ enum class TopLevelDestination(
   ;
 
   companion object {
-    val start: TopLevelDestination
+    internal val startDestination: TopLevelDestination
       get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
 
-    val routes = entries.map { it.screen.startRoute.startDestination.route }
-    val routesWithoutCreateTransaction = entries
-      .toMutableList()
-      .apply { remove(CREATE_TRANSACTION) }
-      .map { it.screen.startRoute.startDestination.route }
+    internal val routesWithoutCreateTransaction by lazy(LazyThreadSafetyMode.NONE) {
+      entries
+        .toMutableList()
+        .apply { remove(CREATE_TRANSACTION) }
+        .map { it.screen.startRoute.startDestination.route }
+    }
   }
 }

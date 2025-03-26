@@ -32,11 +32,12 @@ class OfflineFirstAccountRepository @Inject constructor(
 
   private val accountsList: StateFlow<List<AccountModel>> = accountsDao
     .getAll()
-    .map { accounts -> accounts.map { accountMapper.map(it) } }
+    .map { accounts ->
+      accounts
+        .map { accountMapper.map(it) }
+        .sortedBy { it.ordinalIndex }
+    }
     .stateIn(scope, SharingStarted.Lazily, emptyList())
-
-  private val _accountsList = MutableStateFlow<List<AccountModel>>(emptyList())
-  private val accountsList2 = _accountsList.asStateFlow()
 
   init {
     scope.launch {
@@ -60,6 +61,9 @@ class OfflineFirstAccountRepository @Inject constructor(
     accountsDao
       .getById(id)
       .map(accountMapper::map)
+
+  override fun getByIdSnapshot(id: Long): AccountModel? =
+    getAccountsSnapshot().find { it.id == id }
 
   override suspend fun createAccount(
     currency: CurrencyModel,

@@ -43,13 +43,15 @@ import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.ui.AmountText
+import com.emendo.expensestracker.core.ui.EmptyState
 import com.emendo.expensestracker.core.ui.piechart.charts.DonutPieChart
 import com.emendo.expensestracker.core.ui.piechart.models.PieChartConfig
 import com.emendo.expensestracker.core.ui.piechart.models.PieChartData
 import com.emendo.expensestracker.core.ui.stringValue
-import com.emendo.expensestracker.data.api.model.transaction.labelResId
+import com.emendo.expensestracker.data.api.extensions.labelResId
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.textValueOf
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -66,12 +68,16 @@ internal fun ReportScreen(
   navigator: DestinationsNavigator,
   viewModel: ReportViewModel = hiltViewModel(),
 ) {
-  val state: State<NetworkViewState<ReportScreenData>> = viewModel.state.collectAsStateWithLifecycle()
-  val selectedPeriod: State<ReportPeriod> = viewModel.selectedPeriod.collectAsStateWithLifecycle()
+  val state = viewModel.state.collectAsStateWithLifecycle()
+  val selectedPeriod = viewModel.selectedPeriod.collectAsStateWithLifecycle()
+  val showPickerDialog = viewModel.showPickerDialog.collectAsStateWithLifecycle()
+  val selectedCategory = viewModel.selectedCategory.collectAsStateWithLifecycle()
 
   ReportScreenContent(
     stateProvider = state::value,
     selectedPeriodProvider = selectedPeriod::value,
+    showPickerDialogProvider = showPickerDialog::value,
+    selectedCategoryProvider = selectedCategory::value,
     commandProcessor = viewModel::proceedCommand,
   )
 }
@@ -80,9 +86,12 @@ internal fun ReportScreen(
 private fun ReportScreenContent(
   stateProvider: () -> NetworkViewState<ReportScreenData>,
   selectedPeriodProvider: () -> ReportPeriod,
+  showPickerDialogProvider: () -> Boolean,
+  selectedCategoryProvider: () -> ReportScreenData.CategoryValue?,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
   ExpeScaffoldWithTopBar(titleResId = R.string.report_title) { paddingValues ->
+    // TODO statefulLayout
     Box(
       modifier = Modifier
         .fillMaxSize()
@@ -90,55 +99,21 @@ private fun ReportScreenContent(
     ) {
       when (val stateValue = stateProvider()) {
         is NetworkViewState.Error -> Text(text = stateValue.message)
-        is NetworkViewState.Loading -> ExpLoadingWheel()
+        is NetworkViewState.Loading -> ExpLoadingWheel(modifier = Modifier.align(Alignment.Center))
         is NetworkViewState.Success -> {
           ReportScreenContent(
             state = stateValue.data,
-            selectedPeriod = selectedPeriodProvider,
+            selectedPeriodProvider = selectedPeriodProvider,
+            selectedCategoryProvider = selectedCategoryProvider,
             commandProcessor = commandProcessor,
           )
 
           DateRangePickerDialog(
-            showDialogProvider = { stateValue.data.showPickerDialog },
+            showDialogProvider = showPickerDialogProvider,
             commandProcessor = commandProcessor,
           )
         }
       }
-    }
-  }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun DateRangePickerDialog(
-  showDialogProvider: () -> Boolean,
-  commandProcessor: (ReportScreenCommand) -> Unit,
-) {
-  val datePickerState = rememberDateRangePickerState()
-  if (showDialogProvider()) {
-    DatePickerDialog(
-      onDismissRequest = { commandProcessor(HidePickerDialogCommand()) },
-      confirmButton = {
-        Button(
-          onClick = {
-            commandProcessor(
-              SelectDateCommand(
-                selectedStartDateMillis = datePickerState.selectedStartDateMillis,
-                selectedEndDateMillis = datePickerState.selectedEndDateMillis,
-              )
-            )
-          }
-        ) {
-          Text(text = stringResource(id = R.string.ok))
-        }
-      },
-      dismissButton = {
-        Button(onClick = { commandProcessor(HidePickerDialogCommand()) }) {
-          Text(text = stringResource(id = R.string.cancel))
-        }
-      }
-    ) {
-      DateRangePicker(state = datePickerState)
     }
   }
 }
@@ -146,7 +121,8 @@ private fun DateRangePickerDialog(
 @Composable
 private fun ReportScreenContent(
   state: ReportScreenData,
-  selectedPeriod: () -> ReportPeriod,
+  selectedPeriodProvider: () -> ReportPeriod,
+  selectedCategoryProvider: () -> ReportScreenData.CategoryValue?,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
   LazyColumn(
@@ -159,7 +135,7 @@ private fun ReportScreenContent(
     )
     periods(
       reportPeriods = state.periods,
-      selectedPeriod = selectedPeriod,
+      selectedPeriod = selectedPeriodProvider,
       commandProcessor = commandProcessor,
     )
     balance(
@@ -167,11 +143,34 @@ private fun ReportScreenContent(
       balance = state.balance,
       transactionType = state.transactionType,
     )
-    pieChart(reportPieChartSlices = state.pieChartData)
-    reportSum(state = state)
-    categoryItems(
-      categoryValues = state.categoryValues,
-      transactionType = state.transactionType,
+    if (state.pieChartData == null) {
+      emptyState()
+    } else {
+      pieChart(
+        reportPieChartSlices = state.pieChartData,
+        onSliceClick = { commandProcessor(SelectSlice(it.id)) }
+      )
+      reportSum(
+        selectedCategoryProvider = selectedCategoryProvider,
+        sum = state.reportSum,
+        onClick = { commandProcessor(SelectCategory(it)) },
+      )
+      categoryItems(
+        categoryValues = state.categoryValues,
+        transactionType = state.transactionType,
+        onItemClick = { commandProcessor(SelectCategory(SelectCategoryClickEvent.CategorySelected(it.categoryId))) }
+      )
+    }
+  }
+}
+
+private fun LazyListScope.emptyState() {
+  uniqueItem("emptyState") {
+    EmptyState(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(Dimens.margin_large_x)
+        .animateItem(),
     )
   }
 }
@@ -181,6 +180,7 @@ private fun LazyListScope.periods(
   selectedPeriod: () -> ReportPeriod,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
+  // TODO fix animation is replayed after every navigation to the screen
   uniqueItem("periods") {
     val scrollState = rememberScrollState()
     val coordinates = remember(reportPeriods) { mutableStateMapOf<ReportPeriod, LayoutCoordinates>() }
@@ -189,7 +189,7 @@ private fun LazyListScope.periods(
 
     LaunchedEffect(selectedPeriod()) {
       val period = reportPeriods.getOrNull(reportPeriods.indexOf(selectedPeriod())) ?: return@LaunchedEffect
-      val coordinate = coordinates[period]!!.positionInParent()
+      val coordinate = coordinates[period]?.positionInParent() ?: return@LaunchedEffect
       val x = coordinate.x
       val width = coordinates[period]!!.size.width.toFloat()
       val targetScrollPosition = scrollState.maxValue - x + scrollState.viewportSize / 2 - width / 2
@@ -240,7 +240,9 @@ private fun LazyListScope.periods(
 }
 
 private fun LazyListScope.categoryItems(
-  categoryValues: ImmutableList<ReportScreenData.CategoryValue>, transactionType: TransactionType,
+  categoryValues: ImmutableList<ReportScreenData.CategoryValue>,
+  transactionType: TransactionType,
+  onItemClick: (ReportScreenData.CategoryValue) -> Unit,
 ) {
   items(
     items = categoryValues,
@@ -253,39 +255,55 @@ private fun LazyListScope.categoryItems(
       amount = categoryExpense.amount,
       name = categoryExpense.categoryName.stringValue(),
       transactionType = transactionType,
-      onClick = {},
+      onClick = { onItemClick(categoryExpense) },
     )
     ExpeDivider()
   }
 }
 
-private fun LazyListScope.reportSum(state: ReportScreenData) {
+private fun LazyListScope.reportSum(
+  selectedCategoryProvider: () -> ReportScreenData.CategoryValue?,
+  sum: ReportScreenData.ReportSum,
+  onClick: (event: SelectCategoryClickEvent) -> Unit,
+) {
   uniqueItem("reportSum") {
-    CategoryItem(
-      icon = ExpeIcons.Functions,
-      tint = MaterialTheme.customColorsPalette.neutralColor,
-      amount = state.allExpenses,
-      name = state.reportSumLabel.stringValue(),
-      transactionType = state.transactionType,
-      onClick = {},
-    )
+    val selectedCategory = selectedCategoryProvider()
+
+    if (selectedCategory == null) {
+      CategoryItem(
+        icon = ExpeIcons.Functions,
+        tint = MaterialTheme.customColorsPalette.neutralColor,
+        amount = sum.value,
+        name = sum.label.stringValue(),
+        transactionType = sum.type,
+        onClick = { onClick(SelectCategoryClickEvent.AllCategoriesSelected(sum.type)) },
+      )
+    } else {
+      CategoryItem(
+        icon = selectedCategory.icon.imageVector,
+        tint = selectedCategory.color.color,
+        amount = selectedCategory.amount,
+        name = selectedCategory.categoryName.stringValue(),
+        transactionType = sum.type,
+        onClick = { onClick(SelectCategoryClickEvent.CategorySelected(selectedCategory.categoryId)) },
+      )
+    }
     ExpeDivider()
     VerticalSpacer(height = Dimens.margin_large_x)
   }
 }
 
-private fun LazyListScope.pieChart(reportPieChartSlices: ImmutableList<ReportPieChartSlice>) {
+private fun LazyListScope.pieChart(
+  reportPieChartSlices: ImmutableList<ReportPieChartSlice>,
+  onSliceClick: (PieChartData.Slice) -> Unit,
+) {
   uniqueItem("pieChart") {
     val pieChartData = PieChartData(
       reportPieChartSlices.map {
-        PieChartData.Slice(it.value, it.color.color)
+        PieChartData.Slice(it.categoryId, it.value, it.color.color)
       }.toImmutableList()
     )
     DonutPieChart(
-      modifier = Modifier
-        .padding(Dimens.margin_large_x)
-        .fillMaxWidth()
-        .aspectRatio(1f),
       pieChartData = pieChartData,
       pieChartConfig = PieChartConfig(
         // Disable animation in Preview Mode
@@ -296,13 +314,18 @@ private fun LazyListScope.pieChart(reportPieChartSlices: ImmutableList<ReportPie
         sliceLabelTextColor = Color.White,
         sliceLabelTypeface = Typeface.DEFAULT_BOLD,
       ),
-      onSliceClick = {},
+      onSliceClick = onSliceClick,
+      modifier = Modifier
+        .padding(Dimens.margin_large_x)
+        .fillMaxWidth()
+        .aspectRatio(1f)
+        .animateItem(),
     )
   }
 }
 
 private fun LazyListScope.balance(
-  balanceDate: String,
+  balanceDate: TextValue,
   balance: Amount,
   transactionType: TransactionType,
 ) {
@@ -312,10 +335,11 @@ private fun LazyListScope.balance(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = Dimens.margin_large_x),
+        .padding(horizontal = Dimens.margin_large_x)
+        .animateItem(),
     ) {
       Text(
-        text = balanceDate,
+        text = balanceDate.stringValue(),
         style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier.weight(1f),
       )
@@ -442,23 +466,58 @@ private fun CategoryItem(
   }
 }
 
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DateRangePickerDialog(
+  showDialogProvider: () -> Boolean,
+  commandProcessor: (ReportScreenCommand) -> Unit,
+) {
+  val datePickerState = rememberDateRangePickerState()
+  if (showDialogProvider()) {
+    DatePickerDialog(
+      onDismissRequest = { commandProcessor(HidePickerDialogCommand()) },
+      confirmButton = {
+        Button(
+          onClick = {
+            commandProcessor(
+              SelectDateCommand(
+                selectedStartDateMillis = datePickerState.selectedStartDateMillis,
+                selectedEndDateMillis = datePickerState.selectedEndDateMillis,
+              )
+            )
+          }
+        ) {
+          Text(text = stringResource(id = R.string.ok))
+        }
+      },
+      dismissButton = {
+        Button(onClick = { commandProcessor(HidePickerDialogCommand()) }) {
+          Text(text = stringResource(id = R.string.cancel))
+        }
+      }
+    ) {
+      DateRangePicker(state = datePickerState)
+    }
+  }
+}
+
 @ExpePreview
 @Composable
 private fun ReportScreenPreview() {
   val pieChartData = persistentListOf(
-    ReportPieChartSlice(150f, ColorModel.random),
-    ReportPieChartSlice(120f, ColorModel.random),
-    ReportPieChartSlice(110f, ColorModel.random),
-    ReportPieChartSlice(170f, ColorModel.random),
-    ReportPieChartSlice(120f, ColorModel.random),
+    ReportPieChartSlice(1, 150f, ColorModel.random),
+    ReportPieChartSlice(2, 120f, ColorModel.random),
+    ReportPieChartSlice(3, 110f, ColorModel.random),
+    ReportPieChartSlice(4, 170f, ColorModel.random),
+    ReportPieChartSlice(5, 120f, ColorModel.random),
   )
 
   val screenData =
     ReportScreenData(
-      balanceDate = "Today",
+      balanceDate = textValueOf("Today"),
       balance = Amount.Mock,
       pieChartData = pieChartData,
-      allExpenses = Amount.Mock,
+      reportSum = ReportScreenData.ReportSum(textValueOf("All expenses"), Amount.Mock, TransactionType.EXPENSE),
       categoryValues = List(10) {
         ReportScreenData.CategoryValue(
           categoryId = it.toLong(),
@@ -469,7 +528,6 @@ private fun ReportScreenPreview() {
         )
       }.toImmutableList(),
       transactionType = TransactionType.EXPENSE,
-      reportSumLabel = textValueOf("All expenses"),
       periods = persistentListOf(
         ReportPeriod.Custom(),
         ReportPeriod.AllTime(),
@@ -512,6 +570,8 @@ private fun ReportScreenPreview() {
       ReportScreenContent(
         stateProvider = { NetworkViewState.Success(screenData) },
         commandProcessor = {},
+        showPickerDialogProvider = { false },
+        selectedCategoryProvider = { null },
         selectedPeriodProvider = {
           ReportPeriod.Date(
             label = textValueOf("June '24"),

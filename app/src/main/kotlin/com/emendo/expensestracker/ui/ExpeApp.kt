@@ -23,7 +23,6 @@ import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
-import timber.log.Timber
 
 @Composable
 fun ExpeApp(
@@ -36,13 +35,10 @@ fun ExpeApp(
 ) {
   ExpeScaffold(
     bottomBar = {
-      if (appState.shouldShowBottomBar) {
+      if (appState.showBottomBar) {
       }
 
-      Timber.d("ExpeApp: appState.currentDestinationSpec: ${appState.currentDestinationSpec?.route}")
-      Timber.d("ExpeApp: routes: ${TopLevelDestination.routes}")
-
-      if (appState.shouldShowNavigationBar) {
+      if (appState.showNavigationBar) {
         val routesOnBackStack = rememberRoutesOnBackStack(appState)
         ExpeBottomBar(
           routesOnBackStack = routesOnBackStack.value,
@@ -138,7 +134,7 @@ private fun rememberRoutesOnBackStack(appState: ExpeAppState): MutableState<Immu
       if (isRouteOnBackStack) it else null
     }.toMutableList()
     if (routesOnBackStack.size > 1) {
-      routesOnBackStack.remove(TopLevelDestination.start)
+      routesOnBackStack.remove(TopLevelDestination.startDestination)
     }
     mutableStateOf(routesOnBackStack.toPersistentList())
   }

@@ -7,6 +7,7 @@
   <string name="create">Create</string>
   <string name="save">Save</string>
   <string name="delete">Delete</string>
+  <string name="more">More</string>
   <string name="duplicate">Duplicate</string>
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
@@ -14,8 +15,10 @@
   <string name="on_label">On</string>
   <string name="off_label">Off</string>
   <string name="confirm">Confirm</string>
-  <string name="ok">Ok</string>
+  <string name="ok" translatable="false">Ok</string>
   <string name="edit">Edit</string>
+  <string name="empty_general_title">No data yet</string>
+  <string name="empty_general_message">Come back later</string>
   <!--General-->
 
   <string name="expense">Expense</string>
@@ -79,4 +82,6 @@
   <string name="report_current_balance">Current balance</string>
   <string name="report_all_time">All time</string>
   <string name="report_custom">Custom</string>
+
+  <string name="create_transaction_general_destination">Destination</string>
 </resources>

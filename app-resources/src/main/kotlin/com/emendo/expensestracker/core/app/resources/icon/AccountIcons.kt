@@ -34,5 +34,6 @@ object AccountIcons {
   val Gamepad = Icons.Rounded.Gamepad
   val AccountBalance = Icons.Rounded.AccountBalance
   val House = Icons.Rounded.House
+  val Wallet = Icons.Rounded.Wallet
   val Unknown = ExpeIcons.HideSource
 }

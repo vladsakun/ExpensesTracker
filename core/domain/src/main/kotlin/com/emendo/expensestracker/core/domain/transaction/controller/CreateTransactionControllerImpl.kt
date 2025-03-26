@@ -10,7 +10,6 @@ import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetOrdinalIndex
-import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
@@ -37,8 +36,6 @@ class CreateTransactionControllerImpl @Inject constructor(
         initialValue = null,
       )
 
-  private var isSelectSourceFlow: Boolean = false
-  private var isSelectTransferTargetFlow: Boolean = false
   private var payload: CreateTransactionEventPayload? = null
 
   override fun getTarget(): Flow<TransactionTarget?> {
@@ -57,15 +54,6 @@ class CreateTransactionControllerImpl @Inject constructor(
     transactionSourceMutableState.update { source }
   }
 
-  override fun selectAccount(account: AccountModel) {
-    if (isSelectSourceFlow) {
-      setSource(account)
-      return
-    }
-
-    setTarget(account)
-  }
-
   override fun getSource(): Flow<TransactionSource?> {
     return transactionSourceState
   }
@@ -74,8 +62,12 @@ class CreateTransactionControllerImpl @Inject constructor(
     return transactionSourceState.value
   }
 
-  override fun getDefaultTarget(transactionType: TransactionType): TransactionTarget =
-    CategoryModel(
+  override fun getDefaultNonTransferTarget(transactionType: TransactionType): TransactionTarget? {
+    if (transactionType == TransactionType.TRANSFER) {
+      return null
+    }
+
+    return CategoryModel(
       id = if (transactionType == TransactionType.EXPENSE) {
         DefaultTransactionTargetExpenseId
       } else {
@@ -91,25 +83,6 @@ class CreateTransactionControllerImpl @Inject constructor(
       },
       ordinalIndex = DefaultTransactionTargetOrdinalIndex,
     )
-
-  override fun isSelectMode(): Boolean =
-    isSelectSourceFlow || isSelectTransferTargetFlow
-
-  override fun finishSelectMode() {
-    finishSelectSourceFlow()
-    finishSelectTransferTargetFlow()
-  }
-
-  override fun startSelectSourceFlow() {
-    isSelectSourceFlow = true
-  }
-
-  private fun finishSelectSourceFlow() {
-    isSelectSourceFlow = false
-  }
-
-  override fun startSelectTransferTargetFlow() {
-    isSelectTransferTargetFlow = true
   }
 
   override fun getTransactionPayload(): CreateTransactionEventPayload? = payload
@@ -118,16 +91,10 @@ class CreateTransactionControllerImpl @Inject constructor(
     payload = newPayload
   }
 
-  private fun finishSelectTransferTargetFlow() {
-    isSelectTransferTargetFlow = false
-  }
-
   override fun clear(shouldClearTarget: Boolean) {
     if (shouldClearTarget) {
       transactionTargetState.update { null }
     }
-    finishSelectSourceFlow()
-    finishSelectTransferTargetFlow()
     payload = null
   }
 }

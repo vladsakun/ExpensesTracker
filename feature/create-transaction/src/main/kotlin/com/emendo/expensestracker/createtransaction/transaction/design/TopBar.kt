@@ -9,11 +9,11 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeCenterAlignedT
 import com.emendo.expensestracker.core.designsystem.component.MenuAction
 import com.emendo.expensestracker.core.designsystem.component.NavigationBackIcon
 import com.emendo.expensestracker.core.designsystem.component.TextSwitch
+import com.emendo.expensestracker.core.model.data.TransactionType.Companion.toTransactionType
 import com.emendo.expensestracker.createtransaction.transaction.CreateTransactionUiState
 import com.emendo.expensestracker.createtransaction.transaction.data.ChangeTransactionTypeCommand
 import com.emendo.expensestracker.createtransaction.transaction.data.CreateTransactionCommand
 import com.emendo.expensestracker.createtransaction.transaction.data.SaveTransactionCommand
-import com.emendo.expensestracker.data.api.model.transaction.toTransactionType
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 

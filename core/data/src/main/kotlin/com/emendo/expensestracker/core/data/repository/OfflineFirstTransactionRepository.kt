@@ -9,10 +9,13 @@ import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
+import com.emendo.expensestracker.data.api.GetTransactionTypeUseCase
+import com.emendo.expensestracker.data.api.extensions.asAccount
+import com.emendo.expensestracker.data.api.extensions.asCategory
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
-import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
@@ -32,6 +35,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private val transactionDao: TransactionDao,
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
+  private val getTransactionTypeUseCase: GetTransactionTypeUseCase,
   @ApplicationScope private val scope: CoroutineScope,
 ) : TransactionRepository {
 
@@ -84,23 +88,16 @@ class OfflineFirstTransactionRepository @Inject constructor(
     transferReceivedAmount: Amount?,
     note: String?,
   ) {
-    when {
-      source is AccountModel && target is CategoryModel -> {
-        when (target.type) {
-          CategoryType.EXPENSE -> createExpenseTransaction(source, target, amount, note)
-          CategoryType.INCOME -> createIncomeTransaction(source, target, amount, note)
-        }
-      }
-
-      source is AccountModel && target is AccountModel -> createTransferTransaction(
-        source = source,
-        target = target,
+    when (getTransactionTypeUseCase(source, target)) {
+      TransactionType.INCOME -> createIncomeTransaction(source.asAccount(), target.asCategory(), amount, note)
+      TransactionType.EXPENSE -> createExpenseTransaction(source.asAccount(), target.asCategory(), amount, note)
+      TransactionType.TRANSFER -> createTransferTransaction(
+        source = source.asAccount(),
+        target = target.asAccount(),
         amount = amount,
         note = note,
         transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount should not be null in Transfer transaction" },
       )
-
-      else -> throw IllegalArgumentException("Unsupported transaction type with source: $source, target: $target")
     }
   }
 

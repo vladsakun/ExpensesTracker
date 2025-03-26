@@ -13,6 +13,7 @@ interface AccountRepository {
   fun getLastAccount(): Flow<AccountModel?>
 
   fun getById(id: Long): Flow<AccountModel>
+  fun getByIdSnapshot(id: Long): AccountModel?
 
   suspend fun createAccount(
     currency: CurrencyModel,

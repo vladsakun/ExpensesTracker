@@ -11,8 +11,8 @@ import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.datastore.ChangeListVersions
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
-import com.emendo.expensestracker.data.api.Synchronizer
 import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository
+import com.emendo.expensestracker.data.api.utils.Synchronizer
 import com.emendo.expensestracker.sync.initializers.SyncConstraints
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

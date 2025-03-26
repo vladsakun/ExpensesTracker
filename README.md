@@ -54,3 +54,6 @@ Features:
 34) Transactions period like 1Money instead of MoneyFlow
 35) Last transactions block on Overview (work on Dashboard)
 36) Put custom location PLACE!
+
+Articles to apply:
+https://medium.com/codex/from-junior-to-senior-the-real-way-to-implement-clean-architecture-in-android-8514005e85e1

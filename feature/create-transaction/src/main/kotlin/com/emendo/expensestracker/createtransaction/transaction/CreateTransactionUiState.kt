@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
@@ -45,19 +44,21 @@ data class CreateTransactionScreenData(
   val duplicateEnabled: Boolean = false,
   val amountError: StateEvent = consumed,
   val sourceError: StateEvent = consumed,
+  val targetError: StateEvent = consumed,
+  val transferTargetError: StateEvent = consumed,
 )
 
 data class CreateTransactionBottomSheetState(
-  val data: BottomSheetData? = null,
+  val bottomSheetData: BottomSheetData? = null,
   val show: StateEvent = consumed,
   val hide: StateEvent = consumed,
 )
 
-internal fun TransactionElement.toTransactionItemModel() =
-  TransactionItemModel(icon, name, color)
+internal fun TransactionElement.toTransactionItemModel() = TransactionItemModel(id, icon, name, color)
 
-@Stable
+@Immutable
 data class TransactionItemModel(
+  val id: Long,
   val icon: IconModel,
   val name: TextValue,
   val color: ColorModel,

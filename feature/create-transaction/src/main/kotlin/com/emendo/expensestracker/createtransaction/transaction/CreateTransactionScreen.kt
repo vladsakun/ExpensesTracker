@@ -10,24 +10,29 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.accounts.api.SelectAccountResult
 import com.emendo.expensestracker.app.resources.R
+import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.designsystem.theme.DisabledTextColor
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.model.data.TransactionType
@@ -37,6 +42,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottom
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
+import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.createtransaction.destinations.SelectCategoryScreenDestination
 import com.emendo.expensestracker.createtransaction.transaction.data.*
@@ -52,6 +58,7 @@ import com.emendo.expensestracker.createtransaction.transaction.design.transfer.
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.OpenResultRecipient
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
@@ -68,8 +75,11 @@ private const val CHEVRON_WIDTH = 12
 @Composable
 fun CreateTransactionScreen(
   navigator: DestinationsNavigator,
+  accountResultRecipient: OpenResultRecipient<SelectAccountResult>,
   viewModel: CreateTransactionViewModel = hiltViewModel(),
 ) {
+  accountResultRecipient.handleValueResult(viewModel::updateSelectedAccount)
+
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
   val bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle()
 
@@ -81,12 +91,11 @@ fun CreateTransactionScreen(
     CreateTransactionContent(
       stateProvider = uiState::value,
       bottomSheetStateProvider = bottomSheetState::value,
-      onBackPressed = remember { { navigator.navigateUp() } },
       onCategoryClick = remember { { navigator.navigate(SelectCategoryScreenDestination) } },
+      onBackPressed = remember { { navigator.navigateUp() } },
       commandProcessor = remember { viewModel::proceedCommand },
       onCreateAccountClick = remember { { navigator.navigate(viewModel.getCreateAccountScreenRoute()) } },
-      onAccountListClick = remember { { navigator.navigate(viewModel.getAccountListScreenRoute()) } },
-      onTransferTargetAccountClick = remember { { navigator.navigate(viewModel.getSelectTransferTargetAccountRoute()) } },
+      onSelectAccountClick = { isSource -> navigator.navigate(viewModel.getSelectAccountScreenRoute(isSource)) },
       onDuplicateClick = remember {
         {
           navigator.navigate(viewModel.getDuplicateTransactionScreenRoute()) {
@@ -106,9 +115,8 @@ private fun CreateTransactionContent(
   onCategoryClick: () -> Unit,
   onBackPressed: () -> Unit,
   commandProcessor: (CreateTransactionCommand) -> Unit,
+  onSelectAccountClick: (Boolean) -> Unit,
   onCreateAccountClick: () -> Unit,
-  onAccountListClick: () -> Unit,
-  onTransferTargetAccountClick: () -> Unit,
   onDuplicateClick: () -> Unit,
 ) {
   val scaffoldState = rememberBottomSheetScaffoldState()
@@ -119,16 +127,13 @@ private fun CreateTransactionContent(
     scaffoldState = scaffoldState,
     topBar = { TopBar(stateProvider, commandProcessor, onBackPressed) },
     sheetContent = {
-      val bottomSheetData = bottomSheetStateProvider().data
+      val bottomSheetData = bottomSheetStateProvider().bottomSheetData
       if (bottomSheetData != null) {
         BottomSheetContent(bottomSheetData)
       }
     },
     // Workaround for issue https://issuetracker.google.com/issues/265444789
     sheetPeekHeight = 0.dp,
-    modifier = Modifier
-      .consumeWindowInsets(WindowInsets(0, 0, 0, 0))
-      .fillMaxSize(),
   ) { paddingValues ->
     Column(
       modifier = Modifier
@@ -142,8 +147,7 @@ private fun CreateTransactionContent(
         state = state,
         commandProcessor = commandProcessor,
         onCreateAccountClick = onCreateAccountClick,
-        onSelectAccountClick = onAccountListClick,
-        onTransferTargetAccountClick = onTransferTargetAccountClick,
+        onSelectAccountClick = onSelectAccountClick,
       )
       // Todo Extract to a common TransferBlock
       if (state.screenData.transactionType != TransactionType.TRANSFER) {
@@ -151,14 +155,16 @@ private fun CreateTransactionContent(
 
         // Todo fix Account recomposition on state change
         if (state.accounts.isNotEmpty()) {
-          AccountsSection(
-            accounts = state.accounts,
-            onClick = { account -> commandProcessor(SelectAccount(account)) }
+          TransactionElementRow(
+            label = stringResource(id = R.string.account),
+            transactionItem = state.source,
+            onClick = { onSelectAccountClick(true) },
           )
+          // TODO try movableContentOf
         } else {
           TransactionElementRow(
             label = stringResource(id = R.string.account),
-            onClick = onCreateAccountClick
+            onClick = onCreateAccountClick,
           ) {
             CreateAccountButton(
               onClick = onCreateAccountClick
@@ -256,8 +262,7 @@ private inline fun Header(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
-  noinline onSelectAccountClick: () -> Unit,
-  noinline onTransferTargetAccountClick: () -> Unit,
+  noinline onSelectAccountClick: (Boolean) -> Unit,
 ) {
   // Todo remove Uncategorized visible during animation when switching transaction type
   AnimatedContent(
@@ -270,7 +275,6 @@ private inline fun Header(
         commandProcessor = commandProcessor,
         onCreateAccountClick = onCreateAccountClick,
         onSelectAccountClick = onSelectAccountClick,
-        onTransferTargetAccountClick = onTransferTargetAccountClick,
       )
     } else {
       IncomeExpenseBlock(state, commandProcessor)
@@ -290,7 +294,7 @@ private inline fun IncomeExpenseBlock(
   Column(
     modifier = Modifier
       .clickable {
-        commandProcessor(ShowCalculatorBottomSheetCommand())
+        commandProcessor(ShowCalculatorBottomSheetCommand(true))
         focusManager.clearFocus(force = true)
       },
   ) {
@@ -315,15 +319,14 @@ private inline fun TransferBlock(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
-  noinline onSelectAccountClick: () -> Unit,
-  noinline onTransferTargetAccountClick: () -> Unit,
+  noinline onSelectAccountClick: (Boolean) -> Unit,
 ) {
   TransferRow {
     TransferSource(
       state = state,
       commandProcessor = commandProcessor,
       onCreateAccountClick = onCreateAccountClick,
-      onAccountClick = onSelectAccountClick,
+      onSelectAccountClick = { onSelectAccountClick(true) },
     )
     Chevron(
       width = CHEVRON_WIDTH.dp,
@@ -333,7 +336,7 @@ private inline fun TransferBlock(
       state = state,
       commandProcessor = commandProcessor,
       onCreateAccountClick = onCreateAccountClick,
-      onTransferTargetAccountClick = onTransferTargetAccountClick,
+      onSelectAccountClick = { onSelectAccountClick(false) },
     )
   }
 }
@@ -343,14 +346,15 @@ private inline fun RowScope.TransferSource(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
-  noinline onAccountClick: () -> Unit,
+  noinline onSelectAccountClick: () -> Unit,
 ) {
   TransferEntity(
+    isSource = true,
     transactionItemModel = state.source,
-    amountCommand = ShowCalculatorBottomSheetCommand(),
+    accounts = state.accounts,
     commandProcessor = commandProcessor,
+    onSelectAccountClick = onSelectAccountClick,
     onCreateAccountClick = onCreateAccountClick,
-    onTransferTargetAccountClick = onAccountClick,
   ) {
     TransferAmount(text = state.amount.formattedValue)
     EditableAmount(
@@ -365,14 +369,15 @@ private inline fun RowScope.TransferTarget(
   state: CreateTransactionUiState,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
-  noinline onTransferTargetAccountClick: () -> Unit,
+  noinline onSelectAccountClick: () -> Unit,
 ) {
   TransferEntity(
+    isSource = false,
     transactionItemModel = state.target,
+    accounts = state.accounts,
     commandProcessor = commandProcessor,
-    amountCommand = ShowCalculatorBottomSheetCommand(false),
     onCreateAccountClick = onCreateAccountClick,
-    onTransferTargetAccountClick = onTransferTargetAccountClick,
+    onSelectAccountClick = onSelectAccountClick,
   ) {
     state.transferReceivedAmount?.let { amount ->
       TransferAmount(
@@ -389,26 +394,28 @@ private inline fun RowScope.TransferTarget(
 
 @Composable
 private inline fun RowScope.TransferEntity(
+  isSource: Boolean,
   transactionItemModel: TransactionItemModel?,
-  amountCommand: CreateTransactionCommand,
+  accounts: ImmutableList<AccountUiModel>,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
-  noinline onTransferTargetAccountClick: () -> Unit,
-  crossinline amountBlock: @Composable ColumnScope.() -> Unit,
+  noinline onSelectAccountClick: () -> Unit,
+  crossinline amountBlock: @Composable() (ColumnScope.() -> Unit),
 ) {
   TransferColumn {
     // Todo will be removed
-    if (transactionItemModel == null) {
+    if (accounts.size <= 1) {
       CreateAccountButton(onCreateAccountClick)
       return
     }
 
     TransferAccount(
-      onClick = onTransferTargetAccountClick,
-      account = transactionItemModel,
+      onSelectAccountClick = onSelectAccountClick,
+      accountModel = transactionItemModel,
+      accounts = accounts,
     )
     Column(
-      modifier = Modifier.clickable(onClick = { commandProcessor(amountCommand) }),
+      modifier = Modifier.clickable(onClick = { commandProcessor(ShowCalculatorBottomSheetCommand(isSource)) }),
     ) {
       amountBlock()
     }
@@ -420,7 +427,7 @@ private fun transferTextColor(state: CreateTransactionUiState) =
   if (state.isCustomTransferAmount) {
     MaterialTheme.customColorsPalette.successColor
   } else {
-    MaterialTheme.colorScheme.outline
+    DisabledTextColor
   }
 
 @Composable
@@ -506,86 +513,81 @@ private fun CreateAccountButton(onClick: () -> Unit) {
 @Composable
 @Suppress("NOTHING_TO_INLINE") // inlined to avoid unnecessary recomposition
 private inline fun TransferAccount(
-  noinline onClick: () -> Unit,
-  account: TransactionItemModel,
+  accountModel: TransactionItemModel?,
+  accounts: ImmutableList<AccountUiModel>,
+  noinline onSelectAccountClick: () -> Unit,
 ) {
-  var expanded by remember { mutableStateOf(false) }
-  val scrollState = rememberScrollState()
+  //  var expanded by remember { mutableStateOf(false) }
+  //  val animateRotation = animateFloatAsState(if (expanded) 1.0f else 0.0f)
+  //  val scrollState = rememberScrollState()
+  val enabled = remember(accountModel) { accountModel != null }
+
   Box(
     modifier = Modifier
       .fillMaxSize()
       .wrapContentSize(Alignment.TopStart)
+      .clickable(onClick = onSelectAccountClick),
   ) {
     Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
-      modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-          expanded = !expanded
-        }
+      modifier = Modifier.fillMaxWidth()
     ) {
       Icon(
         modifier = Modifier.size(Dimens.icon_size),
-        imageVector = account.icon.imageVector,
+        imageVector = accountModel?.icon?.imageVector ?: AccountIcons.Wallet,
         contentDescription = null,
+        tint = if (enabled) LocalContentColor.current else DisabledTextColor,
       )
       Text(
-        text = account.name.stringValue(),
+        text = accountModel?.name?.stringValue() ?: stringResource(R.string.create_transaction_general_destination),
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.weight(1f),
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
+        color = if (enabled) Color.Unspecified else DisabledTextColor,
       )
       Icon(
         imageVector = Icons.Default.ArrowDropDown,
-        contentDescription = "Localized description",
-        modifier = Modifier.align(Alignment.CenterVertically)
+        contentDescription = null,
+        modifier = Modifier.align(Alignment.CenterVertically),
       )
     }
+
     // Todo make dropdown menu width as wide of Row
-    DropdownMenu(
-      expanded = expanded,
-      onDismissRequest = { expanded = false },
-      scrollState = scrollState,
-      offset = DpOffset(0.dp, Dimens.margin_small_x),
-    ) {
-      repeat(5) {
-        DropdownMenuItem(
-          text = { Text("Item ${it + 1}") },
-          onClick = { /* TODO */ },
-          leadingIcon = {
-            Icon(
-              Icons.Outlined.Edit,
-              contentDescription = null
-            )
-          }
-        )
-      }
-    }
+    //    DropdownMenu(
+    //      expanded = expanded,
+    //      onDismissRequest = {
+    //        expanded = false
+    //      },
+    //      properties = PopupProperties(
+    //        focusable = true,
+    //        dismissOnBackPress = true,
+    //        dismissOnClickOutside = true,
+    //      ),
+    //      scrollState = scrollState,
+    //      offset = DpOffset(0.dp, Dimens.margin_small_x),
+    //      modifier = Modifier.fillMaxWidth(.4f),
+    //    ) {
+    //      accounts
+    //        .filter { it.id != accountModel?.id }
+    //        .forEach { account: AccountUiModel ->
+    //          DropdownMenuItem(
+    //            text = { Text(account.name.stringValue()) },
+    //            onClick = {
+    //              onSelectAccountClick()
+    //              expanded = false
+    //            },
+    //            leadingIcon = {
+    //              Icon(
+    //                imageVector = account.icon.imageVector,
+    //                contentDescription = null,
+    //              )
+    //            }
+    //          )
+    //        }
+    //    }
   }
-  //  Row(
-  //    modifier = Modifier
-  //      .heightIn(min = Dimens.icon_button_size)
-  //      .clickable(
-  //        onClick = onClick,
-  //        interactionSource = remember { MutableInteractionSource() },
-  //        indication = null,
-  //      )
-  //      .fillMaxWidth(),
-  //    verticalAlignment = Alignment.CenterVertically,
-  //    horizontalArrangement = Arrangement.End,
-  //  ) {
-  //    Icon(
-  //      modifier = Modifier.size(Dimens.icon_size),
-  //      imageVector = account.icon.imageVector,
-  //      contentDescription = null,
-  //    )
-  //    Text(
-  //      text = account.name.stringValue(),
-  //      style = MaterialTheme.typography.bodyLarge,
-  //    )
-  //  }
 }
 
 @Composable
@@ -619,8 +621,7 @@ private fun CreateTransactionScreenPreview(
       onBackPressed = {},
       commandProcessor = {},
       onCreateAccountClick = {},
-      onAccountListClick = {},
-      onTransferTargetAccountClick = {},
+      onSelectAccountClick = { _ -> },
       onDuplicateClick = {},
     )
   }

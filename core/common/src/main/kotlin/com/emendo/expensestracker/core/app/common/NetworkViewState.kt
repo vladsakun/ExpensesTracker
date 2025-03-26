@@ -5,3 +5,6 @@ sealed interface NetworkViewState<out T> {
   data class Error(val message: String) : NetworkViewState<Nothing>
   data class Success<T>(val data: T) : NetworkViewState<T>
 }
+
+val <T> NetworkViewState<T>.successData: T?
+  get() = (this as? NetworkViewState.Success<T>)?.data

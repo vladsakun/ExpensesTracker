@@ -13,8 +13,8 @@ internal class CreateTransactionStatePreviewProvider : PreviewParameterProvider<
   val data = CreateTransactionUiState(
     amount = Amount.Mock,
     screenData = CreateTransactionScreenData(transactionType = TransactionType.DEFAULT),
-    target = TransactionItemModel(IconModel.CHILDCARE, textValueOf("Childcare"), ColorModel.Base),
-    source = TransactionItemModel(IconModel.CREDITCARD, textValueOf("Card"), ColorModel.Purple),
+    target = TransactionItemModel(1, IconModel.CHILDCARE, textValueOf("Childcare"), ColorModel.Base),
+    source = TransactionItemModel(2, IconModel.CREDITCARD, textValueOf("Card"), ColorModel.Purple),
     accounts = persistentListOf(),
   )
 

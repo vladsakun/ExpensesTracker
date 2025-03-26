@@ -2,13 +2,12 @@ package com.emendo.expensestracker.core.app.resources.models
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
-import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 
 enum class IconModel(
   val id: Int,
   val imageVector: ImageVector,
 ) {
-  UNKNOWN(-1, ExpeIcons.HideSource),
+  UNKNOWN(-1, AccountIcons.Unknown),
   GOVERNMENT(1, AccountIcons.AccountBalance),
   GROCERIES(2, AccountIcons.ShoppingCart),
   TRANSPORT(3, AccountIcons.FireTruck),
@@ -21,7 +20,26 @@ enum class IconModel(
   WATCH(10, AccountIcons.Watch),
   CHILDCARE(11, AccountIcons.ChildCare),
   CREDITCARD(12, AccountIcons.CreditCard),
-  OTHERS(13, AccountIcons.Square);
+  OTHERS(13, AccountIcons.Square),
+  SCIENCE(14, AccountIcons.Science),
+  ENERGY(15, AccountIcons.EnergySavingsLeaf),
+  BATHTUB(16, AccountIcons.Bathtub),
+  SPEAKER(17, AccountIcons.Speaker),
+  WORK(18, AccountIcons.Work),
+  TAXI(19, AccountIcons.LocalTaxi),
+  CAR(20, AccountIcons.DirectionsCar),
+  TOYS(21, AccountIcons.Toys),
+  LUGGAGE(22, AccountIcons.Luggage),
+  CELLTOWER(23, AccountIcons.CellTower),
+  CRUELTYFREE(24, AccountIcons.CrueltyFree),
+  CONTENTCUT(25, AccountIcons.ContentCut),
+  LOCALDINING(26, AccountIcons.LocalDining),
+  DISCOUNT(27, AccountIcons.Discount),
+  ARCHIVE(28, AccountIcons.Archive),
+  DANGEROUS(29, AccountIcons.Dangerous),
+  WALLET(30, AccountIcons.Wallet),
+  HOUSE(31, AccountIcons.House),
+  CIRCLE(32, AccountIcons.Circle);
 
   companion object {
     private val icons: List<IconModel> = entries.toMutableList().apply { remove(UNKNOWN) }

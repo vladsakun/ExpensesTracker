@@ -14,7 +14,8 @@ interface CreateTransactionCommander {
   fun updateNoteText(newNote: String)
   fun showConfirmDeleteTransactionBottomSheet()
   fun hideCalculatorBottomSheet()
-  fun selectAccount(account: AccountUiModel)
+  fun selectSourceAccount(account: AccountUiModel)
+  fun selectTargetAccount(account: AccountUiModel)
 
   fun proceedCommand(command: CreateTransactionCommand) {
     command.execute(this)
@@ -26,7 +27,7 @@ interface CreateTransactionCommand {
   fun execute(commander: CreateTransactionCommander)
 }
 
-class ShowCalculatorBottomSheetCommand(private val sourceTrigger: Boolean = true) : CreateTransactionCommand {
+class ShowCalculatorBottomSheetCommand(private val sourceTrigger: Boolean) : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
     commander.showCalculatorBottomSheet(sourceTrigger)
   }
@@ -77,11 +78,5 @@ class ShowConfirmDeleteTransactionBottomSheetCommand : CreateTransactionCommand 
 class HideCalculatorBottomSheetCommand : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
     commander.hideCalculatorBottomSheet()
-  }
-}
-
-class SelectAccount(private val account: AccountUiModel) : CreateTransactionCommand {
-  override fun execute(commander: CreateTransactionCommander) {
-    commander.selectAccount(account)
   }
 }

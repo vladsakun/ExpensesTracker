@@ -12,12 +12,12 @@ import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.transaction.GetTransactionsSumUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
+import com.emendo.expensestracker.core.model.data.TransactionType.Companion.id
 import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
-import com.emendo.expensestracker.data.api.model.transaction.id
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

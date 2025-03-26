@@ -2,8 +2,6 @@
 
 package com.emendo.expensestracker.core.designsystem.component
 
-//noinspection SuspiciousImport
-import android.R
 import androidx.annotation.StringRes
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -20,10 +18,10 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun ExpeCenterAlignedTopBar(
   title: @Composable () -> Unit,
-  navigationIcon: @Composable () -> Unit = {},
   modifier: Modifier = Modifier,
+  navigationIcon: @Composable () -> Unit = {},
   actions: ImmutableList<MenuAction>? = null,
-  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
   CenterAlignedTopAppBar(
@@ -53,7 +51,7 @@ fun ExpeCenterAlignedTopBar(
   modifier: Modifier = Modifier,
   navigationIcon: @Composable () -> Unit = {},
   actions: ImmutableList<MenuAction>? = null,
-  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
   CenterAlignedTopAppBar(
@@ -83,10 +81,10 @@ fun ExpeTopBar(
   modifier: Modifier = Modifier,
   navigationIcon: (@Composable () -> Unit)? = null,
   actions: ImmutableList<MenuAction>? = null,
-  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-  LargeTopAppBar(
+  TopAppBar(
     title = {
       AutoResizedText(
         text = title,
@@ -115,7 +113,7 @@ fun ExpeTopBar(
   @StringRes titleResId: Int,
   modifier: Modifier = Modifier,
   onNavigationBackClick: (() -> Unit)? = null,
-  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
   actions: ImmutableList<MenuAction>? = null,
 ) {
@@ -138,7 +136,7 @@ fun ExpeTopBar(
   title: String,
   modifier: Modifier = Modifier,
   onNavigationBackClick: (() -> Unit)? = null,
-  colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
+  colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
   scrollBehavior: TopAppBarScrollBehavior? = null,
   actions: ImmutableList<MenuAction>? = null,
 ) {
@@ -188,7 +186,7 @@ fun ExpeToolbarIcon(action: MenuAction) {
 @Composable
 private fun NiaTopBarPreview() {
   ExpeTopBar(
-    title = stringResource(id = R.string.untitled),
+    title = "Title",
     actions = persistentListOf(
       MenuAction(
         icon = ExpeIcons.Add,

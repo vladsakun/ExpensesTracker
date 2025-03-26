@@ -38,11 +38,12 @@ fun SelectCurrencyScreen(
     onNavigationClick = navigator::navigateUp,
   ) { paddingValues ->
     val currencies = state.value
+
+    // TODO fix paddings
     if (currencies != null) {
       LazyColumn(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(paddingValues)
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = paddingValues,
       ) {
         items(
           items = currencies,

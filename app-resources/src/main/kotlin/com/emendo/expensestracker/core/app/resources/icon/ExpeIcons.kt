@@ -55,4 +55,5 @@ object ExpeIcons {
   val Functions = Icons.Outlined.Functions
   val UnfoldMore = Icons.Outlined.UnfoldMore
   val Analytics = Icons.Outlined.Analytics
+  val Empty = Icons.Outlined.Pending
 }

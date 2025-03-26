@@ -12,9 +12,9 @@ import com.emendo.expensestracker.core.database.dao.CurrencyRateDao
 import com.emendo.expensestracker.core.database.model.CurrencyRateEntity
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
 import com.emendo.expensestracker.core.network.CurrencyRatesNetworkDataSource
-import com.emendo.expensestracker.data.api.Synchronizer
 import com.emendo.expensestracker.data.api.model.CurrencyRateModel
 import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository
+import com.emendo.expensestracker.data.api.utils.Synchronizer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

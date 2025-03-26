@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.abs
-import kotlin.math.roundToInt
 
 /**
  * Compose function for Drawing Donut chart
@@ -47,9 +46,9 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun DonutPieChart(
-  modifier: Modifier,
   pieChartData: PieChartData,
   pieChartConfig: PieChartConfig,
+  modifier: Modifier = Modifier,
   onSliceClick: (PieChartData.Slice) -> Unit = {},
 ) {
   if (pieChartData.slices.isEmpty()) {

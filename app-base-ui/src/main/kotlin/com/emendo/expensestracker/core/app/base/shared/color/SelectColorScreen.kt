@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +40,7 @@ fun SelectColorScreen(
   resultNavigator: ResultBackNavigator<Int>,
   selectedColorId: Int,
 ) {
-  val colors: ImmutableList<ColorModel> = ColorModel.entries.toImmutableList()
+  val colors: ImmutableList<ColorModel> = remember { ColorModel.entries.toImmutableList() }
   ExpeScaffoldWithTopBar(
     titleResId = R.string.select_color,
     onNavigationClick = navigator::navigateUp,

@@ -8,6 +8,7 @@ import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDesti
 import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.accounts.detail.AccountDetailScreen
+import com.emendo.expensestracker.accounts.list.selectAccountResultRecipient
 import com.emendo.expensestracker.categories.create.CreateCategoryRoute
 import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
@@ -16,6 +17,8 @@ import com.emendo.expensestracker.core.app.base.shared.color.selectColorResultRe
 import com.emendo.expensestracker.core.app.base.shared.currency.selectCurrencyResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.icon.selectIconResultRecipient
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_ACCOUNT
+import com.emendo.expensestracker.createtransaction.destinations.CreateTransactionScreenDestination
+import com.emendo.expensestracker.createtransaction.transaction.CreateTransactionScreen
 import com.emendo.expensestracker.ui.ExpeAppState
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
@@ -33,7 +36,7 @@ fun ExpeNavHost(
     if (IS_DEBUG_ACCOUNT) {
         LaunchedEffect(key1 = Unit) {
             delay(200)
-            navController.navigate(AccountsScreenRouteDestination)
+            navController.navigate(AccountsScreenRouteDestination())
         }
     }
 
@@ -73,6 +76,12 @@ fun ExpeNavHost(
                 categoryId = navArgs.categoryId,
                 colorResultRecipient = selectColorResultRecipient(),
                 iconResultRecipient = selectIconResultRecipient(),
+            )
+        }
+        composable(CreateTransactionScreenDestination) {
+            CreateTransactionScreen(
+                navigator = destinationsNavigator,
+                accountResultRecipient = selectAccountResultRecipient(),
             )
         }
     }

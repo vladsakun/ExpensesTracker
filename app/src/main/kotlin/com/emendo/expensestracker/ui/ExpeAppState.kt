@@ -10,6 +10,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.emendo.expensestracker.navigation.NavGraphs
 import com.emendo.expensestracker.navigation.TopLevelDestination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DestinationSpec
@@ -50,14 +51,14 @@ class ExpeAppState(
   val currentDestinationSpec: DestinationSpec<*>?
     @Composable get() = navController.currentDestinationAsState().value
 
-  val shouldShowBottomBar: Boolean
+  val showBottomBar: Boolean
     get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
 
-  val shouldShowNavigationBar: Boolean
-    @Composable get() = currentDestinationSpec?.route in TopLevelDestination.routesWithoutCreateTransaction
+  val showNavigationBar: Boolean
+    @Composable get() = showNavBar()
 
   val shouldShowNavRail: Boolean
-    get() = !shouldShowBottomBar
+    get() = !showBottomBar
 
   /**
    * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
@@ -98,5 +99,27 @@ class ExpeAppState(
       // Restore state when reselecting a previously selected item
       restoreState = true
     }
+  }
+
+  /**
+   * Determines whether the navigation bar should be shown.
+   *
+   * The navigation bar is shown if the current destination is in the list of routes without the
+   * create transaction route and if the back stack contains only top-level destinations.
+   *
+   * @return `true` if the navigation bar should be shown, `false` otherwise.
+   */
+  @Composable
+  private fun showNavBar(): Boolean {
+    val routesWithoutCreateTransaction = TopLevelDestination.routesWithoutCreateTransaction
+    val nestedNavGraphs: List<String> = NavGraphs.root.nestedNavGraphs.map { it.route }
+    val backStackRoutes = navController.currentBackStack.value
+      .map { it.destination.route }
+      .filter {
+        it != NavGraphs.root.route && it !in nestedNavGraphs
+      }
+
+    val onlyTopLevelDestinations = backStackRoutes.subtract(routesWithoutCreateTransaction).isEmpty()
+    return currentDestinationSpec?.route in routesWithoutCreateTransaction && onlyTopLevelDestinations
   }
 }

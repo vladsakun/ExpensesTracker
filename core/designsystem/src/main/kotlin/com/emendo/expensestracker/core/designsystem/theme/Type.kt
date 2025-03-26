@@ -52,6 +52,5 @@ val Typography = Typography(
 )
 
 val PlaceholderTextStyle: TextStyle
-  @Composable get() = MaterialTheme.typography.bodyLarge.copy(
-    color = MaterialTheme.colorScheme.onSurfaceVariant
-  )
+  @Composable get() = MaterialTheme.typography.bodyLarge.copy(color = DisabledTextColor)
+

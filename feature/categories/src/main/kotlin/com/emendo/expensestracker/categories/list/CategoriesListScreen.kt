@@ -71,8 +71,7 @@ fun CategoriesListRoute(
       stateProvider = uiState::value,
       isEditModeProvider = editModeState::value,
       onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
-      onCategoryClick =
-      remember {
+      onCategoryClick = remember {
         { category: CategoryWithTotal ->
           if (viewModel.isEditMode) {
             navigator.navigate(CategoryDetailRouteDestination(category.category.id))
@@ -228,15 +227,15 @@ private fun CategoriesGrid(
 
   CategoriesLazyVerticalGrid(
     modifier =
-    Modifier
-      .fillMaxSize()
-      .dragContainer(dragDropState, editModeProvider)
-      .combinedClickable(
-        onLongClick = onLongClick,
-        onClick = onClick,
-        interactionSource = remember { MutableInteractionSource() },
-        indication = null,
-      ),
+      Modifier
+        .fillMaxSize()
+        .dragContainer(dragDropState, editModeProvider)
+        .combinedClickable(
+          onLongClick = onLongClick,
+          onClick = onClick,
+          interactionSource = remember { MutableInteractionSource() },
+          indication = null,
+        ),
     state = gridState,
   ) {
     itemsIndexed(

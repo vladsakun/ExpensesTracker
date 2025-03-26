@@ -9,6 +9,8 @@ interface ReportScreenCommander {
   fun setPeriod(period: ReportPeriod)
   fun hideDatePicker()
   fun selectCustomDate(selectedStartDateMillis: Long?, selectedEndDateMillis: Long?)
+  fun selectCategory(event: SelectCategoryClickEvent)
+  fun toggleSelectedPie(sliceId: Long?)
 
   fun proceedCommand(command: ReportScreenCommand) {
     command.execute(this)
@@ -45,4 +47,23 @@ class SelectDateCommand(
   override fun execute(commander: ReportScreenCommander) {
     commander.selectCustomDate(selectedStartDateMillis, selectedEndDateMillis)
   }
+}
+
+class SelectCategory(
+  private val selectCategoryClickEvent: SelectCategoryClickEvent,
+) : ReportScreenCommand {
+  override fun execute(commander: ReportScreenCommander) {
+    commander.selectCategory(selectCategoryClickEvent)
+  }
+}
+
+class SelectSlice(private val sliceId: Long?) : ReportScreenCommand {
+  override fun execute(commander: ReportScreenCommander) {
+    commander.toggleSelectedPie(sliceId)
+  }
+}
+
+sealed interface SelectCategoryClickEvent {
+  data class CategorySelected(val categoryId: Long) : SelectCategoryClickEvent
+  data class AllCategoriesSelected(val type: TransactionType) : SelectCategoryClickEvent
 }

@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.data.api.repository
 
-import com.emendo.expensestracker.data.api.Syncable
 import com.emendo.expensestracker.data.api.model.CurrencyRateModel
+import com.emendo.expensestracker.data.api.utils.Syncable
 import kotlinx.coroutines.flow.Flow
 
 interface CurrencyRateRepository : Syncable {

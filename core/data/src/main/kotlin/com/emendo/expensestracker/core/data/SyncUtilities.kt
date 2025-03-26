@@ -2,7 +2,7 @@ package com.emendo.expensestracker.core.data
 
 import com.emendo.expensestracker.core.datastore.ChangeListVersions
 import com.emendo.expensestracker.core.network.model.NetworkChangeList
-import com.emendo.expensestracker.data.api.Synchronizer
+import com.emendo.expensestracker.data.api.utils.Synchronizer
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 

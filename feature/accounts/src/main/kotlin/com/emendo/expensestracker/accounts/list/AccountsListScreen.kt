@@ -23,7 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.emendo.expensestracker.accounts.api.SelectAccountArgs
+import com.emendo.expensestracker.accounts.api.SelectAccountResult
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
+import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
@@ -37,6 +40,9 @@ import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.scope.AnimatedDestinationScope
+import com.ramcosta.composedestinations.scope.resultRecipient
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
@@ -50,6 +56,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun AccountsScreenRoute(
   navigator: DestinationsNavigator,
+  resultNavigator: ResultBackNavigator<SelectAccountResult>,
+  args: SelectAccountArgs? = null,
   viewModel: AccountsListViewModel = hiltViewModel(),
 ) {
   if (IS_DEBUG_CREATE_ACCOUNT) {
@@ -79,8 +87,7 @@ fun AccountsScreenRoute(
     onAccountClick = { account ->
       // Todo extract to Composition pattern
       if (viewModel.isSelectMode) {
-        viewModel.pickAccountItem(account)
-        navigator.navigateUp()
+        resultNavigator.navigateBack(SelectAccountResult(accountId = account.id, isSource = args?.isSource ?: false))
       } else {
         navigator.navigate(AccountDetailScreenDestination(account.id))
       }
@@ -114,7 +121,6 @@ private fun AccountsListScreenContent(
   val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
   ExpeScaffold(
-    modifier = Modifier.fillMaxSize(),
     topBar = {
       ExpeTopBar(
         title = title,
@@ -257,23 +263,29 @@ private fun AccountList(
 @ReadOnlyComposable
 private fun getInitialModeActions(onClick: () -> Unit) = persistentListOf(
   MenuAction(
-    icon = ExpeIcons.Sort,
+    icon = ExpeIcons.Edit,
     onClick = onClick,
-    contentDescription = stringResource(id = R.string.sort),
+    contentDescription = stringResource(id = R.string.edit),
   ),
 )
 
 @Composable
 @ReadOnlyComposable
-private fun getEditModeActions() = persistentListOf(
-  MenuAction(
-    icon = ExpeIcons.Delete,
-    onClick = {},
-    contentDescription = stringResource(id = R.string.delete),
-  ),
-  MenuAction(
-    icon = ExpeIcons.MoreVert,
-    onClick = {},
-    contentDescription = stringResource(id = R.string.delete),
-  ),
-)
+// TODO: Implement getEditModeActions
+private fun getEditModeActions() = null
+//  persistentListOf(
+//  MenuAction(
+//    icon = ExpeIcons.Delete,
+//    onClick = {},
+//    contentDescription = stringResource(id = R.string.delete),
+//  ),
+//  MenuAction(
+//    icon = ExpeIcons.MoreVert,
+//    onClick = {},
+//    contentDescription = stringResource(id = R.string.more),
+//  ),
+//)
+
+@Composable
+fun AnimatedDestinationScope<*>.selectAccountResultRecipient() =
+  resultRecipient<AccountsScreenRouteDestination, SelectAccountResult>()
