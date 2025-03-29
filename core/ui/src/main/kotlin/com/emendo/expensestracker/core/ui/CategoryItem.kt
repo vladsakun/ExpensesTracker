@@ -87,16 +87,20 @@ fun CategoryItem(
           }
         }
     ) {
-      Icon(
-        imageVector = icon,
-        contentDescription = "$name category icon",
-        tint = color,
+      Box(
         modifier = Modifier
           .clip(RoundedCornerNormalRadiusShape)
           .background(color.copy(alpha = 0.1f))
           .padding(Dimens.margin_normal)
           .then(modifier),
-      )
+      ) {
+        Icon(
+          imageVector = icon,
+          contentDescription = "$name category icon",
+          tint = color,
+          modifier = Modifier.size(Dimens.icon_size_large),
+        )
+      }
       Text(
         text = name,
         maxLines = 1,
@@ -106,34 +110,3 @@ fun CategoryItem(
     }
   }
 }
-
-//@Composable
-//fun AddCategoryItem(
-//  onClick: () -> Unit,
-//  modifier: Modifier = Modifier,
-//) {
-//  // Todo do custom ripple effect animation
-//  Box(modifier = Modifier.height(IntrinsicSize.Max)) {
-//    // Dummy category item to match CategoryItem size
-//    CategoryItem(
-//      name = "Childcare",
-//      color = Color.White,
-//      icon = AccountIcons.ChildCare,
-//      onClick = { },
-//      onDeleteClick = {},
-//      editMode = { false },
-//      modifier = Modifier.alpha(0f),
-//    )
-//    Icon(
-//      imageVector = ExpeIcons.Add,
-//      contentDescription = "icon",
-//      modifier = modifier
-//        .fillMaxSize()
-//        .padding(ItemPadding)
-//        .clip(RoundedCornerNormalRadiusShape)
-//        .clickable(onClick = onClick)
-//        .background(color = MaterialTheme.colorScheme.primaryContainer)
-//        .padding(Dimens.margin_large_x + Dimens.margin_small_x),
-//    )
-//  }
-//}

@@ -250,7 +250,7 @@ private fun CategoriesGrid(
       contentType = { _, _ -> "category" },
     ) { index, category ->
       DraggableItem(dragDropState, index) { isDragging ->
-        val elevation by animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "drag_shadow")
+        val elevation by animateDpAsState(if (isDragging) 24.dp else 0.dp, label = "drag_shadow")
         CategoryItem(
           name = category.category.name.stringValue(),
           color = category.category.color.color,
