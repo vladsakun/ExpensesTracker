@@ -13,6 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -173,9 +176,7 @@ private fun TransactionItem(
         .fillMaxWidth()
         .pointerInput(Unit) {
           detectTapGestures(
-            onLongPress = {
-              expanded = !expanded
-            },
+            onLongPress = { expanded = true },
             onTap = { onClick() }
           )
         }
@@ -211,6 +212,7 @@ private fun TransactionItem(
         } else {
           HorizontalSpacer(width = Dimens.icon_size)
         }
+
         HorizontalSpacer(width = Dimens.margin_small_xx)
         Icon(
           imageVector = transaction.source.icon.imageVector,
@@ -224,6 +226,7 @@ private fun TransactionItem(
           modifier = Modifier.weight(1f),
         )
         HorizontalSpacer(width = Dimens.margin_small_xx)
+
         if (isTransfer) {
           transaction.transferReceivedAmount?.formattedValue?.let { amount ->
             Text(
@@ -232,22 +235,23 @@ private fun TransactionItem(
             )
           }
         }
-        // Todo make dropdown menu width as wide of Row
+
         DropdownMenu(
           expanded = expanded,
           onDismissRequest = { expanded = false },
+          properties = PopupProperties(
+            focusable = true,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+          ),
           scrollState = scrollState,
+          offset = DpOffset(0.dp, Dimens.margin_small_x),
         ) {
           repeat(5) {
             DropdownMenuItem(
               text = { Text("Item ${it + 1}") },
               onClick = { /* TODO */ },
-              leadingIcon = {
-                Icon(
-                  Icons.Outlined.Edit,
-                  contentDescription = null
-                )
-              }
+              leadingIcon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = null) }
             )
           }
         }

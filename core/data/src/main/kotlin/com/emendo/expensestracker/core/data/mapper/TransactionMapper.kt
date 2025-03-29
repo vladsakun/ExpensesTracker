@@ -3,6 +3,7 @@ package com.emendo.expensestracker.core.data.mapper
 import com.emendo.expensestracker.core.data.formatPositive
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
 import com.emendo.expensestracker.core.database.model.TransactionFull
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
@@ -21,6 +22,8 @@ class TransactionMapper @Inject constructor(
 ) : Mapper<TransactionFull, TransactionModel> {
 
   override suspend fun map(from: TransactionFull): TransactionModel = with(from) {
+    val sourceAccount: AccountModel = accountMapper.map(sourceAccount)
+
     val targetAccount: AccountModel? = targetAccount?.let { accountMapper.map(it) }
     val targetCategory: CategoryModel? = targetCategory?.let(::asExternalModel)
     val target = targetAccount ?: targetCategory ?: throw IllegalStateException("Transaction must have a target")
@@ -28,26 +31,31 @@ class TransactionMapper @Inject constructor(
     val currencyModel = CurrencyModel.toCurrencyModel(transactionEntity.currencyCode)
     val amount = amountFormatter.format(transactionEntity.value, currencyModel)
 
-    val transferReceivedValue = transactionEntity.transferReceivedValue
-    val transferReceivedCurrency = transactionEntity.transferReceivedCurrencyCode?.let(CurrencyModel::toCurrencyModel)
-    val transferReceivedAmount =
-      if (transferReceivedValue != null && transferReceivedCurrency != null) {
-        amountFormatter.format(transferReceivedValue, transferReceivedCurrency)
-      } else {
-        null
-      }
+    val type = transactionType
+    val isTransfer = type == TransactionType.TRANSFER
+    val transferReceivedAmount = if (isTransfer) getTransferReceivedAmount() else null
 
     // Todo refactor
     return TransactionModel(
       id = transactionEntity.id,
-      source = accountMapper.map(sourceAccount),
-      target = target,
+      source = if (isTransfer) targetAccount!! else sourceAccount,
+      target = if (isTransfer) sourceAccount else target,
       amount = amount.formatPositive(),
-      type = transactionType,
+      type = type,
       transferReceivedAmount = transferReceivedAmount?.formatPositive(),
       date = transactionEntity.date,
       note = transactionEntity.note,
     )
+  }
+
+  private fun TransactionFull.getTransferReceivedAmount(): Amount? {
+    val transferReceivedValue = transactionEntity.transferReceivedValue
+    val transferReceivedCurrency = transactionEntity.transferReceivedCurrencyCode?.let(CurrencyModel::toCurrencyModel)
+    return if (transferReceivedValue != null && transferReceivedCurrency != null) {
+      amountFormatter.format(transferReceivedValue, transferReceivedCurrency)
+    } else {
+      null
+    }
   }
 }
 
