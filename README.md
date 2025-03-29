@@ -13,6 +13,8 @@ Engineering To-Do:
 5) [ ] Export data via GDrive
 6) [x] Baseline profiles
 7) [x] Dynamic colors
+8) [ ] Kotlin multiplatform migration (Ktor, Kotlin inject)
+9) [ ] Migrate to Jetpack Compose Multiplatform
 
 Features:
 

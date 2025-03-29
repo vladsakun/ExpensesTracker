@@ -19,7 +19,7 @@ fun ExpeAlertDialog(
   dismissActionText: String? = null,
   content: @Composable BoxScope.() -> Unit,
 ) {
-  AlertDialog(onDismissRequest = onAlertDialogDismissRequest) {
+  BasicAlertDialog(onDismissRequest = onAlertDialogDismissRequest) {
     Surface(
       modifier = Modifier.wrapContentSize(),
       shape = MaterialTheme.shapes.large,

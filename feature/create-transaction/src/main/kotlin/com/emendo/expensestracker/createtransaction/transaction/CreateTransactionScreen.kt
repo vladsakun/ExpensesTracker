@@ -1,6 +1,8 @@
 package com.emendo.expensestracker.createtransaction.transaction
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
@@ -17,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -159,6 +162,8 @@ private fun CreateTransactionContent(
             label = stringResource(id = R.string.account),
             transactionItem = state.source,
             onClick = { onSelectAccountClick(true) },
+            error = state.screenData.sourceError == triggered,
+            onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
           )
           // TODO try movableContentOf
         } else {
@@ -224,36 +229,6 @@ private fun AccountChip(accountUiModel: AccountUiModel, onClick: () -> Unit) {
         modifier = Modifier.size(FilterChipDefaults.IconSize),
       )
     }
-  )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BottomSheetEffects(
-  bottomSheetStateProvider: () -> CreateTransactionBottomSheetState,
-  commandProcessor: (CreateTransactionCommand) -> Unit,
-  scaffoldState: BottomSheetScaffoldState,
-) {
-  val scope = rememberCoroutineScope()
-
-  EventEffect(
-    event = bottomSheetStateProvider().hide,
-    onConsumed = { commandProcessor(ConsumeHideCalculatorBottomSheetCommand()) },
-    action = {
-      scope.launch {
-        scaffoldState.bottomSheetState.partialExpand()
-      }
-    },
-  )
-
-  EventEffect(
-    event = bottomSheetStateProvider().show,
-    onConsumed = { commandProcessor(ConsumeShowCalculatorBottomSheetCommand()) },
-    action = {
-      scope.launch {
-        scaffoldState.bottomSheetState.expand()
-      }
-    },
   )
 }
 
@@ -327,6 +302,8 @@ private inline fun TransferBlock(
       commandProcessor = commandProcessor,
       onCreateAccountClick = onCreateAccountClick,
       onSelectAccountClick = { onSelectAccountClick(true) },
+      error = state.screenData.sourceError == triggered,
+      onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
     )
     Chevron(
       width = CHEVRON_WIDTH.dp,
@@ -337,6 +314,8 @@ private inline fun TransferBlock(
       commandProcessor = commandProcessor,
       onCreateAccountClick = onCreateAccountClick,
       onSelectAccountClick = { onSelectAccountClick(false) },
+      error = state.screenData.transferTargetError == triggered,
+      onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.TransferTarget)) },
     )
   }
 }
@@ -347,6 +326,8 @@ private inline fun RowScope.TransferSource(
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
   noinline onSelectAccountClick: () -> Unit,
+  error: Boolean,
+  crossinline onErrorConsumed: () -> Unit,
 ) {
   TransferEntity(
     isSource = true,
@@ -355,6 +336,8 @@ private inline fun RowScope.TransferSource(
     commandProcessor = commandProcessor,
     onSelectAccountClick = onSelectAccountClick,
     onCreateAccountClick = onCreateAccountClick,
+    error = error,
+    onErrorConsumed = onErrorConsumed,
   ) {
     TransferAmount(text = state.amount.formattedValue)
     EditableAmount(
@@ -370,6 +353,8 @@ private inline fun RowScope.TransferTarget(
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
   noinline onSelectAccountClick: () -> Unit,
+  error: Boolean,
+  crossinline onErrorConsumed: () -> Unit,
 ) {
   TransferEntity(
     isSource = false,
@@ -378,6 +363,8 @@ private inline fun RowScope.TransferTarget(
     commandProcessor = commandProcessor,
     onCreateAccountClick = onCreateAccountClick,
     onSelectAccountClick = onSelectAccountClick,
+    error = error,
+    onErrorConsumed = onErrorConsumed,
   ) {
     state.transferReceivedAmount?.let { amount ->
       TransferAmount(
@@ -397,10 +384,12 @@ private inline fun RowScope.TransferEntity(
   isSource: Boolean,
   transactionItemModel: TransactionItemModel?,
   accounts: ImmutableList<AccountUiModel>,
+  error: Boolean,
+  crossinline onErrorConsumed: () -> Unit,
   crossinline commandProcessor: (CreateTransactionCommand) -> Unit,
   noinline onCreateAccountClick: () -> Unit,
   noinline onSelectAccountClick: () -> Unit,
-  crossinline amountBlock: @Composable() (ColumnScope.() -> Unit),
+  crossinline amountBlock: @Composable (ColumnScope.() -> Unit),
 ) {
   TransferColumn {
     // Todo will be removed
@@ -410,9 +399,10 @@ private inline fun RowScope.TransferEntity(
     }
 
     TransferAccount(
-      onSelectAccountClick = onSelectAccountClick,
       accountModel = transactionItemModel,
-      accounts = accounts,
+      onSelectAccountClick = onSelectAccountClick,
+      error = error,
+      onErrorConsumed = onErrorConsumed,
     )
     Column(
       modifier = Modifier.clickable(onClick = { commandProcessor(ShowCalculatorBottomSheetCommand(isSource)) }),
@@ -514,24 +504,29 @@ private fun CreateAccountButton(onClick: () -> Unit) {
 @Suppress("NOTHING_TO_INLINE") // inlined to avoid unnecessary recomposition
 private inline fun TransferAccount(
   accountModel: TransactionItemModel?,
-  accounts: ImmutableList<AccountUiModel>,
   noinline onSelectAccountClick: () -> Unit,
+  crossinline onErrorConsumed: () -> Unit,
+  error: Boolean,
 ) {
-  //  var expanded by remember { mutableStateOf(false) }
-  //  val animateRotation = animateFloatAsState(if (expanded) 1.0f else 0.0f)
-  //  val scrollState = rememberScrollState()
   val enabled = remember(accountModel) { accountModel != null }
+  val backgroundColor = animateColorAsState(
+    targetValue = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
+    finishedListener = { onErrorConsumed() },
+    animationSpec = tween(ERROR_ANIMATION_DURATION_MILLIS),
+    label = "error"
+  )
 
   Box(
     modifier = Modifier
       .fillMaxSize()
       .wrapContentSize(Alignment.TopStart)
-      .clickable(onClick = onSelectAccountClick),
+      .clickable(onClick = onSelectAccountClick)
+      .drawBehind { drawRect(backgroundColor.value) },
   ) {
     Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
-      modifier = Modifier.fillMaxWidth()
+      modifier = Modifier.fillMaxWidth(),
     ) {
       Icon(
         modifier = Modifier.size(Dimens.icon_size),
@@ -553,41 +548,37 @@ private inline fun TransferAccount(
         modifier = Modifier.align(Alignment.CenterVertically),
       )
     }
-
-    // Todo make dropdown menu width as wide of Row
-    //    DropdownMenu(
-    //      expanded = expanded,
-    //      onDismissRequest = {
-    //        expanded = false
-    //      },
-    //      properties = PopupProperties(
-    //        focusable = true,
-    //        dismissOnBackPress = true,
-    //        dismissOnClickOutside = true,
-    //      ),
-    //      scrollState = scrollState,
-    //      offset = DpOffset(0.dp, Dimens.margin_small_x),
-    //      modifier = Modifier.fillMaxWidth(.4f),
-    //    ) {
-    //      accounts
-    //        .filter { it.id != accountModel?.id }
-    //        .forEach { account: AccountUiModel ->
-    //          DropdownMenuItem(
-    //            text = { Text(account.name.stringValue()) },
-    //            onClick = {
-    //              onSelectAccountClick()
-    //              expanded = false
-    //            },
-    //            leadingIcon = {
-    //              Icon(
-    //                imageVector = account.icon.imageVector,
-    //                contentDescription = null,
-    //              )
-    //            }
-    //          )
-    //        }
-    //    }
   }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BottomSheetEffects(
+  bottomSheetStateProvider: () -> CreateTransactionBottomSheetState,
+  commandProcessor: (CreateTransactionCommand) -> Unit,
+  scaffoldState: BottomSheetScaffoldState,
+) {
+  val scope = rememberCoroutineScope()
+
+  EventEffect(
+    event = bottomSheetStateProvider().hide,
+    onConsumed = { commandProcessor(ConsumeHideCalculatorBottomSheetCommand()) },
+    action = {
+      scope.launch {
+        scaffoldState.bottomSheetState.partialExpand()
+      }
+    },
+  )
+
+  EventEffect(
+    event = bottomSheetStateProvider().show,
+    onConsumed = { commandProcessor(ConsumeShowCalculatorBottomSheetCommand()) },
+    action = {
+      scope.launch {
+        scaffoldState.bottomSheetState.expand()
+      }
+    },
+  )
 }
 
 @Composable

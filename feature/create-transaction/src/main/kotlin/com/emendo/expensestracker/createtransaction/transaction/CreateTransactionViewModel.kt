@@ -61,7 +61,6 @@ import javax.inject.Inject
 private const val CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG = "create_transaction_delete_transaction_dialog"
 
 // TODO dev break 22.03
-// 1 - handle targetError, transferTargetError in CreateTransactionScreenData
 // 2 - why Amount filed disappear on transfer type?
 // 3- Finish transfer flow
 // 4 - Fix edge to edge on Select account screen with FAB and Currency select screen
@@ -520,6 +519,7 @@ class CreateTransactionViewModel @Inject constructor(
       when (field) {
         is FieldWithError.Amount -> state.copy(amountError = consumed)
         is FieldWithError.Source -> state.copy(sourceError = consumed)
+        is FieldWithError.TransferTarget -> state.copy(transferTargetError = consumed)
       }
     }
   }
