@@ -15,8 +15,6 @@ import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
 import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
-import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
-import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
@@ -99,15 +97,14 @@ fun CategoriesGrid(
         name = category.name.stringValue(),
         color = category.color.color,
         icon = category.icon.imageVector,
-        total = "",
         onClick = { onCategoryClick(category) },
-        editMode = { false },
         onDeleteClick = {},
+        editMode = { false },
       )
     }
-    uniqueItem("addCategory") {
-      AddCategoryItem(onClick = onAddCategoryClick)
-    }
+    //    uniqueItem("addCategory") {
+    //      AddCategoryItem(onClick = onAddCategoryClick)
+    //    }
   }
 }
 

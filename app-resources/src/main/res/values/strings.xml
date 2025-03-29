@@ -66,12 +66,8 @@
   <string name="sync_notification_channel_name">Sync</string>
   <string name="sync_notification_channel_description">Background tasks for Expenses tracker</string>
 
-  <string name="account_detail_dialog_delete_confirm_title">Are you sure that you want to delete the account?</string>
-  <string name="category_list_dialog_delete_confirm_title">Are you sure that you want to delete the category?</string>
-  <string name="category_detail_dialog_delete_confirm_title">Are you sure that you want to delete the category?</string>
-  <string name="transaction_detail_dialog_delete_confirm_title">Are you sure that you want to delete the transaction?</string>
-
   <string name="create_transaction_note_placeholder">Note</string>
+  <string name="create_transaction_general_destination">Destination</string>
 
   <string name="search">Search</string>
   <string name="sort">Sort</string>
@@ -83,5 +79,10 @@
   <string name="report_all_time">All time</string>
   <string name="report_custom">Custom</string>
 
-  <string name="create_transaction_general_destination">Destination</string>
+  <string name="categories_list_add_category_action">Add category</string>
+
+  <string name="dialog_account_detail_delete_confirm_title">Are you sure that you want to delete the account?</string>
+  <string name="dialog_category_list_delete_confirm_title">Are you sure that you want to delete the category?</string>
+  <string name="dialog_category_detail_delete_confirm_title">Are you sure that you want to delete the category?</string>
+  <string name="dialog_transaction_detail_delete_confirm_title">Are you sure that you want to delete the transaction?</string>
 </resources>

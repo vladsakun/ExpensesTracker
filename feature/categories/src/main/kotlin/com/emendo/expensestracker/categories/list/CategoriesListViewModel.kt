@@ -123,7 +123,7 @@ class CategoriesListViewModel @Inject constructor(
           id = CATEGORY_LIST_DELETE_CATEGORY_DIALOG,
           positiveAction = DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.category.id) },
         )
-        .title(resourceValueOf(R.string.category_list_dialog_delete_confirm_title))
+        .title(resourceValueOf(R.string.dialog_category_list_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()
     )

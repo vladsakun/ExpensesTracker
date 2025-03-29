@@ -86,7 +86,7 @@ class CategoryDetailViewModel @Inject constructor(
           id = CATEGORY_DETAIL_DELETE_CATEGORY_DIALOG,
           positiveAction = Action(resourceValueOf(R.string.delete), ::deleteCategory),
         )
-        .title(resourceValueOf(R.string.category_detail_dialog_delete_confirm_title))
+        .title(resourceValueOf(R.string.dialog_category_detail_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build(),
     )

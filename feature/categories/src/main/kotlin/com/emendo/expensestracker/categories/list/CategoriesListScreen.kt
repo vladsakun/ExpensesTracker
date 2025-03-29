@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.categories.list
 
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,8 +34,6 @@ import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
-import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
-import com.emendo.expensestracker.core.ui.AddCategoryItem
 import com.emendo.expensestracker.core.ui.CategoryItem
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
@@ -91,7 +92,7 @@ fun CategoriesListRoute(
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CategoriesListScreenContent(
   stateProvider: () -> CategoriesListUiState,
@@ -122,6 +123,13 @@ private fun CategoriesListScreenContent(
         }
       )
     },
+    floatingActionButton = {
+      ExtendedFloatingActionButton(
+        onClick = onCreateCategoryClick,
+        icon = { Icon(ExpeIcons.Add, null) },
+        text = { Text(text = stringResource(id = R.string.categories_list_add_category_action)) },
+      )
+    }
   ) { paddingValues ->
     Box(
       modifier = Modifier
@@ -164,7 +172,6 @@ private fun CategoriesListScreenContent(
                 categories = state.categories[page]!!,
                 editModeProvider = isEditModeProvider,
                 onCategoryClick = onCategoryClick,
-                onCreateCategoryClick = onCreateCategoryClick,
                 onDeleteCategoryClick = onDeleteCategoryClick,
                 onMove = onMove,
                 onLongClick = enableEditMode,
@@ -193,7 +200,6 @@ private fun CategoriesGrid(
   categories: CategoriesList,
   editModeProvider: () -> Boolean,
   onCategoryClick: (CategoryWithTotal) -> Unit,
-  onCreateCategoryClick: () -> Unit,
   onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
   onMove: (List<CategoryWithTotal>) -> Unit,
   onLongClick: () -> Unit,
@@ -244,32 +250,25 @@ private fun CategoriesGrid(
       contentType = { _, _ -> "category" },
     ) { index, category ->
       DraggableItem(dragDropState, index) { isDragging ->
-        val elevation by animateDpAsState(if (isDragging) 24.dp else 4.dp, label = "drag_shadow")
+        val elevation by animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "drag_shadow")
         CategoryItem(
           name = category.category.name.stringValue(),
           color = category.category.color.color,
           icon = category.category.icon.imageVector,
-          total = category.totalAmount.formattedValue,
           onClick = { onCategoryClick(category) },
-          editMode = editModeProvider,
           onDeleteClick = { onDeleteCategoryClick(category) },
+          editMode = editModeProvider,
           modifier = Modifier.shadow(elevation, RoundedCornerNormalRadiusShape),
         )
       }
     }
-    uniqueItem(ADD_CATEGORY_KEY) {
-      AddCategoryItem(
-        onClick = onCreateCategoryClick,
-        modifier = Modifier.animateItemPlacement(),
-      )
-    }
   }
 }
 
-// private val itemAnimationSpec: SpringSpec<IntOffset> = spring(
-//  stiffness = Spring.StiffnessLow,
-//  visibilityThreshold = IntOffset.VisibilityThreshold,
-// )
+private val itemAnimationSpec: SpringSpec<IntOffset> = spring(
+  stiffness = Spring.StiffnessLow,
+  visibilityThreshold = IntOffset.VisibilityThreshold,
+)
 
 @Composable
 private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {

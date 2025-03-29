@@ -500,7 +500,7 @@ class CreateTransactionViewModel @Inject constructor(
           id = CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG,
           positiveAction = Action.DangerAction(resourceValueOf(R.string.delete), ::deleteTransaction)
         )
-        .title(resourceValueOf(R.string.transaction_detail_dialog_delete_confirm_title))
+        .title(resourceValueOf(R.string.dialog_transaction_detail_delete_confirm_title))
         .negativeAction(resourceValueOf(R.string.cancel), ::hideModalBottomSheet)
         .build()
     )

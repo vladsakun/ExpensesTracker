@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 
-private const val GRID_CELL_COUNT = 3
+private const val GRID_CELL_COUNT = 4
 
 @Composable
 fun CategoriesLazyVerticalGrid(
@@ -17,7 +17,11 @@ fun CategoriesLazyVerticalGrid(
   LazyVerticalGrid(
     modifier = modifier,
     columns = GridCells.Fixed(GRID_CELL_COUNT),
-    contentPadding = PaddingValues(horizontal = Dimens.margin_small_x),
+    contentPadding = PaddingValues(
+      start = Dimens.margin_small_x,
+      end = Dimens.margin_small_x,
+      bottom = Dimens.margin_small_x + Dimens.FloatingActionButtonHeight,
+    ),
     state = state,
     content = content,
   )

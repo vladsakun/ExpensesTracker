@@ -42,9 +42,7 @@ class OfflineFirstAccountRepository @Inject constructor(
   init {
     scope.launch {
       accountsDao.getAll()
-        .onEach { accounts ->
-          accounts.map { accountMapper.map(it) }
-        }
+        .onEach { accounts -> accounts.map { accountMapper.map(it) } }
         .launchIn(this)
     }
   }

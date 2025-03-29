@@ -100,7 +100,7 @@ class AccountDetailViewModel @Inject constructor(
           id = ACCOUNT_DETAIL_DELETE_ACCOUNT_DIALOG,
           positiveAction = Action(resourceValueOf(R.string.delete), ::deleteAccount)
         )
-        .title(resourceValueOf(R.string.account_detail_dialog_delete_confirm_title))
+        .title(resourceValueOf(R.string.dialog_account_detail_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
         .build()
     )

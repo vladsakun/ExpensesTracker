@@ -15,20 +15,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.emendo.expensestracker.core.app.resources.icon.AccountIcons
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.designsystem.component.AutoResizedText
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
-import com.emendo.expensestracker.core.designsystem.utils.toDp
 import kotlin.random.Random
 
 private val ItemPadding
@@ -39,7 +34,6 @@ fun CategoryItem(
   name: String,
   color: Color,
   icon: ImageVector,
-  total: String,
   onClick: () -> Unit,
   onDeleteClick: () -> Unit,
   editMode: () -> Boolean,
@@ -54,19 +48,19 @@ fun CategoryItem(
       repeatMode = RepeatMode.Reverse,
       initialStartOffset = StartOffset(Random.nextInt(0, 200))
     ),
-    label = "rotation"
+    label = "rotation",
   )
 
-  Box {
+  Box(
+    modifier = Modifier
+      .clickable(onClick = onClick)
+      .padding(bottom = Dimens.margin_small_x),
+  ) {
     AnimatedVisibility(
       visible = editMode(),
       modifier = Modifier
         .zIndex(2f)
-        .graphicsLayer {
-          val translation = -20f
-          translationX = translation
-          translationY = translation
-        },
+        .graphicsLayer { translationY = -20f },
       enter = fadeIn(),
       exit = fadeOut(),
     ) {
@@ -81,8 +75,10 @@ fun CategoryItem(
       }
     }
     Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
       modifier = Modifier
-        .fillMaxSize()
+        .align(Alignment.Center)
         .padding(ItemPadding)
         .graphicsLayer {
           if (editMode()) {
@@ -90,69 +86,54 @@ fun CategoryItem(
             translationX = transition.value
           }
         }
-        .clip(RoundedCornerNormalRadiusShape)
-        .then(modifier)
-        .background(color)
-        .clickable(onClick = onClick)
-        .padding(Dimens.margin_small_x),
-      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
-      horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Icon(
         imageVector = icon,
         contentDescription = "$name category icon",
-        tint = Color.White, // Todo remove hardcoded color
+        tint = color,
+        modifier = Modifier
+          .clip(RoundedCornerNormalRadiusShape)
+          .background(color.copy(alpha = 0.1f))
+          .padding(Dimens.margin_normal)
+          .then(modifier),
       )
-      val textStyle = MaterialTheme.typography.labelSmall
       Text(
         text = name,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        style = textStyle,
-        color = Color.White,
-      )
-      val fontSizeWithSpacing = (textStyle.fontSize.value + 5).sp
-      AutoResizedText(
-        text = total,
-        minFontSize = 8.sp,
-        maxLines = 1,
-        style = textStyle,
-        color = Color.White,
-        modifier = Modifier.height(fontSizeWithSpacing.toDp())
+        style = MaterialTheme.typography.labelSmall,
       )
     }
   }
 }
 
-@Composable
-fun AddCategoryItem(
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  // Todo do custom ripple effect animation
-  Box(modifier = Modifier.height(IntrinsicSize.Max)) {
-    // Dummy category item to match CategoryItem size
-    CategoryItem(
-      name = "Childcare",
-      color = Color.White,
-      icon = AccountIcons.ChildCare,
-      total = "$100",
-      onClick = { },
-      editMode = { false },
-      onDeleteClick = {},
-      modifier = Modifier.alpha(0f),
-    )
-    Icon(
-      imageVector = ExpeIcons.Add,
-      contentDescription = "icon",
-      modifier = modifier
-        .fillMaxSize()
-        .padding(ItemPadding)
-        .clip(RoundedCornerNormalRadiusShape)
-        .clickable(onClick = onClick)
-        .background(color = MaterialTheme.colorScheme.primaryContainer)
-        .padding(Dimens.margin_large_x)
-        .padding(Dimens.margin_small_x),
-    )
-  }
-}
+//@Composable
+//fun AddCategoryItem(
+//  onClick: () -> Unit,
+//  modifier: Modifier = Modifier,
+//) {
+//  // Todo do custom ripple effect animation
+//  Box(modifier = Modifier.height(IntrinsicSize.Max)) {
+//    // Dummy category item to match CategoryItem size
+//    CategoryItem(
+//      name = "Childcare",
+//      color = Color.White,
+//      icon = AccountIcons.ChildCare,
+//      onClick = { },
+//      onDeleteClick = {},
+//      editMode = { false },
+//      modifier = Modifier.alpha(0f),
+//    )
+//    Icon(
+//      imageVector = ExpeIcons.Add,
+//      contentDescription = "icon",
+//      modifier = modifier
+//        .fillMaxSize()
+//        .padding(ItemPadding)
+//        .clip(RoundedCornerNormalRadiusShape)
+//        .clickable(onClick = onClick)
+//        .background(color = MaterialTheme.colorScheme.primaryContainer)
+//        .padding(Dimens.margin_large_x + Dimens.margin_small_x),
+//    )
+//  }
+//}

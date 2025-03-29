@@ -33,4 +33,5 @@ object Dimens {
   //  val margin_small_xxxx = 1.dp
 
   val DialogContentMaxHeight = 280.dp
+  val FloatingActionButtonHeight = 56.dp
 }
