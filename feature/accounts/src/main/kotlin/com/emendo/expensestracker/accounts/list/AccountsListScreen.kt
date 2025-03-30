@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +33,7 @@ import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.*
+import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.ui.AccountItem
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
@@ -154,7 +156,7 @@ private fun AccountsListScreenContent(
             imageVector = ExpeIcons.Add,
             contentDescription = "Add",
           )
-        }
+        },
       )
     },
   ) { padding ->
@@ -215,6 +217,9 @@ private fun AccountList(
       .dragContainer(dragDropState, editModeProvider()),
     state = listState,
     horizontalAlignment = Alignment.CenterHorizontally,
+    contentPadding = PaddingValues(
+      bottom = Dimens.margin_large_x * 2 + Dimens.FloatingActionButtonHeight,
+    ),
   ) {
     itemsIndexed(
       items = list,

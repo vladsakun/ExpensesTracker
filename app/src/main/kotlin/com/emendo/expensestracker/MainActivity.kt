@@ -3,17 +3,21 @@ package com.emendo.expensestracker
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +26,7 @@ import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
+import com.emendo.expensestracker.ui.rememberExpeAppState
 import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -43,26 +48,40 @@ class MainActivity : ComponentActivity() {
     setContent {
       val darkTheme = isSystemInDarkTheme()
       val navController = rememberNavController()
-
-      // Update the dark content of the system bars to match the theme
-      DisposableEffect(darkTheme) {
-        enableEdgeToEdge(
-          statusBarStyle = SystemBarStyle.auto(
-            android.graphics.Color.TRANSPARENT,
-            android.graphics.Color.TRANSPARENT,
-          ) { darkTheme },
-          navigationBarStyle = SystemBarStyle.auto(
-            lightScrim,
-            darkScrim,
-          ) { darkTheme },
-        )
-        onDispose {}
-      }
+      val appState = rememberExpeAppState(
+        windowSizeClass = calculateWindowSizeClass(this),
+        navController = navController,
+      )
 
       ExpensesTrackerTheme(darkTheme = darkTheme) {
-        ExpeApp(
-          windowSizeClass = calculateWindowSizeClass(this),
-          navController = navController,
+        ExpeApp(appState)
+        ProtectNavigationBar()
+      }
+    }
+  }
+
+  @Composable
+  private fun ProtectNavigationBar(modifier: Modifier = Modifier) {
+    val density = LocalDensity.current
+    val tappableElement = WindowInsets.tappableElement
+    val bottomPixels = tappableElement.getBottom(density)
+    val usingTappableBars = remember(bottomPixels) {
+      bottomPixels != 0
+    }
+    val barHeight = remember(bottomPixels) {
+      tappableElement.asPaddingValues(density).calculateBottomPadding()
+    }
+
+    Column(
+      modifier = modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Bottom
+    ) {
+      if (usingTappableBars) {
+        Box(
+          modifier = Modifier
+            .background(BottomAppBarDefaults.containerColor.copy(alpha = 0.5f))
+            .fillMaxWidth()
+            .height(barHeight)
         )
       }
     }
@@ -118,16 +137,14 @@ class MainActivity : ComponentActivity() {
   ) {
     val notificationManager = applicationContext
       .getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val defaultChannel =
-        NotificationChannel(
-          "DEFAULT",
-          "DEFAULT",
-          NotificationManager.IMPORTANCE_DEFAULT
-        )
-      defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-      notificationManager.createNotificationChannel(defaultChannel)
-    }
+    val defaultChannel =
+      NotificationChannel(
+        "DEFAULT",
+        "DEFAULT",
+        NotificationManager.IMPORTANCE_DEFAULT
+      )
+    defaultChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+    notificationManager.createNotificationChannel(defaultChannel)
     val builder = NotificationCompat.Builder(
       applicationContext,
       channel

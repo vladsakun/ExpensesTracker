@@ -1,22 +1,16 @@
 package com.emendo.expensestracker.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.navigation.NavHostController
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_REPORT
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBar
 import com.emendo.expensestracker.core.designsystem.component.ExpeNavigationBarItem
-import com.emendo.expensestracker.core.designsystem.component.ExpeScaffold
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.navigation.ExpeNavHost
 import com.emendo.expensestracker.navigation.TopLevelDestination
@@ -25,15 +19,8 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
-fun ExpeApp(
-  windowSizeClass: WindowSizeClass,
-  navController: NavHostController,
-  appState: ExpeAppState = rememberExpeAppState(
-    windowSizeClass = windowSizeClass,
-    navController = navController,
-  ),
-) {
-  ExpeScaffold(
+fun ExpeApp(appState: ExpeAppState) {
+  Scaffold(
     bottomBar = {
       if (appState.showBottomBar) {
       }
@@ -46,6 +33,7 @@ fun ExpeApp(
         )
       }
     },
+    contentWindowInsets = WindowInsets(0, 0, 0, 0),
   ) { padding ->
     Row(
       modifier = Modifier

@@ -2,7 +2,6 @@ package com.emendo.expensestracker.core.designsystem.component
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,7 +23,6 @@ fun ExpeScaffold(
   content: @Composable (PaddingValues) -> Unit,
 ) {
   Scaffold(
-    contentWindowInsets = WindowInsets(0, 0, 0, 0),
     modifier = modifier,
     topBar = topBar,
     bottomBar = bottomBar,

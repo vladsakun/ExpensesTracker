@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,11 +40,16 @@ fun SelectCurrencyScreen(
   ) { paddingValues ->
     val currencies = state.value
 
-    // TODO fix paddings
     if (currencies != null) {
+      val layoutDirection = LocalLayoutDirection.current
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = paddingValues,
+        contentPadding = PaddingValues(
+          start = paddingValues.calculateStartPadding(layoutDirection),
+          end = paddingValues.calculateEndPadding(layoutDirection),
+          top = paddingValues.calculateTopPadding(),
+          bottom = paddingValues.calculateBottomPadding() + Dimens.margin_large_x,
+        ),
       ) {
         items(
           items = currencies,

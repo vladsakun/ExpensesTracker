@@ -232,16 +232,15 @@ private fun CategoriesGrid(
     }
 
   CategoriesLazyVerticalGrid(
-    modifier =
-      Modifier
-        .fillMaxSize()
-        .dragContainer(dragDropState, editModeProvider)
-        .combinedClickable(
-          onLongClick = onLongClick,
-          onClick = onClick,
-          interactionSource = remember { MutableInteractionSource() },
-          indication = null,
-        ),
+    modifier = Modifier
+      .fillMaxSize()
+      .dragContainer(dragDropState, editModeProvider)
+      .combinedClickable(
+        onLongClick = onLongClick,
+        onClick = onClick,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+      ),
     state = gridState,
   ) {
     itemsIndexed(
