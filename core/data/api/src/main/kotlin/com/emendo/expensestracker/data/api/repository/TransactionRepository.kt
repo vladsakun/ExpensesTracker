@@ -2,6 +2,7 @@ package com.emendo.expensestracker.data.api.repository
 
 import androidx.paging.PagingData
 import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
@@ -18,6 +19,17 @@ interface TransactionRepository {
   suspend fun retrieveFirstTransaction(): TransactionModel?
   suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType>
   fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionModel>>
+  fun getTransactionsPagedInPeriod(
+    targetCategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<PagingData<TransactionModel>>
+
+  fun getTransactionsPagedInPeriod(
+    transactionType: TransactionType,
+    from: Instant,
+    to: Instant,
+  ): Flow<PagingData<TransactionModel>>
 
   suspend fun createTransaction(
     source: TransactionSource,

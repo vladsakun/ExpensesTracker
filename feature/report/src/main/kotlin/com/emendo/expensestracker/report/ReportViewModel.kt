@@ -21,7 +21,11 @@ import com.emendo.expensestracker.model.ui.resourceValueOf
 import com.emendo.expensestracker.model.ui.textValueOf
 import com.emendo.expensestracker.report.ReportScreenData.CategoryValue
 import com.emendo.expensestracker.report.domain.GetCategoriesWithTotalTransactionsUseCase
+import com.emendo.expensestracker.transactions.TransactionsListArgs
+import com.emendo.expensestracker.transactions.TransactionsListScreenApi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
@@ -43,6 +47,7 @@ class ReportViewModel @Inject constructor(
   private val getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val localeManager: ExpeLocaleManager,
   private val periodsFactory: PeriodsFactory,
+  private val transactionsListScreenApi: TransactionsListScreenApi,
 ) : ViewModel(), ReportScreenCommander {
 
   private val _selectedPeriod: MutableStateFlow<ReportPeriod> by savedStateHandle.stateFlow(getDefaultPeriod())
@@ -64,6 +69,9 @@ class ReportViewModel @Inject constructor(
 
   // Todo move to savedStateHandle
   private var periodsCache: Pair<Locale, ImmutableList<ReportPeriod>?> = localeManager.getLocale() to null
+
+  private val _navigation: MutableStateFlow<ReportScreenNavigation> = MutableStateFlow(ReportScreenNavigation())
+  internal val navigation: StateFlow<ReportScreenNavigation> = _navigation
 
   internal val state: StateFlow<NetworkViewState<ReportScreenData>> =
     combine(
@@ -169,12 +177,25 @@ class ReportViewModel @Inject constructor(
   }
 
   override fun selectCategory(event: SelectCategoryClickEvent) {
-    // TODO navigation
-    _selectedCategory.update { if (event is SelectCategoryClickEvent.CategorySelected) event.categoryId else null }
+    val categoryId = (event as? SelectCategoryClickEvent.CategorySelected)?.categoryId
+    val (from, to) = selectedPeriod.value.getFromAndTo()
+
+    val args = if (categoryId == null) {
+      TransactionsListArgs(_transactionType.value, from, to)
+    } else {
+      TransactionsListArgs(categoryId, from, to)
+    }
+
+    val route = transactionsListScreenApi.getRoute(args)
+    _navigation.update { it.copy(openCategoryTransactions = triggered(route)) }
   }
 
   override fun toggleSelectedPie(sliceId: Long?) {
     _selectedCategory.update { if (it == sliceId) null else sliceId }
+  }
+
+  fun onConsumedOpenCategoryTransactionsEvent() {
+    _navigation.update { it.copy(openCategoryTransactions = consumed()) }
   }
 
   private fun getDefaultPeriod(): ReportPeriod {

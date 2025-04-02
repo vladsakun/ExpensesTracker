@@ -62,8 +62,6 @@ private const val CREATE_TRANSACTION_DELETE_TRANSACTION_DIALOG = "create_transac
 
 // TODO dev break 22.03
 // 2 - why Amount filed disappear on transfer type?
-// 3 - Finish transfer flow
-// 4 - Fix edge to edge on Select account screen with FAB and Currency select screen
 
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(

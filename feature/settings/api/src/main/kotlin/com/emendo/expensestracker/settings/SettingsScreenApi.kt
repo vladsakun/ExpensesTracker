@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.settings.api
+package com.emendo.expensestracker.settings
 
 interface SettingsScreenApi {
 

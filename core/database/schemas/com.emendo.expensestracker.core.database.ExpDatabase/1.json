@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4cad46b72e43f9480154bce2ef18c995",
+    "identityHash": "8c967543fe4ad2188a79c5e4a27a86fb",
     "entities": [
       {
         "tableName": "account",
@@ -112,7 +112,7 @@
       },
       {
         "tableName": "transaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -161,6 +161,12 @@
             "columnName": "note",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "typeId",
+            "columnName": "typeId",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "transferReceivedCurrencyCode",
@@ -276,7 +282,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4cad46b72e43f9480154bce2ef18c995')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c967543fe4ad2188a79c5e4a27a86fb')"
     ]
   }
 }

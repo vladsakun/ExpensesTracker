@@ -5,6 +5,8 @@ plugins {
 }
 
 dependencies {
+  implementation(projects.feature.transactions.api)
+
   implementation(libs.kotlinx.datetime)
   implementation(libs.kotlinx.serialization.json)
 }

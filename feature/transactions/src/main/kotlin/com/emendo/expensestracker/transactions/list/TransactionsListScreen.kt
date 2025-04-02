@@ -36,6 +36,7 @@ import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.transactions.TransactionsListArgs
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.Flow
@@ -49,13 +50,16 @@ import java.util.Locale
 @Composable
 fun TransactionsListRoute(
   navigator: DestinationsNavigator,
+  args: TransactionsListArgs? = null,
   viewModel: TransactionsListViewModel = hiltViewModel(),
 ) {
   val state = viewModel.state.collectAsStateWithLifecycle()
 
   TransactionsListScreenContent(
     uiStateProvider = state::value,
-    onTransactionClick = remember { { navigator.navigate(viewModel.openTransactionDetails(it)) } }
+    onTransactionClick = { navigator.navigate(viewModel.getTransactionDetailsRoute(it)) },
+    backButton = args != null,
+    onBackClick = navigator::navigateUp,
   )
 }
 
@@ -63,8 +67,13 @@ fun TransactionsListRoute(
 private fun TransactionsListScreenContent(
   uiStateProvider: () -> TransactionScreenUiState,
   onTransactionClick: (TransactionModel) -> Unit,
+  backButton: Boolean,
+  onBackClick: () -> Unit,
 ) {
-  ExpeScaffoldWithTopBar(titleResId = R.string.transactions) { paddingValues ->
+  ExpeScaffoldWithTopBar(
+    titleResId = R.string.transactions,
+    onNavigationClick = { onBackClick() }.takeIf { backButton },
+  ) { paddingValues ->
     Box(
       modifier = Modifier
         .fillMaxSize()

@@ -10,6 +10,8 @@ import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.model.TransactionFull
 import com.emendo.expensestracker.core.database.util.TABLE_TRANSACTION
 import com.emendo.expensestracker.core.database.util.TRANSACTION_PRIMARY_KEY
+import com.emendo.expensestracker.core.model.data.TransactionType
+import com.emendo.expensestracker.core.model.data.TransactionType.Companion.id
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
@@ -39,6 +41,22 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   abstract fun transactionsPagingSource(): PagingSource<Int, TransactionFull>
 
   @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE typeId == :typeId AND date BETWEEN :from AND :to ORDER BY date DESC")
+  abstract fun transactionsByTypeInPeriodPagingSource(
+    typeId: Int,
+    from: Instant,
+    to: Instant,
+  ): PagingSource<Int, TransactionFull>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE targetCategoryId = :targetCategoryId AND date BETWEEN :from AND :to ORDER BY date DESC")
+  abstract fun transactionsInPeriodPagingSource(
+    targetCategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): PagingSource<Int, TransactionFull>
+
+  @Transaction
   @Query("SELECT * FROM $TABLE_NAME ORDER BY date DESC LIMIT 1")
   abstract suspend fun retrieveLastTransaction(): TransactionFull?
 
@@ -51,8 +69,11 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   abstract suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionFull>
 
   @Transaction
-  @Query("SELECT * FROM $TABLE_NAME WHERE sourceAccountId = :sourceAccountId AND targetAccountId != NULL ORDER BY date DESC LIMIT 1")
-  abstract suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionFull?
+  @Query("SELECT * FROM $TABLE_NAME WHERE sourceAccountId = :sourceAccountId AND typeId = :typeId  ORDER BY date DESC LIMIT 1")
+  abstract suspend fun retrieveLastTransferTransaction(
+    sourceAccountId: Long,
+    typeId: Int = TransactionType.TRANSFER.id,
+  ): TransactionFull?
 
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME ORDER BY date ASC LIMIT 1")

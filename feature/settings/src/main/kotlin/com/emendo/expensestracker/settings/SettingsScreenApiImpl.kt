@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.settings
 
-import com.emendo.expensestracker.settings.api.SettingsScreenApi
 import com.emendo.expensestracker.settings.destinations.SettingsRouteDestination
 import se.ansman.dagger.auto.AutoBind
 import javax.inject.Inject

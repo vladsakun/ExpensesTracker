@@ -55,6 +55,7 @@ import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.textValueOf
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -64,7 +65,7 @@ import kotlin.math.roundToInt
 
 @Destination(start = true)
 @Composable
-internal fun ReportScreen(
+internal fun ReportRoute(
   navigator: DestinationsNavigator,
   viewModel: ReportViewModel = hiltViewModel(),
 ) {
@@ -72,6 +73,13 @@ internal fun ReportScreen(
   val selectedPeriod = viewModel.selectedPeriod.collectAsStateWithLifecycle()
   val showPickerDialog = viewModel.showPickerDialog.collectAsStateWithLifecycle()
   val selectedCategory = viewModel.selectedCategory.collectAsStateWithLifecycle()
+  val navigation = viewModel.navigation.collectAsStateWithLifecycle()
+
+  NavigationEventEffect(
+    event = navigation.value.openCategoryTransactions,
+    onConsumed = viewModel::onConsumedOpenCategoryTransactionsEvent,
+    action = navigator::navigate,
+  )
 
   ReportScreenContent(
     stateProvider = state::value,

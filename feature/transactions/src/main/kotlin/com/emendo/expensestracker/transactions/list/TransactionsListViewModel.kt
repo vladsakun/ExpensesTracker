@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.transactions.list
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -19,6 +20,8 @@ import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
+import com.emendo.expensestracker.transactions.TransactionsListArgs
+import com.emendo.expensestracker.transactions.destinations.TransactionsListRouteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,14 +40,21 @@ class TransactionsListViewModel @Inject constructor(
   private val getTransactionsSumUseCase: GetTransactionsSumUseCase,
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
+  savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-  private val repos: Flow<PagingData<UiModel.TransactionItem>> = transactionRepository
-    .transactionsPagingFlow
+  private val args: TransactionsListArgs? by lazy(LazyThreadSafetyMode.NONE) {
+    TransactionsListRouteDestination.argsFrom(savedStateHandle).args
+  }
+
+  private val transactions: Flow<PagingData<UiModel.TransactionItem>> = getTransactionsFlow()
     .map { it.map(UiModel::TransactionItem) }
 
   private val list: Flow<PagingData<UiModel>> =
-    combine(timeZoneManager.timeZoneState, repos) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem> ->
+    combine(
+      timeZoneManager.timeZoneState,
+      transactions
+    ) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem> ->
       transformPagingData(pagingData, zoneId)
     }.cachedIn(viewModelScope)
 
@@ -108,7 +118,6 @@ class TransactionsListViewModel @Inject constructor(
     )
   }
 
-
   sealed class UiModel {
     data class TransactionItem(val transaction: TransactionModel) : UiModel()
     data class SeparatorItem(val instant: Instant, val sum: String?) : UiModel()
@@ -126,16 +135,21 @@ class TransactionsListViewModel @Inject constructor(
       before.dayOfYear(zoneId) == after.dayOfYear(zoneId) &&
       before.month(zoneId) == after.month(zoneId)
 
-  private fun Instant.year(zoneId: ZoneId) =
-    this.toLocalDateTime(TimeZone.of(zoneId.id)).year
+  private fun Instant.year(zoneId: ZoneId) = toLocalDateTime(TimeZone.of(zoneId.id)).year
+  private fun Instant.dayOfYear(zoneId: ZoneId) = toLocalDateTime(TimeZone.of(zoneId.id)).dayOfYear
+  private fun Instant.month(zoneId: ZoneId) = toLocalDateTime(TimeZone.of(zoneId.id)).month
 
-  private fun Instant.dayOfYear(zoneId: ZoneId) =
-    this.toLocalDateTime(TimeZone.of(zoneId.id)).dayOfYear
+  private fun getTransactionsFlow(): Flow<PagingData<TransactionModel>> {
+    val arguments = args ?: return transactionRepository.transactionsPagingFlow
 
-  private fun Instant.month(zoneId: ZoneId) =
-    this.toLocalDateTime(TimeZone.of(zoneId.id)).month
+    return if (arguments.transactionType == null) {
+      transactionRepository.getTransactionsPagedInPeriod(arguments.categoryId!!, arguments.from, arguments.to)
+    } else {
+      transactionRepository.getTransactionsPagedInPeriod(arguments.transactionType!!, arguments.from, arguments.to)
+    }
+  }
 
-  fun openTransactionDetails(transactionModel: TransactionModel): String =
+  fun getTransactionDetailsRoute(transactionModel: TransactionModel): String =
     createTransactionScreenApi.getRoute(
       source = transactionModel.source,
       target = transactionModel.target,

@@ -113,13 +113,15 @@ class ExpeAppState(
   private fun showNavBar(): Boolean {
     val routesWithoutCreateTransaction = TopLevelDestination.routesWithoutCreateTransaction
     val nestedNavGraphs: List<String> = NavGraphs.root.nestedNavGraphs.map { it.route }
-    val backStackRoutes = navController.currentBackStack.value
-      .map { it.destination.route }
-      .filter {
-        it != NavGraphs.root.route && it !in nestedNavGraphs
+    val backStackRoutesWithoutCategories = navController.currentBackStack.value
+      .mapNotNull {
+        if (it.destination.route == TopLevelDestination.CATEGORIES.screen.startRoute.route) {
+          return@mapNotNull null
+        }
+        it.destination.route
       }
+      .filter { it != NavGraphs.root.route && it !in nestedNavGraphs }
 
-    val onlyTopLevelDestinations = backStackRoutes.subtract(routesWithoutCreateTransaction).isEmpty()
-    return currentDestinationSpec?.route in routesWithoutCreateTransaction && onlyTopLevelDestinations
+    return currentDestinationSpec?.route in routesWithoutCreateTransaction && backStackRoutesWithoutCategories.size <= 1
   }
 }

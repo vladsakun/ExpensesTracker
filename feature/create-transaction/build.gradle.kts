@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.feature.createTransaction.api)
+    api(projects.feature.createTransaction.api)
 
     implementation(libs.kotlinx.datetime)
     implementation(projects.feature.accounts.api)

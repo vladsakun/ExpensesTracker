@@ -29,7 +29,7 @@ import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTrans
 import com.emendo.expensestracker.data.api.model.category.toCategoryWithOrdinalIndex
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf
-import com.emendo.expensestracker.settings.api.SettingsScreenApi
+import com.emendo.expensestracker.settings.SettingsScreenApi
 import com.emendo.expensestracker.sync.initializers.Sync
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf

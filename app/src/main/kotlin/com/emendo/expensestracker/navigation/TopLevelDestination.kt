@@ -65,11 +65,12 @@ enum class TopLevelDestination(
     internal val startDestination: TopLevelDestination
       get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
 
-    internal val routesWithoutCreateTransaction by lazy(LazyThreadSafetyMode.NONE) {
+    internal val routesWithoutCreateTransaction: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
       entries
         .toMutableList()
         .apply { remove(CREATE_TRANSACTION) }
         .map { it.screen.startRoute.startDestination.route }
+        .toSet()
     }
   }
 }

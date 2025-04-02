@@ -9,7 +9,7 @@ enum class TransactionType {
     val DEFAULT = EXPENSE
 
     fun Int.toTransactionType(): TransactionType = TransactionType.entries[this]
-    val TransactionType.id
+    val TransactionType.id: Int
       get() = this.ordinal
   }
 }

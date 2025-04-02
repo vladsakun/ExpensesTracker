@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
+  api(projects.feature.transactions.api)
   implementation(projects.feature.createTransaction.api)
 
   implementation(libs.androidx.activity.compose)
   implementation(libs.paging.compose)
-  implementation(libs.kotlinx.datetime)
 }

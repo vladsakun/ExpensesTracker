@@ -58,13 +58,15 @@ class AccountDetailViewModel @Inject constructor(
   override val modalBottomSheetStateManager: ModalBottomSheetStateManager
     get() = this
 
-  private val accountId: Long = savedStateHandle.getAccountId()
+  private val accountId: Long by lazy(LazyThreadSafetyMode.NONE) {
+    AccountDetailScreenDestination.argsFrom(savedStateHandle).accountId
+  }
   private var editAccountJob: Job? = null
 
   init {
     if (state.value.dataValue() == null) {
       viewModelScope.launch {
-        val account = getAccountByIdUseCase(savedStateHandle.getAccountId())
+        val account = getAccountByIdUseCase(accountId)
           .map(::getDefaultAccountDetailScreenState)
           .first()
 
@@ -113,6 +115,3 @@ class AccountDetailViewModel @Inject constructor(
     }
   }
 }
-
-private fun SavedStateHandle.getAccountId(): Long =
-  requireNotNull(this[AccountDetailScreenDestination.arguments[0].name])

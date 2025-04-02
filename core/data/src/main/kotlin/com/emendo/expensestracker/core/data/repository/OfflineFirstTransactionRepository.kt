@@ -10,6 +10,7 @@ import com.emendo.expensestracker.core.database.model.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
+import com.emendo.expensestracker.core.model.data.TransactionType.Companion.id
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.GetTransactionTypeUseCase
 import com.emendo.expensestracker.data.api.extensions.asAccount
@@ -47,10 +48,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
       }
 
   override val transactionsPagingFlow: Flow<PagingData<TransactionModel>> by lazy {
-    Pager(
-      config = PagingConfig(pageSize = PAGE_SIZE),
-      pagingSourceFactory = { transactionDao.transactionsPagingSource() }
-    ).flow
+    PagerDefault { transactionDao.transactionsPagingSource() }
       .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
       .cachedIn(scope)
   }
@@ -80,6 +78,22 @@ class OfflineFirstTransactionRepository @Inject constructor(
       .map { transactions ->
         transactions.map { transactionMapper.map(it) }
       }
+
+  override fun getTransactionsPagedInPeriod(
+    targetCategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<PagingData<TransactionModel>> =
+    PagerDefault { transactionDao.transactionsInPeriodPagingSource(targetCategoryId, from, to) }
+      .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
+
+  override fun getTransactionsPagedInPeriod(
+    transactionType: TransactionType,
+    from: Instant,
+    to: Instant,
+  ): Flow<PagingData<TransactionModel>> =
+    PagerDefault { transactionDao.transactionsByTypeInPeriodPagingSource(transactionType.id, from, to) }
+      .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
 
   override suspend fun createTransaction(
     source: TransactionSource,
@@ -119,6 +133,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
           currencyCode = amount.currency.currencyCode,
           date = date,
           note = note,
+          typeId = TransactionType.EXPENSE.id,
         )
       )
     }
@@ -142,6 +157,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
           currencyCode = amount.currency.currencyCode,
           date = date,
           note = note,
+          typeId = TransactionType.INCOME.id,
         )
       )
     }
@@ -171,8 +187,12 @@ class OfflineFirstTransactionRepository @Inject constructor(
           note = note,
           transferReceivedCurrencyCode = transferReceivedAmount.currency.currencyCode,
           transferReceivedValue = transferReceivedAmount.value.abs(),
+          typeId = TransactionType.TRANSFER.id,
         )
       )
     }
   }
+
+  private fun <Key : Any, Value : Any> PagerDefault(pagingSourceFactory: () -> PagingSource<Key, Value>): Flow<PagingData<Value>> =
+    Pager(config = PagingConfig(pageSize = PAGE_SIZE), pagingSourceFactory = pagingSourceFactory).flow
 }

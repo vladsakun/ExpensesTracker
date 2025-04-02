@@ -47,6 +47,7 @@ data class TransactionEntity(
   val value: BigDecimal,
   val currencyCode: String,
   val note: String? = null,
+  val typeId: Int,
 
   val transferReceivedCurrencyCode: String? = null,
   val transferReceivedValue: BigDecimal? = null,

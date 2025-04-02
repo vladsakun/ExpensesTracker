@@ -39,8 +39,8 @@ fun ExpeScaffold(
 @Composable
 fun ExpeScaffoldWithTopBar(
   @StringRes titleResId: Int,
-  onNavigationClick: () -> Unit,
   modifier: Modifier = Modifier,
+  onNavigationClick: (() -> Unit)? = null,
   actions: ImmutableList<MenuAction>? = null,
   snackbarHost: @Composable () -> Unit = {},
   floatingActionButton: @Composable () -> Unit = {},
@@ -76,8 +76,8 @@ fun ExpeScaffoldWithTopBar(
 @Composable
 fun ExpeScaffoldWithTopBar(
   title: String,
-  onNavigationClick: () -> Unit,
   modifier: Modifier = Modifier,
+  onNavigationClick: (() -> Unit)? = null,
   actions: ImmutableList<MenuAction>? = null,
   snackbarHost: @Composable () -> Unit = {},
   floatingActionButton: @Composable () -> Unit = {},

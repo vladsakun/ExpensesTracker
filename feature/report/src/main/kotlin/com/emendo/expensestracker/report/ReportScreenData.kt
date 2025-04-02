@@ -8,9 +8,15 @@ import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.resourceValueOf
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+
+data class ReportScreenNavigation(
+  val openCategoryTransactions: StateEventWithContent<String> = consumed(),
+)
 
 @Immutable
 data class ReportScreenData(

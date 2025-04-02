@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.accounts.api.SelectAccountArgs
+import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
@@ -27,6 +28,10 @@ class AccountsListViewModel @Inject constructor(
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+  private val args: SelectAccountArgs? by lazy(LazyThreadSafetyMode.NONE) {
+    AccountsScreenRouteDestination.argsFrom(savedStateHandle).args
+  }
 
   private val selectedAccounts: MutableStateFlow<Set<AccountModel>> = MutableStateFlow(emptySet())
 
@@ -52,8 +57,6 @@ class AccountsListViewModel @Inject constructor(
 
   private val _editMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
   internal val editMode: StateFlow<Boolean> = _editMode
-
-  private val args by lazy(LazyThreadSafetyMode.NONE) { savedStateHandle.get<SelectAccountArgs>("args") }
 
   internal val isSelectMode: Boolean
     get() = args != null
