@@ -102,8 +102,12 @@ class CalculatorFormatterImpl @Inject constructor(
     }
 
     val precision = fromTrimmed.substringAfterLast(decimalSeparator, "").length
-    val value =
-      fromTrimmed.replace(groupingSeparator.toString(), "").replace(decimalSeparator.toString(), "").toBigInteger()
+    val value = fromTrimmed
+      .replace(groupingSeparator.toString(), "")
+      .replace(decimalSeparator.toString(), "")
+      .toBigIntegerOrNull()
+
+    value ?: return BigDecimal.ZERO
 
     return BigDecimal(value, precision)
   }

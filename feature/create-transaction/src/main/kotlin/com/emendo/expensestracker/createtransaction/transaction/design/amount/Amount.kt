@@ -2,8 +2,6 @@ package com.emendo.expensestracker.createtransaction.transaction.design.amount
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +11,6 @@ import com.emendo.expensestracker.core.designsystem.component.AutoSizableText
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.createtransaction.transaction.ERROR_ANIMATION_DURATION_MILLIS
 import com.emendo.expensestracker.createtransaction.transaction.design.amountColor
-import com.emendo.expensestracker.createtransaction.transaction.marginHorizontal
 
 @Composable
 internal fun Amount(
@@ -37,8 +34,6 @@ internal fun Amount(
     textAlign = TextAlign.End,
     maxLines = 1,
     modifier = modifier
-      .fillMaxWidth()
       .drawBehind { drawRect(backgroundColor.value) }
-      .padding(horizontal = marginHorizontal),
   )
 }

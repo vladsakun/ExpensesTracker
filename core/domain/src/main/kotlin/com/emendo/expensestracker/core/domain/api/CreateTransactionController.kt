@@ -20,7 +20,7 @@ interface CreateTransactionController {
   fun getTransactionPayload(): CreateTransactionEventPayload?
   fun setTransactionPayload(newPayload: CreateTransactionEventPayload)
 
-  fun clear(shouldClearTarget: Boolean)
+  fun clear()
 }
 
 fun CreateTransactionController.getTargetOrNonTransferDefault(transactionType: TransactionType): TransactionTarget? {

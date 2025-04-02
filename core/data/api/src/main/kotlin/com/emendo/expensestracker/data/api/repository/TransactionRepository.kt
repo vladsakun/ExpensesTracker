@@ -7,12 +7,13 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
 interface TransactionRepository {
 
-  val transactionsPagingFlow: Flow<PagingData<TransactionModel>>
+  fun getTransactionsPagingFlow(cacheScope: CoroutineScope): Flow<PagingData<TransactionModel>>
   fun getLastTransactionFull(): Flow<TransactionModel?>
 
   suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel?

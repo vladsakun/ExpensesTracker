@@ -47,11 +47,10 @@ class OfflineFirstTransactionRepository @Inject constructor(
         transaction?.let { transactionMapper.map(it) }
       }
 
-  override val transactionsPagingFlow: Flow<PagingData<TransactionModel>> by lazy {
+  override fun getTransactionsPagingFlow(cacheScope: CoroutineScope): Flow<PagingData<TransactionModel>> =
     PagerDefault { transactionDao.transactionsPagingSource() }
       .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
-      .cachedIn(scope)
-  }
+      .cachedIn(cacheScope)
 
   override suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel? =
     transactionDao.retrieveLastTransferTransaction(sourceAccountId)?.let { transactionMapper.map(it) }

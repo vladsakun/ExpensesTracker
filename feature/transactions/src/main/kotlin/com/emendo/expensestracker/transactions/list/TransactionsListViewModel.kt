@@ -16,6 +16,7 @@ import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.core.model.data.TransactionType.Companion.id
 import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
+import com.emendo.expensestracker.data.api.extensions.abs
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
@@ -140,7 +141,7 @@ class TransactionsListViewModel @Inject constructor(
   private fun Instant.month(zoneId: ZoneId) = toLocalDateTime(TimeZone.of(zoneId.id)).month
 
   private fun getTransactionsFlow(): Flow<PagingData<TransactionModel>> {
-    val arguments = args ?: return transactionRepository.transactionsPagingFlow
+    val arguments = args ?: return transactionRepository.getTransactionsPagingFlow(viewModelScope)
 
     return if (arguments.transactionType == null) {
       transactionRepository.getTransactionsPagedInPeriod(arguments.categoryId!!, arguments.from, arguments.to)
@@ -157,18 +158,18 @@ class TransactionsListViewModel @Inject constructor(
         transactionId = transactionModel.id,
         note = transactionModel.note,
         date = transactionModel.date,
-        transactionAmount = transactionModel.amount,
+        transactionAmount = transactionModel.amount.abs(amountFormatter),
         transactionType = transactionModel.type.id,
         transferReceivedAmount = transactionModel.transferReceivedAmount,
       ),
     )
 }
 
-private fun transactionUiState(
+private fun TransactionsListViewModel.transactionUiState(
   transactionRepository: TransactionRepository,
   pagingList: Flow<PagingData<TransactionsListViewModel.UiModel>>,
 ): Flow<TransactionScreenUiState> {
-  return transactionRepository.transactionsPagingFlow.asResult().map {
+  return transactionRepository.getTransactionsPagingFlow(viewModelScope).asResult().map {
     when (it) {
       is Result.Loading -> TransactionScreenUiState.Loading
       is Result.Error -> TransactionScreenUiState.Error("Error loading transactions")

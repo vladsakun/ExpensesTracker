@@ -21,6 +21,11 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import com.emendo.expensestracker.app.resources.R as AppR
 
+/**
+ * Controller responsible for managing the creation of transactions.
+ * This class handles the state and logic required to create, update, and clear transactions.
+ * It provides methods to set and get transaction sources and targets, as well as to manage transaction payloads.
+ */
 class CreateTransactionControllerImpl @Inject constructor(
   getLastUsedAccountUseCase: GetLastUsedAccountUseCase,
   @ApplicationScope private val scope: CoroutineScope,
@@ -31,10 +36,7 @@ class CreateTransactionControllerImpl @Inject constructor(
   private val transactionSourceMutableState: MutableStateFlow<TransactionSource?> by lazy { MutableStateFlow(null) }
   private val transactionSourceState: StateFlow<TransactionSource?> =
     merge(transactionSourceMutableState, getLastUsedAccountUseCase())
-      .stateInEagerly(
-        scope = scope,
-        initialValue = null,
-      )
+      .stateInEagerly(scope = scope, initialValue = null)
 
   private var payload: CreateTransactionEventPayload? = null
 
@@ -91,10 +93,8 @@ class CreateTransactionControllerImpl @Inject constructor(
     payload = newPayload
   }
 
-  override fun clear(shouldClearTarget: Boolean) {
-    if (shouldClearTarget) {
-      transactionTargetState.update { null }
-    }
+  override fun clear() {
+    transactionTargetState.update { null }
     payload = null
   }
 }

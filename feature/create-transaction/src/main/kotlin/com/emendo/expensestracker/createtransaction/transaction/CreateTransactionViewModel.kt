@@ -140,7 +140,7 @@ class CreateTransactionViewModel @Inject constructor(
   internal val bottomSheetState: StateFlow<CreateTransactionBottomSheetState> by lazy { _bottomSheetState }
 
   private var createTransactionJob: Job? = null
-  private var shouldClearTarget = true
+  private var shouldClear = true
   private var hasSelectedCustomCurrency = false
 
   init {
@@ -480,7 +480,7 @@ class CreateTransactionViewModel @Inject constructor(
   fun getDuplicateTransactionScreenRoute(): String {
     val payload = createTransactionController.getTransactionPayload()
       ?: throw IllegalStateException("Transaction payload must not be null")
-    shouldClearTarget = false
+    shouldClear = false
 
     return createTransactionScreenApi.getRoute(
       source = createTransactionController.getSourceSnapshot(),
@@ -616,7 +616,11 @@ class CreateTransactionViewModel @Inject constructor(
 
     return CreateTransactionUiState(
       amount = payload?.transactionAmount ?: transactionFacade.getDefaultAmount(source?.currency),
-      screenData = CreateTransactionScreenData(transactionType = transactionType),
+      screenData = CreateTransactionScreenData(
+        transactionType = transactionType,
+        deleteEnabled = payload != null,
+        duplicateEnabled = payload != null,
+      ),
       target = createTransactionController.getTargetOrNonTransferDefault(TransactionType.DEFAULT)
         ?.toTransactionItemModel(),
       source = source?.toTransactionItemModel(),
@@ -641,7 +645,9 @@ class CreateTransactionViewModel @Inject constructor(
 
   override fun onCleared() {
     super.onCleared()
-    createTransactionController.clear(shouldClearTarget)
+    if (shouldClear) {
+      createTransactionController.clear()
+    }
   }
 }
 

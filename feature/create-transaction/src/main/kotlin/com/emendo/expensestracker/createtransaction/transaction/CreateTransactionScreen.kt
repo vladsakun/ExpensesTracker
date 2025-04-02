@@ -24,6 +24,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.numkeyboard.TransactionCalculatorBottomSheet
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.createtransaction.destinations.CreateTransactionScreenDestination
 import com.emendo.expensestracker.createtransaction.destinations.SelectCategoryScreenDestination
 import com.emendo.expensestracker.createtransaction.transaction.data.*
 import com.emendo.expensestracker.createtransaction.transaction.design.CreateTransactionRow
@@ -56,6 +58,7 @@ import com.emendo.expensestracker.createtransaction.transaction.design.additiona
 import com.emendo.expensestracker.createtransaction.transaction.design.amount.Amount
 import com.emendo.expensestracker.createtransaction.transaction.design.amount.EditableAmount
 import com.emendo.expensestracker.createtransaction.transaction.design.amount.TransferAmount
+import com.emendo.expensestracker.createtransaction.transaction.design.amountColor
 import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferColumn
 import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferRow
 import com.ramcosta.composedestinations.annotation.Destination
@@ -102,7 +105,9 @@ fun CreateTransactionScreen(
       onDuplicateClick = remember {
         {
           navigator.navigate(viewModel.getDuplicateTransactionScreenRoute()) {
-            // Todo pop screen to align navigateUp behavior
+            popUpTo(CreateTransactionScreenDestination.route) {
+              inclusive = true
+            }
           }
         }
       },
@@ -171,21 +176,14 @@ private fun CreateTransactionContent(
             label = stringResource(id = R.string.account),
             onClick = onCreateAccountClick,
           ) {
-            CreateAccountButton(
-              onClick = onCreateAccountClick
-            )
+            CreateAccountButton(onClick = onCreateAccountClick)
           }
         }
       }
-      // Todo think about commandProcessor passing
-      NoteTextField(
-        text = state.note,
-        onNoteValueChange = { note -> commandProcessor(UpdateNoteTextCommand(note)) },
-        onFocused = { commandProcessor(HideCalculatorBottomSheetCommand()) },
-      )
+      NoteTextField(text = state.note, commandProcessor = commandProcessor)
       ExpeDivider()
       SaveButton { commandProcessor(SaveTransactionCommand()) }
-      AdditionalActions(commandProcessor, onDuplicateClick)
+      AdditionalActions(state.screenData, commandProcessor, onDuplicateClick)
     }
   }
 }
@@ -273,12 +271,31 @@ private inline fun IncomeExpenseBlock(
         focusManager.clearFocus(force = true)
       },
   ) {
-    Amount(
-      text = state.amount.formattedValue,
-      transactionType = state.screenData.transactionType,
-      error = state.screenData.amountError == triggered,
-      onErrorConsumed = remember { { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) } },
-    )
+    Row(
+      horizontalArrangement = Arrangement.End,
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(end = marginHorizontal),
+    ) {
+      val transactionType = state.screenData.transactionType
+      Text(
+        text = when (transactionType) {
+          TransactionType.INCOME -> "+"
+          TransactionType.EXPENSE -> "-"
+          else -> ""
+        },
+        color = transactionType.amountColor(),
+        style = MaterialTheme.typography.headlineMedium,
+        maxLines = 1,
+        textAlign = TextAlign.End,
+      )
+      Amount(
+        text = state.amount.formattedValue,
+        transactionType = transactionType,
+        error = state.screenData.amountError == triggered,
+        onErrorConsumed = remember { { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Amount)) } },
+      )
+    }
     EditableAmount(
       text = state.amountCalculatorHint,
       focused = state.sourceAmountFocused,
@@ -422,6 +439,7 @@ private fun transferTextColor(state: CreateTransactionUiState) =
 
 @Composable
 private fun AdditionalActions(
+  data: CreateTransactionScreenData,
   commandProcessor: (CreateTransactionCommand) -> Unit,
   onDuplicateClick: () -> Unit,
 ) {
@@ -434,11 +452,13 @@ private fun AdditionalActions(
         titleResId = R.string.delete,
         icon = ExpeIcons.Delete,
         onClick = { commandProcessor(ShowConfirmDeleteTransactionBottomSheetCommand()) },
+        enabled = data.deleteEnabled,
       )
       AdditionalAction(
         titleResId = R.string.duplicate,
         icon = ExpeIcons.FileCopy,
         onClick = onDuplicateClick,
+        enabled = data.duplicateEnabled,
       )
     }
   }
@@ -471,17 +491,16 @@ private fun SaveButton(
 @Composable
 private fun NoteTextField(
   text: String?,
-  onNoteValueChange: (String) -> Unit,
-  onFocused: () -> Unit,
+  commandProcessor: (CreateTransactionCommand) -> Unit,
 ) {
   ExpeTextField(
     text = text,
-    onValueChange = onNoteValueChange,
+    onValueChange = { commandProcessor(UpdateNoteTextCommand(it)) },
     modifier = Modifier
       .fillMaxWidth()
       .onFocusChanged { focusState ->
         if (focusState.isFocused) {
-          onFocused()
+          commandProcessor(HideCalculatorBottomSheetCommand())
         }
       },
     placeholder = stringResource(id = R.string.create_transaction_note_placeholder),
