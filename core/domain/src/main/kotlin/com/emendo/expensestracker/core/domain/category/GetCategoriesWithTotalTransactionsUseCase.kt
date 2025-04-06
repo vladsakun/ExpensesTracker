@@ -24,13 +24,13 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
   private val currencyConverter: CurrencyConverter,
   private val amountFormatter: AmountFormatter,
   private val userDataRepository: UserDataRepository,
-  private val getUserCreateCategoriesWithNotEmptyPrepopulatedUseCase: GetUserCreateCategoriesWithNotEmptyPrepopulatedUseCase,
+  private val getUserCreatedCategoriesWithTransactionsWithNotEmptyPrepopulatedUseCase: GetUserCreatedCategoriesWithTransactionsWithNotEmptyPrepopulatedUseCase,
 ) {
 
   operator fun invoke(): Flow<List<CategoryWithTotalTransactions>> {
     val combinedFlow: Flow<CategoryWithTotalTransactionsAndCurrencies> =
       combine(
-        getUserCreateCategoriesWithNotEmptyPrepopulatedUseCase(),
+        getUserCreatedCategoriesWithTransactionsWithNotEmptyPrepopulatedUseCase(),
         userDataRepository.generalCurrency,
         currencyRateRepository.getRates(),
       ) { transactions, currency, rates ->

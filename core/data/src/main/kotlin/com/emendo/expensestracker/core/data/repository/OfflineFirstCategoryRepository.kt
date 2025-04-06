@@ -10,9 +10,9 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.mapper.CategoryFullMapper
 import com.emendo.expensestracker.core.data.mapper.asExternalModel
 import com.emendo.expensestracker.core.database.dao.CategoryDao
-import com.emendo.expensestracker.core.database.model.CategoryDetailUpdate
-import com.emendo.expensestracker.core.database.model.CategoryEntity
-import com.emendo.expensestracker.core.database.model.CategoryOrdinalIndexUpdate
+import com.emendo.expensestracker.core.database.model.category.CategoryDetailUpdate
+import com.emendo.expensestracker.core.database.model.category.CategoryEntity
+import com.emendo.expensestracker.core.database.model.category.CategoryOrdinalIndexUpdate
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetOrdinalIndex
@@ -40,13 +40,13 @@ class OfflineFirstCategoryRepository @Inject constructor(
 
   private val categoriesState: StateFlow<List<CategoryModel>> =
     categoryDao
-      .getAll()
+      .getCategoriesFull()
       .map { categories -> categories.map(::asExternalModel) }
       .stateInEagerlyList(scope)
 
   private val categoriesWithTransactionState: StateFlow<List<CategoryWithTransactions>> by lazy(LazyThreadSafetyMode.NONE) {
     categoryDao
-      .getCategoriesFull()
+      .getCategoriesWithTransactionsFull()
       .map { categoryFulls -> categoryFulls.map { categoryFullMapper.map(it) } }
       .stateInLazilyList(scope)
   }
@@ -58,9 +58,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
   override fun getCategories(): Flow<List<CategoryModel>> = categoriesState
   override fun getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>> = categoriesWithTransactionState
   override fun getCategoriesSnapshot(): List<CategoryModel> = categoriesState.value
-  override fun getById(id: Long): Flow<CategoryModel> =
-    categoryDao.getById(id)
-      .map(::asExternalModel)
+  override fun getCategorySnapshotById(id: Long): CategoryModel? = categoriesState.value.firstOrNull { it.id == id }
 
   override suspend fun createCategory(
     name: String,
@@ -155,6 +153,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
         CategoryType.INCOME
       },
       ordinalIndex = DefaultTransactionTargetOrdinalIndex,
+      subcategories = emptyList(),
     )
 
   private fun createDefaultCategories() {

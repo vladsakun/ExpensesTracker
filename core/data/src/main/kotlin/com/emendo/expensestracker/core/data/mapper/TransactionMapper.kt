@@ -2,7 +2,7 @@ package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.core.data.formatPositive
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
-import com.emendo.expensestracker.core.database.model.TransactionFull
+import com.emendo.expensestracker.core.database.model.transaction.TransactionFull
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
@@ -25,7 +25,7 @@ class TransactionMapper @Inject constructor(
     val sourceAccount: AccountModel = accountMapper.map(sourceAccount)
 
     val targetAccount: AccountModel? = targetAccount?.let { accountMapper.map(it) }
-    val targetCategory: CategoryModel? = targetCategory?.let(::asExternalModel)
+    val targetCategory: CategoryModel? = getTargetCategory()
     val target = targetAccount ?: targetCategory ?: throw IllegalStateException("Transaction must have a target")
 
     val currencyModel = CurrencyModel.toCurrencyModel(transactionEntity.currencyCode)
@@ -46,6 +46,13 @@ class TransactionMapper @Inject constructor(
       date = transactionEntity.date,
       note = transactionEntity.note,
     )
+  }
+
+  private fun TransactionFull.getTargetCategory(): CategoryModel? {
+    val category = targetCategory ?: return null
+    val subcategory = targetSubcategory
+
+    return subcategory?.asExternalModel(category) ?: category.asExternalModel()
   }
 
   private fun TransactionFull.getTransferReceivedAmount(): Amount? {

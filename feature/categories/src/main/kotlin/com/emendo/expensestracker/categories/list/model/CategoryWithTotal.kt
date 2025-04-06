@@ -3,7 +3,6 @@ package com.emendo.expensestracker.categories.list.model
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
-import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.model.ui.ColorModel
@@ -45,22 +44,6 @@ data class CategoryWithTotal(
     }
   }
 }
-
-fun toCategoryModel(category: CategoryWithTotal.Category): CategoryModel =
-  CategoryModel(
-    id = category.id,
-    name = category.name,
-    icon = category.icon,
-    color = category.color,
-    ordinalIndex = category.ordinalIndex,
-    type = category.type,
-  )
-
-fun toCategoryWithTotal(category: CategoryWithTotalTransactions): CategoryWithTotal =
-  CategoryWithTotal(
-    totalAmount = category.totalAmount,
-    category = category.asCategory()
-  )
 
 private fun CategoryWithTotalTransactions.asCategory(): CategoryWithTotal.Category = with(categoryModel) {
   CategoryWithTotal.Category(

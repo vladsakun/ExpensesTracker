@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8c967543fe4ad2188a79c5e4a27a86fb",
+    "identityHash": "6c0e3ce65a1b7552dddf1d128fef5943",
     "entities": [
       {
         "tableName": "account",
@@ -111,8 +111,74 @@
         "foreignKeys": []
       },
       {
+        "tableName": "subcategory",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `categoryId` INTEGER NOT NULL, `name` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `ordinalIndex` INTEGER NOT NULL, FOREIGN KEY(`categoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "categoryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "iconId",
+            "columnName": "iconId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ordinalIndex",
+            "columnName": "ordinalIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_subcategory_categoryId",
+            "unique": false,
+            "columnNames": [
+              "categoryId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_subcategory_categoryId` ON `${TABLE_NAME}` (`categoryId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "category",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "categoryId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
         "tableName": "transaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `targetSubcategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetSubcategoryId`) REFERENCES `subcategory`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -141,6 +207,12 @@
           {
             "fieldPath": "targetCategoryId",
             "columnName": "targetCategoryId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "targetSubcategoryId",
+            "columnName": "targetSubcategoryId",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -214,6 +286,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transaction_targetCategoryId` ON `${TABLE_NAME}` (`targetCategoryId`)"
+          },
+          {
+            "name": "index_transaction_targetSubcategoryId",
+            "unique": false,
+            "columnNames": [
+              "targetSubcategoryId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transaction_targetSubcategoryId` ON `${TABLE_NAME}` (`targetSubcategoryId`)"
           }
         ],
         "foreignKeys": [
@@ -245,6 +326,17 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "targetCategoryId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "subcategory",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "targetSubcategoryId"
             ],
             "referencedColumns": [
               "id"
@@ -282,7 +374,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c967543fe4ad2188a79c5e4a27a86fb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6c0e3ce65a1b7552dddf1d128fef5943')"
     ]
   }
 }

@@ -5,10 +5,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.emendo.expensestracker.core.database.common.BaseDao
-import com.emendo.expensestracker.core.database.model.CategoryDetailUpdate
-import com.emendo.expensestracker.core.database.model.CategoryEntity
-import com.emendo.expensestracker.core.database.model.CategoryFull
-import com.emendo.expensestracker.core.database.model.CategoryOrdinalIndexUpdate
+import com.emendo.expensestracker.core.database.model.category.*
 import com.emendo.expensestracker.core.database.util.CATEGORY_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_CATEGORY
 import kotlinx.coroutines.flow.Flow
@@ -27,11 +24,15 @@ abstract class CategoryDao : BaseDao<CategoryEntity>() {
 
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME")
-  abstract fun getCategoriesFull(): Flow<List<CategoryFull>>
+  abstract fun getCategoriesWithTransactionsFull(): Flow<List<CategoryWithTransactionsFull>>
 
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME WHERE category.type = :categoryType")
-  abstract fun getCategoriesFullByType(categoryType: Int): Flow<List<CategoryFull>>
+  abstract fun getCategoriesFullByType(categoryType: Int): Flow<List<CategoryWithTransactionsFull>>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME")
+  abstract fun getCategoriesFull(): Flow<List<CategoryFull>>
 
   @Query("DELETE FROM $TABLE_NAME WHERE id = :id")
   abstract suspend fun deleteById(id: Long)

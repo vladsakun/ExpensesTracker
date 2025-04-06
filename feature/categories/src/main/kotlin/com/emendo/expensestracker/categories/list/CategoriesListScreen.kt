@@ -27,7 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
-import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_TRANSACTION
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.*
@@ -41,6 +40,7 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -73,9 +73,9 @@ fun CategoriesListRoute(
       isEditModeProvider = editModeState::value,
       onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
       onCategoryClick = remember {
-        { category: CategoryWithTotal ->
+        { category: CategoryModel ->
           if (viewModel.isEditMode) {
-            navigator.navigate(CategoryDetailRouteDestination(category.category.id))
+            navigator.navigate(CategoryDetailRouteDestination(category.id))
           } else {
             navigator.navigate(viewModel.getCreateTransactionScreenRoute(category))
           }
@@ -98,11 +98,11 @@ private fun CategoriesListScreenContent(
   stateProvider: () -> CategoriesListUiState,
   isEditModeProvider: () -> Boolean,
   onCreateCategoryClick: () -> Unit,
-  onCategoryClick: (CategoryWithTotal) -> Unit,
+  onCategoryClick: (CategoryModel) -> Unit,
   onPageSelected: (pageIndex: Int) -> Unit,
   onEditClick: () -> Unit,
-  onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
-  onMove: (List<CategoryWithTotal>) -> Unit,
+  onDeleteCategoryClick: (CategoryModel) -> Unit,
+  onMove: (List<CategoryModel>) -> Unit,
   enableEditMode: () -> Unit,
   disableEditMode: () -> Unit,
   openSettings: () -> Unit,
@@ -129,7 +129,7 @@ private fun CategoriesListScreenContent(
         icon = { Icon(ExpeIcons.Add, null) },
         text = { Text(text = stringResource(id = R.string.categories_list_add_category_action)) },
       )
-    }
+    },
   ) { paddingValues ->
     Box(
       modifier = Modifier
@@ -199,9 +199,9 @@ private fun getMenuActions(onEditClick: () -> Unit) = persistentListOf(
 private fun CategoriesGrid(
   categories: CategoriesList,
   editModeProvider: () -> Boolean,
-  onCategoryClick: (CategoryWithTotal) -> Unit,
-  onDeleteCategoryClick: (CategoryWithTotal) -> Unit,
-  onMove: (List<CategoryWithTotal>) -> Unit,
+  onCategoryClick: (CategoryModel) -> Unit,
+  onDeleteCategoryClick: (CategoryModel) -> Unit,
+  onMove: (List<CategoryModel>) -> Unit,
   onLongClick: () -> Unit,
   onClick: () -> Unit,
 ) {
@@ -213,7 +213,7 @@ private fun CategoriesGrid(
   }
   val mutableList =
     remember(categories) {
-      mutableStateListOf<CategoryWithTotal>().apply {
+      mutableStateListOf<CategoryModel>().apply {
         addAll(categories.dataList.toList())
       }
     }
@@ -245,15 +245,15 @@ private fun CategoriesGrid(
   ) {
     itemsIndexed(
       items = mutableList,
-      key = { _, item -> item.category.id },
+      key = { _, item -> item.id },
       contentType = { _, _ -> "category" },
     ) { index, category ->
       DraggableItem(dragDropState, index) { isDragging ->
         val elevation by animateDpAsState(if (isDragging) 24.dp else 0.dp, label = "drag_shadow")
         CategoryItem(
-          name = category.category.name.stringValue(),
-          color = category.category.color.color,
-          icon = category.category.icon.imageVector,
+          name = category.name.stringValue(),
+          color = category.color.color,
+          icon = category.icon.imageVector,
           onClick = { onCategoryClick(category) },
           onDeleteClick = { onDeleteCategoryClick(category) },
           editMode = editModeProvider,

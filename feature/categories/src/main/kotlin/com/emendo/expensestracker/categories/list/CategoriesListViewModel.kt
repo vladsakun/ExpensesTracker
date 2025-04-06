@@ -4,16 +4,13 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
-import com.emendo.expensestracker.categories.list.model.toCategoryModel
-import com.emendo.expensestracker.categories.list.model.toCategoryWithTotal
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
-import com.emendo.expensestracker.core.domain.category.GetCategoriesWithTotalTransactionsUseCase
+import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
@@ -21,11 +18,11 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.label
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toCategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toPageIndex
-import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
 import com.emendo.expensestracker.data.api.model.category.toCategoryWithOrdinalIndex
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf
@@ -43,9 +40,9 @@ private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_c
 
 @HiltViewModel
 class CategoriesListViewModel @Inject constructor(
-  getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
   private val appContext: Application,
   private val categoryRepository: CategoryRepository,
+  private val getCategoriesUseCase: GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
   private val settingsScreenApi: SettingsScreenApi,
@@ -53,11 +50,11 @@ class CategoriesListViewModel @Inject constructor(
 
   /**
    * Stores the latest version from db.
-   * Because of equals in [CategoriesList] and [CategoryWithTotal] [categoriesListUiState]
+   * Because of equals in [CategoriesList] and [CategoryModel] [categoriesListUiState]
    * won't be notified about ordinalIndex change
    */
   private val categoriesListState: StateFlow<CategoriesListState> =
-    categoriesUiState(getCategoriesWithTotalTransactionsUseCase)
+    categoriesUiState(getCategoriesUseCase)
       .stateInWhileSubscribed(
         scope = viewModelScope,
         initialValue = CategoriesListState.Empty,
@@ -65,7 +62,7 @@ class CategoriesListViewModel @Inject constructor(
 
   /**
    * Mapping [categoriesListState] to [CategoriesListUiState] to prevent recomposition
-   * @see equals in [CategoriesList] and [CategoryWithTotal]
+   * @see equals in [CategoriesList] and [CategoryModel]
    */
   val categoriesListUiState: StateFlow<CategoriesListUiState> =
     categoriesListState
@@ -84,12 +81,12 @@ class CategoriesListViewModel @Inject constructor(
     get() = selectedPageIndex.toCategoryType()
 
   private var selectedPageIndex = DEFAULT_PAGE_INDEX
-  private var categoriesOrderedList: List<CategoryWithTotal>? = null
+  private var categoriesOrderedList: List<CategoryModel>? = null
 
-  fun getCreateTransactionScreenRoute(category: CategoryWithTotal): String =
+  fun getCreateTransactionScreenRoute(category: CategoryModel): String =
     createTransactionScreenApi.getRoute(
       source = null,
-      target = toCategoryModel(category.category),
+      target = category,
       shouldNavigateUp = true
     )
 
@@ -116,12 +113,12 @@ class CategoriesListViewModel @Inject constructor(
     _editMode.update { false }
   }
 
-  fun showConfirmDeleteCategoryBottomSheet(category: CategoryWithTotal) {
+  fun showConfirmDeleteCategoryBottomSheet(category: CategoryModel) {
     showModalBottomSheet(
       GeneralBottomSheetData
         .Builder(
           id = CATEGORY_LIST_DELETE_CATEGORY_DIALOG,
-          positiveAction = DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.category.id) },
+          positiveAction = DangerAction(resourceValueOf(R.string.delete)) { deleteCategory(category.id) },
         )
         .title(resourceValueOf(R.string.dialog_category_list_delete_confirm_title))
         .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
@@ -129,7 +126,7 @@ class CategoriesListViewModel @Inject constructor(
     )
   }
 
-  fun onMove(newOrderedList: List<CategoryWithTotal>) {
+  fun onMove(newOrderedList: List<CategoryModel>) {
     categoriesOrderedList = newOrderedList
   }
 
@@ -141,22 +138,22 @@ class CategoriesListViewModel @Inject constructor(
     }
   }
 
-  private suspend fun handleDragEvents(eventsToHandle: List<CategoryWithTotal>?) = withContext(defaultDispatcher) {
+  private suspend fun handleDragEvents(eventsToHandle: List<CategoryModel>?) = withContext(defaultDispatcher) {
     if (eventsToHandle == null) {
       return@withContext
     }
 
-    val categories: List<CategoryWithTotalTransactions> =
+    val categories: List<CategoryModel> =
       categoriesListState.value.successValue?.categories?.get(selectedPageIndex) ?: return@withContext
     val diff: MutableSet<CategoryWithOrdinalIndex> = mutableSetOf()
 
     categories.forEachIndexed { index, model ->
       val newOrderedCategoryByIndex = eventsToHandle[index]
-      if (model.categoryModel.id != newOrderedCategoryByIndex.category.id) {
+      if (model.id != newOrderedCategoryByIndex.id) {
         diff.add(
           CategoryWithOrdinalIndex(
-            id = newOrderedCategoryByIndex.category.id,
-            ordinalIndex = model.categoryModel.ordinalIndex,
+            id = newOrderedCategoryByIndex.id,
+            ordinalIndex = model.ordinalIndex,
           )
         )
       }
@@ -177,9 +174,9 @@ class CategoriesListViewModel @Inject constructor(
   }
 
   private fun startReorderCategoriesWork() {
-    val categoriesValue: List<CategoryWithTotalTransactions> =
+    val categoriesValue: List<CategoryModel> =
       categoriesListState.value.successValue?.categories?.get(selectedPageIndex) ?: return
-    val eventsToHandle: List<Long> = categoriesOrderedList?.map { it.category.id } ?: return
+    val eventsToHandle: List<Long> = categoriesOrderedList?.map { it.id } ?: return
 
     val categories = categoriesValue.map(::toCategoryWithOrdinalIndex)
 
@@ -203,9 +200,9 @@ class CategoriesListViewModel @Inject constructor(
 
 // Todo move some parts to external Mapper
 private fun categoriesUiState(
-  getCategoriesWithTotalTransactionsUseCase: GetCategoriesWithTotalTransactionsUseCase,
+  getUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase: GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase,
 ): Flow<CategoriesListState> =
-  getCategoriesWithTotalTransactionsUseCase().asResult().map { categoriesResult ->
+  getUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase().asResult().map { categoriesResult ->
     when (categoriesResult) {
       is Result.Success -> {
         CategoriesListState.DisplayCategoriesList(
@@ -243,20 +240,19 @@ private fun toCategoriesListUiState(state: CategoriesListState) =
 
 private fun createCategoryPagePairState(
   categoryType: CategoryType,
-  categoriesList: List<CategoryWithTotalTransactions>,
-): Pair<Int, List<CategoryWithTotalTransactions>> =
+  categoriesList: List<CategoryModel>,
+): Pair<Int, List<CategoryModel>> =
   categoryType.toPageIndex() to categoriesList
-    .filter { it.categoryModel.type == categoryType }
-    .sortedBy { it.categoryModel.ordinalIndex }
+    .filter { it.type == categoryType }
+    .sortedBy { it.ordinalIndex }
 
 private fun createCategoryPagePair(
   categoryType: CategoryType,
-  categoriesList: List<CategoryWithTotalTransactions>,
+  categoriesList: List<CategoryModel>,
 ): Pair<Int, CategoriesList> =
   categoryType.toPageIndex() to CategoriesList(
     dataList = categoriesList
-      .filter { it.categoryModel.type == categoryType }
-      .map(::toCategoryWithTotal)
-      .sortedBy { it.category.ordinalIndex }
+      .filter { it.type == categoryType }
+      .sortedBy { it.ordinalIndex }
       .toImmutableList()
   )

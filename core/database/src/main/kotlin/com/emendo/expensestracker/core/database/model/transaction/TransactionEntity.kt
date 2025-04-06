@@ -1,12 +1,16 @@
-package com.emendo.expensestracker.core.database.model
+package com.emendo.expensestracker.core.database.model.transaction
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
+import com.emendo.expensestracker.core.database.model.account.AccountEntity
+import com.emendo.expensestracker.core.database.model.category.CategoryEntity
+import com.emendo.expensestracker.core.database.model.category.SubcategoryEntity
 import com.emendo.expensestracker.core.database.util.ACCOUNT_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.CATEGORY_PRIMARY_KEY
+import com.emendo.expensestracker.core.database.util.SUBCATEGORY_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_TRANSACTION
 import kotlinx.datetime.Instant
 import java.math.BigDecimal
@@ -32,6 +36,12 @@ import java.math.BigDecimal
       childColumns = ["targetCategoryId"],
       onDelete = CASCADE,
     ),
+    ForeignKey(
+      entity = SubcategoryEntity::class,
+      parentColumns = [SUBCATEGORY_PRIMARY_KEY],
+      childColumns = ["targetSubcategoryId"],
+      onDelete = CASCADE,
+    )
   ]
 )
 data class TransactionEntity(
@@ -44,6 +54,8 @@ data class TransactionEntity(
   val targetAccountId: Long? = null,
   @ColumnInfo(index = true)
   val targetCategoryId: Long? = null,
+  @ColumnInfo(index = true)
+  val targetSubcategoryId: Long? = null,
   val value: BigDecimal,
   val currencyCode: String,
   val note: String? = null,

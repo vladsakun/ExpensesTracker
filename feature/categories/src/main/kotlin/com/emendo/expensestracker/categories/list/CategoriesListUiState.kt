@@ -1,9 +1,8 @@
 package com.emendo.expensestracker.categories.list
 
 import androidx.compose.runtime.Stable
-import com.emendo.expensestracker.categories.list.model.CategoryWithTotal
 import com.emendo.expensestracker.categories.list.model.TabData
-import com.emendo.expensestracker.data.api.model.category.CategoryWithTotalTransactions
+import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
@@ -13,7 +12,7 @@ sealed interface CategoriesListState {
   data class Error(val message: String) : CategoriesListState
   data class DisplayCategoriesList(
     val tabs: ImmutableList<TabData>,
-    val categories: Map<Int, List<CategoryWithTotalTransactions>>,
+    val categories: Map<Int, List<CategoryModel>>,
   ) : CategoriesListState
 }
 
@@ -32,7 +31,7 @@ val CategoriesListState.successValue: CategoriesListState.DisplayCategoriesList?
 
 @Stable
 data class CategoriesList(
-  val dataList: ImmutableList<CategoryWithTotal>,
+  val dataList: ImmutableList<CategoryModel>,
 ) {
   override fun equals(other: Any?): Boolean {
     if (javaClass != other?.javaClass) return false

@@ -14,6 +14,7 @@ import com.emendo.expensestracker.model.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class CreateCategoryViewModel @Inject constructor(
 ) : CategoryViewModel<CategoryCreateScreenData>(UiState.Data(getDefault())), CategoryCreateCommandReceiver {
 
   private var createCategoryJob: Job? = null
-  private val categoryType: CategoryType = savedStateHandle[CreateCategoryRouteDestination.arguments[0].name]!!
+  private val categoryType: CategoryType = CreateCategoryRouteDestination.argsFrom(savedStateHandle).categoryType
 
   override fun consumeNavigateUpEvent() {
     _state.updateData {
@@ -63,5 +64,6 @@ private fun getDefault() =
       icon = IconModel.random,
       color = ColorModel.random,
       confirmButtonEnabled = false,
+      subcategories = persistentListOf(),
     )
   )

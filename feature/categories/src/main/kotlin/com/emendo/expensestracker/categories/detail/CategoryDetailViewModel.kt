@@ -7,8 +7,8 @@ import com.emendo.expensestracker.app.base.api.screens.SelectIconScreenApi
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryViewModel
+import com.emendo.expensestracker.categories.common.SubcategoryUiModel
 import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
-import com.emendo.expensestracker.core.domain.category.GetCategorySnapshotByIdUseCase
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
@@ -18,8 +18,8 @@ import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.model.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +31,6 @@ private const val KEY_CATEGORY_MODEL = "CategoryModel"
 class CategoryDetailViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
   private val categoryRepository: CategoryRepository,
-  private val getCategorySnapshotByIdUseCase: GetCategorySnapshotByIdUseCase,
   override val selectIconScreenApi: SelectIconScreenApi,
   override val selectColorScreenApi: SelectColorScreenApi,
 ) : CategoryViewModel<CategoryDetailScreenDataImpl>(),
@@ -49,7 +48,7 @@ class CategoryDetailViewModel @Inject constructor(
   init {
     if (state.value.dataValue() == null) {
       viewModelScope.launch {
-        val category: CategoryModel = getCategorySnapshotByIdUseCase(categoryId).first()
+        val category: CategoryModel = categoryRepository.getCategorySnapshotById(categoryId)!! // Todo handle error case
 
         categoryType = category.type
         // Todo handle error case
@@ -108,6 +107,15 @@ private fun getDefaultCategoryDetailScreenData(categoryModel: CategoryModel) =
         icon = icon,
         color = color,
         confirmButtonEnabled = false,
+        subcategories = subcategories
+          .map {
+            SubcategoryUiModel(
+              id = it.id,
+              name = it.name.textValueOrBlank(),
+              icon = it.icon,
+            )
+          }
+          .toPersistentList(),
       ),
     )
   }

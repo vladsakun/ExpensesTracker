@@ -84,6 +84,7 @@ class CreateTransactionControllerImpl @Inject constructor(
         CategoryType.INCOME
       },
       ordinalIndex = DefaultTransactionTargetOrdinalIndex,
+      subcategories = emptyList(),
     )
   }
 

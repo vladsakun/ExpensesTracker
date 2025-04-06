@@ -6,8 +6,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.emendo.expensestracker.core.database.common.BaseDao
-import com.emendo.expensestracker.core.database.model.TransactionEntity
-import com.emendo.expensestracker.core.database.model.TransactionFull
+import com.emendo.expensestracker.core.database.model.transaction.TransactionEntity
+import com.emendo.expensestracker.core.database.model.transaction.TransactionFull
 import com.emendo.expensestracker.core.database.util.TABLE_TRANSACTION
 import com.emendo.expensestracker.core.database.util.TRANSACTION_PRIMARY_KEY
 import com.emendo.expensestracker.core.model.data.TransactionType

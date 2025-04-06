@@ -18,6 +18,7 @@ import com.emendo.expensestracker.core.app.base.shared.currency.selectCurrencyRe
 import com.emendo.expensestracker.core.app.base.shared.icon.selectIconResultRecipient
 import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_ACCOUNT
 import com.emendo.expensestracker.createtransaction.destinations.CreateTransactionScreenDestination
+import com.emendo.expensestracker.createtransaction.selectcategory.selectCategoryResultRecipient
 import com.emendo.expensestracker.createtransaction.transaction.CreateTransactionScreen
 import com.emendo.expensestracker.ui.ExpeAppState
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -82,6 +83,7 @@ fun ExpeNavHost(
             CreateTransactionScreen(
                 navigator = destinationsNavigator,
                 accountResultRecipient = selectAccountResultRecipient(),
+                categoryResultRecipient = selectCategoryResultRecipient(),
             )
         }
     }

@@ -2,34 +2,71 @@ package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.resources.models.IconModel
-import com.emendo.expensestracker.core.database.model.CategoryEntity
+import com.emendo.expensestracker.core.database.model.category.CategoryEntity
+import com.emendo.expensestracker.core.database.model.category.CategoryFull
+import com.emendo.expensestracker.core.database.model.category.SubcategoryEntity
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetExpenseId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetIncomeId
 import com.emendo.expensestracker.data.api.DefaultTransactionTargetName
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
+import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import com.emendo.expensestracker.model.ui.textValueOf
 
-private fun CategoryEntity.asExternalModel(value: TextValue = textValueOf(this.name)): CategoryModel =
-  CategoryModel(
+internal fun asExternalModel(category: CategoryFull): CategoryModel {
+  return category.asExternalModel(category.nameOrDefault())
+}
+
+internal fun CategoryEntity.asExternalModel(): CategoryModel {
+  return asExternalModel(nameOrDefault())
+}
+
+internal fun SubcategoryEntity.asExternalModel(category: CategoryEntity): CategoryModel {
+  val categoryModel = category.asExternalModel()
+
+  val target = CategoryModel(
     id = id,
-    name = value,
     icon = IconModel.getById(iconId),
-    color = com.emendo.expensestracker.model.ui.ColorModel.getById(colorId),
-    type = CategoryType.getById(type),
+    name = textValueOf(name),
+    color = categoryModel.color,
     ordinalIndex = ordinalIndex,
+    subcategories = emptyList(),
+    type = CategoryType.getById(category.type),
   )
 
-internal fun asExternalModel(category: CategoryEntity): CategoryModel {
-  if (category.id == DefaultTransactionTargetIncomeId || category.id == DefaultTransactionTargetExpenseId) {
-    return if (category.name == DefaultTransactionTargetName) {
-      category.asExternalModel(resourceValueOf(R.string.uncategorized))
-    } else {
-      category.asExternalModel()
-    }
+  return target
+}
+
+private fun CategoryFull.asExternalModel(name: TextValue): CategoryModel =
+  CategoryModel(
+    id = categoryEntity.id,
+    name = name,
+    icon = IconModel.getById(categoryEntity.iconId),
+    color = ColorModel.getById(categoryEntity.colorId),
+    type = CategoryType.getById(categoryEntity.type),
+    ordinalIndex = categoryEntity.ordinalIndex,
+    subcategories = subCategories.map { it.asExternalModel(categoryEntity) },
+  )
+
+private fun CategoryEntity.asExternalModel(name: TextValue): CategoryModel =
+  CategoryModel(
+    id = id,
+    name = name,
+    icon = IconModel.getById(iconId),
+    color = ColorModel.getById(colorId),
+    type = CategoryType.getById(type),
+    ordinalIndex = ordinalIndex,
+    subcategories = emptyList(),
+  )
+
+private fun CategoryFull.nameOrDefault(): TextValue = categoryEntity.nameOrDefault()
+
+private fun CategoryEntity.nameOrDefault(): TextValue {
+  if ((id == DefaultTransactionTargetIncomeId || id == DefaultTransactionTargetExpenseId) && name == DefaultTransactionTargetName) {
+    return resourceValueOf(R.string.uncategorized)
   }
 
-  return category.asExternalModel()
+  return textValueOf(name)
 }

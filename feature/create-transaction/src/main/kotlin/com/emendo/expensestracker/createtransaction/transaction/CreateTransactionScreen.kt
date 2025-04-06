@@ -82,6 +82,7 @@ private const val CHEVRON_WIDTH = 12
 fun CreateTransactionScreen(
   navigator: DestinationsNavigator,
   accountResultRecipient: OpenResultRecipient<SelectAccountResult>,
+  categoryResultRecipient: OpenResultRecipient<Long>,
   viewModel: CreateTransactionViewModel = hiltViewModel(),
 ) {
   accountResultRecipient.handleValueResult(viewModel::updateSelectedAccount)

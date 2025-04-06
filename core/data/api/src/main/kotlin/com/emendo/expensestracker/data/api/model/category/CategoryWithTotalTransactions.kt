@@ -9,8 +9,8 @@ data class CategoryWithTotalTransactions(
   //  val transactions: List<CategoryTransactionModel>,
 )
 
-fun toCategoryWithOrdinalIndex(category: CategoryWithTotalTransactions) =
+fun toCategoryWithOrdinalIndex(category: CategoryModel) =
   CategoryWithOrdinalIndex(
-    id = category.categoryModel.id,
-    ordinalIndex = category.categoryModel.ordinalIndex,
+    id = category.id,
+    ordinalIndex = category.ordinalIndex,
   )

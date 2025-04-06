@@ -10,7 +10,7 @@ interface CategoryRepository {
   fun getCategories(): Flow<List<CategoryModel>>
   fun getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>>
   fun getCategoriesSnapshot(): List<CategoryModel>
-  fun getById(id: Long): Flow<CategoryModel>
+  fun getCategorySnapshotById(id: Long): CategoryModel?
 
   suspend fun createCategory(
     name: String,

@@ -43,7 +43,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
-import com.ramcosta.composedestinations.scope.AnimatedDestinationScope
+import com.ramcosta.composedestinations.scope.DestinationScope
 import com.ramcosta.composedestinations.scope.resultRecipient
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -292,5 +292,5 @@ private fun getEditModeActions() = null
 //)
 
 @Composable
-fun AnimatedDestinationScope<*>.selectAccountResultRecipient() =
+fun DestinationScope<*>.selectAccountResultRecipient() =
   resultRecipient<AccountsScreenRouteDestination, SelectAccountResult>()

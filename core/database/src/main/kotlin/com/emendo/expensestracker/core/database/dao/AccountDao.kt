@@ -4,9 +4,9 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
 import com.emendo.expensestracker.core.database.common.BaseDao
-import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
-import com.emendo.expensestracker.core.database.model.AccountEntity
-import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
+import com.emendo.expensestracker.core.database.model.account.AccountDetailUpdate
+import com.emendo.expensestracker.core.database.model.account.AccountEntity
+import com.emendo.expensestracker.core.database.model.account.AccountOrdinalIndexUpdate
 import com.emendo.expensestracker.core.database.util.ACCOUNT_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_ACCOUNT
 import kotlinx.coroutines.flow.Flow

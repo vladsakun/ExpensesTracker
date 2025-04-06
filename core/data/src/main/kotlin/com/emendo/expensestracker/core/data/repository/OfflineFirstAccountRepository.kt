@@ -6,9 +6,9 @@ import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.data.mapper.AccountMapper
 import com.emendo.expensestracker.core.database.dao.AccountDao
-import com.emendo.expensestracker.core.database.model.AccountDetailUpdate
-import com.emendo.expensestracker.core.database.model.AccountEntity
-import com.emendo.expensestracker.core.database.model.AccountOrdinalIndexUpdate
+import com.emendo.expensestracker.core.database.model.account.AccountDetailUpdate
+import com.emendo.expensestracker.core.database.model.account.AccountEntity
+import com.emendo.expensestracker.core.database.model.account.AccountOrdinalIndexUpdate
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel

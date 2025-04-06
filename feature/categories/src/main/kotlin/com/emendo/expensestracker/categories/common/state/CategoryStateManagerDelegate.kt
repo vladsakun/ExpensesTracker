@@ -19,31 +19,31 @@ class CategoryStateManagerDelegate<T>(defaultState: UiState<T>? = null) :
   override val state: StateFlow<UiState<T>> = _state.asStateFlow()
 
   override fun updateTitle(title: String) {
-    _state.updateScreenDataData {
+    _state.updateScreenData {
       it.copy(title = textValueOf(title))
     }
   }
 
   override fun updateConfirmButtonEnabled(enabled: Boolean) {
-    _state.updateScreenDataData {
+    _state.updateScreenData {
       it.copy(confirmButtonEnabled = enabled)
     }
   }
 
   override fun updateColor(colorId: Int) {
-    _state.updateScreenDataData {
+    _state.updateScreenData {
       it.copy(color = ColorModel.getById(colorId))
     }
   }
 
   override fun updateIcon(iconId: Int) {
-    _state.updateScreenDataData {
+    _state.updateScreenData {
       it.copy(icon = IconModel.getById(iconId))
     }
   }
 }
 
-fun <T> MutableStateFlow<UiState<T>>.updateScreenDataData(updateFunction: (CategoryScreenData) -> CategoryScreenData) where T : CategoryScreenState {
+fun <T> MutableStateFlow<UiState<T>>.updateScreenData(updateFunction: (CategoryScreenData) -> CategoryScreenData) where T : CategoryScreenState {
   update {
     val data = it.dataValue()?.categoryScreenData ?: return@update it
     val updatedScreenData = updateFunction(data)

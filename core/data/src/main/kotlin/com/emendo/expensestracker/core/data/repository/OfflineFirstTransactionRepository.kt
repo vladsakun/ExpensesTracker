@@ -6,7 +6,7 @@ import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.data.mapper.transactionType
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
-import com.emendo.expensestracker.core.database.model.TransactionEntity
+import com.emendo.expensestracker.core.database.model.transaction.TransactionEntity
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
@@ -97,19 +97,34 @@ class OfflineFirstTransactionRepository @Inject constructor(
   override suspend fun createTransaction(
     source: TransactionSource,
     target: TransactionTarget,
+    subcategoryId: Long?,
     amount: Amount,
     transferReceivedAmount: Amount?,
     note: String?,
   ) {
     when (getTransactionTypeUseCase(source, target)) {
-      TransactionType.INCOME -> createIncomeTransaction(source.asAccount(), target.asCategory(), amount, note)
-      TransactionType.EXPENSE -> createExpenseTransaction(source.asAccount(), target.asCategory(), amount, note)
+      TransactionType.INCOME -> createIncomeTransaction(
+        source = source.asAccount(),
+        target = target.asCategory(),
+        subcategoryId = subcategoryId,
+        amount = amount,
+        note = note
+      )
+
+      TransactionType.EXPENSE -> createExpenseTransaction(
+        source = source.asAccount(),
+        target = target.asCategory(),
+        subcategoryId = subcategoryId,
+        amount = amount,
+        note = note
+      )
+
       TransactionType.TRANSFER -> createTransferTransaction(
         source = source.asAccount(),
         target = target.asAccount(),
         amount = amount,
         note = note,
-        transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount should not be null in Transfer transaction" },
+        transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount shouldn't be null in Transfer transaction" },
       )
     }
   }
@@ -117,6 +132,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private suspend fun createExpenseTransaction(
     source: AccountModel,
     target: CategoryModel,
+    subcategoryId: Long?,
     amount: Amount,
     note: String?,
     date: Instant = Clock.System.now(),
@@ -128,6 +144,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
         TransactionEntity(
           sourceAccountId = source.id,
           targetCategoryId = target.id,
+          targetSubcategoryId = subcategoryId,
           value = amount.value.abs().negate(),
           currencyCode = amount.currency.currencyCode,
           date = date,
@@ -141,6 +158,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private suspend fun createIncomeTransaction(
     source: AccountModel,
     target: CategoryModel,
+    subcategoryId: Long?,
     amount: Amount,
     note: String?,
     date: Instant = Clock.System.now(),
@@ -152,6 +170,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
         TransactionEntity(
           sourceAccountId = source.id,
           targetCategoryId = target.id,
+          targetSubcategoryId = subcategoryId,
           value = amount.value.abs(),
           currencyCode = amount.currency.currencyCode,
           date = date,

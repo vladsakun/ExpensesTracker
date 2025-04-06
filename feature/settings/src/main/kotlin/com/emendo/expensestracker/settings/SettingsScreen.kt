@@ -32,13 +32,16 @@ internal fun SettingsRoute(
 ) {
   val uiState = viewModel.state.collectAsStateWithLifecycle()
 
-  ExpeScaffoldWithTopBar(titleResId = R.string.settings) {
+  ExpeScaffoldWithTopBar(
+    titleResId = R.string.settings,
+    onNavigationClick = navigator::navigateUp,
+  ) { paddingValues ->
     SettingsScreen(
       uiStateProvider = uiState::value,
       onItemClick = viewModel::onItemClick,
       modifier = Modifier
         .fillMaxSize()
-        .padding(it),
+        .padding(paddingValues),
     )
   }
 }
@@ -51,7 +54,7 @@ private fun SettingsScreen(
 ) {
   LazyColumn(
     contentPadding = PaddingValues(vertical = Dimens.margin_large_x),
-    modifier = modifier.fillMaxSize(),
+    modifier = modifier,
   ) {
     items(
       items = uiStateProvider().settingsItems,

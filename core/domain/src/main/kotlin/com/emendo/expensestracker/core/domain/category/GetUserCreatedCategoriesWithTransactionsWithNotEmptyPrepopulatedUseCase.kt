@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 // Todo rename
-class GetUserCreateCategoriesWithNotEmptyPrepopulatedUseCase @Inject constructor(
+class GetUserCreatedCategoriesWithTransactionsWithNotEmptyPrepopulatedUseCase @Inject constructor(
   private val categoryRepository: CategoryRepository,
   private val isPrepopulatedCategoryUseCase: IsPrepopulatedCategoryUseCase,
 ) {

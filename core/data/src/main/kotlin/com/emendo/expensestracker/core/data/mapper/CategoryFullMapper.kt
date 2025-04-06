@@ -1,16 +1,16 @@
 package com.emendo.expensestracker.core.data.mapper
 
 import com.emendo.expensestracker.core.data.mapper.base.Mapper
-import com.emendo.expensestracker.core.database.model.CategoryFull
-import com.emendo.expensestracker.core.database.model.TransactionEntity
+import com.emendo.expensestracker.core.database.model.category.CategoryWithTransactionsFull
+import com.emendo.expensestracker.core.database.model.transaction.TransactionEntity
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.category.CategoryTransactionModel
 import com.emendo.expensestracker.data.api.model.category.CategoryWithTransactions
 import javax.inject.Inject
 
-class CategoryFullMapper @Inject constructor() : Mapper<CategoryFull, CategoryWithTransactions> {
+class CategoryFullMapper @Inject constructor() : Mapper<CategoryWithTransactionsFull, CategoryWithTransactions> {
 
-  override suspend fun map(from: CategoryFull): CategoryWithTransactions = with(from) {
+  override suspend fun map(from: CategoryWithTransactionsFull): CategoryWithTransactions = with(from) {
     CategoryWithTransactions(
       categoryModel = asExternalModel(category),
       transactions = transactions.map { toCategoryTransactionModel(it) },

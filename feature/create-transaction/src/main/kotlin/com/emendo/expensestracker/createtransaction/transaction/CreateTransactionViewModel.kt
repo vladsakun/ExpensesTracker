@@ -377,6 +377,7 @@ class CreateTransactionViewModel @Inject constructor(
         amount = uiState.value.amount,
         transferReceivedAmount = uiState.value.transferReceivedAmount,
         note = uiState.value.note,
+        subcategoryId = null // TODO REMOVE hardcode,
       )
 
       numericKeyboardCommander.clear()

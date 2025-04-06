@@ -1,4 +1,4 @@
-package com.emendo.expensestracker.core.database.model
+package com.emendo.expensestracker.core.database.model.category
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
