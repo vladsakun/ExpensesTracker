@@ -44,6 +44,7 @@ import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.repository.AccountRepository
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,6 +52,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -79,6 +81,7 @@ class CreateTransactionViewModel @Inject constructor(
   private val transactionFacade: TransactionFacade,
   private val getCalculatorBottomSheetDataUseCase: GetCalculatorBottomSheetDataUseCase,
   private val getTransactionTypeUseCase: GetTransactionTypeUseCase,
+  private val categoriesRepository: CategoryRepository,
 ) : ViewModel(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
     CalculatorKeyboardActions,
@@ -377,7 +380,7 @@ class CreateTransactionViewModel @Inject constructor(
         amount = uiState.value.amount,
         transferReceivedAmount = uiState.value.transferReceivedAmount,
         note = uiState.value.note,
-        subcategoryId = null // TODO REMOVE hardcode,
+        subcategoryId = uiState.value.selectedSubcategoryId,
       )
 
       numericKeyboardCommander.clear()
@@ -425,6 +428,13 @@ class CreateTransactionViewModel @Inject constructor(
 
     if (target?.id == createTransactionController.getSourceSnapshot()?.id) {
       createTransactionController.setSource(null)
+    }
+  }
+
+  override fun selectSubcategory(subcategory: SubcategoryUiModel) {
+    _uiState.update {
+      val id = subcategory.id
+      it.copy(selectedSubcategoryId = if (it.selectedSubcategoryId == id) null else id)
     }
   }
 
@@ -560,6 +570,15 @@ class CreateTransactionViewModel @Inject constructor(
       // If it is a transfer transaction, target should be account without default value
       target = target.orDefault(screenData.transactionType),
       source = source?.toTransactionItemModel(),
+      subcategories = target?.id?.let {
+        categoriesRepository.getCategorySnapshotById(it)?.subcategories?.map { subcategory ->
+          SubcategoryUiModel(
+            id = subcategory.id,
+            name = subcategory.name,
+            icon = subcategory.icon,
+          )
+        }?.toImmutableList()
+      },
       accounts = accounts,
     )
   }

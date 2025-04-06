@@ -162,6 +162,16 @@ private fun CreateTransactionContent(
       if (state.screenData.transactionType != TransactionType.TRANSFER) {
         CategorySelection(state.target, onCategoryClick)
 
+        // TODO fix recomposition
+        val subcategories = state.subcategories
+        if (subcategories != null && subcategories.isNotEmpty()) {
+          SubcategorySection(
+            subcategories = { subcategories },
+            selectedSubcategoryIdProvider = { state.selectedSubcategoryId },
+            onClick = { commandProcessor(SelectSubcategoryCommand(it)) },
+          )
+        }
+
         // Todo fix Account recomposition on state change
         if (state.accounts.isNotEmpty()) {
           TransactionElementRow(
@@ -215,6 +225,33 @@ private fun AccountsSection(
 }
 
 @Composable
+private inline fun SubcategorySection(
+  crossinline subcategories: () -> ImmutableList<SubcategoryUiModel>,
+  crossinline selectedSubcategoryIdProvider: () -> Long?,
+  crossinline onClick: (SubcategoryUiModel) -> Unit,
+) {
+  LazyHorizontalStaggeredGrid(
+    rows = StaggeredGridCells.Fixed(2),
+    horizontalItemSpacing = Dimens.margin_small_x,
+    verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+    contentPadding = PaddingValues(horizontal = marginHorizontal, vertical = marginVertical),
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(128.dp),
+  ) {
+    items(subcategories()) { subcategory ->
+      SubcategoryChip(
+        subcategory = subcategory,
+        selected = subcategory.id == selectedSubcategoryIdProvider(),
+        onClick = { onClick(subcategory) },
+      )
+    }
+  }
+
+  ExpeDivider()
+}
+
+@Composable
 private fun AccountChip(accountUiModel: AccountUiModel, onClick: () -> Unit) {
   FilterChip(
     modifier = Modifier.heightIn(min = Dimens.icon_button_size),
@@ -224,6 +261,27 @@ private fun AccountChip(accountUiModel: AccountUiModel, onClick: () -> Unit) {
     leadingIcon = {
       Icon(
         imageVector = accountUiModel.icon.imageVector,
+        contentDescription = null,
+        modifier = Modifier.size(FilterChipDefaults.IconSize),
+      )
+    }
+  )
+}
+
+@Composable
+private fun SubcategoryChip(
+  subcategory: SubcategoryUiModel,
+  selected: Boolean,
+  onClick: () -> Unit,
+) {
+  FilterChip(
+    modifier = Modifier.heightIn(min = Dimens.icon_button_size),
+    onClick = onClick,
+    label = { Text(subcategory.name.stringValue()) },
+    selected = selected,
+    leadingIcon = {
+      Icon(
+        imageVector = subcategory.icon.imageVector,
         contentDescription = null,
         modifier = Modifier.size(FilterChipDefaults.IconSize),
       )

@@ -3,6 +3,7 @@ package com.emendo.expensestracker.createtransaction.transaction.data
 import androidx.compose.runtime.Immutable
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.createtransaction.transaction.AccountUiModel
+import com.emendo.expensestracker.createtransaction.transaction.SubcategoryUiModel
 
 interface CreateTransactionCommander {
   fun showCalculatorBottomSheet(sourceTrigger: Boolean)
@@ -16,6 +17,7 @@ interface CreateTransactionCommander {
   fun hideCalculatorBottomSheet()
   fun selectSourceAccount(account: AccountUiModel)
   fun selectTargetAccount(account: AccountUiModel)
+  fun selectSubcategory(subcategory: SubcategoryUiModel)
 
   fun proceedCommand(command: CreateTransactionCommand) {
     command.execute(this)
@@ -78,5 +80,11 @@ class ShowConfirmDeleteTransactionBottomSheetCommand : CreateTransactionCommand 
 class HideCalculatorBottomSheetCommand : CreateTransactionCommand {
   override fun execute(commander: CreateTransactionCommander) {
     commander.hideCalculatorBottomSheet()
+  }
+}
+
+class SelectSubcategoryCommand(private val subcategory: SubcategoryUiModel) : CreateTransactionCommand {
+  override fun execute(commander: CreateTransactionCommander) {
+    commander.selectSubcategory(subcategory)
   }
 }

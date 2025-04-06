@@ -21,6 +21,8 @@ data class CreateTransactionUiState(
   val target: TransactionItemModel?,
   val source: TransactionItemModel?,
   val accounts: ImmutableList<AccountUiModel>,
+  val subcategories: ImmutableList<SubcategoryUiModel>? = null,
+  val selectedSubcategoryId: Long? = null,
   val note: String? = null,
   val transferReceivedAmount: Amount? = null,
   val isCustomTransferAmount: Boolean = false,
@@ -35,6 +37,12 @@ data class AccountUiModel(
   val name: TextValue,
   val icon: IconModel,
   val selected: Boolean,
+)
+
+data class SubcategoryUiModel(
+  val id: Long,
+  val name: TextValue,
+  val icon: IconModel,
 )
 
 @Immutable
