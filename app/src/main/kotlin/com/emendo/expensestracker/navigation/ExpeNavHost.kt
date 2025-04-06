@@ -12,7 +12,10 @@ import com.emendo.expensestracker.accounts.list.selectAccountResultRecipient
 import com.emendo.expensestracker.categories.create.CreateCategoryRoute
 import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
+import com.emendo.expensestracker.categories.destinations.CreateSubcategoryRouteDestination
 import com.emendo.expensestracker.categories.detail.CategoryDetailRoute
+import com.emendo.expensestracker.categories.subcategory.CreateSubcategoryRoute
+import com.emendo.expensestracker.categories.subcategory.subcategoryResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.color.selectColorResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.currency.selectCurrencyResultRecipient
 import com.emendo.expensestracker.core.app.base.shared.icon.selectIconResultRecipient
@@ -24,6 +27,7 @@ import com.emendo.expensestracker.ui.ExpeAppState
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import com.ramcosta.composedestinations.navigation.navigate
+import com.ramcosta.composedestinations.scope.resultBackNavigator
 import kotlinx.coroutines.delay
 
 @Composable
@@ -69,6 +73,7 @@ fun ExpeNavHost(
                 categoryType = navArgs.categoryType,
                 colorResultRecipient = selectColorResultRecipient(),
                 iconResultRecipient = selectIconResultRecipient(),
+                subcategoryResultRecipient = subcategoryResultRecipient(),
             )
         }
         composable(CategoryDetailRouteDestination) {
@@ -77,6 +82,7 @@ fun ExpeNavHost(
                 categoryId = navArgs.categoryId,
                 colorResultRecipient = selectColorResultRecipient(),
                 iconResultRecipient = selectIconResultRecipient(),
+                subcategoryResultRecipient = subcategoryResultRecipient(),
             )
         }
         composable(CreateTransactionScreenDestination) {
@@ -84,6 +90,14 @@ fun ExpeNavHost(
                 navigator = destinationsNavigator,
                 accountResultRecipient = selectAccountResultRecipient(),
                 categoryResultRecipient = selectCategoryResultRecipient(),
+            )
+        }
+        composable(CreateSubcategoryRouteDestination) {
+            CreateSubcategoryRoute(
+                navigator = destinationsNavigator,
+                iconResultRecipient = selectIconResultRecipient(),
+                colorId = navArgs.colorId,
+                resultNavigator = resultBackNavigator(),
             )
         }
     }

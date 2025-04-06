@@ -1,7 +1,7 @@
 plugins {
-    alias(libs.plugins.expensestracker.android.feature)
-    alias(libs.plugins.expensestracker.android.library.compose)
-    //    alias(libs.plugins.vkompose)
+  alias(libs.plugins.expensestracker.android.feature)
+  alias(libs.plugins.expensestracker.android.library.compose)
+  //    alias(libs.plugins.vkompose)
 }
 
 // vkompose {
@@ -34,10 +34,10 @@ plugins {
 // }
 
 dependencies {
-    api(projects.feature.categories.api)
-    implementation(projects.sync.work)
-    implementation(projects.feature.createTransaction.api)
+  api(projects.feature.categories.api)
+  implementation(projects.sync.work)
+  implementation(projects.feature.createTransaction.api)
   implementation(projects.feature.settings.api)
 
-    implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.activity.compose)
 }

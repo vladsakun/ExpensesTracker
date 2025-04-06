@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.accounts.create
 
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -81,11 +80,11 @@ private fun CreateAccountContent(
         onConfirmClick = onCreateAccountClick,
         shouldFocusTitleInputOnLaunch = true,
       ) {
-        Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
         ExpeButton(
           textResId = R.string.create,
           onClick = onCreateAccountClick,
           enabled = state.data.confirmEnabled,
+          modifier = Modifier.padding(Dimens.margin_large_x),
         )
       }
     }

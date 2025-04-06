@@ -20,7 +20,7 @@ data class CategoryScreenData(
 )
 
 data class SubcategoryUiModel(
-  val id: Long,
+  val id: Long?,
   val icon: IconModel,
   val name: String,
 )

@@ -3,10 +3,7 @@ package com.emendo.expensestracker.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.emendo.expensestracker.core.database.dao.AccountDao
-import com.emendo.expensestracker.core.database.dao.CategoryDao
-import com.emendo.expensestracker.core.database.dao.CurrencyRateDao
-import com.emendo.expensestracker.core.database.dao.TransactionDao
+import com.emendo.expensestracker.core.database.dao.*
 import com.emendo.expensestracker.core.database.model.CurrencyRateEntity
 import com.emendo.expensestracker.core.database.model.account.AccountEntity
 import com.emendo.expensestracker.core.database.model.category.CategoryEntity
@@ -31,4 +28,5 @@ abstract class ExpDatabase : RoomDatabase() {
   abstract fun categoryDao(): CategoryDao
   abstract fun transactionDao(): TransactionDao
   abstract fun currencyRateDao(): CurrencyRateDao
+  abstract fun subcategoryDao(): SubcategoryDao
 }

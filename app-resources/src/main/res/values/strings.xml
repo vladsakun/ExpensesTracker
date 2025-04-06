@@ -81,6 +81,8 @@
 
   <string name="categories_list_add_category_action">Add category</string>
 
+  <string name="category_content_subcategories">Subcategories</string>
+  <string name="category_content_add_subcategory_action">Add subcategory</string>
   <string name="create_subcategory_title">Subcategory</string>
 
   <string name="dialog_account_detail_delete_confirm_title">Are you sure that you want to delete the account?</string>

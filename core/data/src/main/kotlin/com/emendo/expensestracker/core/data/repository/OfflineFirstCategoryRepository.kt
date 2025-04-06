@@ -65,8 +65,8 @@ class OfflineFirstCategoryRepository @Inject constructor(
     icon: IconModel,
     color: com.emendo.expensestracker.model.ui.ColorModel,
     type: CategoryType,
-  ) {
-    withContext(ioDispatcher) {
+  ): Long {
+    return withContext(ioDispatcher) {
       val categoriesByType = getCategoriesByType(type)
       val ordinalIndex = getMaxOrdinalIndex(categoriesByType)
       categoryDao.save(
@@ -133,8 +133,7 @@ class OfflineFirstCategoryRepository @Inject constructor(
     }
   }
 
-  private fun getCategoriesByType(type: CategoryType) =
-    categoriesState.value.filter { it.type == type }
+  private fun getCategoriesByType(type: CategoryType) = categoriesState.value.filter { it.type == type }
 
   // Todo remove
   private fun getDefaultTarget(transactionType: CategoryType): TransactionTarget =

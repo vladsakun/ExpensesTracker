@@ -10,7 +10,7 @@ abstract class BaseDao<T> {
   abstract suspend fun deleteAll()
 
   @Upsert
-  abstract suspend fun save(model: T)
+  abstract suspend fun save(model: T): Long
 
   @Upsert
   abstract suspend fun save(models: List<T>)

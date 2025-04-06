@@ -29,11 +29,12 @@ import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 inline fun SelectRow(
   @StringRes labelResId: Int,
   noinline onClick: () -> Unit,
+  modifier: Modifier = Modifier,
   labelModifier: @Composable RowScope.() -> Modifier = { Modifier },
   endLayout: @Composable RowScope.() -> Unit = {},
 ) {
   Row(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
       .heightIn(min = Dimens.min_select_row_height)
       .clip(RoundedCornerNormalRadiusShape)
@@ -101,10 +102,12 @@ inline fun SelectRowWithColor(
   @StringRes labelResId: Int,
   colorProvider: () -> ColorModel,
   noinline onClick: () -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   SelectRow(
     labelResId = labelResId,
     onClick = onClick,
+    modifier = modifier,
     endLayout = {
       Box(
         modifier = Modifier

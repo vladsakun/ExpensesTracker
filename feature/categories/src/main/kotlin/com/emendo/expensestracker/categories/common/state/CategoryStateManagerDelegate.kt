@@ -2,11 +2,14 @@ package com.emendo.expensestracker.categories.common.state
 
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryScreenState
+import com.emendo.expensestracker.categories.common.SubcategoryUiModel
+import com.emendo.expensestracker.categories.subcategory.CreateSubcategoryResult
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.UiState
 import com.emendo.expensestracker.model.ui.dataValue
 import com.emendo.expensestracker.model.ui.textValueOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,6 +42,21 @@ class CategoryStateManagerDelegate<T>(defaultState: UiState<T>? = null) :
   override fun updateIcon(iconId: Int) {
     _state.updateScreenData {
       it.copy(icon = IconModel.getById(iconId))
+    }
+  }
+
+  override fun addSubcategory(result: CreateSubcategoryResult) {
+    _state.updateScreenData {
+      val subcategories = ArrayList(it.subcategories).apply {
+        add(
+          SubcategoryUiModel(
+            id = null,
+            icon = IconModel.getById(result.iconId),
+            name = result.title,
+          )
+        )
+      }
+      it.copy(subcategories = subcategories.toImmutableList())
     }
   }
 }

@@ -8,8 +8,9 @@ import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryViewModel
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
 import com.emendo.expensestracker.core.app.resources.models.IconModel
+import com.emendo.expensestracker.core.domain.category.CreateCategoryWithSubcategoriesUseCase
+import com.emendo.expensestracker.core.domain.model.SubcategoryCreateModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
-import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.model.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -24,7 +25,7 @@ class CreateCategoryViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   override val selectIconScreenApi: SelectIconScreenApi,
   override val selectColorScreenApi: SelectColorScreenApi,
-  private val categoryRepository: CategoryRepository,
+  private val createCategoryWithSubcategoriesUseCase: CreateCategoryWithSubcategoriesUseCase,
 ) : CategoryViewModel<CategoryCreateScreenData>(UiState.Data(getDefault())), CategoryCreateCommandReceiver {
 
   private var createCategoryJob: Job? = null
@@ -43,11 +44,19 @@ class CreateCategoryViewModel @Inject constructor(
 
     createCategoryJob = viewModelScope.launch {
       with(state.value.requireDataValue().categoryScreenData) {
-        categoryRepository.createCategory(
+        createCategoryWithSubcategoriesUseCase(
           name = title.textValueOrBlank(),
           icon = icon,
           color = color,
           type = categoryType,
+          // TODO get rid of mapping
+          subcategories = subcategories.mapIndexed { index, subcategory ->
+            SubcategoryCreateModel(
+              icon = subcategory.icon,
+              name = subcategory.name,
+              ordinalIndex = index,
+            )
+          }
         )
       }
       _state.updateData {

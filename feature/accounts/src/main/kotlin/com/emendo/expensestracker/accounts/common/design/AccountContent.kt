@@ -59,44 +59,52 @@ internal inline fun <T> AccountContent(
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .verticalScroll(rememberScrollState())
         .padding(paddingValues)
-        .padding(Dimens.margin_large_x)
+        .consumeWindowInsets(paddingValues)
         .imePadding(),
-      verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     ) {
-      ExpeTextFieldWithRoundedBackground(
-        placeholder = stringResource(id = R.string.account_name),
-        text = stateProvider().name,
-        onValueChange = onNameChange,
+      Column(
         modifier = Modifier
-          .focusRequester(focusRequester)
-          .onFocusChanged {
-            if (it.isFocused) {
-              keyboardController?.show()
-            }
-          },
-      )
-      SelectRowWithText(
-        labelResId = R.string.balance,
-        textProvider = { stateProvider().balance.formattedValue },
-        onClick = onBalanceRowClick,
-      )
-      SelectRowWithIcon(
-        labelResId = R.string.icon,
-        imageVectorProvider = { stateProvider().icon.imageVector },
-        onClick = onIconRowClick,
-      )
-      SelectRowWithColor(
-        labelResId = R.string.color,
-        colorProvider = { stateProvider().color },
-        onClick = onColorRowClick,
-      )
-      SelectRowWithText(
-        labelResId = R.string.currency,
-        textProvider = { stateProvider().currency.currencySymbolOrCode },
-        onClick = onCurrencyRowClick,
-      )
+          .fillMaxWidth()
+          .verticalScroll(rememberScrollState())
+          .padding(top = Dimens.margin_large_x)
+          .padding(horizontal = Dimens.margin_large_x)
+          .weight(1f),
+        verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+      ) {
+        ExpeTextFieldWithRoundedBackground(
+          placeholder = stringResource(id = R.string.account_name),
+          text = stateProvider().name,
+          onValueChange = onNameChange,
+          modifier = Modifier
+            .focusRequester(focusRequester)
+            .onFocusChanged {
+              if (it.isFocused) {
+                keyboardController?.show()
+              }
+            },
+        )
+        SelectRowWithText(
+          labelResId = R.string.balance,
+          textProvider = { stateProvider().balance.formattedValue },
+          onClick = onBalanceRowClick,
+        )
+        SelectRowWithIcon(
+          labelResId = R.string.icon,
+          imageVectorProvider = { stateProvider().icon.imageVector },
+          onClick = onIconRowClick,
+        )
+        SelectRowWithColor(
+          labelResId = R.string.color,
+          colorProvider = { stateProvider().color },
+          onClick = onColorRowClick,
+        )
+        SelectRowWithText(
+          labelResId = R.string.currency,
+          textProvider = { stateProvider().currency.currencySymbolOrCode },
+          onClick = onCurrencyRowClick,
+        )
+      }
       endContent()
     }
   }

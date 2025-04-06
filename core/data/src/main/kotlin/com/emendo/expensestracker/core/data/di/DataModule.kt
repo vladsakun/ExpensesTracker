@@ -43,4 +43,8 @@ interface DataModule {
   @Binds
   @Singleton
   fun bindsCurrencyCacheManager(currencyCacheManagerImpl: CurrencyCacheManagerImpl): CurrencyCacheManager
+
+  @Binds
+  @Singleton
+  fun bindsSubcategoryRepository(subcategoryRepository: OfflineFirstSubcategoryRepository): SubcategoryRepository
 }

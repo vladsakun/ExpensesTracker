@@ -92,15 +92,21 @@ private fun AccountDetailContent(
         onCurrencyRowClick = onCurrencyRowClick,
         onConfirmClick = onConfirmAccountDetailsClick,
       ) {
-        Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
         ExpeButton(
           textResId = R.string.save,
           onClick = onConfirmAccountDetailsClick,
+          modifier = Modifier
+            .padding(top = Dimens.margin_large_x)
+            .padding(horizontal = Dimens.margin_large_x),
         )
+        Spacer(modifier = Modifier.padding(vertical = Dimens.margin_small_x))
         ExpeButton(
           textResId = R.string.delete,
           onClick = onDeleteClick,
           colors = ButtonDefaults.textButtonColors(),
+          modifier = Modifier
+            .padding(bottom = Dimens.margin_large_x)
+            .padding(horizontal = Dimens.margin_large_x),
         )
       }
     }
