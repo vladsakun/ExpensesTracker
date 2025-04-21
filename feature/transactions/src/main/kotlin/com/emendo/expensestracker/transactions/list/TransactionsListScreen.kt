@@ -193,14 +193,15 @@ private fun TransactionItem(
       verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_xx),
     ) {
       Row(horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x)) {
+        val target = transaction.targetSubcategory ?: transaction.target
         Icon(
-          imageVector = transaction.target.icon.imageVector,
+          imageVector = target.icon.imageVector,
           contentDescription = "icon",
           modifier = Modifier.size(Dimens.icon_size),
-          tint = transaction.target.color.color,
+          tint = target.color.color,
         )
         Text(
-          text = transaction.target.name.stringValue(),
+          text = target.name.stringValue(),
           style = MaterialTheme.typography.bodyLarge,
           modifier = Modifier.weight(1f),
         )

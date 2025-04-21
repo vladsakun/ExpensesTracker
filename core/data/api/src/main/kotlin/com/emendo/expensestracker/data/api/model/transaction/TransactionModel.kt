@@ -9,6 +9,7 @@ data class TransactionModel(
   val id: Long,
   val source: AccountModel,
   val target: TransactionTarget,
+  val targetSubcategory: TransactionTarget?,
   val amount: Amount,
   val type: TransactionType,
   val date: Instant,

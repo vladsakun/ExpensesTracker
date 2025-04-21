@@ -12,6 +12,7 @@ import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toTransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
+import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,8 +26,9 @@ class TransactionMapper @Inject constructor(
     val sourceAccount: AccountModel = accountMapper.map(sourceAccount)
 
     val targetAccount: AccountModel? = targetAccount?.let { accountMapper.map(it) }
-    val targetCategory: CategoryModel? = getTargetCategory()
-    val target = targetAccount ?: targetCategory ?: throw IllegalStateException("Transaction must have a target")
+    val targetCategory: CategoryModel? = targetCategory?.asExternalModel()
+    val target: TransactionTarget =
+      targetAccount ?: targetCategory ?: throw IllegalStateException("Transaction must have a target")
 
     val currencyModel = CurrencyModel.toCurrencyModel(transactionEntity.currencyCode)
     val amount = amountFormatter.format(transactionEntity.value, currencyModel)
@@ -40,6 +42,7 @@ class TransactionMapper @Inject constructor(
       id = transactionEntity.id,
       source = if (isTransfer) targetAccount!! else sourceAccount,
       target = if (isTransfer) sourceAccount else target,
+      targetSubcategory = getTargetSubcategory(),
       amount = amount.formatPositive(),
       type = type,
       transferReceivedAmount = transferReceivedAmount?.formatPositive(),
@@ -48,11 +51,9 @@ class TransactionMapper @Inject constructor(
     )
   }
 
-  private fun TransactionFull.getTargetCategory(): CategoryModel? {
+  private fun TransactionFull.getTargetSubcategory(): CategoryModel? {
     val category = targetCategory ?: return null
-    val subcategory = targetSubcategory
-
-    return subcategory?.asExternalModel(category) ?: category.asExternalModel()
+    return targetSubcategory?.asExternalModel(category)
   }
 
   private fun TransactionFull.getTransferReceivedAmount(): Amount? {

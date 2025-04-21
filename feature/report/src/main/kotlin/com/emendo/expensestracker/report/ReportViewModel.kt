@@ -214,10 +214,11 @@ class ReportViewModel @Inject constructor(
     )
   }
 
-  private fun getTransactionsInSelectedPeriod() = _selectedPeriod.flatMapLatest { period ->
-    val (from, to) = period.getFromAndTo()
-    transactionRepository.getTransactionsInPeriod(from = from, to = to)
-  }
+  private fun getTransactionsInSelectedPeriod(): Flow<List<TransactionModel>> =
+    _selectedPeriod.flatMapLatest { period ->
+      val (from, to) = period.getFromAndTo()
+      transactionRepository.getTransactionsInPeriod(from = from, to = to)
+    }
 }
 
 class PeriodsFactory @Inject constructor(

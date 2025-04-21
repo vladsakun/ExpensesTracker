@@ -73,10 +73,9 @@ class OfflineFirstTransactionRepository @Inject constructor(
       }
 
   override fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionModel>> =
-    transactionDao.getTransactionsInPeriod(from, to)
-      .map { transactions ->
-        transactions.map { transactionMapper.map(it) }
-      }
+    transactionDao
+      .getTransactionsInPeriod(from, to)
+      .map { transactions -> transactions.map { transactionMapper.map(it) } }
 
   override fun getTransactionsPagedInPeriod(
     targetCategoryId: Long,
