@@ -26,7 +26,7 @@ data class ReportScreenData(
   val reportSum: ReportSum,
   val categoryValues: ImmutableList<CategoryValue>,
   val transactionType: TransactionType,
-  val periods: ImmutableList<ReportPeriod>,
+  //  val periods: ImmutableList<ReportPeriod>,
 ) {
 
   data class CategoryValue(
@@ -54,12 +54,10 @@ data class ReportPieChartSlice(
 @Serializable
 sealed class ReportPeriod : java.io.Serializable {
   abstract val label: TextValue
-  abstract val selected: Boolean
 
   @Serializable
   data class Date(
     override val label: TextValue,
-    override val selected: Boolean = false,
     val start: Instant,
     val end: Instant,
   ) : ReportPeriod() {
@@ -88,7 +86,6 @@ sealed class ReportPeriod : java.io.Serializable {
   @Serializable
   data class AllTime(
     override val label: TextValue = resourceValueOf(R.string.report_all_time),
-    override val selected: Boolean = false,
   ) : ReportPeriod() {
 
     override fun equals(other: Any?): Boolean {
@@ -108,7 +105,6 @@ sealed class ReportPeriod : java.io.Serializable {
   @Serializable
   data class Custom(
     override val label: TextValue = resourceValueOf(R.string.report_custom),
-    override val selected: Boolean = false,
     val start: Instant? = null,
     val end: Instant? = null,
   ) : ReportPeriod() {

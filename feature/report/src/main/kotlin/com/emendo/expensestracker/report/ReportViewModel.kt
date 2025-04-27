@@ -26,6 +26,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.*
@@ -55,6 +56,14 @@ class ReportViewModel @Inject constructor(
 
   private val _showPickerDialog: MutableStateFlow<Boolean> by savedStateHandle.stateFlow(false)
   internal val showPickerDialog: StateFlow<Boolean> = _showPickerDialog
+
+  internal val periods: StateFlow<ImmutableList<ReportPeriod>> =
+    flow { emit(getPeriods()) }
+      .stateInWhileSubscribed(viewModelScope, persistentListOf(getDefaultPeriod()))
+
+  internal val selectedPeriodIndex: StateFlow<Int> = combine(periods, selectedPeriod) { periods, selected ->
+    periods.indexOf(selected).coerceAtLeast(0)
+  }.stateInWhileSubscribed(viewModelScope, 0)
 
   private val _transactionType: MutableStateFlow<TransactionType> by savedStateHandle.stateFlow(TransactionType.DEFAULT)
   private val _selectedCategory: MutableStateFlow<Long?> by savedStateHandle.stateFlow(null)
@@ -111,7 +120,7 @@ class ReportViewModel @Inject constructor(
             )
           }.toImmutableList(),
           transactionType = transactionType,
-          periods = getPeriods(), // Extract
+          //          periods = getPeriods(), // Extract
         )
       )
     }.stateInWhileSubscribed(viewModelScope, NetworkViewState.Loading)
@@ -169,7 +178,6 @@ class ReportViewModel @Inject constructor(
         label = label,
         start = startInstant,
         end = endInstant,
-        selected = true,
       )
     }
 
@@ -215,7 +223,6 @@ class ReportViewModel @Inject constructor(
       label = periodsFactory.getPeriodLabel(month = month, year = year),
       start = start,
       end = end,
-      selected = true,
     )
   }
 
@@ -279,9 +286,7 @@ class PeriodsFactory @Inject constructor(
       }
     }
 
-    val periodsImmutable = periods.toImmutableList()
-
-    return periodsImmutable
+    return periods.reversed().toImmutableList()
   }
 
   fun getPeriodLabel(month: java.time.Month, year: Year): TextValue.Value =

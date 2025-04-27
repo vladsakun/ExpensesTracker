@@ -1,32 +1,24 @@
 package com.emendo.expensestracker.report
 
 import android.graphics.Typeface
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,9 +51,7 @@ import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import kotlin.math.roundToInt
 
 @Destination(start = true)
 @Composable
@@ -74,6 +64,8 @@ internal fun ReportRoute(
   val showPickerDialog = viewModel.showPickerDialog.collectAsStateWithLifecycle()
   val selectedCategory = viewModel.selectedCategory.collectAsStateWithLifecycle()
   val navigation = viewModel.navigation.collectAsStateWithLifecycle()
+  val periods = viewModel.periods.collectAsStateWithLifecycle()
+  val selectedPeriodIndex = viewModel.selectedPeriodIndex.collectAsStateWithLifecycle()
 
   NavigationEventEffect(
     event = navigation.value.openCategoryTransactions,
@@ -83,6 +75,8 @@ internal fun ReportRoute(
 
   ReportScreenContent(
     stateProvider = state::value,
+    periodsProvider = periods::value,
+    selectedPeriodIndexProvider = selectedPeriodIndex::value,
     selectedPeriodProvider = selectedPeriod::value,
     showPickerDialogProvider = showPickerDialog::value,
     selectedCategoryProvider = selectedCategory::value,
@@ -93,6 +87,8 @@ internal fun ReportRoute(
 @Composable
 private fun ReportScreenContent(
   stateProvider: () -> NetworkViewState<ReportScreenData>,
+  periodsProvider: () -> ImmutableList<ReportPeriod>,
+  selectedPeriodIndexProvider: () -> Int,
   selectedPeriodProvider: () -> ReportPeriod,
   showPickerDialogProvider: () -> Boolean,
   selectedCategoryProvider: () -> ReportScreenData.CategoryValue?,
@@ -111,6 +107,8 @@ private fun ReportScreenContent(
         is NetworkViewState.Success -> {
           ReportScreenContent(
             state = stateValue.data,
+            periodsProvider = periodsProvider,
+            selectedPeriodIndexProvider = selectedPeriodIndexProvider,
             selectedPeriodProvider = selectedPeriodProvider,
             selectedCategoryProvider = selectedCategoryProvider,
             commandProcessor = commandProcessor,
@@ -129,6 +127,8 @@ private fun ReportScreenContent(
 @Composable
 private fun ReportScreenContent(
   state: ReportScreenData,
+  periodsProvider: () -> ImmutableList<ReportPeriod>,
+  selectedPeriodIndexProvider: () -> Int,
   selectedPeriodProvider: () -> ReportPeriod,
   selectedCategoryProvider: () -> ReportScreenData.CategoryValue?,
   commandProcessor: (ReportScreenCommand) -> Unit,
@@ -142,8 +142,8 @@ private fun ReportScreenContent(
       transactionType = state.transactionType,
     )
     periods(
-      reportPeriods = state.periods,
-      selectedPeriod = selectedPeriodProvider,
+      reportPeriods = periodsProvider,
+      selectedPeriodIndexProvider = selectedPeriodIndexProvider,
       commandProcessor = commandProcessor,
     )
     balance(
@@ -184,65 +184,38 @@ private fun LazyListScope.emptyState() {
 }
 
 private fun LazyListScope.periods(
-  reportPeriods: ImmutableList<ReportPeriod>,
-  selectedPeriod: () -> ReportPeriod,
+  reportPeriods: () -> ImmutableList<ReportPeriod>,
+  selectedPeriodIndexProvider: () -> Int,
   commandProcessor: (ReportScreenCommand) -> Unit,
 ) {
-  // TODO fix animation is replayed after every navigation to the screen
   uniqueItem("periods") {
-    val scrollState = rememberScrollState()
-    val coordinates = remember(reportPeriods) { mutableStateMapOf<ReportPeriod, LayoutCoordinates>() }
-    val indicatorOffset = remember { Animatable(0f) }
-    val selectedItemWidth = remember(reportPeriods, coordinates) { Animatable(0f) }
-
-    LaunchedEffect(selectedPeriod()) {
-      val period = reportPeriods.getOrNull(reportPeriods.indexOf(selectedPeriod())) ?: return@LaunchedEffect
-      val coordinate = coordinates[period]?.positionInParent() ?: return@LaunchedEffect
-      val x = coordinate.x
-      val width = coordinates[period]!!.size.width.toFloat()
-      val targetScrollPosition = scrollState.maxValue - x + scrollState.viewportSize / 2 - width / 2
-
-      val animationSpec = tween<Float>(200)
-      launch { scrollState.animateScrollTo(targetScrollPosition.roundToInt(), animationSpec) }
-      launch { selectedItemWidth.animateTo(width, animationSpec) }
-      launch { indicatorOffset.animateTo(x, animationSpec) }
-    }
-
-    Row(
-      modifier = Modifier
-        .wrapContentWidth()
-        .horizontalScroll(scrollState, reverseScrolling = true),
-    ) {
-      Column {
-        Row(modifier = Modifier.wrapContentWidth()) {
-          reportPeriods.reversed().forEach { period ->
-            Text(
-              text = period.label.stringValue(),
-              style = MaterialTheme.typography.labelSmall,
-              modifier = Modifier
-                .onGloballyPositioned { coordinates[period] = it }
-                .clickable(onClick = { commandProcessor(SetPeriodCommand(period)) })
-                .padding(Dimens.margin_large_x),
-            )
-          }
-        }
+    val selectedTabIndex = selectedPeriodIndexProvider()
+    ScrollableTabRow(
+      edgePadding = 0.dp,
+      selectedTabIndex = selectedTabIndex,
+      modifier = Modifier.wrapContentWidth(),
+      indicator = { tabPositions ->
         Box(
           modifier = Modifier
+            .fillMaxWidth()
             .height(2.dp)
-            .width(with(LocalDensity.current) { selectedItemWidth.value.toDp() })
-            .offset {
-              // Use the animated offset as the offset of the Box.
-              IntOffset(
-                x = indicatorOffset.value.roundToInt(),
-                y = 0,
-              )
-            }
+            .tabIndicatorOffset(tabPositions[selectedTabIndex])
             .clip(RoundedCornerSmallRadiusShape)
             .background(MaterialTheme.colorScheme.primary),
         )
       }
+    ) {
+      reportPeriods().forEach { period ->
+        Text(
+          text = period.label.stringValue(),
+          style = MaterialTheme.typography.labelSmall,
+          textAlign = TextAlign.Center,
+          modifier = Modifier
+            .clickable(onClick = { commandProcessor(SetPeriodCommand(period)) })
+            .padding(Dimens.margin_large_x),
+        )
+      }
     }
-
     VerticalSpacer(height = Dimens.margin_large_x)
   }
 }
@@ -324,7 +297,7 @@ private fun LazyListScope.pieChart(
       ),
       onSliceClick = onSliceClick,
       modifier = Modifier
-        .padding(Dimens.margin_large_x)
+        .padding(Dimens.margin_normal)
         .fillMaxWidth()
         .aspectRatio(1f)
         .animateItem(),
@@ -537,47 +510,49 @@ private fun ReportScreenPreview() {
         )
       }.toImmutableList(),
       transactionType = TransactionType.EXPENSE,
-      periods = persistentListOf(
-        ReportPeriod.Custom(),
-        ReportPeriod.AllTime(),
-        ReportPeriod.Date(
-          label = textValueOf("2024"),
-          start = Instant.DISTANT_PAST,
-          end = Instant.DISTANT_FUTURE,
-          selected = true,
-        ),
-        ReportPeriod.Date(
-          label = textValueOf("2023"),
-          start = Instant.DISTANT_PAST,
-          end = Instant.DISTANT_FUTURE,
-        ),
-        ReportPeriod.Date(
-          label = textValueOf("June '24"),
-          start = Instant.DISTANT_PAST,
-          end = Instant.DISTANT_FUTURE,
-        ),
-        ReportPeriod.Date(
-          label = textValueOf("May '24"),
-          start = Instant.DISTANT_PAST,
-          end = Instant.DISTANT_FUTURE,
-        ),
-        ReportPeriod.Date(
-          label = textValueOf("April '24"),
-          start = Instant.DISTANT_PAST,
-
-          end = Instant.DISTANT_FUTURE,
-        ),
-        ReportPeriod.Date(
-          label = textValueOf("March '24"),
-          start = Instant.DISTANT_PAST,
-          end = Instant.DISTANT_FUTURE,
-        ),
-      ),
     )
   ExpensesTrackerTheme {
     Surface {
       ReportScreenContent(
         stateProvider = { NetworkViewState.Success(screenData) },
+        periodsProvider = {
+          persistentListOf(
+            ReportPeriod.Custom(),
+            ReportPeriod.AllTime(),
+            ReportPeriod.Date(
+              label = textValueOf("2024"),
+              start = Instant.DISTANT_PAST,
+              end = Instant.DISTANT_FUTURE,
+            ),
+            ReportPeriod.Date(
+              label = textValueOf("2023"),
+              start = Instant.DISTANT_PAST,
+              end = Instant.DISTANT_FUTURE,
+            ),
+            ReportPeriod.Date(
+              label = textValueOf("June '24"),
+              start = Instant.DISTANT_PAST,
+              end = Instant.DISTANT_FUTURE,
+            ),
+            ReportPeriod.Date(
+              label = textValueOf("May '24"),
+              start = Instant.DISTANT_PAST,
+              end = Instant.DISTANT_FUTURE,
+            ),
+            ReportPeriod.Date(
+              label = textValueOf("April '24"),
+              start = Instant.DISTANT_PAST,
+
+              end = Instant.DISTANT_FUTURE,
+            ),
+            ReportPeriod.Date(
+              label = textValueOf("March '24"),
+              start = Instant.DISTANT_PAST,
+              end = Instant.DISTANT_FUTURE,
+            ),
+          )
+        },
+        selectedPeriodIndexProvider = { 2 },
         commandProcessor = {},
         showPickerDialogProvider = { false },
         selectedCategoryProvider = { null },
