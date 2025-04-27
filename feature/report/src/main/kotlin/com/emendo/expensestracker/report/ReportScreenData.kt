@@ -134,9 +134,21 @@ sealed class ReportPeriod : java.io.Serializable {
     }
   }
 
-  fun getFromAndTo(): Pair<Instant, Instant> = when (this) {
-    is Date -> start to end
-    is AllTime -> Instant.DISTANT_PAST to Instant.DISTANT_FUTURE
-    is Custom -> checkNotNull(start) to checkNotNull(end)
+  fun getPeriod(): Period = when (this) {
+    is Date -> Period(start, end)
+    is AllTime -> Period(Instant.DISTANT_PAST, Instant.DISTANT_FUTURE)
+    is Custom -> Period(checkNotNull(start), checkNotNull(end))
   }
+}
+
+@Serializable
+data class Period(
+  val from: Long,
+  val to: Long,
+) {
+
+  constructor(from: Instant, to: Instant) : this(from.toEpochMilliseconds(), to.toEpochMilliseconds())
+
+  fun getFromInstant(): Instant = Instant.fromEpochMilliseconds(from)
+  fun getToInstant(): Instant = Instant.fromEpochMilliseconds(to)
 }

@@ -20,6 +20,7 @@ import com.emendo.expensestracker.data.api.extensions.abs
 import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
+import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import com.emendo.expensestracker.transactions.TransactionsListArgs
 import com.emendo.expensestracker.transactions.destinations.TransactionsListRouteDestination
@@ -99,7 +100,7 @@ class TransactionsListViewModel @Inject constructor(
     val to = from.plus(DateTimePeriod(days = 1), timeZone)
     val generalCurrency = currencyCacheManager.getGeneralCurrencySnapshot()
 
-    val transactions = transactionRepository.retrieveTransactionsInPeriod(from, to)
+    val transactions = retrieveTransactionInPeriod(from, to)
     val transactionWithConvertedValues = transactions.map { transaction ->
       if (transaction.currency == generalCurrency) {
         return@map transaction
@@ -118,6 +119,32 @@ class TransactionsListViewModel @Inject constructor(
       sum = amountFormatter.format(total, generalCurrency).formattedValue,
     )
   }
+
+  private suspend fun retrieveTransactionInPeriod(from: Instant, to: Instant): List<TransactionValueWithType> =
+    when (val arguments = args) {
+      null -> transactionRepository.retrieveTransactionsInPeriod(from, to)
+
+      is TransactionsListArgs.TransactionListArgsByType ->
+        transactionRepository.retrieveTransactionsByTypeInPeriod(
+          transactionType = arguments.transactionType,
+          from = from,
+          to = to,
+        )
+
+      is TransactionsListArgs.TransactionListArgsByCategory ->
+        transactionRepository.retrieveTransactionsByCategoryInPeriod(
+          categoryId = arguments.categoryId,
+          from = from,
+          to = to,
+        )
+
+      is TransactionsListArgs.TransactionListArgsBySubcategory ->
+        transactionRepository.retrieveTransactionsBySubcategoryInPeriod(
+          subcategoryId = arguments.subcategoryId,
+          from = from,
+          to = to,
+        )
+    }
 
   sealed class UiModel {
     data class TransactionItem(val transaction: TransactionModel) : UiModel()
@@ -143,10 +170,19 @@ class TransactionsListViewModel @Inject constructor(
   private fun getTransactionsFlow(): Flow<PagingData<TransactionModel>> {
     val arguments = args ?: return transactionRepository.getTransactionsPagingFlow(viewModelScope)
 
-    return if (arguments.transactionType == null) {
-      transactionRepository.getTransactionsPagedInPeriod(arguments.categoryId!!, arguments.from, arguments.to)
-    } else {
-      transactionRepository.getTransactionsPagedInPeriod(arguments.transactionType!!, arguments.from, arguments.to)
+    return when (arguments) {
+      is TransactionsListArgs.TransactionListArgsByCategory ->
+        transactionRepository.getTransactionsPagedInPeriod(arguments.categoryId, arguments.from, arguments.to)
+
+      is TransactionsListArgs.TransactionListArgsByType ->
+        transactionRepository.getTransactionsPagedInPeriod(arguments.transactionType, arguments.from, arguments.to)
+
+      is TransactionsListArgs.TransactionListArgsBySubcategory ->
+        transactionRepository.getTransactionsInSubcategoryPagedInPeriod(
+          targetSubcategoryId = arguments.subcategoryId,
+          from = arguments.from,
+          to = arguments.to,
+        )
     }
   }
 

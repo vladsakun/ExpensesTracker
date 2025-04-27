@@ -57,6 +57,22 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   ): PagingSource<Int, TransactionFull>
 
   @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE targetSubcategoryId = :targetSubcategoryId AND date BETWEEN :from AND :to ORDER BY date DESC")
+  abstract fun transactionsBySubcategoryInPeriodPagingSource(
+    targetSubcategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): PagingSource<Int, TransactionFull>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE targetCategoryId = :targetCategoryId AND date BETWEEN :from AND :to ORDER BY date DESC")
+  abstract fun transactionsInPeriod(
+    targetCategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionFull>>
+
+  @Transaction
   @Query("SELECT * FROM $TABLE_NAME ORDER BY date DESC LIMIT 1")
   abstract suspend fun retrieveLastTransaction(): TransactionFull?
 
@@ -67,6 +83,30 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME WHERE date BETWEEN :from AND :to")
   abstract suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionFull>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE typeId = :typeId AND date BETWEEN :from AND :to")
+  abstract suspend fun retrieveTransactionsByTypeInPeriod(
+    typeId: Int,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionFull>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE targetCategoryId = :categoryId AND date BETWEEN :from AND :to")
+  abstract suspend fun retrieveTransactionsByCategoryInPeriod(
+    categoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionFull>
+
+  @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE targetSubcategoryId = :subcategoryId AND date BETWEEN :from AND :to")
+  abstract suspend fun retrieveTransactionsBySubcategoryInPeriod(
+    subcategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionFull>
 
   @Transaction
   @Query("SELECT * FROM $TABLE_NAME WHERE sourceAccountId = :sourceAccountId AND typeId = :typeId  ORDER BY date DESC LIMIT 1")

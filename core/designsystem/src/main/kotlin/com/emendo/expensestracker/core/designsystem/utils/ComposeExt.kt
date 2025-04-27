@@ -1,5 +1,9 @@
 package com.emendo.expensestracker.core.designsystem.utils
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
@@ -9,6 +13,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -43,3 +48,21 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 @Composable
 @ReadOnlyComposable
 fun TextUnit.toDp(): Dp = with(LocalDensity.current) { this@toDp.toDp() }
+
+@Composable
+fun Modifier.paddingWithoutBottom(paddingValues: PaddingValues): Modifier {
+  val layoutDirection = LocalLayoutDirection.current
+  return this.padding(
+    start = paddingValues.calculateStartPadding(layoutDirection),
+    end = paddingValues.calculateEndPadding(layoutDirection),
+    top = paddingValues.calculateTopPadding(),
+  )
+}
+
+@Composable
+fun PaddingValuesWithBottom(padding: Dp, bottomPadding: Dp) = PaddingValues(
+  start = padding,
+  end = padding,
+  top = padding,
+  bottom = padding + bottomPadding,
+)

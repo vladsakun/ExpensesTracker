@@ -19,12 +19,42 @@ interface TransactionRepository {
   suspend fun retrieveLastTransferTransaction(sourceAccountId: Long): TransactionModel?
   suspend fun retrieveFirstTransaction(): TransactionModel?
   suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType>
+  suspend fun retrieveTransactionsByTypeInPeriod(
+    transactionType: TransactionType,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionValueWithType>
+
+  suspend fun retrieveTransactionsByCategoryInPeriod(
+    categoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionValueWithType>
+
+  suspend fun retrieveTransactionsBySubcategoryInPeriod(
+    subcategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionValueWithType>
+
   fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionModel>>
   fun getTransactionsPagedInPeriod(
     targetCategoryId: Long,
     from: Instant,
     to: Instant,
   ): Flow<PagingData<TransactionModel>>
+
+  fun getTransactionsInSubcategoryPagedInPeriod(
+    targetSubcategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<PagingData<TransactionModel>>
+
+  fun getTransactionsInPeriod(
+    targetCategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionModel>>
 
   fun getTransactionsPagedInPeriod(
     transactionType: TransactionType,

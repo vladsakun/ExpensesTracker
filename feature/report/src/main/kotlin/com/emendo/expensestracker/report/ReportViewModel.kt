@@ -4,24 +4,23 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.core.app.common.NetworkViewState
 import com.emendo.expensestracker.core.app.common.ext.stateFlow
 import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
-import com.emendo.expensestracker.core.app.common.successData
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.manager.ExpeLocaleManager
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
+import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
 import com.emendo.expensestracker.data.api.utils.ExpeDateUtils
-import com.emendo.expensestracker.model.ui.TextValue
-import com.emendo.expensestracker.model.ui.resourceValueOf
-import com.emendo.expensestracker.model.ui.textValueOf
+import com.emendo.expensestracker.model.ui.*
 import com.emendo.expensestracker.report.ReportScreenData.CategoryValue
+import com.emendo.expensestracker.report.destinations.ReportSubcategoriesRouteDestination
 import com.emendo.expensestracker.report.domain.GetCategoriesWithTotalTransactionsUseCase
-import com.emendo.expensestracker.transactions.TransactionsListArgs
+import com.emendo.expensestracker.transactions.TransactionsListArgs.TransactionListArgsByCategory
+import com.emendo.expensestracker.transactions.TransactionsListArgs.TransactionListArgsByType
 import com.emendo.expensestracker.transactions.TransactionsListScreenApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -48,6 +47,7 @@ class ReportViewModel @Inject constructor(
   private val localeManager: ExpeLocaleManager,
   private val periodsFactory: PeriodsFactory,
   private val transactionsListScreenApi: TransactionsListScreenApi,
+  private val categoryRepository: CategoryRepository,
 ) : ViewModel(), ReportScreenCommander {
 
   private val _selectedPeriod: MutableStateFlow<ReportPeriod> by savedStateHandle.stateFlow(getDefaultPeriod())
@@ -178,15 +178,20 @@ class ReportViewModel @Inject constructor(
 
   override fun selectCategory(event: SelectCategoryClickEvent) {
     val categoryId = (event as? SelectCategoryClickEvent.CategorySelected)?.categoryId
-    val (from, to) = selectedPeriod.value.getFromAndTo()
+    val period = selectedPeriod.value.getPeriod()
+    val from = period.getFromInstant()
+    val to = period.getToInstant()
 
-    val args = if (categoryId == null) {
-      TransactionsListArgs(_transactionType.value, from, to)
+    val route: String = if (categoryId == null) {
+      transactionsListScreenApi.getRoute(TransactionListArgsByType(_transactionType.value, from, to))
     } else {
-      TransactionsListArgs(categoryId, from, to)
+      if (categoryRepository.getCategorySnapshotById(categoryId)?.subcategories?.isEmpty() == true) {
+        transactionsListScreenApi.getRoute(TransactionListArgsByCategory(categoryId, from, to))
+      } else {
+        ReportSubcategoriesRouteDestination(categoryId, period).route
+      }
     }
 
-    val route = transactionsListScreenApi.getRoute(args)
     _navigation.update { it.copy(openCategoryTransactions = triggered(route)) }
   }
 
@@ -215,9 +220,9 @@ class ReportViewModel @Inject constructor(
   }
 
   private fun getTransactionsInSelectedPeriod(): Flow<List<TransactionModel>> =
-    _selectedPeriod.flatMapLatest { period ->
-      val (from, to) = period.getFromAndTo()
-      transactionRepository.getTransactionsInPeriod(from = from, to = to)
+    _selectedPeriod.flatMapLatest { selectedPeriod ->
+      val period = selectedPeriod.getPeriod()
+      transactionRepository.getTransactionsInPeriod(from = period.getFromInstant(), to = period.getToInstant())
     }
 }
 
@@ -292,5 +297,5 @@ class PeriodsFactory @Inject constructor(
 
 private fun getNow() = Clock.System.now().toLocalDateTime(TimeZone.UTC)
 
-private fun getReportSumLabelResId(transactionType: TransactionType): Int =
+internal fun getReportSumLabelResId(transactionType: TransactionType): Int =
   if (transactionType == TransactionType.EXPENSE) R.string.report_all_expenses else R.string.report_all_incomes

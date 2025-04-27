@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.core.app.common.NetworkViewState
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.designsystem.component.*
@@ -51,6 +50,7 @@ import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.extensions.labelResId
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.model.ui.NetworkViewState
 import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.textValueOf
 import com.ramcosta.composedestinations.annotation.Destination
@@ -106,7 +106,7 @@ private fun ReportScreenContent(
         .padding(paddingValues),
     ) {
       when (val stateValue = stateProvider()) {
-        is NetworkViewState.Error -> Text(text = stateValue.message)
+        is NetworkViewState.Error -> Text(text = stateValue.message.stringValue())
         is NetworkViewState.Loading -> ExpLoadingWheel(modifier = Modifier.align(Alignment.Center))
         is NetworkViewState.Success -> {
           ReportScreenContent(
@@ -434,16 +434,17 @@ private fun getTransactionTypeItems(
 )
 
 @Composable
-private fun CategoryItem(
+internal fun CategoryItem(
   icon: ImageVector,
   tint: Color,
   amount: Amount,
   name: String,
   transactionType: TransactionType,
   onClick: () -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   Box(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
       .clickable(onClick = onClick),
     contentAlignment = Alignment.Center,

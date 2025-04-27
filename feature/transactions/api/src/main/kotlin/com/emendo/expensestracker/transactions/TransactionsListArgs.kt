@@ -5,24 +5,29 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TransactionsListArgs private constructor(
-  val categoryId: Long?,
-  val from: Instant,
-  val to: Instant,
-  val transactionType: TransactionType?,
-) {
+sealed class TransactionsListArgs {
 
-  constructor(categoryId: Long, from: Instant, to: Instant) : this(
-    categoryId = categoryId,
-    from = from,
-    to = to,
-    transactionType = null,
-  )
+  abstract val from: Instant
+  abstract val to: Instant
 
-  constructor(transactionType: TransactionType, from: Instant, to: Instant) : this(
-    categoryId = null,
-    from = from,
-    to = to,
-    transactionType = transactionType,
-  )
+  @Serializable
+  data class TransactionListArgsByCategory(
+    val categoryId: Long,
+    override val from: Instant,
+    override val to: Instant,
+  ) : TransactionsListArgs()
+
+  @Serializable
+  data class TransactionListArgsBySubcategory(
+    val subcategoryId: Long,
+    override val from: Instant,
+    override val to: Instant,
+  ) : TransactionsListArgs()
+
+  @Serializable
+  data class TransactionListArgsByType(
+    val transactionType: TransactionType,
+    override val from: Instant,
+    override val to: Instant,
+  ) : TransactionsListArgs()
 }

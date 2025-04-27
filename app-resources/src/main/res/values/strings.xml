@@ -79,6 +79,8 @@
   <string name="report_all_time">All time</string>
   <string name="report_custom">Custom</string>
 
+  <string name="report_subcategories_empty_state">No transactions found</string>
+
   <string name="categories_list_add_category_action">Add category</string>
 
   <string name="category_content_subcategories">Subcategories</string>

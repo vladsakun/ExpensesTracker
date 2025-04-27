@@ -7,6 +7,7 @@ import com.emendo.expensestracker.core.data.mapper.transactionType
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.transaction.TransactionEntity
+import com.emendo.expensestracker.core.database.model.transaction.TransactionFull
 import com.emendo.expensestracker.core.database.util.DatabaseUtils
 import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
@@ -64,13 +65,35 @@ class OfflineFirstTransactionRepository @Inject constructor(
 
   override suspend fun retrieveTransactionsInPeriod(from: Instant, to: Instant): List<TransactionValueWithType> =
     transactionDao
-      .retrieveTransactionsInPeriod(from, to).map { transaction ->
-        TransactionValueWithType(
-          type = transaction.transactionType,
-          value = transaction.transactionEntity.value,
-          currency = CurrencyModel.toCurrencyModel(transaction.transactionEntity.currencyCode),
-        )
-      }
+      .retrieveTransactionsInPeriod(from, to)
+      .mapToTransactionValueWithType()
+
+  override suspend fun retrieveTransactionsByTypeInPeriod(
+    transactionType: TransactionType,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionValueWithType> =
+    transactionDao
+      .retrieveTransactionsByTypeInPeriod(transactionType.id, from, to)
+      .mapToTransactionValueWithType()
+
+  override suspend fun retrieveTransactionsByCategoryInPeriod(
+    categoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionValueWithType> =
+    transactionDao
+      .retrieveTransactionsByCategoryInPeriod(categoryId, from, to)
+      .mapToTransactionValueWithType()
+
+  override suspend fun retrieveTransactionsBySubcategoryInPeriod(
+    subcategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): List<TransactionValueWithType> =
+    transactionDao
+      .retrieveTransactionsBySubcategoryInPeriod(subcategoryId, from, to)
+      .mapToTransactionValueWithType()
 
   override fun getTransactionsInPeriod(from: Instant, to: Instant): Flow<List<TransactionModel>> =
     transactionDao
@@ -84,6 +107,22 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ): Flow<PagingData<TransactionModel>> =
     PagerDefault { transactionDao.transactionsInPeriodPagingSource(targetCategoryId, from, to) }
       .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
+
+  override fun getTransactionsInSubcategoryPagedInPeriod(
+    targetSubcategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<PagingData<TransactionModel>> =
+    PagerDefault { transactionDao.transactionsBySubcategoryInPeriodPagingSource(targetSubcategoryId, from, to) }
+      .map { pagingData -> pagingData.map { transactionMapper.map(it) } }
+
+  override fun getTransactionsInPeriod(
+    targetCategoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionModel>> =
+    transactionDao.transactionsInPeriod(targetCategoryId, from, to)
+      .map { data -> data.map { transactionMapper.map(it) } }
 
   override fun getTransactionsPagedInPeriod(
     transactionType: TransactionType,
@@ -212,4 +251,13 @@ class OfflineFirstTransactionRepository @Inject constructor(
 
   private fun <Key : Any, Value : Any> PagerDefault(pagingSourceFactory: () -> PagingSource<Key, Value>): Flow<PagingData<Value>> =
     Pager(config = PagingConfig(pageSize = PAGE_SIZE), pagingSourceFactory = pagingSourceFactory).flow
+
+  private fun List<TransactionFull>.mapToTransactionValueWithType(): List<TransactionValueWithType> =
+    map { transaction ->
+      TransactionValueWithType(
+        type = transaction.transactionType,
+        value = transaction.transactionEntity.value,
+        currency = CurrencyModel.toCurrencyModel(transaction.transactionEntity.currencyCode),
+      )
+    }
 }
