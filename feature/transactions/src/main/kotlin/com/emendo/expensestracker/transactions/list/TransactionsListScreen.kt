@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -24,10 +25,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
-import com.emendo.expensestracker.core.designsystem.component.ExpeDivider
-import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
-import com.emendo.expensestracker.core.designsystem.component.HorizontalSpacer
+import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.customColorsPalette
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerSmallRadiusShape
@@ -36,6 +34,8 @@ import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.model.ui.NetworkViewState
+import com.emendo.expensestracker.model.ui.successData
 import com.emendo.expensestracker.transactions.TransactionsListArgs
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -58,6 +58,7 @@ fun TransactionsListRoute(
   TransactionsListScreenContent(
     uiStateProvider = state::value,
     onTransactionClick = { navigator.navigate(viewModel.getTransactionDetailsRoute(it)) },
+    onCreateTransactionClick = { navigator.navigate(viewModel.getCreateTransactionRoute()) },
     backButton = args != null,
     onBackClick = navigator::navigateUp,
   )
@@ -65,8 +66,9 @@ fun TransactionsListRoute(
 
 @Composable
 private fun TransactionsListScreenContent(
-  uiStateProvider: () -> TransactionScreenUiState,
+  uiStateProvider: () -> NetworkViewState<TransactionScreenUiState>,
   onTransactionClick: (TransactionModel) -> Unit,
+  onCreateTransactionClick: () -> Unit,
   backButton: Boolean,
   onBackClick: () -> Unit,
 ) {
@@ -80,16 +82,45 @@ private fun TransactionsListScreenContent(
         .padding(paddingValues),
     ) {
       when (val state = uiStateProvider()) {
-        is TransactionScreenUiState.Empty -> Unit
-        is TransactionScreenUiState.Loading -> ExpLoadingWheel()
-        is TransactionScreenUiState.Error -> Text(text = state.message)
-        is TransactionScreenUiState.DisplayTransactionsList ->
-          TransactionsList(
-            transactionsFlow = state.transactionList,
-            onTransactionClick = onTransactionClick,
-          )
+        is NetworkViewState.Idle -> Unit
+        is NetworkViewState.Loading -> ExpLoadingWheel()
+        is NetworkViewState.Error -> Text(text = state.message.stringValue())
+        is NetworkViewState.Success<*> -> TransactionsList(
+          transactionsFlow = state.successData?.transactionList!!,
+          onTransactionClick = onTransactionClick,
+          onCreateTransactionClick = onCreateTransactionClick,
+        )
       }
     }
+  }
+}
+
+@Composable
+private fun EmptyState(onCreateTransactionClick: () -> Unit) {
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(Dimens.margin_large_x),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center,
+  ) {
+    Text(
+      text = stringResource(R.string.transactions_list_empty_state_title),
+      style = MaterialTheme.typography.titleLarge,
+      modifier = Modifier.padding(Dimens.margin_large_x),
+    )
+    Text(
+      text = stringResource(R.string.transactions_list_empty_state_message),
+      style = MaterialTheme.typography.titleMedium,
+      modifier = Modifier.padding(horizontal = Dimens.margin_large_x),
+    )
+    ExpeButton(
+      text = stringResource(R.string.transactions_list_create_transaction_action),
+      onClick = onCreateTransactionClick,
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(Dimens.margin_large_x),
+    )
   }
 }
 
@@ -97,32 +128,39 @@ private fun TransactionsListScreenContent(
 private fun TransactionsList(
   transactionsFlow: Flow<PagingData<TransactionsListViewModel.UiModel>>,
   onTransactionClick: (TransactionModel) -> Unit,
+  onCreateTransactionClick: () -> Unit,
 ) {
   val transactions: LazyPagingItems<TransactionsListViewModel.UiModel> = transactionsFlow.collectAsLazyPagingItems()
 
   Box(modifier = Modifier.fillMaxSize()) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-      items(count = transactions.itemCount) { movie ->
-        when (val uiModel = transactions[movie]) {
-          is TransactionsListViewModel.UiModel.TransactionItem -> {
-            TransactionItem(
-              transaction = uiModel.transaction,
-              onClick = { onTransactionClick(uiModel.transaction) },
-            )
-          }
+    if (transactions.itemCount == 0) {
+      // Show empty state if there are no transactions
+      EmptyState(onCreateTransactionClick = onCreateTransactionClick)
+    } else {
+      LazyColumn(modifier = Modifier.fillMaxSize()) {
+        val count = transactions.itemCount
+        items(count = count) { item ->
+          when (val uiModel = transactions[item]) {
+            is TransactionsListViewModel.UiModel.TransactionItem -> {
+              TransactionItem(
+                transaction = uiModel.transaction,
+                onClick = { onTransactionClick(uiModel.transaction) },
+              )
+            }
 
-          is TransactionsListViewModel.UiModel.SeparatorItem -> {
-            SeparatorItem(separator = uiModel)
-          }
+            is TransactionsListViewModel.UiModel.SeparatorItem -> {
+              SeparatorItem(separator = uiModel)
+            }
 
-          else -> Unit
+            else -> Unit
+          }
         }
       }
-    }
-    when (transactions.loadState.refresh) {
-      is LoadState.Loading -> ExpLoadingWheel(modifier = Modifier.align(Alignment.Center))
-      is LoadState.Error -> Text("Error loading transaction list")
-      else -> Unit
+      when (transactions.loadState.refresh) {
+        is LoadState.Loading -> ExpLoadingWheel(modifier = Modifier.align(Alignment.Center))
+        is LoadState.Error -> Text("Error loading transaction list")
+        else -> Unit
+      }
     }
   }
 }

@@ -173,7 +173,7 @@ private fun accountsUiState(accountRepository: AccountRepository): Flow<Accounts
 
       is Result.Error -> AccountsListUiState.Error("Error loading accounts")
       is Result.Loading -> AccountsListUiState.Loading
-      is Result.Empty -> AccountsListUiState.Empty
+      is Result.Idle -> AccountsListUiState.Empty
     }
   }
 }

@@ -61,6 +61,8 @@ import com.emendo.expensestracker.createtransaction.transaction.design.amount.Tr
 import com.emendo.expensestracker.createtransaction.transaction.design.amountColor
 import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferColumn
 import com.emendo.expensestracker.createtransaction.transaction.design.transfer.TransferRow
+import com.emendo.expensestracker.model.ui.ColorModel
+import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -86,6 +88,7 @@ fun CreateTransactionScreen(
   viewModel: CreateTransactionViewModel = hiltViewModel(),
 ) {
   accountResultRecipient.handleValueResult(viewModel::updateSelectedAccount)
+  categoryResultRecipient.handleValueResult(viewModel::updateSelectedCategory)
 
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
   val bottomSheetState = viewModel.bottomSheetState.collectAsStateWithLifecycle()
@@ -167,6 +170,7 @@ private fun CreateTransactionContent(
         if (subcategories != null && subcategories.isNotEmpty()) {
           SubcategorySection(
             subcategories = { subcategories },
+            color = state.target?.color,
             selectedSubcategoryIdProvider = { state.selectedSubcategoryId },
             onClick = { commandProcessor(SelectSubcategoryCommand(it)) },
           )
@@ -228,6 +232,7 @@ private inline fun SubcategorySection(
   crossinline subcategories: () -> ImmutableList<SubcategoryUiModel>,
   crossinline selectedSubcategoryIdProvider: () -> Long?,
   crossinline onClick: (SubcategoryUiModel) -> Unit,
+  color: ColorModel?,
 ) {
   LazyHorizontalStaggeredGrid(
     rows = StaggeredGridCells.Fixed(2),
@@ -243,6 +248,7 @@ private inline fun SubcategorySection(
         subcategory = subcategory,
         selected = subcategory.id == selectedSubcategoryIdProvider(),
         onClick = { onClick(subcategory) },
+        color = color,
       )
     }
   }
@@ -272,6 +278,7 @@ private fun SubcategoryChip(
   subcategory: SubcategoryUiModel,
   selected: Boolean,
   onClick: () -> Unit,
+  color: ColorModel? = null,
 ) {
   FilterChip(
     modifier = Modifier.heightIn(min = Dimens.icon_button_size),
@@ -283,6 +290,7 @@ private fun SubcategoryChip(
         imageVector = subcategory.icon.imageVector,
         contentDescription = null,
         modifier = Modifier.size(FilterChipDefaults.IconSize),
+        tint = color?.color ?: LocalContentColor.current,
       )
     }
   )

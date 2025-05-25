@@ -10,6 +10,5 @@ interface CreateTransactionScreenApi {
     source: TransactionSource?,
     target: TransactionTarget?,
     payload: CreateTransactionEventPayload? = null,
-    shouldNavigateUp: Boolean = false,
   ): String
 }

@@ -60,7 +60,7 @@ private fun categoriesUiState(
       is Result.Success -> getDisplayCategoriesState(categoriesResult.data, categoryType)
       is Result.Error -> SelectCategoryUiState.Error("No categories found ${categoriesResult.exception}")
       is Result.Loading -> SelectCategoryUiState.Loading
-      is Result.Empty -> SelectCategoryUiState.Empty
+      is Result.Idle -> SelectCategoryUiState.Empty
     }
   }
 

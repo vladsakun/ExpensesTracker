@@ -18,7 +18,6 @@ class CreateTransactionScreenApiImpl @Inject constructor(
     source: TransactionSource?,
     target: TransactionTarget?,
     payload: CreateTransactionEventPayload?,
-    shouldNavigateUp: Boolean,
   ): String {
 
     with(createTransactionController) {

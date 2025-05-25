@@ -98,8 +98,7 @@ class CreateTransactionViewModel @Inject constructor(
     createTransactionController.getSource(),
     accountsFlow,
     transform = ::combineCreateTransactionUiState,
-  )
-    .stateInWhileSubscribed(viewModelScope, getDefaultCreateTransactionUiState())
+  ).stateInWhileSubscribed(viewModelScope, getDefaultCreateTransactionUiState())
 
   private val _calculatorBottomSheetState: MutableStateFlow<CalculatorBottomSheetState> =
     MutableStateFlow(getInitialCalculatorState())
@@ -125,8 +124,7 @@ class CreateTransactionViewModel @Inject constructor(
       equalButtonState = equalButtonState,
       currency = currency?.currencySymbolOrCode,
     )
-  }
-    .stateInWhileSubscribed(viewModelScope, getInitialCalculatorState())
+  }.stateInWhileSubscribed(viewModelScope, getInitialCalculatorState())
 
   private val usedCurrencies: StateFlow<List<CurrencyModel>> =
     getUsedCurrenciesUseCase().stateInEagerlyList(viewModelScope)
@@ -350,6 +348,11 @@ class CreateTransactionViewModel @Inject constructor(
     if (result.isSource) updateSourceAccount(account) else updateTargetAccount(account)
   }
 
+  fun updateSelectedCategory(result: Long) {
+    val subcategory = categoriesRepository.getCategorySnapshotById(result) ?: return
+    createTransactionController.setTarget(subcategory)
+  }
+
   private fun updateTargetAccount(account: AccountModel) {
     if (account == createTransactionController.getSourceSnapshot()) {
       createTransactionController.setSource(null)
@@ -497,7 +500,6 @@ class CreateTransactionViewModel @Inject constructor(
       source = createTransactionController.getSourceSnapshot(),
       target = createTransactionController.getTargetSnapshot(),
       payload = payload.copy(transactionId = null),
-      shouldNavigateUp = true,
     )
   }
 

@@ -96,4 +96,11 @@
   <string name="category_list_income_this_month">Income this month</string>
   <string name="category_list_expenses_this_month">Expenses this month</string>
   <!--  CATEGORY LIST-->
+
+  <!--  TRANSACTIONS LIST-->
+  <string name="transactions_list_empty_state_title">No transactions yet</string>
+  <string name="transactions_list_empty_state_message">Add your first transaction</string>
+  <string name="transactions_list_create_transaction_action">Create transaction</string>
+  <string name="transactions_list_error_title">Error retrieving transactions</string>
+  <!--  TRANSACTIONS LIST-->
 </resources>

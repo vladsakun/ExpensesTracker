@@ -83,11 +83,7 @@ class CategoriesListViewModel @Inject constructor(
   private var categoriesOrderedList: List<CategoryModel>? = null
 
   fun getCreateTransactionScreenRoute(category: CategoryModel): String =
-    createTransactionScreenApi.getRoute(
-      source = null,
-      target = category,
-      shouldNavigateUp = true
-    )
+    createTransactionScreenApi.getRoute(source = null, target = category)
 
   fun pageSelected(pageIndex: Int) {
     selectedPageIndex = pageIndex
@@ -218,7 +214,7 @@ private fun categoriesUiState(
 
       is Result.Error -> CategoriesListState.Error("No categories found ${categoriesResult.exception}")
       is Result.Loading -> CategoriesListState.Loading
-      is Result.Empty -> CategoriesListState.Empty
+      is Result.Idle -> CategoriesListState.Empty
     }
   }
 

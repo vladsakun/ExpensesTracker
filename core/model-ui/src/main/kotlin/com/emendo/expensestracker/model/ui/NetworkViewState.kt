@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.model.ui
 
 sealed interface NetworkViewState<out T> {
+  data object Idle : NetworkViewState<Nothing>
   data object Loading : NetworkViewState<Nothing>
   data class Error(val message: TextValue) : NetworkViewState<Nothing>
   data class Success<T>(val data: T) : NetworkViewState<T>

@@ -51,10 +51,7 @@ fun SelectCategoryScreen(
     stateProvider = uiState::value,
     onBackClick = navigator::navigateUp,
     onCreateCategoryClick = { navigator.navigate(viewModel.getCreateCategoryScreenRoute()) },
-    onCategoryClick = { category ->
-      resultNavigator.navigateBack(category.id)
-      navigator.navigateUp()
-    },
+    onCategoryClick = { category -> resultNavigator.navigateBack(category.id) },
   )
 }
 

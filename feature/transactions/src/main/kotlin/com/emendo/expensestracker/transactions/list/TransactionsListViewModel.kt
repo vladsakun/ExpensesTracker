@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
+import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
@@ -22,6 +23,8 @@ import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
+import com.emendo.expensestracker.model.ui.NetworkViewState
+import com.emendo.expensestracker.model.ui.resourceValueOf
 import com.emendo.expensestracker.transactions.TransactionsListArgs
 import com.emendo.expensestracker.transactions.destinations.TransactionsListRouteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,10 +63,11 @@ class TransactionsListViewModel @Inject constructor(
       transformPagingData(pagingData, zoneId)
     }.cachedIn(viewModelScope)
 
-  internal val state: StateFlow<TransactionScreenUiState> = transactionUiState(transactionRepository, list)
+  internal val state: StateFlow<NetworkViewState<TransactionScreenUiState>> =
+    transactionUiState(transactionRepository, list)
     .stateInLazily(
       scope = viewModelScope,
-      initialValue = TransactionScreenUiState.DisplayTransactionsList(list),
+      initialValue = NetworkViewState.Success(TransactionScreenUiState(list)),
     )
 
   private fun transformPagingData(
@@ -199,18 +203,20 @@ class TransactionsListViewModel @Inject constructor(
         transferReceivedAmount = transactionModel.transferReceivedAmount,
       ),
     )
+
+  fun getCreateTransactionRoute(): String = createTransactionScreenApi.getRoute(source = null, target = null)
 }
 
 private fun TransactionsListViewModel.transactionUiState(
   transactionRepository: TransactionRepository,
   pagingList: Flow<PagingData<TransactionsListViewModel.UiModel>>,
-): Flow<TransactionScreenUiState> {
+): Flow<NetworkViewState<TransactionScreenUiState>> {
   return transactionRepository.getTransactionsPagingFlow(viewModelScope).asResult().map {
     when (it) {
-      is Result.Loading -> TransactionScreenUiState.Loading
-      is Result.Error -> TransactionScreenUiState.Error("Error loading transactions")
-      is Result.Success -> TransactionScreenUiState.DisplayTransactionsList(pagingList)
-      is Result.Empty -> TransactionScreenUiState.Empty
+      is Result.Loading -> NetworkViewState.Loading
+      is Result.Error -> NetworkViewState.Error(resourceValueOf(R.string.transactions_list_error_title))
+      is Result.Success -> NetworkViewState.Success(TransactionScreenUiState(pagingList))
+      is Result.Idle -> NetworkViewState.Idle
     }
   }
 }

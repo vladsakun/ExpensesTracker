@@ -102,6 +102,7 @@ private fun ReportScreenContent(
         .padding(paddingValues),
     ) {
       when (val stateValue = stateProvider()) {
+        is NetworkViewState.Idle -> Unit
         is NetworkViewState.Error -> Text(text = stateValue.message.stringValue())
         is NetworkViewState.Loading -> ExpLoadingWheel(modifier = Modifier.align(Alignment.Center))
         is NetworkViewState.Success -> {
