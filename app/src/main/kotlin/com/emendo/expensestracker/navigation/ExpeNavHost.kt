@@ -97,6 +97,9 @@ fun ExpeNavHost(
                 navigator = destinationsNavigator,
                 iconResultRecipient = selectIconResultRecipient(),
                 colorId = navArgs.colorId,
+                name = navArgs.name,
+                iconId = navArgs.iconId,
+                index = navArgs.index,
                 resultNavigator = resultBackNavigator(),
             )
         }

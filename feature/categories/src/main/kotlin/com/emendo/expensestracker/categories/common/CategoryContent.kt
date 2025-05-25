@@ -1,13 +1,12 @@
 package com.emendo.expensestracker.categories.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +26,7 @@ import com.emendo.expensestracker.core.designsystem.utils.uniqueItem
 import com.emendo.expensestracker.core.ui.SelectRowWithColor
 import com.emendo.expensestracker.core.ui.SelectRowWithIcon
 import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.model.ui.textValueOrBlank
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -39,6 +39,8 @@ internal inline fun CategoryContent(
   noinline onColorSelectClick: () -> Unit,
   noinline onConfirmActionClick: () -> Unit,
   noinline onAddSubcategoryClick: () -> Unit,
+  noinline onSubcategoryClick: (name: String, iconId: Int, index: Int) -> Unit,
+  noinline onDeleteSubcategoryClick: (index: Int) -> Unit,
   confirmButtonText: String,
   shouldFocusTitleInputOnLaunch: Boolean = false,
   crossinline additionalBottomContent: @Composable () -> Unit = {},
@@ -46,7 +48,7 @@ internal inline fun CategoryContent(
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
   LaunchedEffect(Unit) {
-    if (shouldFocusTitleInputOnLaunch) {
+    if (shouldFocusTitleInputOnLaunch && stateProvider().title.textValueOrBlank().isBlank()) {
       focusRequester.requestFocus()
       keyboardController?.show()
     }
@@ -114,11 +116,12 @@ internal inline fun CategoryContent(
           items = stateProvider().subcategories,
           key = { index, _ -> index },
           contentType = { _, _ -> "subcategory" },
-        ) { _, subcategory ->
+        ) { index, subcategory ->
           Subcategory(
             title = subcategory.name,
             icon = subcategory.icon.imageVector,
-            onClick = { /* TODO: Handle subcategory click */ },
+            onClick = { onSubcategoryClick(subcategory.name, subcategory.icon.id, index) },
+            onDeleteClick = { onDeleteSubcategoryClick(index) },
           )
         }
         uniqueItem("addSubcategory") {
@@ -149,16 +152,18 @@ internal inline fun CategoryContent(
 }
 
 @Composable
-fun Subcategory(
+private fun Subcategory(
   title: String,
   icon: ImageVector,
   onClick: () -> Unit,
+  onDeleteClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   Row(
     modifier = modifier
       .fillMaxWidth()
       .background(color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+      .clickable(onClick = onClick)
       .padding(start = Dimens.margin_large_x),
     horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
     verticalAlignment = Alignment.CenterVertically,
@@ -169,8 +174,24 @@ fun Subcategory(
       style = MaterialTheme.typography.bodyLarge,
       modifier = Modifier.weight(1f),
     )
-    IconButton(onClick = onClick) {
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { expanded = true }) {
       Icon(imageVector = ExpeIcons.MoreVert, contentDescription = null)
+      ExpeDropdownMenu(
+        expanded = expanded,
+        items = persistentListOf(
+          DropdownMenuItem(
+            text = stringResource(id = R.string.delete),
+            icon = ExpeIcons.Delete,
+            onClick = {
+              onDeleteClick()
+              expanded = false
+            }
+          )
+        ),
+        onDismissRequest = { expanded = false },
+      )
     }
   }
 }

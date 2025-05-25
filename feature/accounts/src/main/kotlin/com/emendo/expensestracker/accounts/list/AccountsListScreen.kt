@@ -4,11 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -34,10 +33,16 @@ import com.emendo.expensestracker.core.app.common.result.IS_DEBUG_CREATE_ACCOUNT
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
+import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
+import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.ui.AccountItem
+import com.emendo.expensestracker.core.ui.AmountTextResizable
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.model.ui.NetworkViewState
+import com.emendo.expensestracker.model.ui.successData
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -72,6 +77,7 @@ fun AccountsScreenRoute(
   val onBackClick: (() -> Unit)? = if (viewModel.isSelectMode) navigator::navigateUp else null
   val uiState = viewModel.uiState.collectAsStateWithLifecycle()
   val editModeState = viewModel.editMode.collectAsStateWithLifecycle()
+  val totalAmountsUiState = viewModel.totalAmountsUiState.collectAsStateWithLifecycle()
 
   BackHandler {
     if (viewModel.editMode.value) {
@@ -85,6 +91,7 @@ fun AccountsScreenRoute(
   AccountsListScreenContent(
     title = stringResource(id = viewModel.titleResId),
     uiStateProvider = uiState::value,
+    totalAmountsProvider = totalAmountsUiState::value,
     onAddAccountClick = { navigator.navigate(CreateAccountRouteDestination) },
     onAccountClick = { account ->
       // Todo extract to Composition pattern
@@ -111,6 +118,7 @@ fun AccountsScreenRoute(
 private fun AccountsListScreenContent(
   title: String,
   uiStateProvider: () -> AccountsListUiState,
+  totalAmountsProvider: () -> NetworkViewState<TotalAmountsUiState>,
   onAddAccountClick: () -> Unit,
   onAccountClick: (AccountModel) -> Unit,
   onAccountLongClick: (AccountModel) -> Unit,
@@ -172,8 +180,9 @@ private fun AccountsListScreenContent(
         is AccountsListUiState.Loading -> ExpLoadingWheel()
         is AccountsListUiState.Error -> Text(text = state.message)
         is AccountsListUiState.DisplayAccountsList -> {
-          AccountList(
+          AccountListContent(
             accountModels = state.accountModels,
+            totalAmountsProvider = totalAmountsProvider,
             onAccountClick = onAccountClick,
             onAccountLongClick = onAccountLongClick,
             editModeProvider = editModeProvider,
@@ -182,6 +191,29 @@ private fun AccountsListScreenContent(
         }
       }
     }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun AccountListContent(
+  accountModels: ImmutableList<AccountUiModel>,
+  totalAmountsProvider: () -> NetworkViewState<TotalAmountsUiState>,
+  onAccountClick: (AccountModel) -> Unit,
+  onAccountLongClick: (AccountModel) -> Unit,
+  editModeProvider: () -> Boolean,
+  onAccountDrag: (List<AccountUiModel>?) -> Unit,
+) {
+  Column {
+    // TODO move into a LazyColumn
+    TotalAmounts(totalAmountsProvider = totalAmountsProvider)
+    AccountList(
+      accountModels = accountModels,
+      onAccountClick = onAccountClick,
+      onAccountLongClick = onAccountLongClick,
+      editModeProvider = editModeProvider,
+      onAccountDrag = onAccountDrag,
+    )
   }
 }
 
@@ -261,6 +293,54 @@ private fun AccountList(
     if (editModeProvider()) {
       hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
     }
+  }
+}
+
+@Composable
+private fun TotalAmounts(totalAmountsProvider: () -> NetworkViewState<TotalAmountsUiState>) {
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(Dimens.margin_small),
+    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small),
+  ) {
+    val totalAmounts = totalAmountsProvider().successData
+    TotalAmount(
+      amount = totalAmounts?.totalIncome,
+      label = R.string.category_list_income_this_month,
+      transactionType = TransactionType.INCOME,
+    )
+    TotalAmount(
+      amount = totalAmounts?.totalExpense,
+      label = R.string.category_list_expenses_this_month,
+      transactionType = TransactionType.EXPENSE,
+    )
+  }
+}
+
+@Composable
+private fun RowScope.TotalAmount(amount: Amount?, label: Int, transactionType: TransactionType) {
+  val dividerColor = DividerDefaults.color
+  Column(
+    modifier = Modifier.Companion
+      .weight(1f)
+      .border(width = Dimens.border_thickness, color = dividerColor, shape = RoundedCornerNormalRadiusShape)
+      .padding(Dimens.margin_small),
+    verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+  ) {
+    AmountTextResizable(
+      amount = amount ?: Amount.ZERO,
+      textStyle = MaterialTheme.typography.titleMedium,
+      transactionType = transactionType,
+      modifier = Modifier
+        .fillMaxWidth()
+        .graphicsLayer { this.alpha = if (amount == null) 0f else 1f },
+    )
+    Text(
+      text = stringResource(label),
+      style = MaterialTheme.typography.labelSmall,
+      modifier = Modifier.fillMaxWidth(),
+    )
   }
 }
 

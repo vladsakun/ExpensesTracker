@@ -15,7 +15,7 @@ import com.emendo.expensestracker.categories.common.CategoryContent
 import com.emendo.expensestracker.categories.common.command.CategoryCommand
 import com.emendo.expensestracker.categories.common.command.UpdateTitleCategoryCommand
 import com.emendo.expensestracker.categories.destinations.CreateSubcategoryRouteDestination
-import com.emendo.expensestracker.categories.subcategory.CreateSubcategoryResult
+import com.emendo.expensestracker.categories.subcategory.SubcategoryResult
 import com.emendo.expensestracker.core.designsystem.component.ExpeButton
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
@@ -32,79 +32,89 @@ import com.ramcosta.composedestinations.result.OpenResultRecipient
 @Destination
 @Composable
 fun CategoryDetailRoute(
-    navigator: DestinationsNavigator,
-    // retrieved in ViewModel via SavedStateHandle
-    @Suppress("UNUSED_PARAMETER") categoryId: Long,
-    colorResultRecipient: OpenResultRecipient<Int>,
-    iconResultRecipient: OpenResultRecipient<Int>,
-    subcategoryResultRecipient: OpenResultRecipient<CreateSubcategoryResult>,
-    viewModel: CategoryDetailViewModel = hiltViewModel(),
+  navigator: DestinationsNavigator,
+  // retrieved in ViewModel via SavedStateHandle
+  @Suppress("UNUSED_PARAMETER") categoryId: Long,
+  colorResultRecipient: OpenResultRecipient<Int>,
+  iconResultRecipient: OpenResultRecipient<Int>,
+  subcategoryResultRecipient: OpenResultRecipient<SubcategoryResult>,
+  viewModel: CategoryDetailViewModel = hiltViewModel(),
 ) {
-    colorResultRecipient.handleValueResult(viewModel::updateColor)
-    iconResultRecipient.handleValueResult(viewModel::updateIcon)
-    subcategoryResultRecipient.handleValueResult(viewModel::addSubcategory)
+  colorResultRecipient.handleValueResult(viewModel::updateColor)
+  iconResultRecipient.handleValueResult(viewModel::updateIcon)
+  subcategoryResultRecipient.handleValueResult(viewModel::handleSubcategoryResult)
 
-    ScreenWithModalBottomSheet(
-        stateManager = viewModel,
-        onNavigateUpClick = navigator::navigateUp,
-        bottomSheetContent = { BottomSheetContent(it) },
-    ) {
-        val state = viewModel.state.collectAsStateWithLifecycle()
+  ScreenWithModalBottomSheet(
+    stateManager = viewModel,
+    onNavigateUpClick = navigator::navigateUp,
+    bottomSheetContent = { BottomSheetContent(it) },
+  ) {
+    val state = viewModel.state.collectAsStateWithLifecycle()
 
-        CategoryDetailContent(
-            stateProvider = state::value,
-            onNavigationClick = navigator::navigateUp,
-            commandProcessor = viewModel::processCommand,
-            onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
-            onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
-            onAddSubcategoryClick = { navigator.navigate(CreateSubcategoryRouteDestination(viewModel.selectedColorId)) }
-        )
-    }
+    CategoryDetailContent(
+      stateProvider = state::value,
+      onNavigationClick = navigator::navigateUp,
+      commandProcessor = viewModel::processCommand,
+      onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
+      onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
+      onAddSubcategoryClick = {
+        navigator.navigate(CreateSubcategoryRouteDestination(viewModel.selectedColorId, null, null, null))
+      },
+      onSubcategoryClick = { name, iconId, index ->
+        navigator.navigate(CreateSubcategoryRouteDestination(viewModel.selectedColorId, name, iconId, index))
+      },
+      onDeleteSubcategoryClick = viewModel::deleteSubcategory,
+    )
+  }
 }
 
 @Composable
 private fun CategoryDetailContent(
-    stateProvider: () -> UiState<CategoryDetailScreenDataImpl>,
-    onNavigationClick: () -> Unit,
-    commandProcessor: (CategoryCommand) -> Unit,
-    onIconSelectClick: () -> Unit,
-    onColorSelectClick: () -> Unit,
-    onAddSubcategoryClick: () -> Unit,
+  stateProvider: () -> UiState<CategoryDetailScreenDataImpl>,
+  onNavigationClick: () -> Unit,
+  commandProcessor: (CategoryCommand) -> Unit,
+  onIconSelectClick: () -> Unit,
+  onColorSelectClick: () -> Unit,
+  onAddSubcategoryClick: () -> Unit,
+  onSubcategoryClick: (name: String, iconId: Int, index: Int) -> Unit,
+  onDeleteSubcategoryClick: (index: Int) -> Unit,
 ) {
-    when (val state = stateProvider()) {
-        is UiState.Data -> {
-            CategoryContent(
-                title = stringResource(id = R.string.category),
-                stateProvider = { state.data.categoryScreenData },
-                onNavigationClick = onNavigationClick,
-                onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
-                onIconSelectClick = onIconSelectClick,
-                onColorSelectClick = onColorSelectClick,
-                onConfirmActionClick = { commandProcessor(UpdateCategoryCategoryDetailCommand()) },
-                onAddSubcategoryClick = onAddSubcategoryClick,
-                confirmButtonText = stringResource(id = R.string.save),
-            ) {
-                ExpeButton(
-                    textResId = R.string.delete,
-                    onClick = { commandProcessor(ShowDeleteCategoryBottomSheetCategoryDetailCommand()) },
-                    colors = ButtonDefaults.textButtonColors(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Dimens.margin_large_x),
-                )
-            }
-        }
-
-        else -> {
-            // Todo handle Empty/Error states
-            Unit
-        }
+  when (val state = stateProvider()) {
+    is UiState.Data -> {
+      CategoryContent(
+        title = stringResource(id = R.string.category),
+        stateProvider = { state.data.categoryScreenData },
+        onNavigationClick = onNavigationClick,
+        onTitleChanged = { commandProcessor(UpdateTitleCategoryCommand(it)) },
+        onIconSelectClick = onIconSelectClick,
+        onColorSelectClick = onColorSelectClick,
+        onConfirmActionClick = { commandProcessor(UpdateCategoryCategoryDetailCommand()) },
+        onAddSubcategoryClick = onAddSubcategoryClick,
+        onSubcategoryClick = onSubcategoryClick,
+        onDeleteSubcategoryClick = onDeleteSubcategoryClick,
+        confirmButtonText = stringResource(id = R.string.save),
+      ) {
+        ExpeButton(
+          textResId = R.string.delete,
+          onClick = { commandProcessor(ShowDeleteCategoryBottomSheetCategoryDetailCommand()) },
+          colors = ButtonDefaults.textButtonColors(),
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimens.margin_large_x),
+        )
+      }
     }
+
+    else -> {
+      // Todo handle Empty/Error states
+      Unit
+    }
+  }
 }
 
 @Composable
 private fun ColumnScope.BottomSheetContent(type: BottomSheetData) {
-    when (type) {
-        is GeneralBottomSheetData -> GeneralBottomSheet(type)
-    }
+  when (type) {
+    is GeneralBottomSheetData -> GeneralBottomSheet(type)
+  }
 }

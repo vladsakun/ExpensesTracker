@@ -37,7 +37,6 @@ import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
-// Todo add custom period
 @HiltViewModel
 class ReportViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,

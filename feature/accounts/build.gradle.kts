@@ -12,4 +12,5 @@ android {
 
 dependencies {
   api(projects.feature.accounts.api)
+  implementation(libs.kotlinx.datetime)
 }

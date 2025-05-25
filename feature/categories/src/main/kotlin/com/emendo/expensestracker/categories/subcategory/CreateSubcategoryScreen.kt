@@ -9,7 +9,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -38,9 +37,13 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun CreateSubcategoryRoute(
   navigator: DestinationsNavigator,
-  colorId: Int,
+  // retrieved in ViewModel via SavedStateHandle
+  @Suppress("UNUSED_PARAMETER") colorId: Int,
+  @Suppress("UNUSED_PARAMETER") name: String?,
+  @Suppress("UNUSED_PARAMETER") iconId: Int?,
+  @Suppress("UNUSED_PARAMETER") index: Int?,
   iconResultRecipient: OpenResultRecipient<Int>,
-  resultNavigator: ResultBackNavigator<CreateSubcategoryResult>,
+  resultNavigator: ResultBackNavigator<SubcategoryResult>,
   viewModel: CreateSubcategoryViewModel = hiltViewModel(),
 ) {
   iconResultRecipient.handleValueResult(viewModel::updateIcon)
@@ -53,7 +56,7 @@ fun CreateSubcategoryRoute(
     actions = persistentListOf(
       MenuAction(
         icon = ExpeIcons.Check,
-        onClick = { resultNavigator.navigateBack(viewModel.getResult()) },
+        onClick = { resultNavigator.navigateBack(viewModel.createResult()) },
         contentDescription = stringResource(id = R.string.confirm),
       )
     )
@@ -62,7 +65,7 @@ fun CreateSubcategoryRoute(
       stateProvider = state::value,
       commandProcessor = viewModel::processCommand,
       onIconSelectClick = { navigator.navigate(viewModel.getSelectIconScreenRoute()) },
-      onConfirmActionClick = { resultNavigator.navigateBack(viewModel.getResult()) },
+      onConfirmActionClick = { resultNavigator.navigateBack(viewModel.createResult()) },
       modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues)
@@ -87,12 +90,15 @@ private fun CreateSubcategoryScreen(
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
   LaunchedEffect(Unit) {
-    focusRequester.requestFocus()
+    if (stateProvider().title.isBlank()) {
+      focusRequester.requestFocus()
+      keyboardController?.show()
+    }
   }
 
   Column(
-    modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+    modifier = modifier,
   ) {
     ExpeTextFieldWithRoundedBackground(
       placeholder = stringResource(id = R.string.title),
@@ -100,11 +106,6 @@ private fun CreateSubcategoryScreen(
       onValueChange = { commandProcessor(UpdateTitleSubcategoryCommand(it)) },
       modifier = Modifier
         .focusRequester(focusRequester)
-        .onFocusChanged {
-          if (it.isFocused) {
-            keyboardController?.show()
-          }
-        }
     )
     SelectRowWithIcon(
       labelResId = R.string.icon,
@@ -126,4 +127,4 @@ private fun CreateSubcategoryScreen(
 
 @Composable
 fun DestinationScope<*>.subcategoryResultRecipient() =
-  resultRecipient<CreateSubcategoryRouteDestination, CreateSubcategoryResult>()
+  resultRecipient<CreateSubcategoryRouteDestination, SubcategoryResult>()

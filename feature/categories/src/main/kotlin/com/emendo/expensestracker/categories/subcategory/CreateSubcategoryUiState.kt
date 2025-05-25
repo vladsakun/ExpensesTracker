@@ -11,11 +11,11 @@ data class CreateSubcategoryUiState(
 ) {
 
   companion object {
-    fun getDefault(color: ColorModel) = CreateSubcategoryUiState(
-      title = "",
-      icon = IconModel.random,
+    fun getDefault(color: ColorModel, iconId: Int?, name: String?) = CreateSubcategoryUiState(
+      title = name ?: "",
+      icon = iconId?.let(IconModel::getById) ?: IconModel.random,
       color = color,
-      confirmButtonEnabled = false,
+      confirmButtonEnabled = !name.isNullOrBlank(),
     )
   }
 }

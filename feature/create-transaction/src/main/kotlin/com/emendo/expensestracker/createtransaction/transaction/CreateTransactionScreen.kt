@@ -181,7 +181,6 @@ private fun CreateTransactionContent(
             error = state.screenData.sourceError == triggered,
             onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
           )
-          // TODO try movableContentOf
         } else {
           TransactionElementRow(
             label = stringResource(id = R.string.account),

@@ -1,7 +1,13 @@
 package com.emendo.expensestracker.accounts.list
 
+import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.collections.immutable.ImmutableList
+
+data class TotalAmountsUiState(
+  val totalIncome: Amount,
+  val totalExpense: Amount,
+)
 
 sealed interface AccountsListUiState {
   data object Loading : AccountsListUiState

@@ -8,26 +8,56 @@ import com.emendo.expensestracker.accounts.api.SelectAccountArgs
 import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDestination
 import com.emendo.expensestracker.app.resources.R
 import com.emendo.expensestracker.core.app.common.ext.stateInLazily
+import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
+import com.emendo.expensestracker.core.domain.transaction.GetTotalInPeriodUseCase
 import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
+import com.emendo.expensestracker.core.model.data.TransactionType
+import com.emendo.expensestracker.data.api.manager.ExpeDateManager
 import com.emendo.expensestracker.data.api.model.AccountModel
 import com.emendo.expensestracker.data.api.repository.AccountRepository
+import com.emendo.expensestracker.data.api.utils.ExpeDateUtils
+import com.emendo.expensestracker.model.ui.NetworkViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountsListViewModel @Inject constructor(
   private val accountRepository: AccountRepository,
+  private val getTotalInPeriodUseCase: GetTotalInPeriodUseCase,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
+  dateManager: ExpeDateManager,
   savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+  private val totalAmountsPeriod: StateFlow<Pair<Instant, Instant>> =
+    flow { emit(ExpeDateUtils.getFirstAndLastDayOfCurrentMonth()) }
+      .stateInWhileSubscribed(
+        scope = viewModelScope,
+        initialValue = ExpeDateUtils.getFirstAndLastDayOfCurrentMonth(),
+        stopTimeoutMillis = 0L,
+        replayExpirationMillis = 0L,
+      )
+  private val dateChangedEvent: Flow<Pair<Instant, Instant>> = dateManager.dateChangedEvent
+    .map { ExpeDateUtils.getFirstAndLastDayOfCurrentMonth() }
+
+  val totalAmountsUiState: StateFlow<NetworkViewState<TotalAmountsUiState>> =
+    merge(totalAmountsPeriod, dateChangedEvent)
+      .flatMapLatest { (start, end) -> totalAmountsUiState(getTotalInPeriodUseCase, start, end) }
+      .stateInWhileSubscribed(
+        scope = viewModelScope,
+        initialValue = NetworkViewState.Loading,
+        stopTimeoutMillis = 0L,
+        replayExpirationMillis = 0L,
+      )
 
   private val args: SelectAccountArgs? by lazy(LazyThreadSafetyMode.NONE) {
     AccountsScreenRouteDestination.argsFrom(savedStateHandle).args
@@ -119,6 +149,17 @@ class AccountsListViewModel @Inject constructor(
   internal fun saveAccountsOrder(accountUiModels: List<AccountUiModel>?) {
     orderedAccounts = accountUiModels
   }
+}
+
+private fun totalAmountsUiState(
+  getTotalInPeriodUseCase: GetTotalInPeriodUseCase,
+  start: Instant,
+  end: Instant,
+): Flow<NetworkViewState<TotalAmountsUiState>> = combine(
+  getTotalInPeriodUseCase(TransactionType.INCOME, start, end),
+  getTotalInPeriodUseCase(TransactionType.EXPENSE, start, end),
+) { totalIncome, totalExpense ->
+  NetworkViewState.Success(TotalAmountsUiState(totalIncome = totalIncome, totalExpense = totalExpense))
 }
 
 private fun accountsUiState(accountRepository: AccountRepository): Flow<AccountsListUiState> {

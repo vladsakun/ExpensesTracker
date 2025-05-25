@@ -1,7 +1,7 @@
 package com.emendo.expensestracker.categories.common.state
 
 import com.emendo.expensestracker.categories.common.CategoryScreenState
-import com.emendo.expensestracker.categories.subcategory.CreateSubcategoryResult
+import com.emendo.expensestracker.categories.subcategory.SubcategoryResult
 import com.emendo.expensestracker.model.ui.UiState
 import com.emendo.expensestracker.model.ui.requireDataValue
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,8 @@ interface CategoryStateManager<T : CategoryScreenState> {
   fun updateConfirmButtonEnabled(enabled: Boolean)
   fun updateColor(colorId: Int)
   fun updateIcon(iconId: Int)
-  fun addSubcategory(result: CreateSubcategoryResult)
+  fun handleSubcategoryResult(result: SubcategoryResult)
+  fun deleteSubcategory(index: Int)
 
   fun changeTitle(newTitle: String) {
     updateTitle(newTitle)

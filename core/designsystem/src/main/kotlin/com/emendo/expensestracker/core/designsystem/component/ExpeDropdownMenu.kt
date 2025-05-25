@@ -7,8 +7,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import kotlinx.collections.immutable.ImmutableList
@@ -24,6 +26,11 @@ fun ExpeDropdownMenu(
     expanded = expanded,
     onDismissRequest = onDismissRequest,
     scrollState = scrollState,
+    properties = PopupProperties(
+      focusable = true,
+      dismissOnBackPress = true,
+      dismissOnClickOutside = true,
+    ),
     offset = DpOffset(0.dp, Dimens.margin_small_x),
   ) {
     items.forEach { item ->
@@ -34,11 +41,18 @@ fun ExpeDropdownMenu(
           onDismissRequest()
         },
         leadingIcon = {
-          if (item.selected) {
+          if (item.icon != null) {
             Icon(
-              ExpeIcons.Check,
+              imageVector = item.icon,
               contentDescription = null,
             )
+          } else {
+            if (item.selected) {
+              Icon(
+                ExpeIcons.Check,
+                contentDescription = null,
+              )
+            }
           }
         }
       )
@@ -49,6 +63,7 @@ fun ExpeDropdownMenu(
 @Immutable
 data class DropdownMenuItem(
   val text: String,
-  val selected: Boolean,
   val onClick: () -> Unit,
+  val selected: Boolean = false,
+  val icon: ImageVector? = null,
 )

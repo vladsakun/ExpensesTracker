@@ -11,7 +11,7 @@ import com.emendo.expensestracker.categories.common.CategoryContent
 import com.emendo.expensestracker.categories.common.command.CategoryCommand
 import com.emendo.expensestracker.categories.common.command.UpdateTitleCategoryCommand
 import com.emendo.expensestracker.categories.destinations.CreateSubcategoryRouteDestination
-import com.emendo.expensestracker.categories.subcategory.CreateSubcategoryResult
+import com.emendo.expensestracker.categories.subcategory.SubcategoryResult
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.model.ui.UiState
@@ -29,12 +29,12 @@ fun CreateCategoryRoute(
   @Suppress("UNUSED_PARAMETER") categoryType: CategoryType,
   colorResultRecipient: OpenResultRecipient<Int>,
   iconResultRecipient: OpenResultRecipient<Int>,
-  subcategoryResultRecipient: OpenResultRecipient<CreateSubcategoryResult>,
+  subcategoryResultRecipient: OpenResultRecipient<SubcategoryResult>,
   viewModel: CreateCategoryViewModel = hiltViewModel(),
 ) {
   colorResultRecipient.handleValueResult(viewModel::updateColor)
   iconResultRecipient.handleValueResult(viewModel::updateIcon)
-  subcategoryResultRecipient.handleValueResult(viewModel::addSubcategory)
+  subcategoryResultRecipient.handleValueResult(viewModel::handleSubcategoryResult)
 
   val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -44,7 +44,20 @@ fun CreateCategoryRoute(
     commandProcessor = viewModel::processCommand,
     onIconSelectClick = remember { { navigator.navigate(viewModel.getSelectIconScreenRoute()) } },
     onColorSelectClick = remember { { navigator.navigate(viewModel.getSelectColorScreenRoute()) } },
-    onAddSubcategoryClick = { navigator.navigate(CreateSubcategoryRouteDestination(viewModel.selectedColorId)) }
+    onAddSubcategoryClick = {
+      navigator.navigate(CreateSubcategoryRouteDestination(viewModel.selectedColorId, null, null, null))
+    },
+    onSubcategoryClick = { name, iconId, index ->
+      navigator.navigate(
+        CreateSubcategoryRouteDestination(
+          colorId = viewModel.selectedColorId,
+          name = name,
+          iconId = iconId,
+          index = index,
+        )
+      )
+    },
+    onDeleteSubcategoryClick = viewModel::deleteSubcategory,
   )
 }
 
@@ -56,6 +69,8 @@ private fun CreateCategoryContent(
   onIconSelectClick: () -> Unit,
   onColorSelectClick: () -> Unit,
   onAddSubcategoryClick: () -> Unit,
+  onSubcategoryClick: (name: String, iconId: Int, index: Int) -> Unit,
+  onDeleteSubcategoryClick: (index: Int) -> Unit,
 ) {
   when (val state = stateProvider()) {
     is UiState.Data -> {
@@ -74,6 +89,8 @@ private fun CreateCategoryContent(
         onColorSelectClick = onColorSelectClick,
         onConfirmActionClick = { commandProcessor(CreateCategoryCommand()) },
         onAddSubcategoryClick = onAddSubcategoryClick,
+        onSubcategoryClick = onSubcategoryClick,
+        onDeleteSubcategoryClick = onDeleteSubcategoryClick,
         confirmButtonText = stringResource(id = R.string.create),
         shouldFocusTitleInputOnLaunch = true,
       )

@@ -23,8 +23,18 @@ class CreateSubcategoryViewModel @Inject constructor(
   private val colorModel by lazy(LazyThreadSafetyMode.NONE) {
     ColorModel.getById(CreateSubcategoryRouteDestination.argsFrom(savedStateHandle).colorId)
   }
+  private val iconId by lazy(LazyThreadSafetyMode.NONE) { CreateSubcategoryRouteDestination.argsFrom(savedStateHandle).iconId }
+  private val name by lazy(LazyThreadSafetyMode.NONE) { CreateSubcategoryRouteDestination.argsFrom(savedStateHandle).name }
+  private val index: Int? by lazy(LazyThreadSafetyMode.NONE) {
+    CreateSubcategoryRouteDestination.argsFrom(
+      savedStateHandle
+    ).index
+  }
 
-  private val _state = MutableStateFlow(CreateSubcategoryUiState.getDefault(colorModel))
+  private val isEditMode: Boolean
+    get() = iconId != null && name != null
+
+  private val _state = MutableStateFlow(CreateSubcategoryUiState.getDefault(colorModel, iconId, name))
   internal val state: StateFlow<CreateSubcategoryUiState> = _state
 
   override fun changeTitle(newTitle: String) {
@@ -42,11 +52,37 @@ class CreateSubcategoryViewModel @Inject constructor(
     _state.update { it.copy(icon = IconModel.getById(newIconId)) }
   }
 
-  internal fun getResult() = CreateSubcategoryResult(state.value.title, state.value.icon.id)
+  internal fun createResult(): SubcategoryResult {
+    return if (isEditMode) {
+      SubcategoryResult.EditSubcategoryResult(
+        title = state.value.title,
+        iconId = state.value.icon.id,
+        index = index!!,
+      )
+    } else {
+      SubcategoryResult.CreateSubcategoryResult(
+        title = state.value.title,
+        iconId = state.value.icon.id,
+      )
+    }
+  }
 }
 
 @Parcelize
-data class CreateSubcategoryResult(
-  val title: String,
-  val iconId: Int,
-) : Parcelable
+sealed interface SubcategoryResult : Parcelable {
+  val title: String
+  val iconId: Int
+
+  @Parcelize
+  data class CreateSubcategoryResult(
+    override val title: String,
+    override val iconId: Int,
+  ) : SubcategoryResult, Parcelable
+
+  @Parcelize
+  data class EditSubcategoryResult(
+    override val title: String,
+    override val iconId: Int,
+    val index: Int,
+  ) : SubcategoryResult, Parcelable
+}

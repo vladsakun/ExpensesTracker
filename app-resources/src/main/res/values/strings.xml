@@ -91,4 +91,9 @@
   <string name="dialog_category_list_delete_confirm_title">Are you sure that you want to delete the category?</string>
   <string name="dialog_category_detail_delete_confirm_title">Are you sure that you want to delete the category?</string>
   <string name="dialog_transaction_detail_delete_confirm_title">Are you sure that you want to delete the transaction?</string>
+
+  <!--  CATEGORY LIST-->
+  <string name="category_list_income_this_month">Income this month</string>
+  <string name="category_list_expenses_this_month">Expenses this month</string>
+  <!--  CATEGORY LIST-->
 </resources>

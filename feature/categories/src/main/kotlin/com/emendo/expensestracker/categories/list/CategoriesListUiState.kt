@@ -2,15 +2,9 @@ package com.emendo.expensestracker.categories.list
 
 import androidx.compose.runtime.Stable
 import com.emendo.expensestracker.categories.list.model.TabData
-import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-
-data class TotalAmountsUiState(
-  val totalIncome: Amount,
-  val totalExpense: Amount,
-)
 
 sealed interface CategoriesListState {
   data object Loading : CategoriesListState

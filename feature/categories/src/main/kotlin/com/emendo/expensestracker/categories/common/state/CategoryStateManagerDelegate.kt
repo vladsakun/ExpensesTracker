@@ -3,7 +3,7 @@ package com.emendo.expensestracker.categories.common.state
 import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryScreenState
 import com.emendo.expensestracker.categories.common.SubcategoryUiModel
-import com.emendo.expensestracker.categories.subcategory.CreateSubcategoryResult
+import com.emendo.expensestracker.categories.subcategory.SubcategoryResult
 import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.UiState
@@ -45,16 +45,35 @@ class CategoryStateManagerDelegate<T>(defaultState: UiState<T>? = null) :
     }
   }
 
-  override fun addSubcategory(result: CreateSubcategoryResult) {
+  override fun handleSubcategoryResult(result: SubcategoryResult) {
     _state.updateScreenData {
       val subcategories = ArrayList(it.subcategories).apply {
-        add(
-          SubcategoryUiModel(
-            id = null,
-            icon = IconModel.getById(result.iconId),
-            name = result.title,
-          )
-        )
+        when (result) {
+          is SubcategoryResult.CreateSubcategoryResult -> {
+            add(
+              SubcategoryUiModel(
+                id = null,
+                icon = IconModel.getById(result.iconId),
+                name = result.title,
+              )
+            )
+          }
+
+          is SubcategoryResult.EditSubcategoryResult -> {
+            val item = get(result.index)
+            val newItem = item.copy(icon = IconModel.getById(result.iconId), name = result.title)
+            set(result.index, newItem)
+          }
+        }
+      }
+      it.copy(subcategories = subcategories.toImmutableList())
+    }
+  }
+
+  override fun deleteSubcategory(index: Int) {
+    _state.updateScreenData {
+      val subcategories = ArrayList(it.subcategories).apply {
+        removeAt(index)
       }
       it.copy(subcategories = subcategories.toImmutableList())
     }
