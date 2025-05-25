@@ -33,8 +33,9 @@ fun <T> Flow<T>.stateInWhileSubscribed(
   scope: CoroutineScope,
   initialValue: T,
   stopTimeoutMillis: Long = 5_000L,
+  replayExpirationMillis: Long = 5_000L,
 ): StateFlow<T> {
-  return stateIn(scope, SharingStarted.WhileSubscribed(stopTimeoutMillis), initialValue)
+  return stateIn(scope, SharingStarted.WhileSubscribed(stopTimeoutMillis, replayExpirationMillis), initialValue)
 }
 
 fun <T> Flow<T>.stateInLazily(

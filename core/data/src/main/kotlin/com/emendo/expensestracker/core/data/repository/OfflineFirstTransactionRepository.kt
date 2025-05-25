@@ -3,7 +3,6 @@ package com.emendo.expensestracker.core.data.repository
 import androidx.paging.*
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
-import com.emendo.expensestracker.core.data.mapper.transactionType
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
 import com.emendo.expensestracker.core.database.model.transaction.TransactionEntity
@@ -123,6 +122,15 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ): Flow<List<TransactionModel>> =
     transactionDao.transactionsInPeriod(targetCategoryId, from, to)
       .map { data -> data.map { transactionMapper.map(it) } }
+
+  override fun getTransactionsByTypeInPeriod(
+    transactionType: TransactionType,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionValueWithType>> =
+    transactionDao
+      .getTransactionsByTypeInPeriod(transactionType.id, from, to)
+      .map { transactions -> transactions.map { toTransactionValueWithType(it) } }
 
   override fun getTransactionsPagedInPeriod(
     transactionType: TransactionType,
@@ -253,11 +261,15 @@ class OfflineFirstTransactionRepository @Inject constructor(
     Pager(config = PagingConfig(pageSize = PAGE_SIZE), pagingSourceFactory = pagingSourceFactory).flow
 
   private fun List<TransactionFull>.mapToTransactionValueWithType(): List<TransactionValueWithType> =
-    map { transaction ->
-      TransactionValueWithType(
-        type = transaction.transactionType,
-        value = transaction.transactionEntity.value,
-        currency = CurrencyModel.toCurrencyModel(transaction.transactionEntity.currencyCode),
-      )
-    }
+    map { transaction -> toTransactionValueWithType(transaction) }
+
+  private fun toTransactionValueWithType(transaction: TransactionFull): TransactionValueWithType =
+    toTransactionValueWithType(transaction.transactionEntity)
+
+  private fun toTransactionValueWithType(transaction: TransactionEntity): TransactionValueWithType =
+    TransactionValueWithType(
+      type = TransactionType.toTransactionType(transaction.typeId),
+      value = transaction.value,
+      currency = CurrencyModel.toCurrencyModel(transaction.currencyCode),
+    )
 }

@@ -8,7 +8,7 @@ enum class TransactionType {
   companion object {
     val DEFAULT = EXPENSE
 
-    fun Int.toTransactionType(): TransactionType = TransactionType.entries[this]
+    fun toTransactionType(id: Int): TransactionType = entries[id]
     val TransactionType.id: Int
       get() = this.ordinal
   }

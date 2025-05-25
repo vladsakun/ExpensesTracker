@@ -56,6 +56,12 @@ interface TransactionRepository {
     to: Instant,
   ): Flow<List<TransactionModel>>
 
+  fun getTransactionsByTypeInPeriod(
+    transactionType: TransactionType,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionValueWithType>>
+
   fun getTransactionsPagedInPeriod(
     transactionType: TransactionType,
     from: Instant,

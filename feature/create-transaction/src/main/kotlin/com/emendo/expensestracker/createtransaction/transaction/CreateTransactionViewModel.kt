@@ -694,5 +694,5 @@ internal fun getTransactionType(payload: CreateTransactionEventPayload?): Transa
     return TransactionType.TRANSFER
   }
 
-  return payload?.transactionType?.toTransactionType() ?: TransactionType.DEFAULT
+  return payload?.transactionType?.let { toTransactionType(it) } ?: TransactionType.DEFAULT
 }

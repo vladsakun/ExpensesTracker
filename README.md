@@ -57,5 +57,8 @@ Features:
 35) Last transactions block on Overview (work on Dashboard)
 36) Put custom location PLACE!
 
+!!!!
+Handle case when deleting one of the transfer accounts. Convert the transaction into income/expense depending whether which account was deleted.
+
 Articles to apply:
 https://medium.com/codex/from-junior-to-senior-the-real-way-to-implement-clean-architecture-in-android-8514005e85e1

@@ -4,13 +4,18 @@ plugins {
 }
 
 android {
+  namespace = "com.emendo.expensestracker.core.designsystem"
+
   defaultConfig {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   lint {
     checkDependencies = true
   }
-  namespace = "com.emendo.expensestracker.core.designsystem"
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
 }
 
 dependencies {

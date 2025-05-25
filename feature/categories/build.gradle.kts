@@ -4,6 +4,13 @@ plugins {
   //    alias(libs.plugins.vkompose)
 }
 
+android {
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
+}
+
 // vkompose {
 //    skippabilityCheck = true
 //    // or
@@ -40,4 +47,5 @@ dependencies {
   implementation(projects.feature.settings.api)
 
   implementation(libs.androidx.activity.compose)
+  implementation(libs.kotlinx.datetime)
 }

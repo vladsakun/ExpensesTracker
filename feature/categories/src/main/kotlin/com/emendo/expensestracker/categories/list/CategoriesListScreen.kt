@@ -9,16 +9,16 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -33,6 +33,9 @@ import com.emendo.expensestracker.core.designsystem.component.*
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.designsystem.utils.RoundedCornerNormalRadiusShape
+import com.emendo.expensestracker.core.model.data.Amount
+import com.emendo.expensestracker.core.model.data.TransactionType
+import com.emendo.expensestracker.core.ui.AmountTextResizable
 import com.emendo.expensestracker.core.ui.CategoryItem
 import com.emendo.expensestracker.core.ui.bottomsheet.BottomSheetData
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ScreenWithModalBottomSheet
@@ -42,6 +45,8 @@ import com.emendo.expensestracker.core.ui.category.CategoriesLazyVerticalGrid
 import com.emendo.expensestracker.core.ui.stringValue
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
+import com.emendo.expensestracker.model.ui.NetworkViewState
+import com.emendo.expensestracker.model.ui.successData
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -61,6 +66,7 @@ fun CategoriesListRoute(
   viewModel: CategoriesListViewModel = hiltViewModel(),
 ) {
   val uiState = viewModel.categoriesListUiState.collectAsStateWithLifecycle()
+  val totalAmounts = viewModel.totalAmountsUiState.collectAsStateWithLifecycle()
   val editModeState = viewModel.editMode.collectAsStateWithLifecycle()
 
   ScreenWithModalBottomSheet(
@@ -70,6 +76,7 @@ fun CategoriesListRoute(
   ) {
     CategoriesListScreenContent(
       stateProvider = uiState::value,
+      totalAmountsProvider = totalAmounts::value,
       isEditModeProvider = editModeState::value,
       onCreateCategoryClick = remember { { navigator.navigate(CreateCategoryRouteDestination(viewModel.categoryType)) } },
       onCategoryClick = remember {
@@ -96,6 +103,7 @@ fun CategoriesListRoute(
 @Composable
 private fun CategoriesListScreenContent(
   stateProvider: () -> CategoriesListUiState,
+  totalAmountsProvider: () -> NetworkViewState<TotalAmountsUiState>,
   isEditModeProvider: () -> Boolean,
   onCreateCategoryClick: () -> Unit,
   onCategoryClick: (CategoryModel) -> Unit,
@@ -154,6 +162,9 @@ private fun CategoriesListScreenContent(
           }
 
           Column {
+            TotalAmounts(totalAmountsProvider)
+            ExpeDivider()
+            VerticalSpacer(Dimens.margin_small_x)
             TextSwitch(
               selectedIndex = selectedPageIndex.intValue,
               items = state.tabs.map { stringResource(id = it.titleResId) }.toImmutableList(),
@@ -180,6 +191,72 @@ private fun CategoriesListScreenContent(
             }
           }
         }
+      }
+    }
+  }
+}
+
+@Composable
+private fun TotalAmounts(totalAmountsProvider: () -> NetworkViewState<TotalAmountsUiState>) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+  ) {
+    val dividerColor = DividerDefaults.color
+    Column(
+      modifier = Modifier
+        .weight(1f)
+        .drawBehind {
+          val borderSize = Dimens.divider_thickness.toPx()
+          val margin = Dimens.margin_small_x.toPx()
+          val x = size.width + margin / 2
+          drawLine(
+            color = dividerColor,
+            start = Offset(x, 0f),
+            end = Offset(x, size.height),
+            strokeWidth = borderSize
+          )
+        }
+        .padding(Dimens.margin_small_x),
+      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+    ) {
+      Text(
+        text = "Income this month",
+        style = MaterialTheme.typography.labelSmall,
+        textAlign = TextAlign.End,
+        modifier = Modifier.fillMaxWidth(),
+      )
+      totalAmountsProvider().successData?.totalIncome?.let {
+        AmountTextResizable(
+          amount = it,
+          textStyle = MaterialTheme.typography.bodyMedium,
+          transactionType = TransactionType.INCOME,
+          textAlign = TextAlign.End,
+          modifier = Modifier.fillMaxWidth(),
+        )
+        // TODO show skeleton loading
+      }
+    }
+    Column(
+      modifier = Modifier
+        .weight(1f)
+        .padding(Dimens.margin_small_x),
+      verticalArrangement = Arrangement.spacedBy(Dimens.margin_small_x),
+    ) {
+      Text(
+        text = "Expenses this month",
+        style = MaterialTheme.typography.labelSmall,
+        textAlign = TextAlign.End,
+        modifier = Modifier.fillMaxWidth(),
+      )
+      totalAmountsProvider().successData?.totalExpense?.let {
+        AmountTextResizable(
+          amount = it,
+          textStyle = MaterialTheme.typography.bodyMedium,
+          transactionType = TransactionType.EXPENSE,
+          textAlign = TextAlign.End,
+          modifier = Modifier.fillMaxWidth(),
+        )
       }
     }
   }
@@ -285,6 +362,7 @@ private fun CategoriesListPreview(
   ExpensesTrackerTheme {
     CategoriesListScreenContent(
       stateProvider = { previewData },
+      totalAmountsProvider = { NetworkViewState.Success(TotalAmountsUiState(Amount.Mock, Amount.Mock)) },
       onCreateCategoryClick = {},
       onCategoryClick = {},
       onPageSelected = {},

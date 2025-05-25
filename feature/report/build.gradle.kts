@@ -4,6 +4,13 @@ plugins {
   id("kotlinx-serialization")
 }
 
+android {
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
+}
+
 dependencies {
   implementation(projects.feature.transactions.api)
 

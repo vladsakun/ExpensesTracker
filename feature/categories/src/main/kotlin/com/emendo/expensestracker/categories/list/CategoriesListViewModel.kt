@@ -11,13 +11,16 @@ import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase
+import com.emendo.expensestracker.core.domain.transaction.GetTotalInPeriodUseCase
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
+import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
 import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
+import com.emendo.expensestracker.data.api.manager.ExpeDateManager
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.label
@@ -25,6 +28,8 @@ import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toPageIndex
 import com.emendo.expensestracker.data.api.model.category.toCategoryWithOrdinalIndex
 import com.emendo.expensestracker.data.api.repository.CategoryRepository
+import com.emendo.expensestracker.data.api.utils.ExpeDateUtils
+import com.emendo.expensestracker.model.ui.NetworkViewState
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import com.emendo.expensestracker.settings.SettingsScreenApi
 import com.emendo.expensestracker.sync.initializers.Sync
@@ -34,6 +39,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import javax.inject.Inject
 
 private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_category_dialog"
@@ -42,11 +48,34 @@ private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_c
 class CategoriesListViewModel @Inject constructor(
   private val appContext: Application,
   private val categoryRepository: CategoryRepository,
-  private val getCategoriesUseCase: GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase,
+  getCategoriesUseCase: GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase,
+  dateManager: ExpeDateManager,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
+  private val getTotalInPeriodUseCase: GetTotalInPeriodUseCase,
   private val settingsScreenApi: SettingsScreenApi,
 ) : ViewModel(), ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
+
+  private val totalAmountsPeriod: StateFlow<Pair<Instant, Instant>> =
+    flow { emit(ExpeDateUtils.getFirstAndLastDayOfCurrentMonth()) }
+      .stateInWhileSubscribed(
+        scope = viewModelScope,
+        initialValue = ExpeDateUtils.getFirstAndLastDayOfCurrentMonth(),
+        stopTimeoutMillis = 0L,
+        replayExpirationMillis = 0L,
+      )
+  private val dateChangedEvent: Flow<Pair<Instant, Instant>> = dateManager.dateChangedEvent
+    .map { ExpeDateUtils.getFirstAndLastDayOfCurrentMonth() }
+
+  val totalAmountsUiState: StateFlow<NetworkViewState<TotalAmountsUiState>> =
+    merge(totalAmountsPeriod, dateChangedEvent)
+      .flatMapLatest { (start, end) -> totalAmountsUiState(getTotalInPeriodUseCase, start, end) }
+      .stateInWhileSubscribed(
+        scope = viewModelScope,
+        initialValue = NetworkViewState.Loading,
+        stopTimeoutMillis = 0L,
+        replayExpirationMillis = 0L,
+      )
 
   /**
    * Stores the latest version from db.
@@ -196,6 +225,17 @@ class CategoriesListViewModel @Inject constructor(
   companion object {
     private val DEFAULT_PAGE_INDEX = CategoryType.EXPENSE.toPageIndex()
   }
+}
+
+private fun totalAmountsUiState(
+  getTotalInPeriodUseCase: GetTotalInPeriodUseCase,
+  start: Instant,
+  end: Instant,
+): Flow<NetworkViewState<TotalAmountsUiState>> = combine(
+  getTotalInPeriodUseCase(TransactionType.INCOME, start, end),
+  getTotalInPeriodUseCase(TransactionType.EXPENSE, start, end),
+) { totalIncome, totalExpense ->
+  NetworkViewState.Success(TotalAmountsUiState(totalIncome = totalIncome, totalExpense = totalExpense))
 }
 
 // Todo move some parts to external Mapper

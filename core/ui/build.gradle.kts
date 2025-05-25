@@ -5,6 +5,11 @@ plugins {
 
 android {
   namespace = "com.emendo.expensestracker.core.ui"
+
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
 }
 
 dependencies {

@@ -7,6 +7,7 @@ plugins {
 android {
   buildFeatures {
     buildConfig = true
+    androidResources = false
   }
   testOptions {
     unitTests {

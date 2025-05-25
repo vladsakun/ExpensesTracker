@@ -32,7 +32,7 @@ internal fun TopBar(
         selectedIndex = stateProvider().screenData.transactionType.ordinal,
         items = tabsResId.map { stringResource(id = it) }.toPersistentList(),
         onSelectionChange = { tabIndex ->
-          commandProcessor(ChangeTransactionTypeCommand(tabIndex.toTransactionType()))
+          commandProcessor(ChangeTransactionTypeCommand(toTransactionType(tabIndex)))
         },
       )
     },

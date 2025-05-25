@@ -5,10 +5,16 @@ plugins {
 }
 
 android {
+  namespace = "com.emendo.expensestracker.core.datastore"
+
   defaultConfig {
     consumerProguardFile("consumer-proguard-rules.pro")
   }
-  namespace = "com.emendo.expensestracker.core.datastore"
+
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
 }
 
 protobuf {

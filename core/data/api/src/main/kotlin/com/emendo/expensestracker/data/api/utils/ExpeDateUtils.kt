@@ -17,4 +17,17 @@ object ExpeDateUtils {
 
     return Pair(firstInstant, lastInstant)
   }
+
+  fun getFirstAndLastDayOfCurrentMonth(): Pair<Instant, Instant> {
+    val now = Clock.System.now()
+    val date = now.toLocalDateTime(TimeZone.UTC)
+    val isLeapYear = Year.isLeap(date.year.toLong())
+    val firstDayOfMonth = LocalDate(date.year, date.monthNumber, 1)
+    val lastDayOfMonth = LocalDate(date.year, date.monthNumber, firstDayOfMonth.month.length(isLeapYear))
+
+    val firstInstant = firstDayOfMonth.atStartOfDayIn(TimeZone.UTC)
+    val lastInstant = lastDayOfMonth.atTime(23, 59, 59).toInstant(TimeZone.UTC)
+
+    return Pair(firstInstant, lastInstant)
+  }
 }

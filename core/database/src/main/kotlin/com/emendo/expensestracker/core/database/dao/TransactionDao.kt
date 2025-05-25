@@ -73,6 +73,14 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   ): Flow<List<TransactionFull>>
 
   @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE typeId = :typeId AND date BETWEEN :from AND :to ORDER BY date DESC")
+  abstract fun getTransactionsByTypeInPeriod(
+    typeId: Int,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionEntity>>
+
+  @Transaction
   @Query("SELECT * FROM $TABLE_NAME ORDER BY date DESC LIMIT 1")
   abstract suspend fun retrieveLastTransaction(): TransactionFull?
 

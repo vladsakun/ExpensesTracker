@@ -8,6 +8,11 @@ android {
     //        testInstrumentationRunner = "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
   }
   namespace = "com.emendo.expensestracker.sync"
+
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
 }
 
 dependencies {

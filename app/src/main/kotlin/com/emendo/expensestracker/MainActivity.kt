@@ -23,6 +23,7 @@ import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
+import com.emendo.expensestracker.core.app.base.app.base.DateBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiver
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
   private val localeBroadcastReceiver by lazy { LocaleBroadcastReceiver(viewModel::updateLocale) }
   private val timeZoneBroadcastReceiver by lazy { TimeZoneBroadcastReceiver(viewModel::updateTimeZone) }
+  private val dateBroadcastReceiver by lazy { DateBroadcastReceiver(viewModel::updateDate) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     // Turn off the decor fitting system windows, which allows us to handle insets,
@@ -91,6 +93,7 @@ class MainActivity : ComponentActivity() {
     super.onStart()
     localeBroadcastReceiver.register(this)
     timeZoneBroadcastReceiver.register(this)
+    dateBroadcastReceiver.register(this)
 
     displayNotification(
       title = "Test deep link",
@@ -105,6 +108,7 @@ class MainActivity : ComponentActivity() {
     super.onStop()
     localeBroadcastReceiver.unregister(this)
     timeZoneBroadcastReceiver.unregister(this)
+    dateBroadcastReceiver.unregister(this)
   }
 
   private fun getPendingIntent(): PendingIntent {

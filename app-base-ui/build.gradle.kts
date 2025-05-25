@@ -11,6 +11,11 @@ android {
   namespace = "com.emendo.expensestracker.core.app.base.ui"
 
   composeDestinations("app.base.ui")
+
+  buildFeatures {
+    // Disable R class generation for this module to reduce build time and size
+    androidResources = false
+  }
 }
 
 dependencies {
