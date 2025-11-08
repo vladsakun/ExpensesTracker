@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6c0e3ce65a1b7552dddf1d128fef5943",
+    "identityHash": "6d8eed1319ada70957e2ecec8b48e5b4",
     "entities": [
       {
         "tableName": "account",
@@ -178,7 +178,7 @@
       },
       {
         "tableName": "transaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `targetSubcategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetSubcategoryId`) REFERENCES `subcategory`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `timeZoneId` TEXT NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `targetSubcategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetSubcategoryId`) REFERENCES `subcategory`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -190,6 +190,12 @@
             "fieldPath": "date",
             "columnName": "date",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeZoneId",
+            "columnName": "timeZoneId",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -374,7 +380,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6c0e3ce65a1b7552dddf1d128fef5943')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d8eed1319ada70957e2ecec8b48e5b4')"
     ]
   }
 }

@@ -3,6 +3,7 @@ package com.emendo.expensestracker.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.emendo.expensestracker.core.database.common.BaseDao
 import com.emendo.expensestracker.core.database.model.category.CategoryEntity
 import com.emendo.expensestracker.core.database.model.category.SubcategoryDetailUpdate
@@ -29,6 +30,9 @@ abstract class SubcategoryDao : BaseDao<SubcategoryEntity>() {
 
   @Update(entity = CategoryEntity::class)
   abstract suspend fun updateOrdinalIndex(update: SubcategoryOrdinalIndexUpdate)
+
+  @Upsert
+  abstract suspend fun upsert(entity: SubcategoryEntity)
 
   companion object {
     private const val TABLE_NAME = TABLE_SUBCATEGORY

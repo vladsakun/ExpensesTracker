@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.core.datastore
 
 import androidx.datastore.core.DataStore
+import com.emendo.expensestracker.core.model.data.DarkThemeConfig
 import com.emendo.expensestracker.core.model.data.UserData
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModels
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,18 @@ class ExpePreferencesDataStore @Inject constructor(
         generalCurrencyCode = it.generalCurrencyCode,
         shouldShowNotifications = it.shouldShowNotifications,
         isBackupEnabled = it.isBackupEnabled,
+        darkThemeConfig = DarkThemeConfig.DARK,
+        //        darkThemeConfig = when (it.darkThemeConfig) {
+        //          null,
+        //          DarkThemeConfigProto.DARK_THEME_CONFIG_UNSPECIFIED,
+        //          DarkThemeConfigProto.UNRECOGNIZED,
+        //          DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM,
+        //            ->
+        //            DarkThemeConfig.FOLLOW_SYSTEM
+        //          DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT ->
+        //            DarkThemeConfig.LIGHT
+        //          DarkThemeConfigProto.DARK_THEME_CONFIG_DARK -> DarkThemeConfig.DARK
+        //        },
       )
     }
 
@@ -39,6 +52,19 @@ class ExpePreferencesDataStore @Inject constructor(
         this.useDynamicColor = useDynamicColor
       }
     }
+  }
+
+  suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+    //    userPreferences.updateData {
+    //      it.copy {
+    //        this.darkThemeConfig = when (darkThemeConfig) {
+    //          DarkThemeConfig.FOLLOW_SYSTEM ->
+    //            DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM
+    //          DarkThemeConfig.LIGHT -> DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT
+    //          DarkThemeConfig.DARK -> DarkThemeConfigProto.DARK_THEME_CONFIG_DARK
+    //        }
+    //      }
+    //    }
   }
 
   suspend fun getGeneralCurrencyCode(): String =

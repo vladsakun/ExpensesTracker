@@ -10,7 +10,7 @@ import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
-import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase
+import com.emendo.expensestracker.core.domain.category.GetUserCreatedCategoriesUseCase
 import com.emendo.expensestracker.core.model.data.CategoryWithOrdinalIndex
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
@@ -42,7 +42,7 @@ private const val CATEGORY_LIST_DELETE_CATEGORY_DIALOG = "category_list_delete_c
 class CategoriesListViewModel @Inject constructor(
   private val appContext: Application,
   private val categoryRepository: CategoryRepository,
-  getCategoriesUseCase: GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase,
+  getCategoriesUseCase: GetUserCreatedCategoriesUseCase,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
   private val settingsScreenApi: SettingsScreenApi,
@@ -194,10 +194,8 @@ class CategoriesListViewModel @Inject constructor(
 }
 
 // Todo move some parts to external Mapper
-private fun categoriesUiState(
-  getUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase: GetUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase,
-): Flow<CategoriesListState> =
-  getUserCreatedCategoriesWithNotEmptyPrepopulatedUseCase().asResult().map { categoriesResult ->
+private fun categoriesUiState(getCategoriesUseCase: GetUserCreatedCategoriesUseCase): Flow<CategoriesListState> =
+  getCategoriesUseCase().asResult().map { categoriesResult ->
     when (categoriesResult) {
       is Result.Success -> {
         CategoriesListState.DisplayCategoriesList(

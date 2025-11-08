@@ -13,6 +13,7 @@ import com.emendo.expensestracker.core.database.util.CATEGORY_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.SUBCATEGORY_PRIMARY_KEY
 import com.emendo.expensestracker.core.database.util.TABLE_TRANSACTION
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import java.math.BigDecimal
 
 @Entity(
@@ -48,6 +49,7 @@ data class TransactionEntity(
   @PrimaryKey(autoGenerate = true)
   val id: Long = 0,
   val date: Instant,
+  val timeZoneId: String = TimeZone.currentSystemDefault().id,
   @ColumnInfo(index = true)
   val sourceAccountId: Long,
   @ColumnInfo(index = true)

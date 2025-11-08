@@ -196,14 +196,7 @@ private fun LazyListScope.periods(
       selectedTabIndex = selectedTabIndex,
       modifier = Modifier.wrapContentWidth(),
       indicator = { tabPositions ->
-        Box(
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-            .tabIndicatorOffset(tabPositions[selectedTabIndex])
-            .clip(RoundedCornerSmallRadiusShape)
-            .background(MaterialTheme.colorScheme.primary),
-        )
+        TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]))
       }
     ) {
       reportPeriods().forEach { period ->

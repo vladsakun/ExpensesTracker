@@ -8,6 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,17 +21,28 @@ import com.emendo.expensestracker.core.designsystem.component.ExpePreview
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
+import com.emendo.expensestracker.core.ui.handleValueResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.OpenResultRecipient
 import kotlinx.collections.immutable.persistentListOf
 
 @Destination(start = true)
 @Composable
 internal fun SettingsRoute(
   navigator: DestinationsNavigator,
+  currencyResultRecipient: OpenResultRecipient<String>,
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
+  currencyResultRecipient.handleValueResult(viewModel::updateCurrencyByCode)
+
   val uiState = viewModel.state.collectAsStateWithLifecycle()
+
+  LaunchedEffect(viewModel.navigationEvent) {
+    viewModel.navigationEvent.collect { route ->
+      navigator.navigate(route)
+    }
+  }
 
   ExpeScaffoldWithTopBar(
     titleResId = R.string.settings,

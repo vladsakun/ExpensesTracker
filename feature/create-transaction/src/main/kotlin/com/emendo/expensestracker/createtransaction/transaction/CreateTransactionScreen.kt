@@ -189,6 +189,8 @@ private fun CreateTransactionContent(
           TransactionElementRow(
             label = stringResource(id = R.string.account),
             onClick = onCreateAccountClick,
+            error = state.screenData.sourceError == triggered,
+            onErrorConsumed = { commandProcessor(ConsumeFieldErrorCommand(FieldWithError.Source)) },
           ) {
             CreateAccountButton(onClick = onCreateAccountClick)
           }

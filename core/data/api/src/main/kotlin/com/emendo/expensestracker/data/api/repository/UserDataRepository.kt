@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.data.api.repository
 
+import com.emendo.expensestracker.core.model.data.DarkThemeConfig
 import com.emendo.expensestracker.core.model.data.UserData
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,11 @@ interface UserDataRepository {
 
   suspend fun shouldUseDynamicColor(): Boolean
   suspend fun setUseDynamicColor(useDynamicColor: Boolean)
+
+  /**
+   * Sets the desired dark theme config.
+   */
+  suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
 
   suspend fun getGeneralCurrencyCode(): String
   suspend fun setGeneralCurrencyCode(currencyCode: String)

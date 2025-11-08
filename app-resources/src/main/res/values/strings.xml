@@ -72,16 +72,19 @@
   <string name="search">Search</string>
   <string name="sort">Sort</string>
 
+  <!--ACCOUNTS LIST-->
+  <string name="accounts_list_create_account_action">Add account</string>
+  <!--ACCOUNTS LIST-->
+
+  <!--REPORT-->
   <string name="report_title">Report</string>
   <string name="report_all_expenses">All expenses</string>
   <string name="report_all_incomes">All incomes</string>
   <string name="report_current_balance">Current balance</string>
   <string name="report_all_time">All time</string>
   <string name="report_custom">Custom</string>
-
   <string name="report_subcategories_empty_state">No transactions found</string>
-
-  <string name="categories_list_add_category_action">Add category</string>
+  <!--REPORT-->
 
   <string name="category_content_subcategories">Subcategories</string>
   <string name="category_content_add_subcategory_action">Add subcategory</string>
@@ -93,6 +96,7 @@
   <string name="dialog_transaction_detail_delete_confirm_title">Are you sure that you want to delete the transaction?</string>
 
   <!--  CATEGORY LIST-->
+  <string name="categories_list_add_category_action">Add category</string>
   <string name="category_list_income_this_month">Income this month</string>
   <string name="category_list_expenses_this_month">Expenses this month</string>
   <!--  CATEGORY LIST-->
@@ -102,5 +106,10 @@
   <string name="transactions_list_empty_state_message">Add your first transaction</string>
   <string name="transactions_list_create_transaction_action">Create transaction</string>
   <string name="transactions_list_error_title">Error retrieving transactions</string>
+  <string name="transactions_list_duplicate_action">Duplicate</string>
+  <string name="transactions_list_delete_action">Delete</string>
+
+  <string name="transactions_list_dialog_delete_transaction_title">Are you sure that you want to delete the transaction?</string>
+  <string name="transactions_list_dialog_delete_transaction_message">This action cannot be undone.</string>
   <!--  TRANSACTIONS LIST-->
 </resources>

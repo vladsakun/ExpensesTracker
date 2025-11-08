@@ -2,6 +2,7 @@ package com.emendo.expensestracker.core.data.repository
 
 import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.datastore.ExpePreferencesDataStore
+import com.emendo.expensestracker.core.model.data.DarkThemeConfig
 import com.emendo.expensestracker.core.model.data.UserData
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
@@ -40,6 +41,10 @@ class OfflineFirstUserDataRepository @Inject constructor(
 
   override suspend fun setUseDynamicColor(useDynamicColor: Boolean) {
     expePreferencesDataStore.setUseDynamicColor(useDynamicColor)
+  }
+
+  override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+    expePreferencesDataStore.setDarkThemeConfig(darkThemeConfig)
   }
 
   override suspend fun getGeneralCurrencyCode() =

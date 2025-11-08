@@ -5,4 +5,5 @@ data class UserData(
   val generalCurrencyCode: String,
   val shouldShowNotifications: Boolean,
   val isBackupEnabled: Boolean,
+  val darkThemeConfig: DarkThemeConfig,
 )

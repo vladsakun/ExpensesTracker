@@ -8,13 +8,18 @@ import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.core.app.common.ext.stateInLazily
+import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.result.Result
 import com.emendo.expensestracker.core.app.common.result.asResult
 import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.transaction.GetTransactionsSumUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.core.model.data.TransactionType.Companion.id
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
+import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
+import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
+import com.emendo.expensestracker.core.ui.bottomsheet.general.Action.Companion.DangerAction
+import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheetData
 import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.extensions.abs
@@ -32,9 +37,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import java.time.ZoneId
 import javax.inject.Inject
+
+private const val TRANSACTIONS_LIST_DELETE_TRANSACTION_DIALOG = "transactions_list_delete_transaction_dialog"
 
 @HiltViewModel
 class TransactionsListViewModel @Inject constructor(
@@ -46,7 +54,7 @@ class TransactionsListViewModel @Inject constructor(
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
   savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : ViewModel(), TransactionListCommander, ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
   private val args: TransactionsListArgs? by lazy(LazyThreadSafetyMode.NONE) {
     TransactionsListRouteDestination.argsFrom(savedStateHandle).args
@@ -63,12 +71,29 @@ class TransactionsListViewModel @Inject constructor(
       transformPagingData(pagingData, zoneId)
     }.cachedIn(viewModelScope)
 
-  internal val state: StateFlow<NetworkViewState<TransactionScreenUiState>> =
+  internal val state: StateFlow<NetworkViewState<TransactionsUiState>> =
     transactionUiState(transactionRepository, list)
-    .stateInLazily(
-      scope = viewModelScope,
-      initialValue = NetworkViewState.Success(TransactionScreenUiState(list)),
+      .stateInWhileSubscribed(scope = viewModelScope, initialValue = NetworkViewState.Idle)
+
+  override fun showConfirmDeleteTransactionBottomSheet(transaction: TransactionModel) {
+    showModalBottomSheet(
+      GeneralBottomSheetData
+        .Builder(
+          id = TRANSACTIONS_LIST_DELETE_TRANSACTION_DIALOG,
+          positiveAction = DangerAction(resourceValueOf(R.string.delete)) { deleteTransaction(transaction.id) },
+        )
+        .title(resourceValueOf(R.string.transactions_list_dialog_delete_transaction_title))
+        .negativeAction(Action(resourceValueOf(R.string.cancel), ::hideModalBottomSheet))
+        .build()
     )
+  }
+
+  private fun deleteTransaction(transactionId: Long) {
+    viewModelScope.launch {
+      transactionRepository.deleteTransaction(transactionId)
+      hideModalBottomSheet()
+    }
+  }
 
   private fun transformPagingData(
     pagingData: PagingData<UiModel.TransactionItem>,
@@ -190,7 +215,7 @@ class TransactionsListViewModel @Inject constructor(
     }
   }
 
-  fun getTransactionDetailsRoute(transactionModel: TransactionModel): String =
+  fun getTransactionDetailsRoute(transactionModel: TransactionModel, editMode: Boolean): String =
     createTransactionScreenApi.getRoute(
       source = transactionModel.source,
       target = transactionModel.target,
@@ -201,6 +226,7 @@ class TransactionsListViewModel @Inject constructor(
         transactionAmount = transactionModel.amount.abs(amountFormatter),
         transactionType = transactionModel.type.id,
         transferReceivedAmount = transactionModel.transferReceivedAmount,
+        editMode = editMode,
       ),
     )
 
@@ -210,12 +236,15 @@ class TransactionsListViewModel @Inject constructor(
 private fun TransactionsListViewModel.transactionUiState(
   transactionRepository: TransactionRepository,
   pagingList: Flow<PagingData<TransactionsListViewModel.UiModel>>,
-): Flow<NetworkViewState<TransactionScreenUiState>> {
+): Flow<NetworkViewState<TransactionsUiState>> {
   return transactionRepository.getTransactionsPagingFlow(viewModelScope).asResult().map {
     when (it) {
       is Result.Loading -> NetworkViewState.Loading
       is Result.Error -> NetworkViewState.Error(resourceValueOf(R.string.transactions_list_error_title))
-      is Result.Success -> NetworkViewState.Success(TransactionScreenUiState(pagingList))
+      is Result.Success -> {
+        NetworkViewState.Success(TransactionsUiState(pagingList))
+      }
+
       is Result.Idle -> NetworkViewState.Idle
     }
   }

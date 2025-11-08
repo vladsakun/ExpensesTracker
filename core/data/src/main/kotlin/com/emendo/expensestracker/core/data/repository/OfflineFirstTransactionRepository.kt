@@ -1,7 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
 import androidx.paging.*
-import com.emendo.expensestracker.core.app.common.network.di.ApplicationScope
 import com.emendo.expensestracker.core.data.mapper.TransactionMapper
 import com.emendo.expensestracker.core.database.dao.AccountDao
 import com.emendo.expensestracker.core.database.dao.TransactionDao
@@ -37,7 +36,6 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
   private val getTransactionTypeUseCase: GetTransactionTypeUseCase,
-  @ApplicationScope private val scope: CoroutineScope,
 ) : TransactionRepository {
 
   override fun getLastTransactionFull(): Flow<TransactionModel?> =
@@ -175,6 +173,30 @@ class OfflineFirstTransactionRepository @Inject constructor(
     }
   }
 
+  override suspend fun updateTransaction(
+    transactionId: Long,
+    source: TransactionSource,
+    target: TransactionTarget,
+    subcategoryId: Long?,
+    amount: Amount,
+    date: Instant,
+    transferReceivedAmount: Amount?,
+    note: String?,
+  ) {
+    transactionDao.upsert(
+      TransactionEntity(
+        sourceAccountId = source.id,
+        targetCategoryId = target.id,
+        targetSubcategoryId = subcategoryId,
+        value = amount.value.abs().negate(),
+        currencyCode = amount.currency.currencyCode,
+        date = date,
+        note = note,
+        typeId = TransactionType.EXPENSE.id,
+      )
+    )
+  }
+
   private suspend fun createExpenseTransaction(
     source: AccountModel,
     target: CategoryModel,
@@ -264,7 +286,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
     map { transaction -> toTransactionValueWithType(transaction) }
 
   private fun toTransactionValueWithType(transaction: TransactionFull): TransactionValueWithType =
-    toTransactionValueWithType(transaction.transactionEntity)
+    toTransactionValueWithType(transaction.entity)
 
   private fun toTransactionValueWithType(transaction: TransactionEntity): TransactionValueWithType =
     TransactionValueWithType(

@@ -20,4 +20,16 @@ class OfflineFirstSubcategoryRepository @Inject constructor(
       ),
     )
   }
+
+  override suspend fun updateSubcategory(id: Long, name: String, icon: IconModel, categoryId: Long, ordinalIndex: Int) {
+    subcategoryDao.upsert(
+      SubcategoryEntity(
+        id = id,
+        categoryId = categoryId,
+        name = name,
+        iconId = icon.id,
+        ordinalIndex = ordinalIndex
+      ),
+    )
+  }
 }

@@ -10,4 +10,12 @@ interface SubcategoryRepository {
     categoryId: Long,
     ordinalIndex: Int,
   )
+
+  suspend fun updateSubcategory(
+    id: Long,
+    name: String,
+    icon: IconModel,
+    categoryId: Long,
+    ordinalIndex: Int,
+  )
 }

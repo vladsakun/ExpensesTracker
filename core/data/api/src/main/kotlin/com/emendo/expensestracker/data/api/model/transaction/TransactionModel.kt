@@ -4,6 +4,7 @@ import com.emendo.expensestracker.core.model.data.Amount
 import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 
 data class TransactionModel(
   val id: Long,
@@ -13,6 +14,7 @@ data class TransactionModel(
   val amount: Amount,
   val type: TransactionType,
   val date: Instant,
+  val timeZone: TimeZone,
   val note: String?,
   val transferReceivedAmount: Amount? = null,
 )

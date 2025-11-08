@@ -157,14 +157,15 @@ private fun AccountsListScreenContent(
     },
     floatingActionButtonPosition = FabPosition.End,
     floatingActionButton = {
-      FloatingActionButton(
-        onClick = onAddAccountClick,
-        content = {
+      ExtendedFloatingActionButton(
+        text = { Text(text = stringResource(id = R.string.accounts_list_create_account_action)) },
+        icon = {
           Icon(
             imageVector = ExpeIcons.Add,
-            contentDescription = "Add",
+            contentDescription = stringResource(id = R.string.accounts_list_create_account_action),
           )
         },
+        onClick = onAddAccountClick,
       )
     },
   ) { padding ->

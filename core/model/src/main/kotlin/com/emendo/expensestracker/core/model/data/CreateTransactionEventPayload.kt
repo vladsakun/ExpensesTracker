@@ -9,4 +9,5 @@ data class CreateTransactionEventPayload(
   val date: Instant,
   val transactionType: Int,
   val transferReceivedAmount: Amount?,
+  val editMode: Boolean = false,
 )

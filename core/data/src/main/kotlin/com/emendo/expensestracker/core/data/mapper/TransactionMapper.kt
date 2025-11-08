@@ -13,6 +13,7 @@ import com.emendo.expensestracker.data.api.model.category.CategoryType
 import com.emendo.expensestracker.data.api.model.category.CategoryType.Companion.toTransactionType
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
+import kotlinx.datetime.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,8 +31,8 @@ class TransactionMapper @Inject constructor(
     val target: TransactionTarget =
       targetAccount ?: targetCategory ?: throw IllegalStateException("Transaction must have a target")
 
-    val currencyModel = CurrencyModel.toCurrencyModel(transactionEntity.currencyCode)
-    val amount = amountFormatter.format(transactionEntity.value, currencyModel)
+    val currencyModel = CurrencyModel.toCurrencyModel(entity.currencyCode)
+    val amount = amountFormatter.format(entity.value, currencyModel)
 
     val type = transactionType
     val isTransfer = type == TransactionType.TRANSFER
@@ -39,15 +40,16 @@ class TransactionMapper @Inject constructor(
 
     // Todo refactor
     return TransactionModel(
-      id = transactionEntity.id,
+      id = entity.id,
       source = if (isTransfer) targetAccount!! else sourceAccount,
       target = if (isTransfer) sourceAccount else target,
       targetSubcategory = getTargetSubcategory(),
       amount = amount.formatPositive(),
       type = type,
       transferReceivedAmount = transferReceivedAmount?.formatPositive(),
-      date = transactionEntity.date,
-      note = transactionEntity.note,
+      date = entity.date,
+      note = entity.note,
+      timeZone = TimeZone.of(entity.timeZoneId),
     )
   }
 
@@ -57,8 +59,8 @@ class TransactionMapper @Inject constructor(
   }
 
   private fun TransactionFull.getTransferReceivedAmount(): Amount? {
-    val transferReceivedValue = transactionEntity.transferReceivedValue
-    val transferReceivedCurrency = transactionEntity.transferReceivedCurrencyCode?.let(CurrencyModel::toCurrencyModel)
+    val transferReceivedValue = entity.transferReceivedValue
+    val transferReceivedCurrency = entity.transferReceivedCurrencyCode?.let(CurrencyModel::toCurrencyModel)
     return if (transferReceivedValue != null && transferReceivedCurrency != null) {
       amountFormatter.format(transferReceivedValue, transferReceivedCurrency)
     } else {

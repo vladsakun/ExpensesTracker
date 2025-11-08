@@ -8,7 +8,7 @@ import com.emendo.expensestracker.core.database.model.category.SubcategoryEntity
 
 data class TransactionFull(
   @Embedded
-  val transactionEntity: TransactionEntity,
+  val entity: TransactionEntity,
   @Relation(parentColumn = "sourceAccountId", entityColumn = "id")
   val sourceAccount: AccountEntity,
   @Relation(parentColumn = "targetAccountId", entityColumn = "id")

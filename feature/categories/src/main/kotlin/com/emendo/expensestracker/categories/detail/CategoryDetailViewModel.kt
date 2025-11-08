@@ -9,6 +9,8 @@ import com.emendo.expensestracker.categories.common.CategoryScreenData
 import com.emendo.expensestracker.categories.common.CategoryViewModel
 import com.emendo.expensestracker.categories.common.SubcategoryUiModel
 import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
+import com.emendo.expensestracker.core.domain.category.UpdateCategoryWithSubcategoriesUseCase
+import com.emendo.expensestracker.core.domain.model.SubcategoryEditModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
@@ -33,6 +35,7 @@ class CategoryDetailViewModel @Inject constructor(
   private val categoryRepository: CategoryRepository,
   override val selectIconScreenApi: SelectIconScreenApi,
   override val selectColorScreenApi: SelectColorScreenApi,
+  private val updateCategoryWithSubcategoriesUseCase: UpdateCategoryWithSubcategoriesUseCase,
 ) : CategoryViewModel<CategoryDetailScreenDataImpl>(),
     ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate(),
     CategoryDetailsCommandReceiver {
@@ -62,20 +65,28 @@ class CategoryDetailViewModel @Inject constructor(
       return
     }
 
-    updateCategoryJob =
-      viewModelScope.launch {
-        with(state.value.requireDataValue().categoryScreenData) {
-          categoryRepository.updateCategory(
-            id = categoryId,
-            name = title.textValueOrBlank(),
-            icon = icon,
-            color = color,
-            type = checkNotNull(categoryType),
-          )
-        }
-
-        navigateUp()
+    updateCategoryJob = viewModelScope.launch {
+      with(state.value.requireDataValue().categoryScreenData) {
+        updateCategoryWithSubcategoriesUseCase(
+          id = categoryId,
+          name = title.textValueOrBlank(),
+          icon = icon,
+          color = color,
+          type = checkNotNull(categoryType),
+          // TODO remove mapping
+          subcategories = subcategories.map {
+            SubcategoryEditModel(
+              id = it.id,
+              name = it.name,
+              icon = it.icon,
+              ordinalIndex = subcategories.indexOf(it),
+            )
+          },
+        )
       }
+
+      navigateUp()
+    }
   }
 
   override fun showDeleteCategoryBottomSheet() {

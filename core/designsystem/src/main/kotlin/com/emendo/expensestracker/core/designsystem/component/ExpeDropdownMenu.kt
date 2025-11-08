@@ -1,12 +1,10 @@
 package com.emendo.expensestracker.core.designsystem.component
 
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -35,7 +33,12 @@ fun ExpeDropdownMenu(
   ) {
     items.forEach { item ->
       DropdownMenuItem(
-        text = { Text(text = item.text) },
+        text = {
+          Text(
+            text = item.text,
+            color = item.textColor ?: Color.Unspecified,
+          )
+        },
         onClick = {
           item.onClick()
           onDismissRequest()
@@ -45,6 +48,7 @@ fun ExpeDropdownMenu(
             Icon(
               imageVector = item.icon,
               contentDescription = null,
+              tint = item.iconColor ?: LocalContentColor.current,
             )
           } else {
             if (item.selected) {
@@ -66,4 +70,6 @@ data class DropdownMenuItem(
   val onClick: () -> Unit,
   val selected: Boolean = false,
   val icon: ImageVector? = null,
+  val iconColor: Color? = null,
+  val textColor: Color? = null,
 )
