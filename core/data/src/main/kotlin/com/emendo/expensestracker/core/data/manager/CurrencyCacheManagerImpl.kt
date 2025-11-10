@@ -22,10 +22,7 @@ class CurrencyCacheManagerImpl @Inject constructor(
 ) : CurrencyCacheManager {
 
   override val currencyCodes: StateFlow<Map<String, CurrencyModel>?> =
-    combine(
-      expeLocaleManager.localeState,
-      currencyRatesRepository.getCurrencyCodes()
-    ) { locale, codes ->
+    combine(expeLocaleManager.localeState, currencyRatesRepository.getCurrencyCodes()) { locale, codes ->
       codes.toCurrenciesMap()
     }.stateInEagerly(scope, null)
 

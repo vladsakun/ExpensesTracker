@@ -4,6 +4,7 @@ import com.emendo.expensestracker.core.app.resources.models.IconModel
 import com.emendo.expensestracker.core.model.data.AccountWithOrdinalIndex
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.AccountModel
+import com.emendo.expensestracker.model.ui.ColorModel
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
@@ -19,7 +20,7 @@ interface AccountRepository {
     currency: CurrencyModel,
     name: String,
     icon: IconModel,
-    color: com.emendo.expensestracker.model.ui.ColorModel,
+    color: ColorModel,
     balance: BigDecimal,
   )
 
@@ -28,7 +29,7 @@ interface AccountRepository {
     currency: CurrencyModel,
     name: String,
     icon: IconModel,
-    color: com.emendo.expensestracker.model.ui.ColorModel,
+    color: ColorModel,
     balance: BigDecimal,
   )
 

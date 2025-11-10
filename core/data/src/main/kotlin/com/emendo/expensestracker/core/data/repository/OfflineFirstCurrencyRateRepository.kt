@@ -1,6 +1,6 @@
 package com.emendo.expensestracker.core.data.repository
 
-import com.emendo.expensestracker.core.app.common.ext.stateInLazily
+import com.emendo.expensestracker.core.app.common.ext.stateInEagerly
 import com.emendo.expensestracker.core.app.common.ext.stateInLazilyList
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
@@ -42,7 +42,7 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
           .mapNotNull(::toCurrencyRateModel)
           .associateBy { it.currencyCode }
       }
-      .stateInLazily(scope, emptyMap())
+      .stateInEagerly(scope, emptyMap())
 
   private val currencies: StateFlow<List<String>> =
     currencyRatesDao

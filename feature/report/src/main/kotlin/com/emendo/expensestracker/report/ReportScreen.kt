@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -191,13 +190,10 @@ private fun LazyListScope.periods(
 ) {
   uniqueItem("periods") {
     val selectedTabIndex = selectedPeriodIndexProvider()
-    ScrollableTabRow(
+    PrimaryScrollableTabRow(
       edgePadding = 0.dp,
       selectedTabIndex = selectedTabIndex,
       modifier = Modifier.wrapContentWidth(),
-      indicator = { tabPositions ->
-        TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]))
-      }
     ) {
       reportPeriods().forEach { period ->
         Text(
