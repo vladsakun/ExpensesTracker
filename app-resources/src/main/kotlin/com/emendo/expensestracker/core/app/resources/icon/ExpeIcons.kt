@@ -34,6 +34,8 @@ object ExpeIcons {
   val Backspace = Icons.AutoMirrored.Outlined.Backspace
   val Settings = Icons.Outlined.Settings
   val Currency = Icons.Outlined.MonetizationOn
+  val Language = Icons.Outlined.Language
+  val QuestionMark = Icons.Outlined.QuestionMark
   val Notifications = Icons.Outlined.Notifications
   val ColorLens = Icons.Outlined.ColorLens
   val Security = Icons.Outlined.Security

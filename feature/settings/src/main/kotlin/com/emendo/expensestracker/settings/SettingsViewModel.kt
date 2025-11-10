@@ -10,6 +10,7 @@ import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.model.data.UserData
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
 import com.emendo.expensestracker.model.ui.textValueOf
+import com.emendo.expensestracker.settings.destinations.HelpArticlesListScreenDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
 import kotlinx.collections.immutable.persistentListOf
@@ -85,8 +86,6 @@ constructor(
         ),
     )
 
-  private fun getSettingsItemStringRes(it: Boolean) = if (it) AppR.string.on_label else AppR.string.off_label
-
   private fun getSelectCurrencyScreenRoute(): String =
     selectCurrencyScreenApi.getSelectCurrencyScreenRoute()
 
@@ -94,13 +93,10 @@ constructor(
     when (settingsItemModel.id) {
       GENERAL_CURRENCY_ID -> {
         navigationChannel.trySend(getSelectCurrencyScreenRoute())
-        //          if (userDataRepository.getGeneralCurrencyCode() == "USD") {
-        //            userDataRepository.setGeneralCurrencyCode("EUR")
-        //          } else {
-        //            userDataRepository.setGeneralCurrencyCode("USD")
-        //          }
       }
-
+      HELP -> {
+        navigationChannel.trySend(HelpArticlesListScreenDestination.route)
+      }
       APPEARANCE -> {
         showThemeDialog.value = StateEvent.Triggered
       }

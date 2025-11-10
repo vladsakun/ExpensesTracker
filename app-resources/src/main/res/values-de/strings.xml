@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--General-->
+  <string name="back">Zurück</string>
+  <string name="close">Schließen</string>
+  <string name="add">Hinzufügen</string>
+  <string name="create">Erstellen</string>
+  <string name="save">Speichern</string>
+  <string name="delete">Löschen</string>
+  <string name="more">Mehr</string>
+  <string name="duplicate">Duplizieren</string>
+  <string name="cancel">Abbrechen</string>
+  <string name="done">Fertig</string>
+  <string name="loading">Laden</string>
+  <string name="on_label">An</string>
+  <string name="off_label">Aus</string>
+  <string name="confirm">Bestätigen</string>
+  <string name="ok" translatable="false">Ok</string>
+  <string name="edit">Bearbeiten</string>
+  <string name="empty_general_title">Noch keine Daten</string>
+  <string name="empty_general_message">Kommen Sie später wieder</string>
+  <!--General-->
+
+  <string name="expense">Ausgabe</string>
+  <string name="income">Einnahme</string>
+  <string name="transfer">Überweisung</string>
+  <string name="substract">Subtrahieren</string>
+  <string name="multiply">Multiplizieren</string>
+  <string name="divide">Dividieren</string>
+  <string name="clear">Löschen</string>
+  <string name="equal">Gleich</string>
+  <string name="currency_with_symbol">Währung\n%s</string>
+  <string name="currency">Währung</string>
+  <string name="select_currency">Währung auswählen</string>
+  <string name="archive">Archivieren</string>
+  <string name="icon">Symbol</string>
+  <string name="title">Titel</string>
+  <string name="color">Farbe</string>
+  <string name="select_color">Farbe auswählen</string>
+  <string name="select_icon">Symbol auswählen</string>
+  <string name="balance">Kontostand</string>
+  <string name="accounts">Konten</string>
+  <string name="select_account">Konto auswählen</string>
+  <string name="account">Konto</string>
+  <string name="accounts_loading">Konten werden geladen</string>
+  <string name="account_name">Kontoname</string>
+  <string name="create_account">Konto erstellen</string>
+  <string name="categories">Kategorien</string>
+  <string name="category">Kategorie</string>
+  <string name="categories_loading">Kategorien werden geladen</string>
+  <string name="create_category">Kategorie erstellen</string>
+  <string name="transactions">Transaktionen</string>
+  <string name="create_transaction">Transaktion erstellen</string>
+  <string name="settings">Einstellungen</string>
+  <string name="general_currency">Allgemeine Währung</string>
+  <string name="reminders">Erinnerungen</string>
+  <string name="appearance">Aussehen</string>
+  <string name="security">Sicherheit</string>
+  <string name="backups">Backups</string>
+  <string name="help">Hilfe</string>
+  <string name="advanced_settings">Erweiterte Einstellungen</string>
+  <string name="save_transaction">Transaktion speichern</string>
+  <string name="uncategorized">Ohne Kategorie</string>
+
+  <string name="sync_notification_title">Ausgaben-Tracker</string>
+  <string name="sync_notification_channel_name">Synchronisierung</string>
+  <string name="sync_notification_channel_description">Hintergrundaufgaben für Ausgaben-Tracker</string>
+
+  <string name="create_transaction_note_placeholder">Notiz</string>
+  <string name="create_transaction_general_destination">Ziel</string>
+
+  <string name="search">Suche</string>
+  <string name="sort">Sortieren</string>
+
+  <!--ACCOUNTS LIST-->
+  <string name="accounts_list_create_account_action">Konto hinzufügen</string>
+  <!--ACCOUNTS LIST-->
+
+  <!--REPORT-->
+  <string name="report_title">Bericht</string>
+  <string name="report_balance">Kontostand: </string>
+  <string name="report_all_expenses">Alle Ausgaben</string>
+  <string name="report_all_incomes">Alle Einnahmen</string>
+  <string name="report_current_balance">Aktueller Kontostand</string>
+  <string name="report_all_time">Gesamte Zeit</string>
+  <string name="report_custom">Benutzerdefiniert</string>
+  <string name="report_subcategories_empty_state">Keine Transaktionen gefunden</string>
+  <!--REPORT-->
+
+  <string name="category_content_subcategories">Unterkategorien</string>
+  <string name="category_content_add_subcategory_action">Unterkategorie hinzufügen</string>
+  <string name="create_subcategory_title">Unterkategorie</string>
+
+  <string name="dialog_account_detail_delete_confirm_title">Sind Sie sicher, dass Sie das Konto löschen möchten?</string>
+  <string name="dialog_category_list_delete_confirm_title">Sind Sie sicher, dass Sie die Kategorie löschen möchten?</string>
+  <string name="dialog_category_detail_delete_confirm_title">Sind Sie sicher, dass Sie die Kategorie löschen möchten?</string>
+  <string name="dialog_transaction_detail_delete_confirm_title">Sind Sie sicher, dass Sie die Transaktion löschen möchten?</string>
+
+  <!--  CATEGORY LIST-->
+  <string name="categories_list_add_category_action">Kategorie hinzufügen</string>
+  <string name="category_list_income_this_month">Einnahmen diesen Monat</string>
+  <string name="category_list_expenses_this_month">Ausgaben diesen Monat</string>
+  <!--  CATEGORY LIST-->
+
+  <!--  TRANSACTIONS LIST-->
+  <string name="transactions_list_empty_state_title">Noch keine Transaktionen</string>
+  <string name="transactions_list_empty_state_message">Fügen Sie die erste Transaktion hinzu</string>
+  <string name="transactions_list_create_transaction_action">Transaktion erstellen</string>
+  <string name="transactions_list_error_title">Fehler beim Laden der Transaktionen</string>
+  <string name="transactions_list_duplicate_action">Duplizieren</string>
+  <string name="transactions_list_delete_action">Löschen</string>
+
+  <string name="transactions_list_dialog_delete_transaction_title">Sind Sie sicher, dass Sie die Transaktion löschen möchten?</string>
+  <string name="transactions_list_dialog_delete_transaction_message">Diese Aktion kann nicht rückgängig gemacht werden.</string>
+  <!--  TRANSACTIONS LIST-->
+
+  <!--THEME DIALOG-->
+  <string name="theme_dialog_title">Thema auswählen</string>
+  <string name="theme_dialog_dismiss">Schließen</string>
+  <string name="theme_dialog_dynamic_color_preference">Dynamische Farbe</string>
+  <string name="theme_dialog_dynamic_color_yes">Ja</string>
+  <string name="theme_dialog_dynamic_color_no">Nein</string>
+  <string name="theme_dialog_dark_mode_preference">Dunkler Modus</string>
+  <string name="theme_dialog_dark_mode_config_system_default">Systemstandard</string>
+  <string name="theme_dialog_dark_mode_config_light">Hell</string>
+  <string name="theme_dialog_dark_mode_config_dark">Dunkel</string>
+  <!--THEME DIALOG-->
+
+  <!--HELP-->
+  <string name="help_article_how_to_use_title">Wie benutzt man Expenses Tracker</string>
+  <string name="help_article_currency_settings_title">Währungseinstellungen</string>
+  <string name="help_article_app_language_title">App-Sprache</string>
+  <string name="help_article_questions_title">Noch Fragen?</string>
+  <string name="help_screen_how_to_use">
+  <![CDATA[
+  <h3>Wie benutzt man Expenses Tracker</h3>
+  <br/>
+
+  Expenses Tracker hilft Ihnen, Ihre persönlichen Finanzen zu verwalten, zu planen und zu analysieren. Die App ist für Nutzer gedacht, die eine einfache und effektive Möglichkeit suchen, Ausgaben und Einnahmen zu verfolgen, Budgets zu setzen und ihre finanzielle Aktivität zu überprüfen.
+  <br/>
+
+  <br/>
+  <h3>Konten erstellen</h3>
+  <br/>
+
+  Fügen Sie Konten hinzu, die Ihre tatsächlichen Finanzquellen widerspiegeln, wie "Bargeld", "Bankkonto" oder "Kreditkarte". Jedes Konto kann eine eigene Währung und einen eigenen Kontostand haben, sodass Sie Ihre Mittel genau verfolgen können.
+  <br/>
+
+  <br/>
+  <h3>Kategorien einrichten</h3>
+  <br/>
+
+  Expenses Tracker bietet Standardkategorien für Ausgaben und Einnahmen. Sie können Kategorien und Unterkategorien nach Ihren Ausgabengewohnheiten hinzufügen, umbenennen oder löschen. Organisieren Sie die Kategorien auf dem Hauptbildschirm, indem Sie auf das Bearbeitungssymbol klicken.
+  <br/>
+
+  <br/>
+  <h3>Transaktionen erfassen</h3>
+  <br/>
+
+  Erfassen Sie jede Ausgabe und Einnahme als Transaktion. Geben Sie für jede Transaktion das Konto, die Kategorie, den Betrag und bei Bedarf eine Notiz an.
+  <br/>
+
+  <br/>
+  <h3>Finanzen analysieren</h3>
+  <br/>
+
+  Verwenden Sie den Bereich "Bericht", um Ausgaben und Einnahmen für beliebige Zeiträume anzuzeigen. Visualisieren Sie die Daten mit interaktiven Diagrammen, z.B. Kreisdiagrammen für die Verteilung nach Kategorien. So können Sie Ihre finanziellen Gewohnheiten besser verstehen und fundierte Entscheidungen treffen.
+  Entdecken Sie alle Funktionen, um Ihre Finanzen zu kontrollieren und Ihre Ziele zu erreichen!]]>
+  </string>
+  <string name="help_screen_currency_settings">
+  <![CDATA[
+  <h3>Währungseinstellungen</h3>
+  <br/>
+
+  Expenses Tracker unterstützt die Verwaltung von Finanzen in mehreren Währungen, sodass Sie Ausgaben und Einnahmen in verschiedenen Konten und Situationen einfach verfolgen können.
+  <br/>
+
+  <br/>
+  <h3>Allgemeine Währung</h3>
+  <br/>
+
+  Die allgemeine Währung wird standardmäßig für die Anzeige von Gesamtsummen und Berichten verwendet. Sie können sie unter Einstellungen ▸ Allgemeine Währung festlegen. Alle neuen Konten und die meisten Summen verwenden diese Währung, sofern nicht anders angegeben.
+  <br/>
+
+  <br/>
+  <h3>Kontowährung</h3>
+  <br/>
+
+  Jedes Konto kann eine eigene Währung haben, was praktisch ist, wenn Sie Konten in verschiedenen Ländern haben oder mehrere Währungen verwenden. Legen Sie die Währung für jedes Konto beim Erstellen oder Bearbeiten fest. Transaktionen in diesem Konto werden in der gewählten Währung erfasst.
+  Nutzen Sie diese Funktionen, um Ihre Finanzen übersichtlich zu halten, unabhängig von der Anzahl der verwendeten Währungen.]]>
+  </string>
+  <string name="help_screen_app_language">
+  <![CDATA[
+  <h3>App-Sprache</h3>
+  <br/>
+
+  Expenses Tracker ist in mehreren Sprachen verfügbar. Standardmäßig verwendet die App die Sprache Ihres Geräts. Sie können in den App-Einstellungen eine andere Sprache auswählen: Einstellungen ▸ Sprache.
+  Wenn Ihre Sprache nicht in der Liste der unterstützten Sprachen enthalten ist und Sie bei der Übersetzung helfen möchten, kontaktieren Sie uns bitte. Wir freuen uns über Beiträge und können das notwendige Material für die Lokalisierung bereitstellen.
+  Wenn Sie Fehler oder Ungenauigkeiten in der Übersetzung bemerken, informieren Sie uns bitte, und wir werden sie beheben.
+  Email: support@expensestracker.app]]>
+  </string>
+  <string name="help_screen_questions">
+  <![CDATA[
+  <h3>Noch Fragen?</h3>
+  <br/>
+
+  Wenn Sie Fragen zur Nutzung von Expenses Tracker haben oder Hilfe bei einer Funktion benötigen, kontaktieren Sie uns bitte. Wir helfen Ihnen gerne weiter und sorgen dafür, dass Sie das Beste aus der App herausholen.
+  Fragen Sie uns: support@expensestracker.app]]>
+  </string>
+</resources>
+

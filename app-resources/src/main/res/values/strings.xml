@@ -125,4 +125,86 @@
   <string name="theme_dialog_dark_mode_config_light">Light</string>
   <string name="theme_dialog_dark_mode_config_dark">Dark</string>
   <!--THEME DIALOG-->
+
+  <!--HELP-->
+  <string name="help_article_how_to_use_title">How to Use Expenses Tracker</string>
+  <string name="help_article_currency_settings_title">Currency Settings</string>
+  <string name="help_article_app_language_title">App Language</string>
+  <string name="help_article_questions_title">Any Questions Left?</string>
+  <string name="help_screen_how_to_use">
+  <![CDATA[
+  <h3>How to Use Expenses Tracker</h3>
+  <br/>
+
+  Expenses Tracker helps you manage, plan, and analyze your personal finances. The app is designed for users who want a simple and effective way to track expenses and income, set budgets, and review financial activity.
+  <br/>
+
+  <br/>
+  <h3>Create Accounts</h3>
+  <br/>
+
+  Add accounts that represent your real financial sources, such as "Cash," "Bank Account," or "Credit Card." Each account can have its own currency and balance, allowing you to track your money accurately.
+  <br/>
+
+  <br/>
+  <h3>Customize Categories</h3>
+  <br/>
+
+  Expenses Tracker provides default categories for expenses and income. You can add, rename, or remove categories and subcategories to match your spending habits. Organize your categories on the dashboard by clicking edit icon.
+  <br/>
+
+  <br/>
+  <h3>Record Transactions</h3>
+  <br/>
+
+  Log every expense and income as a transaction. For each transaction, specify the account, category, amount, and add notes if needed.
+  <br/>
+
+  <br/>
+  <h3>Analyze Your Finances</h3>
+  <br/>
+
+  Use the Report section to review your expenses and income for any period. Visualize your data with interactive charts, such as pie charts for category breakdowns. This helps you understand your financial habits and make informed decisions.
+  Explore all features to take control of your finances and achieve your goals!]]>
+  </string>
+  <string name="help_screen_currency_settings">
+  <![CDATA[
+  <h3>Currency Settings</h3>
+  <br/>
+
+  Expenses Tracker supports managing your finances in multiple currencies, making it easy to track spending and income across different accounts and situations.
+  <br/>
+
+  <br/>
+  <h3>General Currency</h3>
+  <br/>
+
+  The general currency is the default used for displaying overall totals and reports. You can set this in Settings ▸ General Currency. All new accounts and most summaries will use this currency unless you specify otherwise.
+  <br/>
+
+  <br/>
+  <h3>Account Currency</h3>
+  <br/>
+
+  Each account can have its own currency, which is useful if you have accounts in different countries or use multiple currencies. Set the currency for each account when creating or editing it. Transactions in that account will be recorded in its selected currency.
+  Use these features to keep your finances organized, no matter how many currencies you use.]]>
+  </string>
+  <string name="help_screen_app_language">
+  <![CDATA[
+  <h3>App Language</h3>
+  <br/>
+
+  Expenses Tracker is available in multiple languages. By default, the app uses your device\'s system language. If you prefer, you can select a different language in the app settings: Settings ▸ Language.
+  If your language is not supported and you would like to help with translation, please contact us. We welcome contributions and can provide the necessary materials for localization.
+  If you notice any errors or inaccuracies in the translation, let us know and we will work to correct them.
+  Email: support@expensestracker.app]]>
+  </string>
+  <string name="help_screen_questions">
+  <![CDATA[
+  <h3>Any Questions Left?</h3>
+  <br/>
+
+  If you have any questions about how to use Expenses Tracker or need help with any feature, please contact us. We are here to assist you and make sure you get the most out of the app.
+  Ask your question: support@expensestracker.app]]>
+  </string>
 </resources>

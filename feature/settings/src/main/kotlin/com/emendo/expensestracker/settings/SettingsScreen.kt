@@ -9,9 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,7 +22,6 @@ import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.ui.handleValueResult
 import com.emendo.expensestracker.core.ui.stringValue
-import com.emendo.expensestracker.model.ui.textValueOf
 import com.emendo.expensestracker.settings.theme.ThemeDialog
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -100,7 +96,7 @@ private fun SettingsItem(
     Row(
       modifier = Modifier
         .clickable(onClick = onClick)
-        .padding(Dimens.margin_large_x),
+        .padding(horizontal = Dimens.margin_large_x, vertical = Dimens.margin_normal),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
     ) {

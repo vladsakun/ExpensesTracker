@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--General-->
+  <string name="back">Назад</string>
+  <string name="close">Закрити</string>
+  <string name="add">Додати</string>
+  <string name="create">Створити</string>
+  <string name="save">Зберегти</string>
+  <string name="delete">Видалити</string>
+  <string name="more">Більше</string>
+  <string name="duplicate">Дублювати</string>
+  <string name="cancel">Скасувати</string>
+  <string name="done">Готово</string>
+  <string name="loading">Завантаження</string>
+  <string name="on_label">Увімкнено</string>
+  <string name="off_label">Вимкнено</string>
+  <string name="confirm">Підтвердити</string>
+  <string name="ok" translatable="false">Ok</string>
+  <string name="edit">Редагувати</string>
+  <string name="empty_general_title">Даних ще немає</string>
+  <string name="empty_general_message">Поверніться пізніше</string>
+  <!--General-->
+
+  <string name="expense">Витрата</string>
+  <string name="income">Дохід</string>
+  <string name="transfer">Переказ</string>
+  <string name="substract">Відняти</string>
+  <string name="multiply">Помножити</string>
+  <string name="divide">Поділити</string>
+  <string name="clear">Очистити</string>
+  <string name="equal">Дорівнює</string>
+  <string name="currency_with_symbol">Валюта\n%s</string>
+  <string name="currency">Валюта</string>
+  <string name="select_currency">Виберіть валюту</string>
+  <string name="archive">Архівувати</string>
+  <string name="icon">Іконка</string>
+  <string name="title">Назва</string>
+  <string name="color">Колір</string>
+  <string name="select_color">Виберіть колір</string>
+  <string name="select_icon">Виберіть іконку</string>
+  <string name="balance">Баланс</string>
+  <string name="accounts">Рахунки</string>
+  <string name="select_account">Виберіть рахунок</string>
+  <string name="account">Рахунок</string>
+  <string name="accounts_loading">Завантаження рахунків</string>
+  <string name="account_name">Назва рахунку</string>
+  <string name="create_account">Створити рахунок</string>
+  <string name="categories">Категорії</string>
+  <string name="category">Категорія</string>
+  <string name="categories_loading">Завантаження категорій</string>
+  <string name="create_category">Створити категорію</string>
+  <string name="transactions">Транзакції</string>
+  <string name="create_transaction">Створити транзакцію</string>
+  <string name="settings">Налаштування</string>
+  <string name="general_currency">Загальна валюта</string>
+  <string name="reminders">Нагадування</string>
+  <string name="appearance">Зовнішній вигляд</string>
+  <string name="security">Безпека</string>
+  <string name="backups">Резервні копії</string>
+  <string name="help">Допомога</string>
+  <string name="advanced_settings">Додаткові налаштування</string>
+  <string name="save_transaction">Зберегти транзакцію</string>
+  <string name="uncategorized">Без категорії</string>
+
+  <string name="sync_notification_title">Трекер витрат</string>
+  <string name="sync_notification_channel_name">Синхронізація</string>
+  <string name="sync_notification_channel_description">Фонові завдання для трекера витрат</string>
+
+  <string name="create_transaction_note_placeholder">Примітка</string>
+  <string name="create_transaction_general_destination">Призначення</string>
+
+  <string name="search">Пошук</string>
+  <string name="sort">Сортувати</string>
+
+  <!--ACCOUNTS LIST-->
+  <string name="accounts_list_create_account_action">Додати рахунок</string>
+  <!--ACCOUNTS LIST-->
+
+  <!--REPORT-->
+  <string name="report_title">Звіт</string>
+  <string name="report_balance">Баланс: </string>
+  <string name="report_all_expenses">Всі витрати</string>
+  <string name="report_all_incomes">Всі доходи</string>
+  <string name="report_current_balance">Поточний баланс</string>
+  <string name="report_all_time">Весь час</string>
+  <string name="report_custom">Власний</string>
+  <string name="report_subcategories_empty_state">Транзакцій не знайдено</string>
+  <!--REPORT-->
+
+  <string name="category_content_subcategories">Підкатегорії</string>
+  <string name="category_content_add_subcategory_action">Додати підкатегорію</string>
+  <string name="create_subcategory_title">Підкатегорія</string>
+
+  <string name="dialog_account_detail_delete_confirm_title">Ви впевнені, що хочете видалити рахунок?</string>
+  <string name="dialog_category_list_delete_confirm_title">Ви впевнені, що хочете видалити категорію?</string>
+  <string name="dialog_category_detail_delete_confirm_title">Ви впевнені, що хочете видалити категорію?</string>
+  <string name="dialog_transaction_detail_delete_confirm_title">Ви впевнені, що хочете видалити транзакцію?</string>
+
+  <!--  CATEGORY LIST-->
+  <string name="categories_list_add_category_action">Додати категорію</string>
+  <string name="category_list_income_this_month">Дохід цього місяця</string>
+  <string name="category_list_expenses_this_month">Витрати цього місяця</string>
+  <!--  CATEGORY LIST-->
+
+  <!--  TRANSACTIONS LIST-->
+  <string name="transactions_list_empty_state_title">Транзакцій ще немає</string>
+  <string name="transactions_list_empty_state_message">Додайте першу транзакцію</string>
+  <string name="transactions_list_create_transaction_action">Створити транзакцію</string>
+  <string name="transactions_list_error_title">Помилка отримання транзакцій</string>
+  <string name="transactions_list_duplicate_action">Дублювати</string>
+  <string name="transactions_list_delete_action">Видалити</string>
+
+  <string name="transactions_list_dialog_delete_transaction_title">Ви впевнені, що хочете видалити транзакцію?</string>
+  <string name="transactions_list_dialog_delete_transaction_message">Цю дію не можна скасувати.</string>
+  <!--  TRANSACTIONS LIST-->
+
+  <!--THEME DIALOG-->
+  <string name="theme_dialog_title">Виберіть тему</string>
+  <string name="theme_dialog_dismiss">Закрити</string>
+  <string name="theme_dialog_dynamic_color_preference">Динамічний колір</string>
+  <string name="theme_dialog_dynamic_color_yes">Так</string>
+  <string name="theme_dialog_dynamic_color_no">Ні</string>
+  <string name="theme_dialog_dark_mode_preference">Темний режим</string>
+  <string name="theme_dialog_dark_mode_config_system_default">Системний за замовчуванням</string>
+  <string name="theme_dialog_dark_mode_config_light">Світлий</string>
+  <string name="theme_dialog_dark_mode_config_dark">Темний</string>
+  <!--THEME DIALOG-->
+
+  <!--HELP-->
+  <string name="help_article_how_to_use_title">Як користуватися Expenses Tracker</string>
+  <string name="help_article_currency_settings_title">Налаштування валюти</string>
+  <string name="help_article_app_language_title">Мова додатку</string>
+  <string name="help_article_questions_title">Залишилися питання?</string>
+  <string name="help_screen_how_to_use">
+  <![CDATA[
+  <h3>Як користуватися Expenses Tracker</h3>
+  <br/>
+
+  Expenses Tracker допомагає керувати, планувати та аналізувати ваші особисті фінанси. Додаток створено для користувачів, які хочуть простий та ефективний спосіб відстежувати витрати та доходи, встановлювати бюджети та переглядати фінансову активність.
+  <br/>
+
+  <br/>
+  <h3>Створення рахунків</h3>
+  <br/>
+
+  Додавайте рахунки, які відображають ваші реальні фінансові джерела, такі як "Готівка", "Банківський рахунок" або "Кредитна картка". Кожен рахунок може мати власну валюту та баланс, що дозволяє точно відстежувати ваші кошти.
+  <br/>
+
+  <br/>
+  <h3>Налаштування категорій</h3>
+  <br/>
+
+  Expenses Tracker надає стандартні категорії для витрат і доходів. Ви можете додавати, перейменовувати або видаляти категорії та підкатегорії відповідно до ваших звичок витрат. Організуйте категорії на головному екрані, натиснувши іконку редагування.
+  <br/>
+
+  <br/>
+  <h3>Запис транзакцій</h3>
+  <br/>
+
+  Фіксуйте кожну витрату та дохід як транзакцію. Для кожної транзакції вкажіть рахунок, категорію, суму та додайте примітки за потреби.
+  <br/>
+
+  <br/>
+  <h3>Аналіз фінансів</h3>
+  <br/>
+
+  Використовуйте розділ "Звіт" для перегляду витрат і доходів за будь-який період. Візуалізуйте дані за допомогою інтерактивних діаграм, наприклад, кругових діаграм для розподілу по категоріях. Це допоможе зрозуміти ваші фінансові звички та приймати обґрунтовані рішення.
+  Досліджуйте всі функції, щоб взяти під контроль свої фінанси та досягти своїх цілей!]]>
+  </string>
+  <string name="help_screen_currency_settings">
+  <![CDATA[
+  <h3>Налаштування валюти</h3>
+  <br/>
+
+  Expenses Tracker підтримує керування фінансами у декількох валютах, що дозволяє легко відстежувати витрати та доходи у різних рахунках і ситуаціях.
+  <br/>
+
+  <br/>
+  <h3>Загальна валюта</h3>
+  <br/>
+
+  Загальна валюта використовується за замовчуванням для відображення загальних підсумків і звітів. Ви можете встановити її в Налаштуваннях ▸ Загальна валюта. Всі нові рахунки та більшість підсумків використовуватимуть цю валюту, якщо не вказано інше.
+  <br/>
+
+  <br/>
+  <h3>Валюта рахунку</h3>
+  <br/>
+
+  Кожен рахунок може мати власну валюту, що зручно, якщо у вас є рахунки в різних країнах або ви використовуєте кілька валют. Встановіть валюту для кожного рахунку під час створення або редагування. Транзакції в цьому рахунку будуть записані у вибраній валюті.
+  Використовуйте ці функції, щоб зберігати фінанси впорядкованими, незалежно від кількості валют, які ви використовуєте.]]>
+  </string>
+  <string name="help_screen_app_language">
+  <![CDATA[
+  <h3>Мова додатку</h3>
+  <br/>
+
+  Expenses Tracker доступний кількома мовами. За замовчуванням додаток використовує мову вашого пристрою. Якщо бажаєте, ви можете вибрати іншу мову в налаштуваннях додатку: Налаштування ▸ Мова.
+  Якщо вашої мови немає у списку підтримуваних і ви хочете допомогти з перекладом, будь ласка, зв'яжіться з нами. Ми вітаємо внески та можемо надати необхідні матеріали для локалізації.
+  Якщо ви помітили помилки або неточності у перекладі, повідомте нам, і ми виправимо їх.
+  Email: support@expensestracker.app]]>
+  </string>
+  <string name="help_screen_questions">
+  <![CDATA[
+  <h3>Залишилися питання?</h3>
+  <br/>
+
+  Якщо у вас є питання щодо використання Expenses Tracker або потрібна допомога з будь-якою функцією, будь ласка, зв'яжіться з нами. Ми допоможемо вам і зробимо все, щоб ви отримали максимум від додатку.
+  Задайте питання: support@expensestracker.app]]>
+  </string>
+</resources>
+
