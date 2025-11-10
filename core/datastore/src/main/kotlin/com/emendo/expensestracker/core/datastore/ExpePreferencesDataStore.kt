@@ -54,16 +54,17 @@ class ExpePreferencesDataStore @Inject constructor(
   }
 
   suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
-    //    userPreferences.updateData {
-    //      it.copy {
-    //        this.darkThemeConfig = when (darkThemeConfig) {
-    //          DarkThemeConfig.FOLLOW_SYSTEM ->
-    //            DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM
-    //          DarkThemeConfig.LIGHT -> DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT
-    //          DarkThemeConfig.DARK -> DarkThemeConfigProto.DARK_THEME_CONFIG_DARK
-    //        }
-    //      }
-    //    }
+    userPreferences.updateData {
+      it.copy {
+        this.darkThemeConfig = when (darkThemeConfig) {
+          DarkThemeConfig.FOLLOW_SYSTEM ->
+            DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM
+
+          DarkThemeConfig.LIGHT -> DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT
+          DarkThemeConfig.DARK -> DarkThemeConfigProto.DARK_THEME_CONFIG_DARK
+        }
+      }
+    }
   }
 
   suspend fun getGeneralCurrencyCode(): String =
