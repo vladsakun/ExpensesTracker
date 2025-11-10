@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--General-->
+  <string name="back">Zpět</string>
+  <string name="close">Zavřít</string>
+  <string name="add">Přidat</string>
+  <string name="create">Vytvořit</string>
+  <string name="save">Uložit</string>
+  <string name="delete">Smazat</string>
+  <string name="more">Více</string>
+  <string name="duplicate">Duplikovat</string>
+  <string name="cancel">Zrušit</string>
+  <string name="done">Hotovo</string>
+  <string name="loading">Načítání</string>
+  <string name="on_label">Zapnuto</string>
+  <string name="off_label">Vypnuto</string>
+  <string name="confirm">Potvrdit</string>
+  <string name="ok" translatable="false">Ok</string>
+  <string name="edit">Upravit</string>
+  <string name="empty_general_title">Zatím žádná data</string>
+  <string name="empty_general_message">Vraťte se později</string>
+  <!--General-->
+
+  <string name="expense">Výdaj</string>
+  <string name="income">Příjem</string>
+  <string name="transfer">Převod</string>
+  <string name="substract">Odečíst</string>
+  <string name="multiply">Vynásobit</string>
+  <string name="divide">Vydělit</string>
+  <string name="clear">Vymazat</string>
+  <string name="equal">Rovná se</string>
+  <string name="currency_with_symbol">Měna\n%s</string>
+  <string name="currency">Měna</string>
+  <string name="select_currency">Vyberte měnu</string>
+  <string name="archive">Archivovat</string>
+  <string name="icon">Ikona</string>
+  <string name="title">Název</string>
+  <string name="color">Barva</string>
+  <string name="select_color">Vyberte barvu</string>
+  <string name="select_icon">Vyberte ikonu</string>
+  <string name="balance">Zůstatek</string>
+  <string name="accounts">Účty</string>
+  <string name="select_account">Vyberte účet</string>
+  <string name="account">Účet</string>
+  <string name="accounts_loading">Načítání účtů</string>
+  <string name="account_name">Název účtu</string>
+  <string name="create_account">Vytvořit účet</string>
+  <string name="categories">Kategorie</string>
+  <string name="category">Kategorie</string>
+  <string name="categories_loading">Načítání kategorií</string>
+  <string name="create_category">Vytvořit kategorii</string>
+  <string name="transactions">Transakce</string>
+  <string name="create_transaction">Vytvořit transakci</string>
+  <string name="settings">Nastavení</string>
+  <string name="general_currency">Hlavní měna</string>
+  <string name="reminders">Připomenutí</string>
+  <string name="appearance">Vzhled</string>
+  <string name="security">Zabezpečení</string>
+  <string name="backups">Zálohy</string>
+  <string name="help">Nápověda</string>
+  <string name="advanced_settings">Pokročilé nastavení</string>
+  <string name="save_transaction">Uložit transakci</string>
+  <string name="uncategorized">Bez kategorie</string>
+
+  <string name="sync_notification_title">Sledovač výdajů</string>
+  <string name="sync_notification_channel_name">Synchronizace</string>
+  <string name="sync_notification_channel_description">Úlohy na pozadí pro sledovač výdajů</string>
+
+  <string name="create_transaction_note_placeholder">Poznámka</string>
+  <string name="create_transaction_general_destination">Cíl</string>
+
+  <string name="search">Hledat</string>
+  <string name="sort">Třídit</string>
+
+  <!--ACCOUNTS LIST-->
+  <string name="accounts_list_create_account_action">Přidat účet</string>
+  <!--ACCOUNTS LIST-->
+
+  <!--REPORT-->
+  <string name="report_title">Přehled</string>
+  <string name="report_balance">Zůstatek: </string>
+  <string name="report_all_expenses">Všechny výdaje</string>
+  <string name="report_all_incomes">Všechny příjmy</string>
+  <string name="report_current_balance">Aktuální zůstatek</string>
+  <string name="report_all_time">Celé období</string>
+  <string name="report_custom">Vlastní</string>
+  <string name="report_subcategories_empty_state">Nebyly nalezeny žádné transakce</string>
+  <!--REPORT-->
+
+  <string name="category_content_subcategories">Podkategorie</string>
+  <string name="category_content_add_subcategory_action">Přidat podkategorii</string>
+  <string name="create_subcategory_title">Podkategorie</string>
+
+  <string name="dialog_account_detail_delete_confirm_title">Opravdu chcete účet smazat?</string>
+  <string name="dialog_category_list_delete_confirm_title">Opravdu chcete kategorii smazat?</string>
+  <string name="dialog_category_detail_delete_confirm_title">Opravdu chcete kategorii smazat?</string>
+  <string name="dialog_transaction_detail_delete_confirm_title">Opravdu chcete transakci smazat?</string>
+
+  <!--  CATEGORY LIST-->
+  <string name="categories_list_add_category_action">Přidat kategorii</string>
+  <string name="category_list_income_this_month">Příjmy tento měsíc</string>
+  <string name="category_list_expenses_this_month">Výdaje tento měsíc</string>
+  <!--  CATEGORY LIST-->
+
+  <!--  TRANSACTIONS LIST-->
+  <string name="transactions_list_empty_state_title">Zatím žádné transakce</string>
+  <string name="transactions_list_empty_state_message">Přidejte první transakci</string>
+  <string name="transactions_list_create_transaction_action">Vytvořit transakci</string>
+  <string name="transactions_list_error_title">Chyba při načítání transakcí</string>
+  <string name="transactions_list_duplicate_action">Duplikovat</string>
+  <string name="transactions_list_delete_action">Smazat</string>
+
+  <string name="transactions_list_dialog_delete_transaction_title">Opravdu chcete transakci smazat?</string>
+  <string name="transactions_list_dialog_delete_transaction_message">Tuto akci nelze vrátit zpět.</string>
+  <!--  TRANSACTIONS LIST-->
+
+  <!--THEME DIALOG-->
+  <string name="theme_dialog_title">Vyberte motiv</string>
+  <string name="theme_dialog_dismiss">Zavřít</string>
+  <string name="theme_dialog_dynamic_color_preference">Dynamická barva</string>
+  <string name="theme_dialog_dynamic_color_yes">Ano</string>
+  <string name="theme_dialog_dynamic_color_no">Ne</string>
+  <string name="theme_dialog_dark_mode_preference">Tmavý režim</string>
+  <string name="theme_dialog_dark_mode_config_system_default">Systémové výchozí</string>
+  <string name="theme_dialog_dark_mode_config_light">Světlý</string>
+  <string name="theme_dialog_dark_mode_config_dark">Tmavý</string>
+  <!--THEME DIALOG-->
+
+  <!--HELP-->
+  <string name="help_article_how_to_use_title">Jak používat Expenses Tracker</string>
+  <string name="help_article_currency_settings_title">Nastavení měny</string>
+  <string name="help_article_app_language_title">Jazyk aplikace</string>
+  <string name="help_article_questions_title">Máte otázky?</string>
+  <string name="help_screen_how_to_use">
+  <![CDATA[
+  <h3>Jak používat Expenses Tracker</h3>
+  <br/>
+
+  Expenses Tracker vám pomůže spravovat, plánovat a analyzovat vaše osobní finance. Aplikace je určena pro uživatele, kteří hledají jednoduchý a efektivní způsob sledování výdajů a příjmů, nastavení rozpočtů a přehled o finanční aktivitě.
+  <br/>
+
+  <br/>
+  <h3>Vytváření účtů</h3>
+  <br/>
+
+  Přidávejte účty, které odrážejí vaše skutečné finanční zdroje, například "Hotovost", "Bankovní účet" nebo "Kreditní karta". Každý účet může mít vlastní měnu a zůstatek, což umožňuje přesné sledování vašich prostředků.
+  <br/>
+
+  <br/>
+  <h3>Nastavení kategorií</h3>
+  <br/>
+
+  Expenses Tracker nabízí standardní kategorie pro výdaje a příjmy. Můžete přidávat, přejmenovávat nebo mazat kategorie a podkategorie podle svých zvyklostí. Organizujte kategorie na hlavní obrazovce klepnutím na ikonu úprav.
+  <br/>
+
+  <br/>
+  <h3>Zaznamenávání transakcí</h3>
+  <br/>
+
+  Každý výdaj a příjem zaznamenejte jako transakci. U každé transakce uveďte účet, kategorii, částku a případně poznámku.
+  <br/>
+
+  <br/>
+  <h3>Analýza financí</h3>
+  <br/>
+
+  Použijte sekci "Přehled" pro zobrazení výdajů a příjmů za libovolné období. Vizualizujte data pomocí interaktivních grafů, například koláčových grafů pro rozdělení podle kategorií. To vám pomůže pochopit vaše finanční návyky a činit informovaná rozhodnutí.
+  Prozkoumejte všechny funkce, abyste měli své finance pod kontrolou a dosáhli svých cílů!]]>
+  </string>
+  <string name="help_screen_currency_settings">
+  <![CDATA[
+  <h3>Nastavení měny</h3>
+  <br/>
+
+  Expenses Tracker podporuje správu financí ve více měnách, což vám umožní snadno sledovat výdaje a příjmy na různých účtech a v různých situacích.
+  <br/>
+
+  <br/>
+  <h3>Hlavní měna</h3>
+  <br/>
+
+  Hlavní měna se používá ve výchozím nastavení pro zobrazení souhrnů a přehledů. Můžete ji nastavit v Nastavení ▸ Hlavní měna. Všechny nové účty a většina souhrnů budou používat tuto měnu, pokud není uvedeno jinak.
+  <br/>
+
+  <br/>
+  <h3>Měna účtu</h3>
+  <br/>
+
+  Každý účet může mít vlastní měnu, což je užitečné, pokud máte účty v různých zemích nebo používáte více měn. Nastavte měnu pro každý účet při jeho vytváření nebo úpravě. Transakce na tomto účtu budou zaznamenány ve zvolené měně.
+  Využijte tyto funkce, abyste měli finance přehledně uspořádané, bez ohledu na počet používaných měn.]]>
+  </string>
+  <string name="help_screen_app_language">
+  <![CDATA[
+  <h3>Jazyk aplikace</h3>
+  <br/>
+
+  Expenses Tracker je dostupný v několika jazycích. Ve výchozím nastavení aplikace používá jazyk vašeho zařízení. Pokud chcete, můžete si v nastavení aplikace vybrat jiný jazyk: Nastavení ▸ Jazyk.
+  Pokud váš jazyk není v seznamu podporovaných a chcete pomoci s překladem, kontaktujte nás. Přivítáme váš příspěvek a můžeme poskytnout potřebné materiály pro lokalizaci.
+  Pokud si všimnete chyb nebo nepřesností v překladu, dejte nám vědět a my je opravíme.
+  Email: support@expensestracker.app]]>
+  </string>
+  <string name="help_screen_questions">
+  <![CDATA[
+  <h3>Máte otázky?</h3>
+  <br/>
+
+  Pokud máte dotazy ohledně používání Expenses Tracker nebo potřebujete pomoc s jakoukoli funkcí, kontaktujte nás. Rádi vám pomůžeme a uděláme vše pro to, abyste z aplikace vytěžili maximum.
+  Zeptejte se nás: support@expensestracker.app]]>
+  </string>
+</resources>
+
