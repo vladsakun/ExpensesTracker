@@ -25,6 +25,8 @@ fun ExpeTextFieldWithRoundedBackground(
   singleline: Boolean = true,
   enabled: Boolean = true,
   maxLength: Int = Int.MAX_VALUE,
+  startIcon: (@Composable (() -> Unit))? = null,
+  endIcon: (@Composable (() -> Unit))? = null,
 ) {
   ExpeTextField(
     placeholder = placeholder,
@@ -39,5 +41,7 @@ fun ExpeTextFieldWithRoundedBackground(
     singleline = singleline,
     enabled = enabled,
     maxLength = maxLength,
+    startIcon = startIcon,
+    endIcon = endIcon,
   )
 }
