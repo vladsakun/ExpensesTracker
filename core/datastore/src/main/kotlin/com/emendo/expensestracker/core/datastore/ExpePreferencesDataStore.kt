@@ -22,18 +22,17 @@ class ExpePreferencesDataStore @Inject constructor(
         generalCurrencyCode = it.generalCurrencyCode,
         shouldShowNotifications = it.shouldShowNotifications,
         isBackupEnabled = it.isBackupEnabled,
-        darkThemeConfig = DarkThemeConfig.DARK,
-        //        darkThemeConfig = when (it.darkThemeConfig) {
-        //          null,
-        //          DarkThemeConfigProto.DARK_THEME_CONFIG_UNSPECIFIED,
-        //          DarkThemeConfigProto.UNRECOGNIZED,
-        //          DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM,
-        //            ->
-        //            DarkThemeConfig.FOLLOW_SYSTEM
-        //          DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT ->
-        //            DarkThemeConfig.LIGHT
-        //          DarkThemeConfigProto.DARK_THEME_CONFIG_DARK -> DarkThemeConfig.DARK
-        //        },
+        darkThemeConfig = when (it.darkThemeConfig) {
+          null,
+          DarkThemeConfigProto.DARK_THEME_CONFIG_UNSPECIFIED,
+          DarkThemeConfigProto.UNRECOGNIZED,
+          DarkThemeConfigProto.DARK_THEME_CONFIG_FOLLOW_SYSTEM,
+            -> DarkThemeConfig.FOLLOW_SYSTEM
+
+          DarkThemeConfigProto.DARK_THEME_CONFIG_LIGHT -> DarkThemeConfig.LIGHT
+
+          DarkThemeConfigProto.DARK_THEME_CONFIG_DARK -> DarkThemeConfig.DARK
+        },
       )
     }
 

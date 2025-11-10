@@ -9,12 +9,13 @@ import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.model.data.UserData
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
+import com.emendo.expensestracker.model.ui.textValueOf
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.emendo.expensestracker.app.resources.R as AppR
@@ -26,23 +27,25 @@ constructor(
   private val userDataRepository: UserDataRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
-  val selectCurrencyScreenApi: SelectCurrencyScreenApi,
+  private val selectCurrencyScreenApi: SelectCurrencyScreenApi,
 ) : ViewModel() {
 
-  internal val state = getSettingsScreenData(userDataRepository, ::mapState)
+  private val showThemeDialog: MutableStateFlow<StateEvent> = MutableStateFlow(StateEvent.Consumed)
+
+  internal val state = getSettingsScreenData(userDataRepository, showThemeDialog, ::mapState)
     .stateInWhileSubscribed(scope = viewModelScope, initialValue = mapState(userDataRepository.getUserDataSnapshot()))
 
   private val navigationChannel: Channel<String> = Channel(Channel.CONFLATED)
   internal val navigationEvent = navigationChannel.receiveAsFlow()
 
-  private fun mapState(userData: UserData? = null): SettingsScreenData =
+  private fun mapState(userData: UserData?): SettingsScreenData =
     SettingsScreenData(
       settingsItems =
         persistentListOf(
           SettingsItemModel(
             id = GENERAL_CURRENCY_ID,
             titleResId = AppR.string.general_currency,
-            value = userData?.generalCurrencyCode?.let(SettingsItemValue::StringValue),
+            value = textValueOf(userData?.generalCurrencyCode ?: ""),
             icon = ExpeIcons.Currency,
           ),
           //        SettingsItemModel(
@@ -97,6 +100,10 @@ constructor(
         //            userDataRepository.setGeneralCurrencyCode("USD")
         //          }
       }
+
+      APPEARANCE -> {
+        showThemeDialog.value = StateEvent.Triggered
+      }
     }
   }
 
@@ -104,6 +111,10 @@ constructor(
     viewModelScope.launch(defaultDispatcher) {
       userDataRepository.setGeneralCurrencyCode(currency)
     }
+  }
+
+  fun dismissThemeDialog() {
+    showThemeDialog.value = StateEvent.Consumed
   }
 
   companion object {
@@ -119,5 +130,8 @@ constructor(
 
 private fun getSettingsScreenData(
   userDataRepository: UserDataRepository,
+  showThemeDialog: StateFlow<StateEvent>,
   mapState: (UserData?) -> SettingsScreenData,
-) = userDataRepository.userData.map(mapState)
+): Flow<SettingsScreenData> = combine(userDataRepository.userData, showThemeDialog) { userData, showThemeDialogValue ->
+  mapState(userData).copy(showThemeDialog = showThemeDialogValue)
+}

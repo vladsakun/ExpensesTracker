@@ -1,6 +1,7 @@
 plugins {
   alias(libs.plugins.expensestracker.android.library)
   alias(libs.plugins.expensestracker.android.hilt)
+  id("com.google.devtools.ksp")
 }
 
 android {
@@ -29,7 +30,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.serialization.json)
 
-  kapt(libs.hilt.ext.compiler)
+  ksp(libs.hilt.ext.compiler)
 
   androidTestImplementation(libs.androidx.work.testing)
 }

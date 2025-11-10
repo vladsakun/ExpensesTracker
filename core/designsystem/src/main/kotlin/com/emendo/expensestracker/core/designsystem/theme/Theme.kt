@@ -80,12 +80,11 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun ExpensesTrackerTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
-  // Dynamic color is available on Android 12+
-  dynamicColor: Boolean = false, // Todo change to true before release
+  disableDynamicTheming: Boolean = true,
   content: @Composable () -> Unit,
 ) {
   val colorScheme = when {
-    dynamicColor && supportsDynamicTheming() -> {
+    !disableDynamicTheming && supportsDynamicTheming() -> {
       val context = LocalContext.current
       if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     }

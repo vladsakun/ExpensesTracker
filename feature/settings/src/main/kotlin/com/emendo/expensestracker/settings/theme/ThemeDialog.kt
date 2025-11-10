@@ -1,6 +1,5 @@
-package com.google.samples.apps.nowinandroid.feature.settings
+package com.emendo.expensestracker.settings.theme
 
-import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,8 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,45 +19,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.emendo.expensestracker.settings.theme.ThemeUiState
+import com.emendo.expensestracker.app.resources.R
+import com.emendo.expensestracker.core.designsystem.component.ExpLoadingWheel
+import com.emendo.expensestracker.core.designsystem.component.ExpeButton
+import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
+import com.emendo.expensestracker.core.designsystem.theme.supportsDynamicTheming
+import com.emendo.expensestracker.core.model.data.DarkThemeConfig
+import com.emendo.expensestracker.core.model.data.DarkThemeConfig.*
 import com.emendo.expensestracker.settings.theme.ThemeUiState.Loading
 import com.emendo.expensestracker.settings.theme.ThemeUiState.Success
-import com.emendo.expensestracker.settings.theme.UserEditableSettings
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaTextButton
-import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
-import com.google.samples.apps.nowinandroid.core.designsystem.theme.supportsDynamicTheming
-import com.google.samples.apps.nowinandroid.core.model.data.DarkThemeConfig
-import com.google.samples.apps.nowinandroid.core.model.data.DarkThemeConfig.DARK
-import com.google.samples.apps.nowinandroid.core.model.data.DarkThemeConfig.FOLLOW_SYSTEM
-import com.google.samples.apps.nowinandroid.core.model.data.DarkThemeConfig.LIGHT
-import com.google.samples.apps.nowinandroid.core.model.data.ThemeBrand
-import com.google.samples.apps.nowinandroid.core.model.data.ThemeBrand.ANDROID
-import com.google.samples.apps.nowinandroid.core.model.data.ThemeBrand.DEFAULT
-import com.google.samples.apps.nowinandroid.core.ui.TrackScreenViewEvent
-import com.google.samples.apps.nowinandroid.feature.settings.R.string
 
 @Composable
 fun ThemeDialog(
   onDismiss: () -> Unit,
-  viewModel: SettingsViewModel = hiltViewModel(),
+  viewModel: ThemeViewModel = hiltViewModel(),
 ) {
-  val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
-  SettingsDialog(
+  val settingsUiState by viewModel.themeUiState.collectAsStateWithLifecycle()
+  ThemeDialog(
     onDismiss = onDismiss,
     themeUiState = settingsUiState,
-    onChangeThemeBrand = viewModel::updateThemeBrand,
     onChangeDynamicColorPreference = viewModel::updateDynamicColorPreference,
     onChangeDarkThemeConfig = viewModel::updateDarkThemeConfig,
   )
 }
 
 @Composable
-fun SettingsDialog(
+private fun ThemeDialog(
   themeUiState: ThemeUiState,
   supportDynamicColor: Boolean = supportsDynamicTheming(),
   onDismiss: () -> Unit,
-  onChangeThemeBrand: (themeBrand: ThemeBrand) -> Unit,
   onChangeDynamicColorPreference: (useDynamicColor: Boolean) -> Unit,
   onChangeDarkThemeConfig: (darkThemeConfig: DarkThemeConfig) -> Unit,
 ) {
@@ -79,7 +66,7 @@ fun SettingsDialog(
     onDismissRequest = { onDismiss() },
     title = {
       Text(
-        text = stringResource(string.feature_settings_title),
+        text = stringResource(R.string.theme_dialog_title),
         style = MaterialTheme.typography.titleLarge,
       )
     },
@@ -87,39 +74,26 @@ fun SettingsDialog(
       HorizontalDivider()
       Column(Modifier.verticalScroll(rememberScrollState())) {
         when (themeUiState) {
-          Loading -> {
-            Text(
-              text = stringResource(string.feature_settings_loading),
-              modifier = Modifier.padding(vertical = 16.dp),
-            )
-          }
+          Loading -> ExpLoadingWheel()
 
           is Success -> {
             SettingsPanel(
               settings = themeUiState.settings,
               supportDynamicColor = supportDynamicColor,
-              onChangeThemeBrand = onChangeThemeBrand,
               onChangeDynamicColorPreference = onChangeDynamicColorPreference,
               onChangeDarkThemeConfig = onChangeDarkThemeConfig,
             )
           }
         }
         HorizontalDivider(Modifier.padding(top = 8.dp))
-        LinksPanel()
       }
-      TrackScreenViewEvent(screenName = "Settings")
     },
     confirmButton = {
-      NiaTextButton(
+      ExpeButton(
         onClick = onDismiss,
         modifier = Modifier.padding(horizontal = 8.dp),
-      ) {
-        Text(
-          text = stringResource(string.feature_settings_dismiss_dialog_button_text),
-          style = MaterialTheme.typography.labelLarge,
-          color = MaterialTheme.colorScheme.primary,
-        )
-      }
+        textResId = R.string.theme_dialog_dismiss,
+      )
     },
   )
 }
@@ -129,54 +103,40 @@ fun SettingsDialog(
 private fun ColumnScope.SettingsPanel(
   settings: UserEditableSettings,
   supportDynamicColor: Boolean,
-  onChangeThemeBrand: (themeBrand: ThemeBrand) -> Unit,
   onChangeDynamicColorPreference: (useDynamicColor: Boolean) -> Unit,
   onChangeDarkThemeConfig: (darkThemeConfig: DarkThemeConfig) -> Unit,
 ) {
-  SettingsDialogSectionTitle(text = stringResource(string.feature_settings_theme))
-  Column(Modifier.selectableGroup()) {
-    SettingsDialogThemeChooserRow(
-      text = stringResource(string.feature_settings_brand_default),
-      selected = settings.brand == DEFAULT,
-      onClick = { onChangeThemeBrand(DEFAULT) },
-    )
-    SettingsDialogThemeChooserRow(
-      text = stringResource(string.feature_settings_brand_android),
-      selected = settings.brand == ANDROID,
-      onClick = { onChangeThemeBrand(ANDROID) },
-    )
-  }
-  AnimatedVisibility(visible = settings.brand == DEFAULT && supportDynamicColor) {
+  AnimatedVisibility(supportDynamicColor) {
     Column {
-      SettingsDialogSectionTitle(text = stringResource(string.feature_settings_dynamic_color_preference))
+      SettingsDialogSectionTitle(text = stringResource(R.string.theme_dialog_dynamic_color_preference))
       Column(Modifier.selectableGroup()) {
         SettingsDialogThemeChooserRow(
-          text = stringResource(string.feature_settings_dynamic_color_yes),
+          text = stringResource(R.string.theme_dialog_dynamic_color_yes),
           selected = settings.useDynamicColor,
           onClick = { onChangeDynamicColorPreference(true) },
         )
         SettingsDialogThemeChooserRow(
-          text = stringResource(string.feature_settings_dynamic_color_no),
+          text = stringResource(R.string.theme_dialog_dynamic_color_no),
           selected = !settings.useDynamicColor,
           onClick = { onChangeDynamicColorPreference(false) },
         )
       }
     }
   }
-  SettingsDialogSectionTitle(text = stringResource(string.feature_settings_dark_mode_preference))
+  SettingsDialogSectionTitle(text = stringResource(R.string.theme_dialog_dark_mode_preference))
   Column(Modifier.selectableGroup()) {
     SettingsDialogThemeChooserRow(
-      text = stringResource(string.feature_settings_dark_mode_config_system_default),
+      text = stringResource(R.string.theme_dialog_dark_mode_config_system_default),
       selected = settings.darkThemeConfig == FOLLOW_SYSTEM,
       onClick = { onChangeDarkThemeConfig(FOLLOW_SYSTEM) },
     )
     SettingsDialogThemeChooserRow(
-      text = stringResource(string.feature_settings_dark_mode_config_light),
+      text = stringResource(R.string.theme_dialog_dark_mode_config_light),
       selected = settings.darkThemeConfig == LIGHT,
       onClick = { onChangeDarkThemeConfig(LIGHT) },
     )
     SettingsDialogThemeChooserRow(
-      text = stringResource(string.feature_settings_dark_mode_config_dark),
+      text = stringResource(R.string.theme_dialog_dark_mode_config_dark),
       selected = settings.darkThemeConfig == DARK,
       onClick = { onChangeDarkThemeConfig(DARK) },
     )
@@ -218,57 +178,18 @@ fun SettingsDialogThemeChooserRow(
   }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun LinksPanel() {
-  FlowRow(
-    horizontalArrangement = Arrangement.spacedBy(
-      space = 16.dp,
-      alignment = Alignment.CenterHorizontally,
-    ),
-    modifier = Modifier.fillMaxWidth(),
-  ) {
-    val uriHandler = LocalUriHandler.current
-    NiaTextButton(
-      onClick = { uriHandler.openUri(PRIVACY_POLICY_URL) },
-    ) {
-      Text(text = stringResource(string.feature_settings_privacy_policy))
-    }
-    val context = LocalContext.current
-    NiaTextButton(
-      onClick = {
-        context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
-      },
-    ) {
-      Text(text = stringResource(string.feature_settings_licenses))
-    }
-    NiaTextButton(
-      onClick = { uriHandler.openUri(BRAND_GUIDELINES_URL) },
-    ) {
-      Text(text = stringResource(string.feature_settings_brand_guidelines))
-    }
-    NiaTextButton(
-      onClick = { uriHandler.openUri(FEEDBACK_URL) },
-    ) {
-      Text(text = stringResource(string.feature_settings_feedback))
-    }
-  }
-}
-
 @Preview
 @Composable
-private fun PreviewSettingsDialog() {
-  NiaTheme {
-    SettingsDialog(
+private fun PreviewThemeDialog() {
+  ExpensesTrackerTheme {
+    ThemeDialog(
       onDismiss = {},
       themeUiState = Success(
         UserEditableSettings(
-          brand = DEFAULT,
           darkThemeConfig = FOLLOW_SYSTEM,
           useDynamicColor = false,
         ),
       ),
-      onChangeThemeBrand = {},
       onChangeDynamicColorPreference = {},
       onChangeDarkThemeConfig = {},
     )
@@ -277,18 +198,13 @@ private fun PreviewSettingsDialog() {
 
 @Preview
 @Composable
-private fun PreviewSettingsDialogLoading() {
-  NiaTheme {
-    SettingsDialog(
+private fun PreviewThemeDialogLoading() {
+  ExpensesTrackerTheme {
+    ThemeDialog(
       onDismiss = {},
       themeUiState = Loading,
-      onChangeThemeBrand = {},
       onChangeDynamicColorPreference = {},
       onChangeDarkThemeConfig = {},
     )
   }
 }
-
-private const val PRIVACY_POLICY_URL = "https://policies.google.com/privacy"
-private const val BRAND_GUIDELINES_URL = "https://developer.android.com/distribute/marketing-tools/brand-guidelines"
-private const val FEEDBACK_URL = "https://goo.gle/nia-app-feedback"

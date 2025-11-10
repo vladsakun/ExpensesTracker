@@ -5,6 +5,7 @@ import android.app.*
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -14,13 +15,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
+import androidx.tracing.trace
 import com.emendo.expensestracker.accounts.destinations.AccountDetailScreenDestination
 import com.emendo.expensestracker.broadcast.LocaleBroadcastReceiver
 import com.emendo.expensestracker.core.app.base.app.base.DateBroadcastReceiver
@@ -28,7 +33,13 @@ import com.emendo.expensestracker.core.app.base.app.base.TimeZoneBroadcastReceiv
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.ui.ExpeApp
 import com.emendo.expensestracker.ui.rememberExpeAppState
+import com.emendo.expensestracker.util.isSystemInDarkTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
@@ -44,18 +55,71 @@ class MainActivity : ComponentActivity() {
     // Turn off the decor fitting system windows, which allows us to handle insets,
     // including IME animations, and go edge-to-edge
     // This also sets up the initial system bar style based on the platform theme
-    enableEdgeToEdge()
+    val splashScreen = installSplashScreen()
     super.onCreate(savedInstanceState)
 
+    // We keep this as a mutable state, so that we can track changes inside the composition.
+    // This allows us to react to dark/light mode changes.
+    var themeSettings by mutableStateOf(
+      ThemeSettings(
+        darkTheme = resources.configuration.isSystemInDarkTheme,
+        disableDynamicTheming = MainActivityUiState.Loading.shouldDisableDynamicTheming,
+      ),
+    )
+
+    // Update the uiState
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        combine(
+          isSystemInDarkTheme(),
+          viewModel.uiState,
+        ) { systemDark, uiState ->
+          ThemeSettings(
+            darkTheme = uiState.shouldUseDarkTheme(systemDark),
+            disableDynamicTheming = uiState.shouldDisableDynamicTheming,
+          )
+        }
+          .onEach { themeSettings = it }
+          .map { it.darkTheme }
+          .distinctUntilChanged()
+          .collect { darkTheme ->
+            trace("niaEdgeToEdge") {
+              // Turn off the decor fitting system windows, which allows us to handle insets,
+              // including IME animations, and go edge-to-edge.
+              // This is the same parameters as the default enableEdgeToEdge call, but we manually
+              // resolve whether or not to show dark theme using uiState, since it can be different
+              // than the configuration's dark theme value based on the user preference.
+              enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.auto(
+                  lightScrim = android.graphics.Color.TRANSPARENT,
+                  darkScrim = android.graphics.Color.TRANSPARENT,
+                ) { darkTheme },
+                navigationBarStyle = SystemBarStyle.auto(
+                  lightScrim = lightScrim,
+                  darkScrim = darkScrim,
+                ) { darkTheme },
+              )
+            }
+          }
+      }
+    }
+
+    // Keep the splash screen on-screen until the UI state is loaded. This condition is
+    // evaluated each time the app needs to be redrawn so it should be fast to avoid blocking
+    // the UI.
+    splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
+
     setContent {
-      val darkTheme = isSystemInDarkTheme()
       val navController = rememberNavController()
       val appState = rememberExpeAppState(
         windowSizeClass = calculateWindowSizeClass(this),
         navController = navController,
       )
 
-      ExpensesTrackerTheme(darkTheme = darkTheme) {
+      ExpensesTrackerTheme(
+        darkTheme = themeSettings.darkTheme,
+        disableDynamicTheming = themeSettings.disableDynamicTheming,
+      ) {
         ExpeApp(appState)
         ProtectNavigationBar()
       }
@@ -223,3 +287,12 @@ class MainActivity : ComponentActivity() {
    */
   private val darkScrim = android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b)
 }
+
+/**
+ * Class for the system theme settings.
+ * This wrapping class allows us to combine all the changes and prevent unnecessary recompositions.
+ */
+data class ThemeSettings(
+  val darkTheme: Boolean,
+  val disableDynamicTheming: Boolean,
+)

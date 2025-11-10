@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,14 +24,18 @@ import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTo
 import com.emendo.expensestracker.core.designsystem.theme.Dimens
 import com.emendo.expensestracker.core.designsystem.theme.ExpensesTrackerTheme
 import com.emendo.expensestracker.core.ui.handleValueResult
+import com.emendo.expensestracker.core.ui.stringValue
+import com.emendo.expensestracker.model.ui.textValueOf
+import com.emendo.expensestracker.settings.theme.ThemeDialog
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.OpenResultRecipient
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
 
 @Destination(start = true)
 @Composable
-internal fun SettingsRoute(
+fun SettingsRoute(
   navigator: DestinationsNavigator,
   currencyResultRecipient: OpenResultRecipient<String>,
   viewModel: SettingsViewModel = hiltViewModel(),
@@ -42,6 +48,10 @@ internal fun SettingsRoute(
     viewModel.navigationEvent.collect { route ->
       navigator.navigate(route)
     }
+  }
+
+  if (uiState.value.showThemeDialog == triggered) {
+    ThemeDialog(onDismiss = viewModel::dismissThemeDialog)
   }
 
   ExpeScaffoldWithTopBar(
@@ -107,7 +117,7 @@ private fun SettingsItem(
       )
       item.value?.let {
         Text(
-          text = it.text,
+          text = it.stringValue(),
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.secondary,
         )
@@ -120,15 +130,6 @@ private fun SettingsItem(
     )
   }
 }
-
-private val SettingsItemValue.text: String
-  @Composable
-  @ReadOnlyComposable
-  get() =
-    when (this) {
-      is SettingsItemValue.StringValue -> value
-      is SettingsItemValue.StringResValue -> stringResource(id = resId)
-    }
 
 @ExpePreview
 @Composable

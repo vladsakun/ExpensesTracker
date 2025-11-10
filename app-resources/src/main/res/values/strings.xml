@@ -112,4 +112,16 @@
   <string name="transactions_list_dialog_delete_transaction_title">Are you sure that you want to delete the transaction?</string>
   <string name="transactions_list_dialog_delete_transaction_message">This action cannot be undone.</string>
   <!--  TRANSACTIONS LIST-->
+
+  <!--THEME DIALOG-->
+  <string name="theme_dialog_title">Select theme</string>
+  <string name="theme_dialog_dismiss">Dismiss</string>
+  <string name="theme_dialog_dynamic_color_preference">Dynamic color</string>
+  <string name="theme_dialog_dynamic_color_yes">Yes</string>
+  <string name="theme_dialog_dynamic_color_no">No</string>
+  <string name="theme_dialog_dark_mode_preference">Dark mode</string>
+  <string name="theme_dialog_dark_mode_config_system_default">System default</string>
+  <string name="theme_dialog_dark_mode_config_light">Light</string>
+  <string name="theme_dialog_dark_mode_config_dark">Dark</string>
+  <!--THEME DIALOG-->
 </resources>
