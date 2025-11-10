@@ -20,6 +20,7 @@ import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionSource
 import com.emendo.expensestracker.data.api.model.transaction.TransactionTarget
 import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
+import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
   private val databaseUtils: DatabaseUtils,
   private val transactionMapper: TransactionMapper,
   private val getTransactionTypeUseCase: GetTransactionTypeUseCase,
+  private val currencyRateRepository: CurrencyRateRepository,
 ) : TransactionRepository {
 
   override fun getLastTransactionFull(): Flow<TransactionModel?> =
@@ -183,13 +185,16 @@ class OfflineFirstTransactionRepository @Inject constructor(
     transferReceivedAmount: Amount?,
     note: String?,
   ) {
+    val currencyCode = amount.currency.currencyCode
+    val usdToOriginalRate = currencyRateRepository.getOrFetchRate(currencyCode, date)
     transactionDao.upsert(
       TransactionEntity(
         sourceAccountId = source.id,
         targetCategoryId = target.id,
         targetSubcategoryId = subcategoryId,
         value = amount.value.abs().negate(),
-        currencyCode = amount.currency.currencyCode,
+        currencyCode = currencyCode,
+        usdToOriginalRate = usdToOriginalRate,
         date = date,
         note = note,
         typeId = TransactionType.EXPENSE.id,
@@ -206,15 +211,20 @@ class OfflineFirstTransactionRepository @Inject constructor(
     date: Instant = Clock.System.now(),
   ) {
     databaseUtils.expeWithTransaction {
+      val currencyCode = amount.currency.currencyCode
+      val usdToOriginalRate = currencyRateRepository.getOrFetchRate(currencyCode, date)
       val newBalance = source.balance.value - amount.value
+
       accountDao.updateBalance(source.id, newBalance)
+
       transactionDao.save(
         TransactionEntity(
           sourceAccountId = source.id,
           targetCategoryId = target.id,
           targetSubcategoryId = subcategoryId,
           value = amount.value.abs().negate(),
-          currencyCode = amount.currency.currencyCode,
+          usdToOriginalRate = usdToOriginalRate,
+          currencyCode = currencyCode,
           date = date,
           note = note,
           typeId = TransactionType.EXPENSE.id,
@@ -232,7 +242,10 @@ class OfflineFirstTransactionRepository @Inject constructor(
     date: Instant = Clock.System.now(),
   ) {
     databaseUtils.expeWithTransaction {
+      val currencyCode = amount.currency.currencyCode
+      val usdToOriginalRate = currencyRateRepository.getOrFetchRate(currencyCode, date)
       val newBalance = source.balance.value + amount.value
+
       accountDao.updateBalance(source.id, newBalance)
       transactionDao.save(
         TransactionEntity(
@@ -240,7 +253,8 @@ class OfflineFirstTransactionRepository @Inject constructor(
           targetCategoryId = target.id,
           targetSubcategoryId = subcategoryId,
           value = amount.value.abs(),
-          currencyCode = amount.currency.currencyCode,
+          currencyCode = currencyCode,
+          usdToOriginalRate = usdToOriginalRate,
           date = date,
           note = note,
           typeId = TransactionType.INCOME.id,
@@ -258,6 +272,8 @@ class OfflineFirstTransactionRepository @Inject constructor(
     date: Instant = Clock.System.now(),
   ) {
     databaseUtils.expeWithTransaction {
+      val currencyCode = amount.currency.currencyCode
+      val usdToOriginalRate = currencyRateRepository.getOrFetchRate(currencyCode, date)
       val newSourceBalance = source.balance.value - amount.value
       val newTargetBalance = target.balance.value + transferReceivedAmount.value
 
@@ -268,7 +284,8 @@ class OfflineFirstTransactionRepository @Inject constructor(
           sourceAccountId = source.id,
           targetAccountId = target.id,
           value = amount.value.abs().negate(),
-          currencyCode = amount.currency.currencyCode,
+          currencyCode = currencyCode,
+          usdToOriginalRate = usdToOriginalRate,
           date = date,
           note = note,
           transferReceivedCurrencyCode = transferReceivedAmount.currency.currencyCode,
@@ -293,5 +310,7 @@ class OfflineFirstTransactionRepository @Inject constructor(
       type = TransactionType.toTransactionType(transaction.typeId),
       value = transaction.value,
       currency = CurrencyModel.toCurrencyModel(transaction.currencyCode),
+      date = transaction.date,
+      usdToOriginalRate = transaction.usdToOriginalRate,
     )
 }

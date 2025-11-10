@@ -42,7 +42,6 @@ import com.emendo.expensestracker.data.api.extensions.labelResId
 import com.emendo.expensestracker.model.ui.ColorModel
 import com.emendo.expensestracker.model.ui.ColorModel.Companion.color
 import com.emendo.expensestracker.model.ui.NetworkViewState
-import com.emendo.expensestracker.model.ui.TextValue
 import com.emendo.expensestracker.model.ui.textValueOf
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -145,11 +144,6 @@ private fun ReportScreenContent(
       reportPeriods = periodsProvider,
       selectedPeriodIndexProvider = selectedPeriodIndexProvider,
       commandProcessor = commandProcessor,
-    )
-    balance(
-      balanceDate = state.balanceDate,
-      balance = state.balance,
-      transactionType = state.transactionType,
     )
     if (state.pieChartData == null) {
       emptyState()
@@ -295,35 +289,35 @@ private fun LazyListScope.pieChart(
   }
 }
 
-private fun LazyListScope.balance(
-  balanceDate: TextValue,
-  balance: Amount,
-  transactionType: TransactionType,
-) {
-  uniqueItem("balance") {
-    Row(
-      horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = Dimens.margin_large_x)
-        .animateItem(),
-    ) {
-      Text(
-        text = balanceDate.stringValue(),
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.weight(1f),
-      )
-      AmountText(
-        amount = balance,
-        textStyle = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.weight(1f),
-        textAlign = TextAlign.End,
-        transactionType = transactionType,
-      )
-    }
-  }
-}
+//private fun LazyListScope.balance(
+//  balanceDate: TextValue,
+//  balance: Amount,
+//  transactionType: TransactionType,
+//) {
+//  uniqueItem("balance") {
+//    Row(
+//      horizontalArrangement = Arrangement.spacedBy(Dimens.margin_large_x),
+//      verticalAlignment = Alignment.CenterVertically,
+//      modifier = Modifier
+//        .fillMaxWidth()
+//        .padding(horizontal = Dimens.margin_large_x)
+//        .animateItem(),
+//    ) {
+//      Text(
+//        text = balanceDate.stringValue(),
+//        style = MaterialTheme.typography.bodyMedium,
+//        modifier = Modifier.weight(1f),
+//      )
+//      AmountText(
+//        amount = balance,
+//        textStyle = MaterialTheme.typography.bodyMedium,
+//        modifier = Modifier.weight(1f),
+//        textAlign = TextAlign.End,
+//        transactionType = transactionType,
+//      )
+//    }
+//  }
+//}
 
 private fun LazyListScope.typeSelection(
   commandProcessor: (ReportScreenCommand) -> Unit,
@@ -486,8 +480,6 @@ private fun ReportScreenPreview() {
 
   val screenData =
     ReportScreenData(
-      balanceDate = textValueOf("Today"),
-      balance = Amount.Mock,
       pieChartData = pieChartData,
       reportSum = ReportScreenData.ReportSum(textValueOf("All expenses"), Amount.Mock, TransactionType.EXPENSE),
       categoryValues = List(10) {

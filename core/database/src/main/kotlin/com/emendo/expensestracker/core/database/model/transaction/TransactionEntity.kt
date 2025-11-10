@@ -63,6 +63,28 @@ data class TransactionEntity(
   val note: String? = null,
   val typeId: Int,
 
+  /*
+  Главная причина, по которой вам нужна таблица ExchangeRate, — это способность конвертировать сумму из валюты транзакции в текущую базовую валюту приложения (которая меняется).
+
+  Пример сценария:
+  Пользователь тратит $100 \text{CZK}$ (currencyOriginal).
+  Вы сохраняете в транзакции: usdToOriginalRate ($24.50$).
+  Пользователь устанавливает базовую валюту приложения как $\text{EUR}$.
+
+  Проблема: Как конвертировать $\text{CZK}$ в $\text{EUR}$?
+  Вы не можете взять курс $\text{CZK} \to \text{EUR}$ напрямую из транзакции.
+  Вам нужна кросс-конвертация через $\text{USD}$:
+
+  $$
+  \text{Сумма в EUR} = \text{amountOriginal} \times \frac{\text{Курс}_{\text{USD} \to \text{EUR}} \text{(на дату)}}{\text{usdToOriginalRate} \text{(из транзакции)}}
+  $$
+
+  Значение из транзакции: amountOriginal ($100 \text{CZK}$) и usdToOriginalRate ($24.50$).
+  Недостающее значение: $\text{Курс}_{\text{USD} \to \text{EUR}}$ на дату транзакции.
+  Именно это недостающее значение, исторический курс $\text{USD} \to \text{EUR}$, вы должны получить из таблицы ExchangeRate.
+  */
+  val usdToOriginalRate: BigDecimal,
+
   val transferReceivedCurrencyCode: String? = null,
   val transferReceivedValue: BigDecimal? = null,
 )

@@ -3,29 +3,25 @@ package com.emendo.expensestracker.core.domain.currency
 import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
 import com.emendo.expensestracker.data.api.manager.CurrencyConverter
 import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository
-import kotlinx.datetime.Instant
 import java.math.BigDecimal
 import javax.inject.Inject
 
-class ConvertCurrencyUseCase @Inject constructor(
+class ConvertCurrencyNowUseCase @Inject constructor(
   private val currencyRateRepository: CurrencyRateRepository,
   private val currencyConverter: CurrencyConverter,
 ) {
 
-  suspend operator fun invoke(
+  operator fun invoke(
     value: BigDecimal,
     fromCurrencyCode: String,
     toCurrencyCode: String,
-    usdToOriginalRate: BigDecimal,
-    conversionDate: Instant,
   ): BigDecimal =
     try {
       currencyConverter.convert(
         value = value,
         fromCurrencyCode = fromCurrencyCode,
         toCurrencyCode = toCurrencyCode,
-        usdToOriginalRate = usdToOriginalRate,
-        currencyRates = currencyRateRepository.getOrFetchRates(conversionDate),
+        currencyRates = currencyRateRepository.getTodayRatesSnapshot(),
       )
     } catch (e: CurrencyRateNotFoundException) {
       value

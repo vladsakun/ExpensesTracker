@@ -49,6 +49,7 @@ class TransactionMapper @Inject constructor(
       transferReceivedAmount = transferReceivedAmount?.formatPositive(),
       date = entity.date,
       note = entity.note,
+      usdToOriginalRate = entity.usdToOriginalRate,
       timeZone = TimeZone.of(entity.timeZoneId),
     )
   }

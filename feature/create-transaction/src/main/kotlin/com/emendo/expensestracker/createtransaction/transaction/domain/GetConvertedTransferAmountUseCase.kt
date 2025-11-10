@@ -9,14 +9,14 @@ import javax.inject.Inject
 
 class GetConvertedTransferAmountUseCase @Inject constructor(
   private val createTransactionController: CreateTransactionController,
-  private val getConvertedFormattedValueUseCase: GetConvertedFormattedValueUseCase,
+  private val getConvertedFormattedValueNowUseCase: GetConvertedFormattedValueNowUseCase,
 ) {
 
   operator fun invoke(amount: BigDecimal): Amount? {
     val target: AccountModel = createTransactionController.getTargetSnapshot() as? AccountModel ?: return null
     val source: TransactionSource = createTransactionController.getSourceSnapshot() ?: return null
 
-    return getConvertedFormattedValueUseCase(
+    return getConvertedFormattedValueNowUseCase(
       value = amount,
       fromCurrency = source.currency,
       toCurrency = target.currency,

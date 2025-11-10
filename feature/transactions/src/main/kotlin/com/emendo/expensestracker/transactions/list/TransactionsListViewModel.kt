@@ -139,6 +139,8 @@ class TransactionsListViewModel @Inject constructor(
         value = transaction.value,
         fromCurrencyCode = transaction.currency.currencyCode,
         toCurrencyCode = generalCurrency.currencyCode,
+        usdToOriginalRate = transaction.usdToOriginalRate,
+        conversionDate = transaction.date,
       )
       transaction.copy(value = convertedValue)
     }

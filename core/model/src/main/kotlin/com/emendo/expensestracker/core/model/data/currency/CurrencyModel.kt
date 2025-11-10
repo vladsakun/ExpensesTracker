@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.model.data.currency
 
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModels.CURRENCY_RATES_BASE
 import java.util.Currency
 
 data class CurrencyModel(
@@ -18,7 +19,7 @@ data class CurrencyModel(
     )
 
     val USD = CurrencyModel(
-      currencyCode = "USD",
+      currencyCode = CURRENCY_RATES_BASE,
       currencyName = "US dollar",
       currencySymbol = "$",
     )

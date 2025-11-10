@@ -15,7 +15,10 @@ import com.emendo.expensestracker.data.api.repository.CategoryRepository
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
 import com.emendo.expensestracker.data.api.utils.ExpeDateUtils
-import com.emendo.expensestracker.model.ui.*
+import com.emendo.expensestracker.model.ui.NetworkViewState
+import com.emendo.expensestracker.model.ui.resourceValueOf
+import com.emendo.expensestracker.model.ui.successData
+import com.emendo.expensestracker.model.ui.textValueOf
 import com.emendo.expensestracker.report.ReportScreenData.CategoryValue
 import com.emendo.expensestracker.report.destinations.ReportSubcategoriesRouteDestination
 import com.emendo.expensestracker.report.domain.GetCategoriesWithTotalTransactionsUseCase
@@ -33,7 +36,6 @@ import kotlinx.datetime.*
 import java.math.BigDecimal
 import java.time.Year
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
@@ -88,7 +90,7 @@ class ReportViewModel @Inject constructor(
       _transactionType,
     ) { currency, transactions, transactionType ->
       val categoryWithTotal: List<Pair<CategoryModel, BigDecimal>> =
-        getCategoriesWithTotalTransactionsUseCase(transactions, transactionType)
+        getCategoriesWithTotalTransactionsUseCase(currency, transactions, transactionType)
           .sortedByDescending { it.second }
 
       val pieChartData = categoryWithTotal.map { (category, total) ->
@@ -102,11 +104,9 @@ class ReportViewModel @Inject constructor(
       NetworkViewState.Success(
         ReportScreenData(
           pieChartData = pieChartData,
-          balanceDate = textValueOf("Balance: "), // Todo remove hardcoded string
-          balance = amountFormatter.format(transactions.sumOf { it.amount.value }.abs(), currency),
           reportSum = ReportScreenData.ReportSum(
             label = resourceValueOf(getReportSumLabelResId(transactionType)),
-            value = amountFormatter.format(transactions.sumOf { it.amount.value }.abs(), currency),
+            value = categoryWithTotal.sumOf { it.second }.let { amountFormatter.format(it.abs(), currency) },
             type = transactionType,
           ),
           categoryValues = categoryWithTotal.map { (category, total) ->
@@ -119,7 +119,6 @@ class ReportViewModel @Inject constructor(
             )
           }.toImmutableList(),
           transactionType = transactionType,
-          //          periods = getPeriods(), // Extract
         )
       )
     }.stateInWhileSubscribed(viewModelScope, NetworkViewState.Loading)
@@ -212,7 +211,6 @@ class ReportViewModel @Inject constructor(
 
   private fun getDefaultPeriod(): ReportPeriod {
     // Get from data store last selected period
-
     val (start, end) = ExpeDateUtils.getFirstAndLastDayOfMonth(date = getNow())
     val localDateTime = start.toLocalDateTime(TimeZone.UTC)
     val month = localDateTime.month
@@ -230,73 +228,6 @@ class ReportViewModel @Inject constructor(
       val period = selectedPeriod.getPeriod()
       transactionRepository.getTransactionsInPeriod(from = period.getFromInstant(), to = period.getToInstant())
     }
-}
-
-class PeriodsFactory @Inject constructor(
-  private val localeManager: ExpeLocaleManager,
-  private val transactionRepository: TransactionRepository,
-) {
-
-  suspend fun getPeriods(selectedPeriod: ReportPeriod): ImmutableList<ReportPeriod> {
-    val firstTransaction = transactionRepository.retrieveFirstTransaction()?.date ?: Clock.System.now()
-
-    val now = getNow()
-    val startYear = firstTransaction.toLocalDateTime(TimeZone.UTC).year
-    val yearNow = now.year
-    val diff = (yearNow - startYear).coerceAtMost(3) // Maximum 3 years history suggestion
-
-    // Years
-    val periods = mutableListOf(
-      if (selectedPeriod is ReportPeriod.Custom) selectedPeriod else ReportPeriod.Custom(),
-      ReportPeriod.AllTime()
-    )
-    for (i in yearNow downTo yearNow - diff) {
-      val year = Year.of(i)
-      val start = year.atDay(1).atStartOfDay().toInstant(TimeZone.UTC.toJavaZoneOffset()).toKotlinInstant()
-      val end = year.atDay(year.length()).atStartOfDay().toInstant(TimeZone.UTC.toJavaZoneOffset()).toKotlinInstant()
-      periods.add(
-        ReportPeriod.Date(
-          label = textValueOf(year.toString()),
-          start = start,
-          end = end,
-        ),
-      )
-    }
-
-    // Months
-    for (i in yearNow downTo yearNow - diff) {
-      val year = Year.of(i)
-      val monthRange: OpenEndRange<Month> = if (year.value == now.year) {
-        year.atMonth(now.month).month.rangeUntil(year.atMonth(1).month)
-      } else {
-        year.atMonth(12).month.rangeUntil(year.atMonth(1).month)
-      }
-      for (monthValue in monthRange.start.value downTo monthRange.endExclusive.value) {
-        val month: java.time.Month = Month.of(monthValue)
-        val date = LocalDateTime(year = year.value, month = month, 1, 0, 0)
-        val (start, end) = ExpeDateUtils.getFirstAndLastDayOfMonth(date)
-        periods.add(
-          ReportPeriod.Date(
-            label = getPeriodLabel(month, year),
-            start = start,
-            end = end,
-          ),
-        )
-      }
-    }
-
-    return periods.reversed().toImmutableList()
-  }
-
-  fun getPeriodLabel(month: java.time.Month, year: Year): TextValue.Value =
-    textValueOf(month.getMonthLabel() + year.getYearLabel())
-
-  private fun Int.getYearLabel(): String = Year.of(this).getYearLabel()
-  private fun Year.getYearLabel(): String = " '${toString().substring(2)}"
-
-  private fun java.time.Month.getMonthLabel(): String? =
-    getDisplayName(TextStyle.FULL_STANDALONE, localeManager.getLocale())
-
 }
 
 private fun getNow() = Clock.System.now().toLocalDateTime(TimeZone.UTC)

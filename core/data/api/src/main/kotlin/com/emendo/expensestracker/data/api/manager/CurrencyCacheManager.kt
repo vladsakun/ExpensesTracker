@@ -4,7 +4,7 @@ import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import kotlinx.coroutines.flow.StateFlow
 
 interface CurrencyCacheManager {
-  val currencyCodes: StateFlow<Map<String, CurrencyModel>?>
+  val currencyModels: StateFlow<Map<String, CurrencyModel>?>
   fun getCurrenciesMapSnapshot(): Map<String, CurrencyModel>?
   fun getGeneralCurrencySnapshot(): CurrencyModel
 }

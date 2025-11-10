@@ -5,6 +5,7 @@ import com.emendo.expensestracker.core.model.data.TransactionType
 import com.emendo.expensestracker.data.api.model.AccountModel
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import java.math.BigDecimal
 
 data class TransactionModel(
   val id: Long,
@@ -16,5 +17,6 @@ data class TransactionModel(
   val date: Instant,
   val timeZone: TimeZone,
   val note: String?,
+  val usdToOriginalRate: BigDecimal,
   val transferReceivedAmount: Amount? = null,
 )

@@ -31,3 +31,22 @@ object ExpeDateUtils {
     return Pair(firstInstant, lastInstant)
   }
 }
+
+/**
+ * Функция для получения текущей даты в формате YYYY-MM-DD.
+ * @param timeZone - Часовой пояс, по которому определяется "сегодня".
+ */
+fun todayAsString(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+  val today = Clock.System.now().toLocalDateTime(timeZone).date
+
+  // 2. Форматируем ее в строку YYYY-MM-DD
+  return today.toString()
+}
+
+/**
+ * Преобразует Instant в строковое представление даты YYYY-MM-DD.
+ */
+fun instantToDateString(instant: Instant, timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+  // Преобразуем точный момент времени в дату, используя часовой пояс
+  return instant.toLocalDateTime(timeZone).date.toString()
+}

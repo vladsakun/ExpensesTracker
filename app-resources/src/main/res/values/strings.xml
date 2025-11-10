@@ -78,6 +78,7 @@
 
   <!--REPORT-->
   <string name="report_title">Report</string>
+  <string name="report_balance">Balance: </string>
   <string name="report_all_expenses">All expenses</string>
   <string name="report_all_incomes">All incomes</string>
   <string name="report_current_balance">Current balance</string>

@@ -8,6 +8,14 @@ interface CurrencyConverter {
     value: BigDecimal,
     fromCurrencyCode: String,
     toCurrencyCode: String,
+    usdToOriginalRate: BigDecimal,
+    currencyRates: Map<String, CurrencyRateModel>,
+  ): BigDecimal
+
+  fun convert(
+    value: BigDecimal,
+    fromCurrencyCode: String,
+    toCurrencyCode: String,
     currencyRates: Map<String, CurrencyRateModel>,
   ): BigDecimal
 }

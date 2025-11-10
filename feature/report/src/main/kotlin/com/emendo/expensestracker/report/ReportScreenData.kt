@@ -20,8 +20,6 @@ data class ReportScreenNavigation(
 
 @Immutable
 data class ReportScreenData(
-  val balanceDate: TextValue,
-  val balance: Amount,
   val pieChartData: ImmutableList<ReportPieChartSlice>?,
   val reportSum: ReportSum,
   val categoryValues: ImmutableList<CategoryValue>,

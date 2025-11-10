@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6d8eed1319ada70957e2ecec8b48e5b4",
+    "identityHash": "699d6e5a88327289d2735dd1c215fdce",
     "entities": [
       {
         "tableName": "account",
@@ -56,9 +56,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "category",
@@ -106,9 +104,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "subcategory",
@@ -178,7 +174,7 @@
       },
       {
         "tableName": "transaction",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `timeZoneId` TEXT NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `targetSubcategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetSubcategoryId`) REFERENCES `subcategory`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `timeZoneId` TEXT NOT NULL, `sourceAccountId` INTEGER NOT NULL, `targetAccountId` INTEGER, `targetCategoryId` INTEGER, `targetSubcategoryId` INTEGER, `value` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `note` TEXT, `typeId` INTEGER NOT NULL, `usdToOriginalRate` TEXT NOT NULL, `transferReceivedCurrencyCode` TEXT, `transferReceivedValue` TEXT, FOREIGN KEY(`sourceAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetAccountId`) REFERENCES `account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetCategoryId`) REFERENCES `category`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`targetSubcategoryId`) REFERENCES `subcategory`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -207,20 +203,17 @@
           {
             "fieldPath": "targetAccountId",
             "columnName": "targetAccountId",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "targetCategoryId",
             "columnName": "targetCategoryId",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "targetSubcategoryId",
             "columnName": "targetSubcategoryId",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "value",
@@ -237,8 +230,7 @@
           {
             "fieldPath": "note",
             "columnName": "note",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "typeId",
@@ -247,16 +239,20 @@
             "notNull": true
           },
           {
+            "fieldPath": "usdToOriginalRate",
+            "columnName": "usdToOriginalRate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "transferReceivedCurrencyCode",
             "columnName": "transferReceivedCurrencyCode",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "transferReceivedValue",
             "columnName": "transferReceivedValue",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -352,35 +348,64 @@
       },
       {
         "tableName": "currency_rate",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`currencyCode` TEXT NOT NULL, `rate` TEXT, PRIMARY KEY(`currencyCode`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`base_currency_code` TEXT NOT NULL, `target_currency_code` TEXT NOT NULL, `rate_date` TEXT NOT NULL, `rate_multiplier` TEXT NOT NULL, `created_at` INTEGER NOT NULL, PRIMARY KEY(`base_currency_code`, `target_currency_code`, `rate_date`))",
         "fields": [
           {
-            "fieldPath": "currencyCode",
-            "columnName": "currencyCode",
+            "fieldPath": "baseCurrencyCode",
+            "columnName": "base_currency_code",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "rate",
-            "columnName": "rate",
+            "fieldPath": "targetCurrencyCode",
+            "columnName": "target_currency_code",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
+          },
+          {
+            "fieldPath": "rateDate",
+            "columnName": "rate_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rateMultiplier",
+            "columnName": "rate_multiplier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "currencyCode"
+            "base_currency_code",
+            "target_currency_code",
+            "rate_date"
           ]
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_currency_rate_target_currency_code_rate_date",
+            "unique": true,
+            "columnNames": [
+              "target_currency_code",
+              "rate_date"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_currency_rate_target_currency_code_rate_date` ON `${TABLE_NAME}` (`target_currency_code`, `rate_date`)"
+          }
+        ]
       }
     ],
-    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d8eed1319ada70957e2ecec8b48e5b4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '699d6e5a88327289d2735dd1c215fdce')"
     ]
   }
 }

@@ -9,7 +9,7 @@ import javax.inject.Inject
 class TransactionFacade @Inject constructor(
   private val getLastTransferAccountOrFirstUseCase: GetLastTransferAccountOrFirstUseCase,
   private val getDefaultAmountUseCase: GetDefaultAmountUseCase,
-  private val getConvertedFormattedValueUseCase: GetConvertedFormattedValueUseCase,
+  private val getConvertedFormattedValueNowUseCase: GetConvertedFormattedValueNowUseCase,
   private val getTransferReceivedAmountUseCase: GetTransferReceivedAmountUseCase,
 ) {
 
@@ -20,7 +20,7 @@ class TransactionFacade @Inject constructor(
     getDefaultAmountUseCase(currencyModel)
 
   fun getConvertedFormattedValue(value: BigDecimal, fromCurrency: CurrencyModel, toCurrency: CurrencyModel) =
-    getConvertedFormattedValueUseCase(value, fromCurrency, toCurrency)
+    getConvertedFormattedValueNowUseCase(value, fromCurrency, toCurrency)
 
   fun getTransferReceivedAmount(state: CreateTransactionUiState, sourceAmount: BigDecimal) =
     getTransferReceivedAmountUseCase(state, sourceAmount)

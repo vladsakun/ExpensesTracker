@@ -49,5 +49,5 @@ class SelectCurrencyViewModel @Inject constructor(
 
 private fun getCurrencyModelsState(currencyCacheManager: CurrencyCacheManager): Flow<ImmutableList<CurrencyModel>?> =
   currencyCacheManager
-    .currencyCodes
+    .currencyModels
     .map { it?.values?.toImmutableList() }

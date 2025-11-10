@@ -1,14 +1,19 @@
 package com.emendo.expensestracker.report.domain
 
+import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.model.data.TransactionType
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.data.api.model.category.CategoryModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import java.math.BigDecimal
 import javax.inject.Inject
 
-class GetCategoriesWithTotalTransactionsUseCase @Inject constructor() {
+class GetCategoriesWithTotalTransactionsUseCase @Inject constructor(
+  private val convertCurrencyUseCase: ConvertCurrencyUseCase,
+) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
+    generalCurrency: CurrencyModel,
     transactions: List<TransactionModel>,
     transactionType: TransactionType,
   ): List<Pair<CategoryModel, BigDecimal>> {
@@ -20,7 +25,19 @@ class GetCategoriesWithTotalTransactionsUseCase @Inject constructor() {
       }
     val categoryWithTotal: List<Pair<CategoryModel, BigDecimal>> = categoryExpenses.mapNotNull { entry ->
       val category = entry.key ?: return@mapNotNull null
-      val sum = entry.value.sumOf { it.amount.value }.abs()
+      val sum = entry.value
+        .sumOf {
+          val fromCurrencyCode = it.source.currency.currencyCode
+          val toCurrency = generalCurrency.currencyCode
+          convertCurrencyUseCase(
+            value = it.amount.value,
+            fromCurrencyCode = fromCurrencyCode,
+            toCurrencyCode = toCurrency,
+            usdToOriginalRate = it.usdToOriginalRate,
+            conversionDate = it.date,
+          )
+        }
+        .abs()
       Pair(category, sum)
     }
     return categoryWithTotal

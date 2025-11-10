@@ -267,7 +267,7 @@ private fun groupByYear(transactions: List<TransactionModel>): Map<Int, List<Tra
   }.toMap()
 }
 
-fun getBarDataByWeek(
+suspend fun getBarDataByWeek(
   transactions: List<TransactionModel>,
   generalCurrency: CurrencyModel,
   convertCurrencyUseCase: ConvertCurrencyUseCase,
@@ -292,7 +292,7 @@ private fun getReportSumLabel(type: TransactionType) =
     resourceValueOf(R.string.report_all_incomes)
   }
 
-private fun getSubcategories(
+private suspend fun getSubcategories(
   transactions: List<TransactionModel>,
   generalCurrency: CurrencyModel,
   convertCurrencyUseCase: ConvertCurrencyUseCase,
@@ -306,7 +306,7 @@ private fun getSubcategories(
     }
     .toImmutableList()
 
-private fun createSubcategoryUiModel(
+private suspend fun createSubcategoryUiModel(
   subcategory: TransactionTarget,
   transactions: List<TransactionModel>,
   generalCurrency: CurrencyModel,
@@ -319,7 +319,7 @@ private fun createSubcategoryUiModel(
   sum = getSum(transactions, generalCurrency, convertCurrencyUseCase, amountFormatter),
 )
 
-private fun getSum(
+private suspend fun getSum(
   transactions: List<TransactionModel>,
   generalCurrency: CurrencyModel,
   convertCurrencyUseCase: ConvertCurrencyUseCase,
@@ -331,6 +331,8 @@ private fun getSum(
         it.amount.value,
         fromCurrencyCode = it.amount.currency.currencyCode,
         toCurrencyCode = generalCurrency.currencyCode,
+        usdToOriginalRate = it.usdToOriginalRate,
+        conversionDate = it.date,
       )
     }
     .abs()

@@ -20,12 +20,22 @@ class GetTotalInPeriodUseCase @Inject constructor(
 
   operator fun invoke(transactionType: TransactionType, startDate: Instant, endDate: Instant): Flow<Amount> {
     val transactionsFlow = transactionRepository.getTransactionsByTypeInPeriod(transactionType, startDate, endDate)
-    return combine(userDataRepository.generalCurrency, transactionsFlow) { generalCurrency, transactions ->
+    val generalCurrencyFlow = userDataRepository.generalCurrency
+
+    return combine(generalCurrencyFlow, transactionsFlow) { generalCurrency, transactions ->
       val generalCurrencyCode = generalCurrency.currencyCode
       val totalValue = transactions
-        .map { it.value to it.currency }
-        .sumOf { (value, currency) -> convertCurrencyUseCase(value, currency.currencyCode, generalCurrencyCode) }
+        .sumOf { transaction ->
+          convertCurrencyUseCase(
+            value = transaction.value,
+            fromCurrencyCode = transaction.currency.currencyCode,
+            toCurrencyCode = generalCurrencyCode,
+            conversionDate = transaction.date,
+            usdToOriginalRate = transaction.usdToOriginalRate,
+          )
+        }
         .abs()
+
       amountFormatter.format(totalValue, generalCurrency)
     }
   }
