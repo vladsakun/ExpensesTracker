@@ -4,7 +4,7 @@ import com.emendo.expensestracker.core.model.data.keyboard.EqualButtonState
 import com.emendo.expensestracker.model.ui.NumericKeyboardActions
 import kotlinx.coroutines.flow.StateFlow
 
-data class BalanceBottomSheetData(
+data class BalanceBottomSheetData constructor(
   val text: StateFlow<String>,
   val actions: InitialBalanceKeyboardActions,
   val numericKeyboardActions: NumericKeyboardActions,

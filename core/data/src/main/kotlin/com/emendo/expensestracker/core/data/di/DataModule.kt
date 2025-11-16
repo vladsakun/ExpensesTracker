@@ -47,4 +47,8 @@ interface DataModule {
   @Binds
   @Singleton
   fun bindsSubcategoryRepository(subcategoryRepository: OfflineFirstSubcategoryRepository): SubcategoryRepository
+
+  @Binds
+  @Singleton
+  fun bindsBudgetRepository(budgetRepository: OfflineFirstBudgetRepository): BudgetRepository
 }

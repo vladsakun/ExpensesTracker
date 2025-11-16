@@ -15,6 +15,7 @@ import com.emendo.expensestracker.core.domain.currency.ConvertCurrencyUseCase
 import com.emendo.expensestracker.core.domain.transaction.GetTransactionsSumUseCase
 import com.emendo.expensestracker.core.model.data.CreateTransactionEventPayload
 import com.emendo.expensestracker.core.model.data.TransactionType.Companion.id
+import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManager
 import com.emendo.expensestracker.core.ui.bottomsheet.base.ModalBottomSheetStateManagerDelegate
 import com.emendo.expensestracker.core.ui.bottomsheet.general.Action
@@ -23,11 +24,11 @@ import com.emendo.expensestracker.core.ui.bottomsheet.general.GeneralBottomSheet
 import com.emendo.expensestracker.create.transaction.api.CreateTransactionScreenApi
 import com.emendo.expensestracker.data.api.amount.AmountFormatter
 import com.emendo.expensestracker.data.api.extensions.abs
-import com.emendo.expensestracker.data.api.manager.CurrencyCacheManager
 import com.emendo.expensestracker.data.api.manager.ExpeTimeZoneManager
 import com.emendo.expensestracker.data.api.model.transaction.TransactionModel
 import com.emendo.expensestracker.data.api.model.transaction.TransactionValueWithType
 import com.emendo.expensestracker.data.api.repository.TransactionRepository
+import com.emendo.expensestracker.data.api.repository.UserDataRepository
 import com.emendo.expensestracker.model.ui.NetworkViewState
 import com.emendo.expensestracker.model.ui.resourceValueOf
 import com.emendo.expensestracker.transactions.TransactionsListArgs
@@ -49,10 +50,10 @@ class TransactionsListViewModel @Inject constructor(
   private val transactionRepository: TransactionRepository,
   timeZoneManager: ExpeTimeZoneManager,
   private val amountFormatter: AmountFormatter,
-  private val currencyCacheManager: CurrencyCacheManager,
   private val getTransactionsSumUseCase: GetTransactionsSumUseCase,
   private val convertCurrencyUseCase: ConvertCurrencyUseCase,
   private val createTransactionScreenApi: CreateTransactionScreenApi,
+  private val userDataRepository: UserDataRepository,
   savedStateHandle: SavedStateHandle,
 ) : ViewModel(), TransactionListCommander, ModalBottomSheetStateManager by ModalBottomSheetStateManagerDelegate() {
 
@@ -66,9 +67,10 @@ class TransactionsListViewModel @Inject constructor(
   private val list: Flow<PagingData<UiModel>> =
     combine(
       timeZoneManager.timeZoneState,
-      transactions
-    ) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem> ->
-      transformPagingData(pagingData, zoneId)
+      transactions,
+      userDataRepository.generalCurrency,
+    ) { zoneId: ZoneId, pagingData: PagingData<UiModel.TransactionItem>, generalCurrency ->
+      transformPagingData(pagingData, zoneId, generalCurrency)
     }.cachedIn(viewModelScope)
 
   internal val state: StateFlow<NetworkViewState<TransactionsUiState>> =
@@ -98,6 +100,7 @@ class TransactionsListViewModel @Inject constructor(
   private fun transformPagingData(
     pagingData: PagingData<UiModel.TransactionItem>,
     zoneId: ZoneId,
+    generalCurrency: CurrencyModel,
   ): PagingData<UiModel> {
     return pagingData.insertSeparators { before: UiModel.TransactionItem?, after: UiModel.TransactionItem? ->
       if (after == null) {
@@ -107,7 +110,7 @@ class TransactionsListViewModel @Inject constructor(
 
       if (before == null) {
         // we're at the beginning of the list
-        return@insertSeparators SeparatorItem(zoneId, after)
+        return@insertSeparators SeparatorItem(zoneId, after, generalCurrency)
       }
 
       // check between 2 items
@@ -115,7 +118,7 @@ class TransactionsListViewModel @Inject constructor(
         // no separator
         null
       } else {
-        SeparatorItem(zoneId, after)
+        SeparatorItem(zoneId, after, generalCurrency)
       }
     }
   }
@@ -123,11 +126,11 @@ class TransactionsListViewModel @Inject constructor(
   private suspend fun SeparatorItem(
     zoneId: ZoneId,
     after: UiModel.TransactionItem,
+    generalCurrency: CurrencyModel,
   ): UiModel.SeparatorItem {
     val timeZone = TimeZone.of(zoneId.id)
     val from = after.transaction.date.toLocalDateTime(timeZone).date.atStartOfDayIn(timeZone)
     val to = from.plus(DateTimePeriod(days = 1), timeZone)
-    val generalCurrency = currencyCacheManager.getGeneralCurrencySnapshot()
 
     val transactions = retrieveTransactionInPeriod(from, to)
     val transactionWithConvertedValues = transactions.map { transaction ->

@@ -107,6 +107,7 @@ dependencies {
   implementation(projects.feature.settings)
   implementation(projects.feature.createTransaction)
   implementation(projects.feature.report)
+  implementation(projects.feature.budget)
 
   implementation(projects.androidApi)
   implementation(projects.appBaseUi)

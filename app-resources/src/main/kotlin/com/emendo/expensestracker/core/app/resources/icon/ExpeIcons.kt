@@ -58,4 +58,6 @@ object ExpeIcons {
   val UnfoldMore = Icons.Outlined.UnfoldMore
   val Analytics = Icons.Outlined.Analytics
   val Empty = Icons.Outlined.Pending
+  val Budget = Icons.Outlined.MonetizationOn
+  val BudgetBorder = Icons.Outlined.MonetizationOn
 }

@@ -4,9 +4,9 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.accounts.AccountsNavGraph
 import com.emendo.expensestracker.app.resources.R
+import com.emendo.expensestracker.budget.BudgetNavGraph
 import com.emendo.expensestracker.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.createtransaction.CreatetransactionNavGraph
 import com.emendo.expensestracker.report.ReportNavGraph
 import com.emendo.expensestracker.transactions.TransactionsNavGraph
 import com.ramcosta.composedestinations.spec.NavGraphSpec
@@ -38,12 +38,12 @@ enum class TopLevelDestination(
     iconTextId = R.string.categories,
     titleTextId = R.string.categories,
   ),
-  CREATE_TRANSACTION(
-    screen = CreatetransactionNavGraph,
-    selectedIcon = ExpeIcons.AddCircle,
-    unselectedIcon = ExpeIcons.AddCircle,
-    iconTextId = R.string.add,
-    titleTextId = null,
+  BUDGET(
+    screen = BudgetNavGraph,
+    selectedIcon = ExpeIcons.Budget,
+    unselectedIcon = ExpeIcons.BudgetBorder,
+    iconTextId = R.string.budget,
+    titleTextId = R.string.budget,
   ),
   TRANSACTIONS(
     screen = TransactionsNavGraph,
@@ -65,10 +65,17 @@ enum class TopLevelDestination(
     internal val startDestination: TopLevelDestination
       get() = TopLevelDestination.entries.first { it.screen == NavGraphs.root.startRoute }
 
-    internal val routesWithoutCreateTransaction: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
+    //    internal val routesWithoutCreateTransaction: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
+    //      entries
+    //        .toMutableList()
+    //        .apply { remove(CREATE_TRANSACTION) }
+    //        .map { it.screen.startRoute.startDestination.route }
+    //        .toSet()
+    //    }
+
+    internal val routes: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
       entries
         .toMutableList()
-        .apply { remove(CREATE_TRANSACTION) }
         .map { it.screen.startRoute.startDestination.route }
         .toSet()
     }

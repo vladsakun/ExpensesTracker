@@ -3,7 +3,7 @@ package com.emendo.expensestracker.core.model.data
 import com.emendo.expensestracker.core.model.data.currency.CurrencyModel
 import java.math.BigDecimal
 
-data class Amount(
+data class Amount constructor(
   val formattedValue: String,
   val currency: CurrencyModel,
   val value: BigDecimal,

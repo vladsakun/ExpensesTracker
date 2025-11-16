@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.emendo.expensestracker.core.database.dao.*
 import com.emendo.expensestracker.core.database.model.CurrencyRateEntity
 import com.emendo.expensestracker.core.database.model.account.AccountEntity
+import com.emendo.expensestracker.core.database.model.budget.BudgetEntity
 import com.emendo.expensestracker.core.database.model.category.CategoryEntity
 import com.emendo.expensestracker.core.database.model.category.SubcategoryEntity
 import com.emendo.expensestracker.core.database.model.transaction.TransactionEntity
@@ -18,6 +19,7 @@ import com.emendo.expensestracker.core.database.util.Converter
     SubcategoryEntity::class,
     TransactionEntity::class,
     CurrencyRateEntity::class,
+    BudgetEntity::class,
   ],
   version = 1,
   exportSchema = true,
@@ -29,4 +31,5 @@ abstract class ExpDatabase : RoomDatabase() {
   abstract fun transactionDao(): TransactionDao
   abstract fun currencyRateDao(): CurrencyRateDao
   abstract fun subcategoryDao(): SubcategoryDao
+  abstract fun budgetsDao(): BudgetDao
 }

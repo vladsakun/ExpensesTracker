@@ -9,6 +9,8 @@ import com.emendo.expensestracker.accounts.destinations.AccountsScreenRouteDesti
 import com.emendo.expensestracker.accounts.destinations.CreateAccountRouteDestination
 import com.emendo.expensestracker.accounts.detail.AccountDetailScreen
 import com.emendo.expensestracker.accounts.list.selectAccountResultRecipient
+import com.emendo.expensestracker.budget.create.CreateBudgetRoute
+import com.emendo.expensestracker.budget.destinations.CreateBudgetRouteDestination
 import com.emendo.expensestracker.categories.create.CreateCategoryRoute
 import com.emendo.expensestracker.categories.destinations.CategoryDetailRouteDestination
 import com.emendo.expensestracker.categories.destinations.CreateCategoryRouteDestination
@@ -108,6 +110,14 @@ fun ExpeNavHost(
     composable(SettingsRouteDestination) {
       SettingsRoute(
         navigator = destinationsNavigator,
+        currencyResultRecipient = selectCurrencyResultRecipient(),
+      )
+    }
+    composable(CreateBudgetRouteDestination) {
+      CreateBudgetRoute(
+        navigator = destinationsNavigator,
+        iconResultRecipient = selectIconResultRecipient(),
+        categoryResultRecipient = selectCategoryResultRecipient(),
         currencyResultRecipient = selectCurrencyResultRecipient(),
       )
     }

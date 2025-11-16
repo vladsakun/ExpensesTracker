@@ -61,6 +61,13 @@
   <string name="advanced_settings">Advanced settings</string>
   <string name="save_transaction">Save Transaction</string>
   <string name="uncategorized">Uncategorized</string>
+  <!--  BUDGET-->
+  <string name="create_budget">Create budget</string>
+  <string name="budget">Budget</string>
+  <string name="create_budget_title">Create Budget</string>
+  <string name="limit">Limit</string>
+  <string name="not_selected">Not selected</string>
+  <!--  BUDGET-->
 
   <string name="sync_notification_title">Expenses tracker</string>
   <string name="sync_notification_channel_name">Sync</string>

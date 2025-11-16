@@ -78,19 +78,23 @@ class ExpeAppState(
       return
     }
 
-    navController.popBackStack(
-      route = TopLevelDestination.CREATE_TRANSACTION.screen.route,
-      inclusive = true,
-    )
+    //    navController.popBackStack(
+    //      route = TopLevelDestination.CREATE_TRANSACTION.screen.route,
+    //      inclusive = true,
+    //    )
 
     navController.navigate(topLevelDestination.screen) {
       // Pop up to the start destination of the graph to
       // avoid building up a large stack of destinations
       // on the back stack as users select items
-      if (topLevelDestination != TopLevelDestination.CREATE_TRANSACTION) {
-        popUpTo(navController.graph.findStartDestination().id) {
-          saveState = true
-        }
+      //      if (topLevelDestination != TopLevelDestination.CREATE_TRANSACTION) {
+      //        popUpTo(navController.graph.findStartDestination().id) {
+      //          saveState = true
+      //        }
+      //      }
+
+      popUpTo(navController.graph.findStartDestination().id) {
+        saveState = true
       }
 
       // Avoid multiple copies of the same destination when
@@ -111,7 +115,8 @@ class ExpeAppState(
    */
   @Composable
   private fun showNavBar(): Boolean {
-    val routesWithoutCreateTransaction = TopLevelDestination.routesWithoutCreateTransaction
+    //    val routesWithoutCreateTransaction = TopLevelDestination.routesWithoutCreateTransaction
+    val routesWithoutCreateTransaction = TopLevelDestination.routes
     val nestedNavGraphs: List<String> = NavGraphs.root.nestedNavGraphs.map { it.route }
     val backStackRoutesWithoutCategories = navController.currentBackStack.value
       .mapNotNull {

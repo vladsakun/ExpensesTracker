@@ -1,5 +1,8 @@
 package com.emendo.expensestracker.model.ui
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+
 sealed interface NetworkViewState<out T> {
   data object Idle : NetworkViewState<Nothing>
   data object Loading : NetworkViewState<Nothing>
@@ -9,3 +12,15 @@ sealed interface NetworkViewState<out T> {
 
 val <T> NetworkViewState<T>.successData: T?
   get() = (this as? NetworkViewState.Success<T>)?.data
+
+fun <D> MutableStateFlow<NetworkViewState<D>>.updateData(
+  function: (D) -> D,
+) {
+  update { state ->
+    if (state is NetworkViewState.Success) {
+      state.copy(data = function(state.data))
+    } else {
+      state
+    }
+  }
+}

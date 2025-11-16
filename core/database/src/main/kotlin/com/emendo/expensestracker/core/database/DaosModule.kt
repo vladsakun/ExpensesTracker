@@ -23,4 +23,7 @@ object DaosModule {
 
   @Provides
   fun providesSubcategoryDao(database: ExpDatabase): SubcategoryDao = database.subcategoryDao()
+
+  @Provides
+  fun providesBudgetDao(database: ExpDatabase): BudgetDao = database.budgetsDao()
 }
