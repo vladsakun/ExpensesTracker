@@ -67,6 +67,7 @@
   <string name="create_budget_title">Create Budget</string>
   <string name="limit">Limit</string>
   <string name="not_selected">Not selected</string>
+  <string name="delete_budget_confirmation">Are you sure you want to delete a budget?</string>
   <!--  BUDGET-->
 
   <string name="sync_notification_title">Expenses tracker</string>

@@ -31,6 +31,12 @@ interface TransactionRepository {
     to: Instant,
   ): List<TransactionValueWithType>
 
+  fun getTransactionsByCategoryInPeriod(
+    categoryId: Long,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionValueWithType>>
+
   suspend fun retrieveTransactionsBySubcategoryInPeriod(
     subcategoryId: Long,
     from: Instant,

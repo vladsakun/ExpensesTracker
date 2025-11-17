@@ -1,6 +1,7 @@
 package com.emendo.expensestracker.budget.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.emendo.expensestracker.app.resources.R
+import com.emendo.expensestracker.budget.destinations.BudgetDetailRouteDestination
 import com.emendo.expensestracker.budget.destinations.CreateBudgetRouteDestination
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.core.designsystem.component.ExpeScaffoldWithTopBar
@@ -35,6 +37,7 @@ fun BudgetListRoute(
   BudgetListScreen(
     budgets = budgetsUi.value,
     onAddBudgetClick = { navigator.navigate(CreateBudgetRouteDestination) },
+    onBudgetClick = { budgetId -> navigator.navigate(BudgetDetailRouteDestination(budgetId)) }
   )
 }
 
@@ -42,6 +45,7 @@ fun BudgetListRoute(
 private fun BudgetListScreen(
   budgets: List<BudgetModelUi>,
   onAddBudgetClick: () -> Unit,
+  onBudgetClick: (Long) -> Unit,
 ) {
   ExpeScaffoldWithTopBar(
     titleResId = R.string.budget,
@@ -64,19 +68,20 @@ private fun BudgetListScreen(
       contentPadding = padding,
     ) {
       items(budgets) { budgetUi ->
-        BudgetListItem(budgetUi)
+        BudgetListItem(budgetUi, onBudgetClick)
       }
     }
   }
 }
 
 @Composable
-private fun BudgetListItem(budgetUi: BudgetModelUi) {
+private fun BudgetListItem(budgetUi: BudgetModelUi, onBudgetClick: (Long) -> Unit) {
   val budget = budgetUi.budget
   Card(
     modifier = Modifier
       .padding(horizontal = 16.dp, vertical = 8.dp)
-      .fillMaxWidth(),
+      .fillMaxWidth()
+      .clickable { onBudgetClick(budget.id) },
     shape = RoundedCornerShape(16.dp),
     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
