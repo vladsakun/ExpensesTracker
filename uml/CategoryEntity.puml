@@ -1,0 +1,11 @@
+@startuml
+class CategoryEntity {
+    +id: Long
+    +name: String
+    +iconId: Int
+    +colorId: Int
+    +type: Int
+    +ordinalIndex: Int
+}
+@enduml
+

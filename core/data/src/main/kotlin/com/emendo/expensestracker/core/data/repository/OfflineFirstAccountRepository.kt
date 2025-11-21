@@ -17,7 +17,6 @@ import com.emendo.expensestracker.data.api.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -39,15 +38,11 @@ class OfflineFirstAccountRepository @Inject constructor(
     }
     .stateIn(scope, SharingStarted.Lazily, emptyList())
 
-  init {
-    scope.launch {
-      accountsDao.getAll()
-        .onEach { accounts -> accounts.map { accountMapper.map(it) } }
-        .launchIn(this)
-    }
+  override fun getAccounts(): Flow<List<AccountModel>> = accountsList
+  override suspend fun retrieveAccounts(): List<AccountModel> = accountsDao.retrieveAll().map {
+    accountMapper.map(it)
   }
 
-  override fun getAccounts(): Flow<List<AccountModel>> = accountsList
   override fun getAccountsSnapshot(): List<AccountModel> = accountsList.value
 
   override fun getLastAccount(): Flow<AccountModel?> =
@@ -69,7 +64,7 @@ class OfflineFirstAccountRepository @Inject constructor(
     icon: IconModel,
     color: com.emendo.expensestracker.model.ui.ColorModel,
     balance: BigDecimal,
-  ) {
+  ): Long =
     withContext(ioDispatcher) {
       accountsDao.save(
         AccountEntity(
@@ -82,7 +77,6 @@ class OfflineFirstAccountRepository @Inject constructor(
         )
       )
     }
-  }
 
   override suspend fun updateAccount(
     id: Long,

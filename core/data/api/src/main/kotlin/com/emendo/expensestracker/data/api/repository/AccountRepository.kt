@@ -10,6 +10,7 @@ import java.math.BigDecimal
 
 interface AccountRepository {
   fun getAccounts(): Flow<List<AccountModel>>
+  suspend fun retrieveAccounts(): List<AccountModel>
   fun getAccountsSnapshot(): List<AccountModel>
   fun getLastAccount(): Flow<AccountModel?>
 
@@ -22,7 +23,7 @@ interface AccountRepository {
     icon: IconModel,
     color: ColorModel,
     balance: BigDecimal,
-  )
+  ): Long
 
   suspend fun updateAccount(
     id: Long,

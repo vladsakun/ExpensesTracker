@@ -1,0 +1,17 @@
+@startuml
+class CategoriesListViewModel {
+    -categoryRepository: CategoryRepository
+    +categoriesListUiState: StateFlow<CategoriesListUiState>
+    +editMode: StateFlow<Boolean>
+    +invertEditMode()
+    +onMove(newOrderedList)
+    +showConfirmDeleteCategoryBottomSheet(category)
+    -deleteCategory(categoryId)
+    +pageSelected(pageIndex)
+    +enableEditMode()
+    +disableEditMode()
+    +getCreateTransactionScreenRoute(category)
+    +getSettingsRoute()
+}
+@enduml
+

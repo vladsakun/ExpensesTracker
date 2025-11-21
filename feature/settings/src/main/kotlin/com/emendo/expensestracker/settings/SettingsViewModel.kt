@@ -96,12 +96,11 @@ constructor(
       GENERAL_CURRENCY_ID -> {
         navigationChannel.trySend(getSelectCurrencyScreenRoute())
       }
+
       HELP -> {
-        viewModelScope.launch {
-          createSampleAccountAndCategoryUseCase()
-          navigationChannel.trySend(HelpArticlesListScreenDestination.route)
-        }
+        navigationChannel.trySend(HelpArticlesListScreenDestination.route)
       }
+
       APPEARANCE -> {
         showThemeDialog.value = StateEvent.Triggered
       }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.*
+import timber.log.Timber
 import java.math.BigDecimal
 import java.time.Year
 import javax.inject.Inject
@@ -149,6 +150,7 @@ class OfflineFirstCurrencyRateRepository @Inject constructor(
         ?: throw CurrencyRateNotFoundException()
 
     } catch (e: Exception) {
+      Timber.e(e, "Error fetching currency rate for $targetCode on $date")
       throw CurrencyRateNotFoundException()
     }
   }

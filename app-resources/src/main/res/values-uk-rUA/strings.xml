@@ -52,7 +52,7 @@
   <string name="transactions">Транзакції</string>
   <string name="create_transaction">Створити транзакцію</string>
   <string name="settings">Налаштування</string>
-  <string name="general_currency">Загальна валюта</string>
+  <string name="general_currency">Основна валюта</string>
   <string name="reminders">Нагадування</string>
   <string name="appearance">Зовнішній вигляд</string>
   <string name="security">Безпека</string>
@@ -61,6 +61,14 @@
   <string name="advanced_settings">Додаткові налаштування</string>
   <string name="save_transaction">Зберегти транзакцію</string>
   <string name="uncategorized">Без категорії</string>
+  <!--  BUDGET-->
+  <string name="create_budget">Створити бюджет</string>
+  <string name="budget">Бюджет</string>
+  <string name="create_budget_title">Створити бюджет</string>
+  <string name="limit">Ліміт</string>
+  <string name="not_selected">Не вибрано</string>
+  <string name="delete_budget_confirmation">Ви впевнені, що хочете видалити бюджет?</string>
+  <!--  BUDGET-->
 
   <string name="sync_notification_title">Трекер витрат</string>
   <string name="sync_notification_channel_name">Синхронізація</string>
@@ -209,4 +217,5 @@
   Якщо у вас є питання щодо використання Expenses Tracker або потрібна допомога з будь-якою функцією, будь ласка, зв\'яжіться з нами. Ми допоможемо вам і зробимо все, щоб ви отримали максимум від додатку.
   Задайте питання: support@expensestracker.app]]>
   </string>
+  <string name="app_name">Трекер витрат</string>
 </resources>

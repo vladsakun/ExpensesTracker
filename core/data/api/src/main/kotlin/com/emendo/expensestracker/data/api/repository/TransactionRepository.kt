@@ -83,6 +83,16 @@ interface TransactionRepository {
     note: String? = null,
   )
 
+  suspend fun createTransaction(
+    source: TransactionSource,
+    target: TransactionTarget,
+    subcategoryId: Long?,
+    amount: Amount,
+    transferReceivedAmount: Amount? = null,
+    note: String? = null,
+    date: Instant,
+  )
+
   suspend fun updateTransaction(
     transactionId: Long,
     source: TransactionSource,

@@ -20,7 +20,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         configureKotlinAndroid(this)
         defaultConfig {
           targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
-          resourceConfigurations += setOf("en")
+          //          resourceConfigurations += setOf("en")
           ndk {
             try {
               val localProperties = gradleLocalProperties(rootDir, providers)

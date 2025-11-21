@@ -182,6 +182,45 @@ class OfflineFirstTransactionRepository @Inject constructor(
     }
   }
 
+  override suspend fun createTransaction(
+    source: TransactionSource,
+    target: TransactionTarget,
+    subcategoryId: Long?,
+    amount: Amount,
+    transferReceivedAmount: Amount?,
+    note: String?,
+    date: Instant,
+  ) {
+    when (getTransactionTypeUseCase(source, target)) {
+      TransactionType.INCOME -> createIncomeTransaction(
+        source = source.asAccount(),
+        target = target.asCategory(),
+        subcategoryId = subcategoryId,
+        amount = amount,
+        note = note,
+        date = date,
+      )
+
+      TransactionType.EXPENSE -> createExpenseTransaction(
+        source = source.asAccount(),
+        target = target.asCategory(),
+        subcategoryId = subcategoryId,
+        amount = amount,
+        note = note,
+        date = date,
+      )
+
+      TransactionType.TRANSFER -> createTransferTransaction(
+        source = source.asAccount(),
+        target = target.asAccount(),
+        amount = amount,
+        note = note,
+        transferReceivedAmount = checkNotNull(transferReceivedAmount) { "TransferReceivedAmount shouldn't be null in Transfer transaction" },
+        date = date,
+      )
+    }
+  }
+
   override suspend fun updateTransaction(
     transactionId: Long,
     source: TransactionSource,

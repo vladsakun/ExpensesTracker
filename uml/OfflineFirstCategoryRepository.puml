@@ -1,0 +1,16 @@
+@startuml
+class OfflineFirstCategoryRepository {
+    -categoryDao: CategoryDao
+    -categoryFullMapper: CategoryFullMapper
+    +getCategories()
+    +getCategoriesWithTransactions()
+    +getCategoriesSnapshot()
+    +getCategorySnapshotById(id)
+    +createCategory(...)
+    +updateCategory(...)
+    +updateOrdinalIndex(id, ordinalIndex)
+    +deleteCategory(id)
+}
+CategoryRepository <|.. OfflineFirstCategoryRepository
+@enduml
+

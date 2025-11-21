@@ -1,0 +1,14 @@
+@startuml
+interface CategoryRepository {
+    +deleteCategory(id)
+    +updateOrdinalIndex(id, ordinalIndex)
+    +updateCategory(id, name, icon, color, type)
+    +createCategory(name, icon, color, type): Long
+    +getCategorySnapshotById(id: Long): CategoryModel?
+    +getCategoriesSnapshot(): List<CategoryModel>
+    +getCategoriesWithTransactions(): Flow<List<CategoryWithTransactions>>
+    +getCategories(): Flow<List<CategoryModel>>
+}
+@enduml
+
+

@@ -1,0 +1,6 @@
+@startuml
+class CategoriesListScreen
+class CategoriesListViewModel
+CategoriesListScreen ..> CategoriesListViewModel : використовує
+@enduml
+

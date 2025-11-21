@@ -63,3 +63,16 @@ Handle case when deleting one of the transfer accounts. Convert the transaction 
 
 Articles to apply:
 https://medium.com/codex/from-junior-to-senior-the-real-way-to-implement-clean-architecture-in-android-8514005e85e1
+
+libs:
+
+1) Jetpack compose (detailed) vs XML
+2) Room vs SQLite
+3) Material3
+4) DataStore vs SharedPreferences
+5) Hilt vs Dagger
+6) Kotlin Coroutines vs RxJava
+7) Compose destinations (less detailed) vs Compose navigation
+8) WorkManager vs AlarmManager vs JobScheduler
+9) Kotlinx serialization vs Gson vs Moshi
+10) Retrofit vs Ktor
