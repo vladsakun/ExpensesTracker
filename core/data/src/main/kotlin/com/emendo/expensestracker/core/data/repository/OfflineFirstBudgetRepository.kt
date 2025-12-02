@@ -47,7 +47,7 @@ class OfflineFirstBudgetRepository @Inject constructor(
     colorId: Int,
     amount: BigDecimal,
     period: BudgetPeriod,
-    categoryId: Long,
+    categoryIds: List<Long>,
     currencyCode: String,
   ) {
     withContext(ioDispatcher) {
@@ -58,7 +58,7 @@ class OfflineFirstBudgetRepository @Inject constructor(
           iconId = iconId,
           colorId = colorId,
           period = period,
-          categoryId = categoryId,
+          categoryIds = categoryIds,
           currencyCode = currencyCode,
         )
       )
@@ -72,7 +72,7 @@ class OfflineFirstBudgetRepository @Inject constructor(
     colorId: Int,
     amount: BigDecimal,
     period: BudgetPeriod,
-    categoryId: Long?,
+    categoryIds: List<Long>,
     currencyCode: String,
   ) {
     withContext(ioDispatcher) {
@@ -84,7 +84,7 @@ class OfflineFirstBudgetRepository @Inject constructor(
           iconId = iconId,
           colorId = colorId,
           period = period,
-          categoryId = categoryId ?: 0L,
+          categoryIds = categoryIds,
           currencyCode = currencyCode,
         )
       )

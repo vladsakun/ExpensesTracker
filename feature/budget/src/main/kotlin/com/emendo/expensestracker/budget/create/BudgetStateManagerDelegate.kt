@@ -24,7 +24,7 @@ class BudgetStateManagerDelegate(defaultState: NetworkViewState<CreateBudgetScre
     _state.updateData {
       it.copy(
         name = name,
-        confirmButtonEnabled = it.limit.value != Amount.ZERO.value && it.category != null,
+        confirmButtonEnabled = it.limit.value != Amount.ZERO.value && it.categories.isNotEmpty(),
       )
     }
   }
@@ -33,7 +33,7 @@ class BudgetStateManagerDelegate(defaultState: NetworkViewState<CreateBudgetScre
     _state.updateData {
       it.copy(
         limit = limit,
-        confirmButtonEnabled = it.name.isNotBlank() && it.category != null,
+        confirmButtonEnabled = it.name.isNotBlank() && it.categories.isNotEmpty(),
       )
     }
   }
@@ -46,11 +46,11 @@ class BudgetStateManagerDelegate(defaultState: NetworkViewState<CreateBudgetScre
     _state.updateData { it.copy(color = ColorModel.getById(colorId)) }
   }
 
-  override fun updateCategory(category: CategoryModel) {
+  override fun updateCategories(categories: List<CategoryModel>) {
     _state.updateData {
       it.copy(
-        confirmButtonEnabled = it.name.isNotBlank() && it.limit.value != Amount.ZERO.value,
-        category = category
+        confirmButtonEnabled = it.name.isNotBlank() && it.limit.value != Amount.ZERO.value && categories.isNotEmpty(),
+        categories = categories
       )
     }
   }

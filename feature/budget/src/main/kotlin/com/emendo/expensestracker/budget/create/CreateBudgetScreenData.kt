@@ -11,7 +11,7 @@ data class CreateBudgetScreenData(
   val limit: Amount,
   val icon: IconModel,
   val color: ColorModel,
-  val category: CategoryModel?,
+  val categories: List<CategoryModel>,
   val currency: CurrencyModel,
   val confirmButtonEnabled: Boolean,
 ) {
@@ -21,16 +21,16 @@ data class CreateBudgetScreenData(
       iconId: Int?,
       name: String?,
       limit: Amount?,
-      categoryId: CategoryModel?,
+      categoryIds: List<CategoryModel>?,
       currency: CurrencyModel = CurrencyModel.USD,
     ) = CreateBudgetScreenData(
       name = name ?: "",
       limit = limit ?: Amount.ZERO,
       icon = iconId?.let(IconModel::getById) ?: IconModel.random,
       color = color,
-      category = categoryId,
+      categories = categoryIds ?: emptyList(),
       currency = currency,
-      confirmButtonEnabled = !name.isNullOrBlank() && !limit?.formattedValue.isNullOrBlank(),
+      confirmButtonEnabled = !name.isNullOrBlank() && !limit?.formattedValue.isNullOrBlank() && !categoryIds.isNullOrEmpty(),
     )
   }
 }

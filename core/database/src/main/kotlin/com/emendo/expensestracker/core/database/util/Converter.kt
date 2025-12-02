@@ -16,4 +16,11 @@ class Converter {
 
   @TypeConverter
   fun toInstant(value: Long?): Instant? = value?.let(Instant::fromEpochMilliseconds)
+
+  @TypeConverter
+  fun fromCategoryIds(ids: List<Long>?): String? = ids?.joinToString(",")
+
+  @TypeConverter
+  fun toCategoryIds(value: String?): List<Long> =
+    if (value.isNullOrEmpty()) emptyList() else value.split(",").map { it.toLong() }
 }

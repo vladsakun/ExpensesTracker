@@ -98,7 +98,10 @@ constructor(
       }
 
       HELP -> {
-        navigationChannel.trySend(HelpArticlesListScreenDestination.route)
+        viewModelScope.launch {
+          createSampleAccountAndCategoryUseCase()
+          navigationChannel.trySend(HelpArticlesListScreenDestination.route)
+        }
       }
 
       APPEARANCE -> {

@@ -34,7 +34,19 @@ class GetBudgetProgressUseCase @Inject constructor(
       }
 
       val flows: List<Flow<BudgetProgressData>> = budgetList.map { budget ->
-        val categoryId = budget.categoryId
+        val categoryIds = budget.categoryIds
+        if (categoryIds.isEmpty()) {
+          return@map flowOf(
+            BudgetProgressData(
+              budget = budget,
+              spent = BigDecimal.ZERO,
+              limit = budget.amount.value,
+              percent = 0f,
+              currency = budget.amount.currency,
+            )
+          )
+        }
+
         val limit = budget.amount.value
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         val startOfMonth = LocalDate(now.year, now.monthNumber, 1)
@@ -42,13 +54,14 @@ class GetBudgetProgressUseCase @Inject constructor(
         val startInstant = startOfMonth.atStartOfDayIn(TimeZone.currentSystemDefault())
         val endInstant = endOfMonth.atStartOfDayIn(TimeZone.currentSystemDefault())
         val budgetCurrency = budget.amount.currency
-        transactionRepository.getTransactionsInPeriod(categoryId, startInstant, endInstant).map { transactions ->
+        transactionRepository.getTransactionsByCategoriesInPeriod(categoryIds, startInstant, endInstant)
+          .map { transactions ->
           val spent = transactions
             .filter { it.type == TransactionType.EXPENSE }
             .sumOf { transaction ->
               convertCurrencyUseCase(
-                value = transaction.amount.value,
-                fromCurrencyCode = transaction.amount.currency.currencyCode,
+                value = transaction.value,
+                fromCurrencyCode = transaction.currency.currencyCode,
                 toCurrencyCode = budgetCurrency.currencyCode,
                 conversionDate = transaction.date,
                 usdToOriginalRate = transaction.usdToOriginalRate,

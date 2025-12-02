@@ -15,5 +15,5 @@ data class BudgetModel(
   val color: ColorModel,
   val amount: Amount,
   val period: BudgetPeriod = BudgetPeriod.MONTHLY,
-  val categoryId: Long,
+  val categoryIds: List<Long>,
 )

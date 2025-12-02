@@ -44,7 +44,7 @@ class BudgetDetailViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
   private val getBudgetValueForDateUseCase: GetBudgetValueForDateUseCase,
   private val amountFormatter: AmountFormatter,
-  private val budgetRepository: BudgetRepository, // Inject repository
+  private val budgetRepository: BudgetRepository,
 ) : ViewModel() {
 
   private val _months: List<BudgetPeriod.Month> = (0..11).map {

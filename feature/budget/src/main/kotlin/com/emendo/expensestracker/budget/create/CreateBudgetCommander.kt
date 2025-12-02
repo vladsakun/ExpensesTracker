@@ -6,7 +6,7 @@ typealias CreateBudgetCommand = Command<CreateBudgetCommander>
 
 interface CreateBudgetCommander {
   fun changeName(newName: String)
-  fun changeCategory(category: Long)
+  fun changeCategories(categoryIds: List<Long>)
   fun changeCurrency(currencyCode: String)
   fun changeIcon(iconId: Int)
   fun changeColor(colorId: Int)
@@ -22,9 +22,9 @@ class UpdateNameBudgetCommand(private val newName: String) : CreateBudgetCommand
   }
 }
 
-class UpdateCategoryBudgetCommand(private val categoryId: Long) : CreateBudgetCommand {
+class UpdateCategoriesBudgetCommand(private val categoryIds: List<Long>) : CreateBudgetCommand {
   override fun execute(receiver: CreateBudgetCommander) {
-    receiver.changeCategory(categoryId)
+    receiver.changeCategories(categoryIds)
   }
 }
 

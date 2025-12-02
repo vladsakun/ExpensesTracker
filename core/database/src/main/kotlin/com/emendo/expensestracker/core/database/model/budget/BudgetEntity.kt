@@ -15,6 +15,6 @@ data class BudgetEntity(
   val iconId: Int,
   val colorId: Int,
   val period: BudgetPeriod = BudgetPeriod.MONTHLY,
-  val categoryId: Long,
+  val categoryIds: List<Long>,
   val currencyCode: String,
 )

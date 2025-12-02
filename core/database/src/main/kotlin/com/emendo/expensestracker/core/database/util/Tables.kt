@@ -19,3 +19,5 @@ const val RATE_DATE = "rate_date"
 
 const val TABLE_BUDGET = "budget"
 const val BUDGET_PRIMARY_KEY = "id"
+
+const val TABLE_BUDGET_CATEGORY = "budget_category"

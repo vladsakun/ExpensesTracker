@@ -49,7 +49,7 @@ fun CreateBudgetRoute(
     viewModel.processCommand(UpdateIconBudgetCommand(iconId))
   }
   categoryResultRecipient.handleValueResult { category ->
-    viewModel.processCommand(UpdateCategoryBudgetCommand(category))
+    viewModel.processCommand(UpdateCategoriesBudgetCommand(listOf(category)))
   }
   currencyResultRecipient.handleValueResult { currencyCode ->
     viewModel.processCommand(UpdateCurrencyBudgetCommand(currencyCode))
@@ -154,7 +154,9 @@ private fun CreateBudgetScreen(
           )
           SelectRowWithText(
             labelResId = R.string.category,
-            textProvider = { data.category?.name?.stringValue() ?: stringResource(R.string.not_selected) },
+            textProvider = {
+              data.categories.firstOrNull()?.name?.stringValue() ?: stringResource(R.string.not_selected)
+            },
             onClick = onCategorySelectClick,
           )
           SelectRowWithText(

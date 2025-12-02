@@ -92,6 +92,13 @@ class OfflineFirstTransactionRepository @Inject constructor(
   ): Flow<List<TransactionValueWithType>> = transactionDao.getTransactionsByCategoryInPeriod(categoryId, from, to)
     .map { transactions -> transactions.map { toTransactionValueWithType(it) } }
 
+  override fun getTransactionsByCategoriesInPeriod(
+    categoryIds: List<Long>,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionValueWithType>> = transactionDao.getTransactionsByCategoriesInPeriod(categoryIds, from, to)
+    .map { transactions -> transactions.map { toTransactionValueWithType(it) } }
+
   override suspend fun retrieveTransactionsBySubcategoryInPeriod(
     subcategoryId: Long,
     from: Instant,

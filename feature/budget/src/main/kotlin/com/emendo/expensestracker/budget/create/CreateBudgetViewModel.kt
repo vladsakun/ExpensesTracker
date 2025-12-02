@@ -41,7 +41,7 @@ class CreateBudgetViewModel @Inject constructor(
           iconId = null,
           name = null,
           limit = null,
-          categoryId = null,
+          categoryIds = emptyList(),
           currency = userDataRepository.getUserDataSnapshot()?.generalCurrencyCode?.let {
             CurrencyModel.toCurrencyModel(
               it
@@ -68,7 +68,7 @@ class CreateBudgetViewModel @Inject constructor(
         colorId = data.color.id,
         amount = data.limit.value,
         period = MONTHLY,
-        categoryId = data.category!!.id,
+        categoryIds = data.categories.map { it.id },
         currencyCode = data.currency.currencyCode,
       )
       navigateUp()
@@ -85,7 +85,8 @@ class CreateBudgetViewModel @Inject constructor(
   override fun changeName(newName: String) = updateName(newName)
   override fun changeIcon(iconId: Int) = updateIcon(iconId)
   override fun changeColor(colorId: Int) = updateColor(colorId)
-  override fun changeCategory(category: Long) = updateCategory(categoryRepository.getCategorySnapshotById(category)!!)
+  override fun changeCategories(categoryIds: List<Long>) =
+    updateCategories(categoryIds.mapNotNull { categoryRepository.getCategorySnapshotById(it) })
   override fun changeCurrency(currencyCode: String) {
     updateCurrency(amountFormatter, CurrencyModel.toCurrencyModel(currencyCode))
   }

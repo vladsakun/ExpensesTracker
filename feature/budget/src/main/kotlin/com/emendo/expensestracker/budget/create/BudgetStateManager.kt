@@ -16,7 +16,7 @@ interface BudgetStateManager<T> {
   fun updateLimit(limit: Amount)
   fun updateIcon(iconId: Int)
   fun updateColor(colorId: Int)
-  fun updateCategory(category: CategoryModel)
+  fun updateCategories(categories: List<CategoryModel>)
   fun updateCurrency(amountFormatter: AmountFormatter, currency: CurrencyModel)
   fun updateConfirmEnabled(enabled: Boolean)
   fun requireDataValue(): T

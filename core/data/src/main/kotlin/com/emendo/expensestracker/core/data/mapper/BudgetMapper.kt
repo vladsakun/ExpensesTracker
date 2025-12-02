@@ -25,7 +25,7 @@ class BudgetMapper @Inject constructor(
       icon = IconModel.getById(iconId),
       color = ColorModel.getById(colorId),
       period = period,
-      categoryId = categoryId,
+      categoryIds = categoryIds,
       currency = currencyModel,
     )
   }

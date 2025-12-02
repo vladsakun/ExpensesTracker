@@ -17,7 +17,7 @@ interface BudgetRepository {
     colorId: Int,
     amount: BigDecimal,
     period: BudgetPeriod,
-    categoryId: Long,
+    categoryIds: List<Long>,
     currencyCode: String,
   )
 
@@ -28,7 +28,7 @@ interface BudgetRepository {
     colorId: Int,
     amount: BigDecimal,
     period: BudgetPeriod,
-    categoryId: Long? = null,
+    categoryIds: List<Long>,
     currencyCode: String,
   )
 

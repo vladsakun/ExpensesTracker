@@ -117,6 +117,14 @@ abstract class TransactionDao : BaseDao<TransactionEntity>() {
   ): Flow<List<TransactionFull>>
 
   @Transaction
+  @Query("SELECT * FROM $TABLE_NAME WHERE targetCategoryId IN (:categoryIds) AND date BETWEEN :from AND :to")
+  abstract fun getTransactionsByCategoriesInPeriod(
+    categoryIds: List<Long>,
+    from: Instant,
+    to: Instant,
+  ): Flow<List<TransactionFull>>
+
+  @Transaction
   @Query("SELECT * FROM $TABLE_NAME WHERE targetSubcategoryId = :subcategoryId AND date BETWEEN :from AND :to")
   abstract suspend fun retrieveTransactionsBySubcategoryInPeriod(
     subcategoryId: Long,

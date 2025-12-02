@@ -21,7 +21,9 @@ class GetBudgetValueForDateUseCase @Inject constructor(
   operator fun invoke(budgetId: Long, period: YearMonth): Flow<BudgetValueResult> {
     val budget = budgetRepository.getByIdSnapshot(budgetId) ?: return emptyFlow()
 
-    val categoryId = budget.categoryId
+    val categoryIds = budget.categoryIds
+    if (categoryIds.isEmpty()) return emptyFlow()
+
     val limit = budget.amount.value
     val budgetCurrency = budget.currency
     // Calculate start and end of month in kotlinx.datetime
@@ -29,9 +31,9 @@ class GetBudgetValueForDateUseCase @Inject constructor(
     val endOfMonth = startOfMonth.plus(DatePeriod(months = 1))
     val startInstant = startOfMonth.atStartOfDayIn(TimeZone.currentSystemDefault())
     val endInstant = endOfMonth.atStartOfDayIn(TimeZone.currentSystemDefault())
-    // Use getTransactionsByCategoryInPeriod (returns Flow)
-    return transactionRepository.getTransactionsByCategoryInPeriod(
-      categoryId = categoryId,
+    // Use getTransactionsByCategoriesInPeriod (returns Flow for multiple categories)
+    return transactionRepository.getTransactionsByCategoriesInPeriod(
+      categoryIds = categoryIds,
       from = startInstant,
       to = endInstant
     ).map { transactions ->
