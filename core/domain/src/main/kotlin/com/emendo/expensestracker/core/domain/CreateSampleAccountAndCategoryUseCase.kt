@@ -29,9 +29,9 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) {
 
-  private suspend fun createAccount() {
+  private suspend fun createSampleAccount() {
     accountRepository.createAccount(
-      name = "Картка",
+      name = "Card",
       balance = BigDecimal(100000),
       icon = IconModel.CREDITCARD,
       color = ColorModel.Blue,
@@ -40,26 +40,26 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
   }
 
   suspend operator fun invoke() = withContext(ioDispatcher) {
-    createAccount()
+    createSampleAccount()
 
     // Category definitions with valid icons
     val categoriesData = listOf(
-      Triple("Житло", IconModel.HOUSE, ColorModel.Blue),
-      Triple("Комунальні послуги", IconModel.ENERGY, ColorModel.Orange),
-      Triple("Продукти", IconModel.LOCAL_GROCERY_STORE, ColorModel.Green),
-      Triple("Транспорт", IconModel.LOCAL_GAS_STATION, ColorModel.Red),
-      Triple("Освіта", IconModel.EDUCATION, ColorModel.Purple),
-      Triple("Медицина", IconModel.LOCAL_HOSPITAL, ColorModel.Red),
-      Triple("Ресторани", IconModel.RESTAURANT, ColorModel.Orange),
-      Triple("Кіно", IconModel.ENTERTAINMENT, ColorModel.Purple),
-      Triple("Відпочинок", IconModel.SPA, ColorModel.Green),
-      Triple("Подарунки", IconModel.ENTERTAINMENT, ColorModel.Red),
-      Triple("Ремонти", IconModel.BUSINESS, ColorModel.Orange),
-      Triple("Інші дрібні витрати", IconModel.WALLET, ColorModel.Gray),
+      Triple("Housing", IconModel.HOUSE, ColorModel.Blue),
+      Triple("Utilities", IconModel.ENERGY, ColorModel.Orange),
+      Triple("Groceries", IconModel.LOCAL_GROCERY_STORE, ColorModel.Green),
+      Triple("Transport", IconModel.LOCAL_GAS_STATION, ColorModel.Red),
+      Triple("Education", IconModel.EDUCATION, ColorModel.Purple),
+      Triple("Healthcare", IconModel.LOCAL_HOSPITAL, ColorModel.Red),
+      Triple("Restaurants", IconModel.RESTAURANT, ColorModel.Orange),
+      Triple("Cinema", IconModel.ENTERTAINMENT, ColorModel.Purple),
+      Triple("Leisure", IconModel.SPA, ColorModel.Green),
+      Triple("Gifts", IconModel.ENTERTAINMENT, ColorModel.Red),
+      Triple("Repairs", IconModel.BUSINESS, ColorModel.Orange),
+      Triple("Miscellaneous", IconModel.WALLET, ColorModel.Gray),
     )
 
     // Create categories
-    val createCategoriesDeff = categoriesData.map { (name, icon, color) ->
+    val createCategoriesDeferred = categoriesData.map { (name, icon, color) ->
       async {
         categoryRepository.createCategory(
           name = name,
@@ -70,17 +70,17 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
       }
     }
 
-    createCategoriesDeff.awaitAll()
+    createCategoriesDeferred.awaitAll()
 
     // Get actual created account and categories
     val account = accountRepository.retrieveAccounts().find { it.id == 1L }!!
     val categories = categoryRepository.getCategories().first()
 
     // Category clusters for budgets
-    val mandatoryCategoryNames = setOf("Житло", "Комунальні послуги", "Продукти", "Транспорт")
-    val flexibleCategoryNames = setOf("Освіта", "Медицина")
-    val entertainmentCategoryNames = setOf("Ресторани", "Кіно", "Відпочинок", "Подарунки")
-    val unexpectedCategoryNames = setOf("Ремонти", "Інші дрібні витрати")
+    val mandatoryCategoryNames = setOf("Housing", "Utilities", "Groceries", "Transport")
+    val flexibleCategoryNames = setOf("Education", "Healthcare")
+    val entertainmentCategoryNames = setOf("Restaurants", "Cinema", "Leisure", "Gifts")
+    val unexpectedCategoryNames = setOf("Repairs", "Miscellaneous")
 
     @Suppress("UNCHECKED_CAST")
     val mandatoryCategories = categories.filter { it.name.textValueOrBlank() in mandatoryCategoryNames }
@@ -95,7 +95,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
     val unexpectedCategories = categories.filter { it.name.textValueOrBlank() in unexpectedCategoryNames }
 
     // Create transactions for sample data
-    val transactionsDeff = mutableListOf<Deferred<Unit>>()
+    val transactionsDeferred = mutableListOf<Deferred<Unit>>()
 
     val year = 2025
     for (month in 1..12) {
@@ -104,7 +104,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
         repeat(5) { day ->
           val date = LocalDate(year, month, day + 1).atStartOfDayIn(TimeZone.currentSystemDefault())
           val randomExpense = (1000..3000).random()
-          transactionsDeff.add(async {
+          transactionsDeferred.add(async {
             transactionRepository.createTransaction(
               source = account,
               target = category,
@@ -126,7 +126,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
         repeat(3) { day ->
           val date = LocalDate(year, month, day + 6).atStartOfDayIn(TimeZone.currentSystemDefault())
           val randomExpense = (500..1500).random()
-          transactionsDeff.add(async {
+          transactionsDeferred.add(async {
             transactionRepository.createTransaction(
               source = account,
               target = category,
@@ -136,7 +136,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
                 currency = account.currency,
                 value = BigDecimal(randomExpense),
               ),
-              note = category.name.toString(),
+              note = null,
               date = date,
             )
           })
@@ -148,7 +148,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
         repeat(2) { day ->
           val date = LocalDate(year, month, day + 10).atStartOfDayIn(TimeZone.currentSystemDefault())
           val randomExpense = (300..1000).random()
-          transactionsDeff.add(async {
+          transactionsDeferred.add(async {
             transactionRepository.createTransaction(
               source = account,
               target = category,
@@ -158,7 +158,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
                 currency = account.currency,
                 value = BigDecimal(randomExpense),
               ),
-              note = category.name.toString(),
+              note = null,
               date = date,
             )
           })
@@ -170,7 +170,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
         repeat(1) { day ->
           val date = LocalDate(year, month, day + 15).atStartOfDayIn(TimeZone.currentSystemDefault())
           val randomExpense = (500..2000).random()
-          transactionsDeff.add(async {
+          transactionsDeferred.add(async {
             transactionRepository.createTransaction(
               source = account,
               target = category,
@@ -180,7 +180,7 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
                 currency = account.currency,
                 value = BigDecimal(randomExpense),
               ),
-              note = category.name.toString(),
+              note = null,
               date = date,
             )
           })
@@ -188,12 +188,12 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
       }
     }
 
-    awaitAll(*transactionsDeff.toTypedArray())
+    transactionsDeferred.awaitAll()
 
     // Create 4 budgets
-    // 1. Обов'язкові витрати - 30000грн/місяць
+    // 1. Essential expenses - 30000 UAH / month
     budgetRepository.createBudget(
-      name = "Обов'язкові витрати",
+      name = "Essential expenses",
       iconId = mandatoryCategories.firstOrNull()?.icon?.id ?: IconModel.WALLET.id,
       colorId = mandatoryCategories.firstOrNull()?.color?.id ?: ColorModel.Red.id,
       amount = BigDecimal(30000),
@@ -202,9 +202,9 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
       currencyCode = account.currency.currencyCode,
     )
 
-    // 2. Гнучкі витрати - 10000грн/місяць
+    // 2. Flexible expenses - 10000 UAH / month
     budgetRepository.createBudget(
-      name = "Гнучкі витрати",
+      name = "Flexible expenses",
       iconId = flexibleCategories.firstOrNull()?.icon?.id ?: IconModel.EDUCATION.id,
       colorId = flexibleCategories.firstOrNull()?.color?.id ?: ColorModel.Purple.id,
       amount = BigDecimal(10000),
@@ -213,9 +213,9 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
       currencyCode = account.currency.currencyCode,
     )
 
-    // 3. Розваги та хобі - 5000грн/місяць
+    // 3. Entertainment & hobbies - 5000 UAH / month
     budgetRepository.createBudget(
-      name = "Розваги та хобі",
+      name = "Entertainment & hobbies",
       iconId = entertainmentCategories.firstOrNull()?.icon?.id ?: IconModel.ENTERTAINMENT.id,
       colorId = entertainmentCategories.firstOrNull()?.color?.id ?: ColorModel.Green.id,
       amount = BigDecimal(5000),
@@ -224,9 +224,9 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
       currencyCode = account.currency.currencyCode,
     )
 
-    // 4. Непередбачувані витрати - 5000грн/місяць
+    // 4. Unexpected expenses - 5000 UAH / month
     budgetRepository.createBudget(
-      name = "Непередбачувані витрати",
+      name = "Unexpected expenses",
       iconId = unexpectedCategories.firstOrNull()?.icon?.id ?: IconModel.BUSINESS.id,
       colorId = unexpectedCategories.firstOrNull()?.color?.id ?: ColorModel.Orange.id,
       amount = BigDecimal(5000),
