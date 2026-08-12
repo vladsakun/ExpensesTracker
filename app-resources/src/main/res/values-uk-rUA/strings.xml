@@ -70,6 +70,10 @@
   <string name="delete_budget_confirmation">Ви впевнені, що хочете видалити бюджет?</string>
   <!--  BUDGET-->
 
+  <!--  SELECT CURRENCY-->
+  <string name="search_currency">Пошук валюти…</string>
+  <!--  SELECT CURRENCY-->
+
   <string name="sync_notification_title">Трекер витрат</string>
   <string name="sync_notification_channel_name">Синхронізація</string>
   <string name="sync_notification_channel_description">Фонові завдання для трекера витрат</string>
@@ -109,6 +113,22 @@
   <string name="category_list_income_this_month">Дохід цього місяця</string>
   <string name="category_list_expenses_this_month">Витрати цього місяця</string>
   <!--  CATEGORY LIST-->
+
+  <!--  SAMPLE CATEGORIES-->
+  <string name="category_sample_housing">Житло</string>
+  <string name="category_sample_utilities">Комунальні послуги</string>
+  <string name="category_sample_groceries">Продукти</string>
+  <string name="category_sample_transport">Транспорт</string>
+  <string name="category_sample_education">Освіта</string>
+  <string name="category_sample_healthcare">Здоров\'я</string>
+  <string name="category_sample_restaurants">Ресторани</string>
+  <string name="category_sample_cinema">Кіно</string>
+  <string name="category_sample_leisure">Дозвілля</string>
+  <string name="category_sample_gifts">Подарунки</string>
+  <string name="category_sample_repairs">Ремонт</string>
+  <string name="category_sample_miscellaneous">Різне</string>
+  <string name="category_sample_salary">Зарплата</string>
+  <!--  SAMPLE CATEGORIES-->
 
   <!--  TRANSACTIONS LIST-->
   <string name="transactions_list_empty_state_title">Транзакцій ще немає</string>

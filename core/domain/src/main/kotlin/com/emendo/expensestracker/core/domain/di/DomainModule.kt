@@ -1,5 +1,7 @@
 package com.emendo.expensestracker.core.domain.di
 
+import com.emendo.expensestracker.core.android.api.OnAppCreate
+import com.emendo.expensestracker.core.domain.SampleDataSetup
 import com.emendo.expensestracker.core.domain.account.GetAccountByIdUseCase
 import com.emendo.expensestracker.core.domain.api.CreateTransactionController
 import com.emendo.expensestracker.core.domain.common.GetModelComponent
@@ -9,6 +11,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
 @Module
@@ -22,4 +25,8 @@ interface DomainModule {
   @Binds
   @Singleton
   fun bindsGetAccountByIdUseCase(getAccountByIdUseCase: GetAccountByIdUseCase): GetModelComponent<AccountModel>
+
+  @Binds
+  @IntoSet
+  fun setupSampleDataOnCreate(sampleDataSetup: SampleDataSetup): OnAppCreate
 }

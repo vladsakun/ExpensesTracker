@@ -14,8 +14,6 @@ import java.time.Year
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val CURRENCY_RATES_BASE_URL = "https://v6.exchangerate-api.com/v6/6d5c8906bc3ec0bfe7b628f4/"
-
 /**
  * Retrofit API declaration for Currency Network API
  */

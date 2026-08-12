@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,11 +52,19 @@ fun SelectCurrencyScreen(
       val layoutDirection = LocalLayoutDirection.current
       Column(modifier = Modifier.fillMaxSize()) {
         ExpeTextFieldWithRoundedBackground(
-          placeholder = "Search currency...",
+          placeholder = stringResource(R.string.search_currency),
           text = searchQuery,
           onValueChange = viewModel::onSearchQueryChange,
           endIcon = { ExpeTextFieldClearIcon(text = searchQuery, onValueChange = viewModel::onSearchQueryChange) },
-          startIcon = { Icon(imageVector = ExpeIcons.Search, contentDescription = null) },
+          startIcon = {
+            IconButton(onClick = { }) {
+              Icon(
+                imageVector = ExpeIcons.Search,
+                contentDescription = stringResource(R.string.search_currency),
+              )
+            }
+            //            Icon(imageVector = ExpeIcons.Search, contentDescription = null)
+          },
           modifier = Modifier
             .fillMaxWidth()
             .padding(

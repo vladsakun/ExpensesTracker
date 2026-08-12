@@ -71,6 +71,10 @@
   <string name="delete_budget_confirmation">Are you sure you want to delete a budget?</string>
   <!--  BUDGET-->
 
+  <!--  SELECT CURRENCY-->
+  <string name="search_currency">Search currency…</string>
+  <!--  SELECT CURRENCY-->
+
   <string name="sync_notification_title">Expenses tracker</string>
   <string name="sync_notification_channel_name">Sync</string>
   <string name="sync_notification_channel_description">Background tasks for Expenses tracker</string>
@@ -110,6 +114,22 @@
   <string name="category_list_income_this_month">Income this month</string>
   <string name="category_list_expenses_this_month">Expenses this month</string>
   <!--  CATEGORY LIST-->
+
+  <!--  SAMPLE CATEGORIES-->
+  <string name="category_sample_housing">Housing</string>
+  <string name="category_sample_utilities">Utilities</string>
+  <string name="category_sample_groceries">Groceries</string>
+  <string name="category_sample_transport">Transport</string>
+  <string name="category_sample_education">Education</string>
+  <string name="category_sample_healthcare">Healthcare</string>
+  <string name="category_sample_restaurants">Restaurants</string>
+  <string name="category_sample_cinema">Cinema</string>
+  <string name="category_sample_leisure">Leisure</string>
+  <string name="category_sample_gifts">Gifts</string>
+  <string name="category_sample_repairs">Repairs</string>
+  <string name="category_sample_miscellaneous">Miscellaneous</string>
+  <string name="category_sample_salary">Salary</string>
+  <!--  SAMPLE CATEGORIES-->
 
   <!--  TRANSACTIONS LIST-->
   <string name="transactions_list_empty_state_title">No transactions yet</string>

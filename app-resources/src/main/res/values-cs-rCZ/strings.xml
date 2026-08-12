@@ -62,6 +62,10 @@
   <string name="save_transaction">Uložit transakci</string>
   <string name="uncategorized">Bez kategorie</string>
 
+  <!--  SELECT CURRENCY-->
+  <string name="search_currency">Hledat měnu…</string>
+  <!--  SELECT CURRENCY-->
+
   <string name="sync_notification_title">Sledovač výdajů</string>
   <string name="sync_notification_channel_name">Synchronizace</string>
   <string name="sync_notification_channel_description">Úlohy na pozadí pro sledovač výdajů</string>
@@ -101,6 +105,22 @@
   <string name="category_list_income_this_month">Příjmy tento měsíc</string>
   <string name="category_list_expenses_this_month">Výdaje tento měsíc</string>
   <!--  CATEGORY LIST-->
+
+  <!--  SAMPLE CATEGORIES-->
+  <string name="category_sample_housing">Bydlení</string>
+  <string name="category_sample_utilities">Služby</string>
+  <string name="category_sample_groceries">Potraviny</string>
+  <string name="category_sample_transport">Doprava</string>
+  <string name="category_sample_education">Vzdělávání</string>
+  <string name="category_sample_healthcare">Zdraví</string>
+  <string name="category_sample_restaurants">Restaurace</string>
+  <string name="category_sample_cinema">Kino</string>
+  <string name="category_sample_leisure">Volný čas</string>
+  <string name="category_sample_gifts">Dárky</string>
+  <string name="category_sample_repairs">Opravy</string>
+  <string name="category_sample_miscellaneous">Různé</string>
+  <string name="category_sample_salary">Plat</string>
+  <!--  SAMPLE CATEGORIES-->
 
   <!--  TRANSACTIONS LIST-->
   <string name="transactions_list_empty_state_title">Zatím žádné transakce</string>

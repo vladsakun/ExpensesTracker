@@ -6,9 +6,7 @@ import com.emendo.expensestracker.core.android.api.OnAppCreate
 import com.emendo.expensestracker.sync.initializers.Sync
 import com.ramcosta.composedestinations.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,7 +42,7 @@ class ExpensesTrackerApplication : Application() {
     @Inject
     fun initApp(appCreatePlugins: @JvmSuppressWildcards Set<OnAppCreate>) {
         applicationScope.launch {
-            appCreatePlugins.forEach { it.onCreate() }
+            appCreatePlugins.map { async { it.onCreate() } }.awaitAll()
         }
     }
 

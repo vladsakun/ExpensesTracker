@@ -1,6 +1,5 @@
 package com.emendo.expensestracker.core.domain.currency
 
-import com.emendo.expensestracker.core.model.data.exception.CurrencyRateNotFoundException
 import com.emendo.expensestracker.data.api.manager.CurrencyConverter
 import com.emendo.expensestracker.data.api.repository.CurrencyRateRepository
 import kotlinx.datetime.Instant
@@ -18,16 +17,17 @@ class ConvertCurrencyUseCase @Inject constructor(
     toCurrencyCode: String,
     usdToOriginalRate: BigDecimal,
     conversionDate: Instant,
-  ): BigDecimal =
-    try {
-      currencyConverter.convert(
-        value = value,
-        fromCurrencyCode = fromCurrencyCode,
-        toCurrencyCode = toCurrencyCode,
-        usdToOriginalRate = usdToOriginalRate,
-        currencyRates = currencyRateRepository.getOrFetchRates(conversionDate),
-      )
-    } catch (e: CurrencyRateNotFoundException) {
-      value
-    }
+  ): BigDecimal = value
+  // TODO remove Use API to fetch real currency rates
+  //    try {
+  //      currencyConverter.convert(
+  //        value = value,
+  //        fromCurrencyCode = fromCurrencyCode,
+  //        toCurrencyCode = toCurrencyCode,
+  //        usdToOriginalRate = usdToOriginalRate,
+  //        currencyRates = currencyRateRepository.getOrFetchRates(conversionDate),
+  //      )
+  //    } catch (e: CurrencyRateNotFoundException) {
+  //      value
+  //    }
 }

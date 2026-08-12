@@ -62,6 +62,10 @@
   <string name="save_transaction">Сохранить транзакцию</string>
   <string name="uncategorized">Без категории</string>
 
+  <!--  SELECT CURRENCY-->
+  <string name="search_currency">Поиск валюты…</string>
+  <!--  SELECT CURRENCY-->
+
   <string name="sync_notification_title">Трекер расходов</string>
   <string name="sync_notification_channel_name">Синхронизация</string>
   <string name="sync_notification_channel_description">Фоновые задачи для трекера расходов</string>
@@ -101,6 +105,22 @@
   <string name="category_list_income_this_month">Доход за этот месяц</string>
   <string name="category_list_expenses_this_month">Расходы за этот месяц</string>
   <!--  CATEGORY LIST-->
+
+  <!--  SAMPLE CATEGORIES-->
+  <string name="category_sample_housing">Жильё</string>
+  <string name="category_sample_utilities">Коммунальные услуги</string>
+  <string name="category_sample_groceries">Продукты</string>
+  <string name="category_sample_transport">Транспорт</string>
+  <string name="category_sample_education">Образование</string>
+  <string name="category_sample_healthcare">Здоровье</string>
+  <string name="category_sample_restaurants">Рестораны</string>
+  <string name="category_sample_cinema">Кино</string>
+  <string name="category_sample_leisure">Досуг</string>
+  <string name="category_sample_gifts">Подарки</string>
+  <string name="category_sample_repairs">Ремонт</string>
+  <string name="category_sample_miscellaneous">Разное</string>
+  <string name="category_sample_salary">Зарплата</string>
+  <!--  SAMPLE CATEGORIES-->
 
   <!--  TRANSACTIONS LIST-->
   <string name="transactions_list_empty_state_title">Транзакций пока нет</string>

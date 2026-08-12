@@ -7,7 +7,6 @@ import com.emendo.expensestracker.core.app.common.ext.stateInWhileSubscribed
 import com.emendo.expensestracker.core.app.common.network.Dispatcher
 import com.emendo.expensestracker.core.app.common.network.ExpeDispatchers
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
-import com.emendo.expensestracker.core.domain.CreateSampleAccountAndCategoryUseCase
 import com.emendo.expensestracker.core.model.data.UserData
 import com.emendo.expensestracker.data.api.repository.UserDataRepository
 import com.emendo.expensestracker.model.ui.textValueOf
@@ -23,14 +22,11 @@ import javax.inject.Inject
 import com.emendo.expensestracker.app.resources.R as AppR
 
 @HiltViewModel
-class SettingsViewModel
-@Inject
-constructor(
+class SettingsViewModel @Inject constructor(
   private val userDataRepository: UserDataRepository,
   @Dispatcher(ExpeDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
   @Dispatcher(ExpeDispatchers.Default) private val defaultDispatcher: CoroutineDispatcher,
   private val selectCurrencyScreenApi: SelectCurrencyScreenApi,
-  private val createSampleAccountAndCategoryUseCase: CreateSampleAccountAndCategoryUseCase,
 ) : ViewModel() {
 
   private val showThemeDialog: MutableStateFlow<StateEvent> = MutableStateFlow(StateEvent.Consumed)
@@ -98,10 +94,7 @@ constructor(
       }
 
       HELP -> {
-        viewModelScope.launch {
-          createSampleAccountAndCategoryUseCase()
-          navigationChannel.trySend(HelpArticlesListScreenDestination.route)
-        }
+        navigationChannel.trySend(HelpArticlesListScreenDestination.route)
       }
 
       APPEARANCE -> {

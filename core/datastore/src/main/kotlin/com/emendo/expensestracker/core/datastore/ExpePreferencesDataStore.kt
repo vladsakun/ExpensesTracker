@@ -80,6 +80,17 @@ class ExpePreferencesDataStore @Inject constructor(
     }
   }
 
+  suspend fun hasCreatedSampleData(): Boolean =
+    userPreferences.data.map { it.hasCreatedSampleData }.firstOrNull() ?: false
+
+  suspend fun setHasCreatedSampleData(created: Boolean) {
+    userPreferences.updateData {
+      it.copy {
+        this.hasCreatedSampleData = created
+      }
+    }
+  }
+
   suspend fun getFavouriteCurrenciesCodes(): Set<String> =
     userPreferences.data.map { it.favouriteCurrencyCodesMap.keys }.firstOrNull() ?: emptySet()
 

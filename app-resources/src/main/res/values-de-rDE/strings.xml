@@ -62,6 +62,10 @@
   <string name="save_transaction">Transaktion speichern</string>
   <string name="uncategorized">Ohne Kategorie</string>
 
+  <!--  SELECT CURRENCY-->
+  <string name="search_currency">Währung suchen…</string>
+  <!--  SELECT CURRENCY-->
+
   <string name="sync_notification_title">Ausgaben-Tracker</string>
   <string name="sync_notification_channel_name">Synchronisierung</string>
   <string name="sync_notification_channel_description">Hintergrundaufgaben für Ausgaben-Tracker</string>
@@ -101,6 +105,22 @@
   <string name="category_list_income_this_month">Einnahmen diesen Monat</string>
   <string name="category_list_expenses_this_month">Ausgaben diesen Monat</string>
   <!--  CATEGORY LIST-->
+
+  <!--  SAMPLE CATEGORIES-->
+  <string name="category_sample_housing">Wohnen</string>
+  <string name="category_sample_utilities">Nebenkosten</string>
+  <string name="category_sample_groceries">Lebensmittel</string>
+  <string name="category_sample_transport">Transport</string>
+  <string name="category_sample_education">Bildung</string>
+  <string name="category_sample_healthcare">Gesundheit</string>
+  <string name="category_sample_restaurants">Restaurants</string>
+  <string name="category_sample_cinema">Kino</string>
+  <string name="category_sample_leisure">Freizeit</string>
+  <string name="category_sample_gifts">Geschenke</string>
+  <string name="category_sample_repairs">Reparaturen</string>
+  <string name="category_sample_miscellaneous">Sonstiges</string>
+  <string name="category_sample_salary">Gehalt</string>
+  <!--  SAMPLE CATEGORIES-->
 
   <!--  TRANSACTIONS LIST-->
   <string name="transactions_list_empty_state_title">Noch keine Transaktionen</string>

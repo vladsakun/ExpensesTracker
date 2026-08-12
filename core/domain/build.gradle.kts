@@ -15,9 +15,11 @@ android {
 dependencies {
   implementation(projects.core.data.api)
   implementation(projects.core.common)
+  implementation(projects.core.datastore)
   implementation(projects.core.model)
   implementation(projects.core.modelUi)
   implementation(projects.appResources)
+  implementation(projects.androidApi)
 
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.datetime)

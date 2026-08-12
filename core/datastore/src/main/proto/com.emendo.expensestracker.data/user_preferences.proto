@@ -21,4 +21,5 @@ message UserPreferences {
   // System
   bool should_fetch_currency_rates = 9;
   DarkThemeConfigProto dark_theme_config = 10;
+  bool has_created_sample_data = 11;
 }
