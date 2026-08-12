@@ -1,5 +1,6 @@
 package com.emendo.expensestracker.core.ui
 
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,11 +21,12 @@ fun AmountText(
   textAlign: TextAlign? = null,
   textColor: Color? = null,
 ) {
+  val defaultColor = LocalContentColor.current
   val color: Color = when {
     textColor != null -> textColor
 
     transactionType == null -> if (amount.value.signum() == -1) {
-      Color.Unspecified
+      defaultColor
     } else {
       MaterialTheme.customColorsPalette.successColor
     }
@@ -32,7 +34,7 @@ fun AmountText(
     else -> if (transactionType == TransactionType.INCOME) {
       MaterialTheme.customColorsPalette.successColor
     } else {
-      Color.Unspecified
+      defaultColor
     }
   }
   Text(

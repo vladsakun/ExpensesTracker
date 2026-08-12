@@ -218,7 +218,7 @@
   Expenses Tracker je dostupný v několika jazycích. Ve výchozím nastavení aplikace používá jazyk vašeho zařízení. Pokud chcete, můžete si v nastavení aplikace vybrat jiný jazyk: Nastavení ▸ Jazyk.
   Pokud váš jazyk není v seznamu podporovaných a chcete pomoci s překladem, kontaktujte nás. Přivítáme váš příspěvek a můžeme poskytnout potřebné materiály pro lokalizaci.
   Pokud si všimnete chyb nebo nepřesností v překladu, dejte nám vědět a my je opravíme.
-  Email: support@expensestracker.app]]>
+  ]]>
   </string>
   <string name="help_screen_questions">
   <![CDATA[
@@ -226,6 +226,6 @@
   <br/>
 
   Pokud máte dotazy ohledně používání Expenses Tracker nebo potřebujete pomoc s jakoukoli funkcí, kontaktujte nás. Rádi vám pomůžeme a uděláme vše pro to, abyste z aplikace vytěžili maximum.
-  Zeptejte se nás: support@expensestracker.app]]>
+  Zeptejte se nás: ]]>
   </string>
 </resources>

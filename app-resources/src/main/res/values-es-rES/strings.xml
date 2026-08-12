@@ -218,7 +218,7 @@
   Expenses Tracker está disponible en varios idiomas. Por defecto, la aplicación utiliza el idioma de tu dispositivo. Si lo deseas, puedes elegir otro idioma en la configuración de la aplicación: Configuración ▸ Idioma.
   Si tu idioma no está en la lista de idiomas compatibles y quieres ayudar con la traducción, por favor contáctanos. Agradecemos las contribuciones y podemos proporcionarte el material necesario para la localización.
   Si detectas errores o inexactitudes en la traducción, háznoslo saber y los corregiremos.
-  Email: support@expensestracker.app]]>
+  ]]>
   </string>
   <string name="help_screen_questions">
   <![CDATA[
@@ -226,6 +226,6 @@
   <br/>
 
   Si tienes preguntas sobre el uso de Expenses Tracker o necesitas ayuda con alguna función, por favor contáctanos. Te ayudaremos y haremos todo lo posible para que aproveches al máximo la aplicación.
-  Pregúntanos: support@expensestracker.app]]>
+  Pregúntanos: ]]>
   </string>
 </resources>

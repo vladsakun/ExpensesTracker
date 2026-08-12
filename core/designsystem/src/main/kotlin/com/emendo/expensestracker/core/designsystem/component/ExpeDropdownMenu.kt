@@ -36,7 +36,7 @@ fun ExpeDropdownMenu(
         text = {
           Text(
             text = item.text,
-            color = item.textColor ?: Color.Unspecified,
+            color = item.textColor ?: LocalContentColor.current,
           )
         },
         onClick = {

@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -323,7 +322,7 @@ private fun TotalAmounts(totalAmountsProvider: () -> NetworkViewState<TotalAmoun
 private fun RowScope.TotalAmount(amount: Amount?, label: Int, transactionType: TransactionType) {
   val dividerColor = DividerDefaults.color
   Column(
-    modifier = Modifier.Companion
+    modifier = Modifier
       .weight(1f)
       .border(width = Dimens.border_thickness, color = dividerColor, shape = RoundedCornerNormalRadiusShape)
       .padding(Dimens.margin_small),
@@ -333,9 +332,7 @@ private fun RowScope.TotalAmount(amount: Amount?, label: Int, transactionType: T
       amount = amount ?: Amount.ZERO,
       textStyle = MaterialTheme.typography.titleMedium,
       transactionType = transactionType,
-      modifier = Modifier
-        .fillMaxWidth()
-        .graphicsLayer { this.alpha = if (amount == null) 0f else 1f },
+      modifier = Modifier.fillMaxWidth()
     )
     Text(
       text = stringResource(label),

@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -627,7 +626,7 @@ private inline fun TransferAccount(
         modifier = Modifier.weight(1f),
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
-        color = if (enabled) Color.Unspecified else DisabledTextColor,
+        color = if (enabled) LocalContentColor.current else DisabledTextColor,
       )
       Icon(
         imageVector = Icons.Default.ArrowDropDown,

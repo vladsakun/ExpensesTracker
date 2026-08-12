@@ -76,7 +76,7 @@ fun ExpeButton(
       text = text,
       modifier = Modifier.padding(Dimens.margin_small_x),
       style = textStyle,
-      color = textColor ?: Color.Unspecified,
+      color = textColor ?: LocalContentColor.current,
     )
   }
 }
