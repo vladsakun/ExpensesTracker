@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.emendo.expensestracker.accounts.AccountsNavGraph
 import com.emendo.expensestracker.app.resources.R
-import com.emendo.expensestracker.budget.BudgetNavGraph
 import com.emendo.expensestracker.categories.CategoriesNavGraph
 import com.emendo.expensestracker.core.app.resources.icon.ExpeIcons
 import com.emendo.expensestracker.report.ReportNavGraph
@@ -38,13 +37,14 @@ enum class TopLevelDestination(
     iconTextId = R.string.categories,
     titleTextId = R.string.categories,
   ),
-  BUDGET(
-    screen = BudgetNavGraph,
-    selectedIcon = ExpeIcons.Budget,
-    unselectedIcon = ExpeIcons.BudgetBorder,
-    iconTextId = R.string.budget,
-    titleTextId = R.string.budget,
-  ),
+
+  //  BUDGET(
+  //    screen = BudgetNavGraph,
+  //    selectedIcon = ExpeIcons.Budget,
+  //    unselectedIcon = ExpeIcons.BudgetBorder,
+  //    iconTextId = R.string.budget,
+  //    titleTextId = R.string.budget,
+  //  ),
   TRANSACTIONS(
     screen = TransactionsNavGraph,
     selectedIcon = ExpeIcons.ReceiptLong,

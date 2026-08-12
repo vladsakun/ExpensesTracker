@@ -28,8 +28,8 @@ class CreateSampleAccountAndCategoryUseCase @Inject constructor(
 
   private suspend fun createSampleAccount() {
     accountRepository.createAccount(
-      name = "Card",
-      balance = BigDecimal(100000),
+      name = context.getString(AppR.string.account_sample_card),
+      balance = BigDecimal(0),
       icon = IconModel.CREDITCARD,
       color = ColorModel.Blue,
       currency = CurrencyModel.toCurrencyModel(CurrencyModels.localCurrency.currencyCode),
